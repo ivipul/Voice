@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
 
-private val PillButtonHeight = 57.dp
+private val RoundButtonSize = 64.dp
+private val RoundButtonIconSize = 24.dp
+private val PillButtonHeight = 64.dp
 private val PillOuterCornerRadius = 999.dp
 private val PillInnerCornerRadius = 40.dp
 private val PillButtonContainerColor = Color.White
@@ -95,9 +97,13 @@ private fun RoundIconButton(
     colors = IconButtonDefaults.filledIconButtonColors(
       containerColor = MaterialTheme.colorScheme.surfaceVariant,
     ),
-    modifier = Modifier.size(53.dp),
+    modifier = Modifier.size(RoundButtonSize),
   ) {
-    Icon(imageVector = icon, contentDescription = contentDescription)
+    Icon(
+      modifier = Modifier.size(RoundButtonIconSize),
+      imageVector = icon,
+      contentDescription = contentDescription,
+    )
   }
 }
 
@@ -121,9 +127,9 @@ private fun PillButton(
     Icon(
       imageVector = icon,
       contentDescription = null,
-      modifier = Modifier.size(18.dp),
+      modifier = Modifier.size(RoundButtonIconSize),
     )
     Spacer(modifier = Modifier.size(6.dp))
-    Text(text = label)
+    Text(text = label, style = MaterialTheme.typography.bodyLarge)
   }
 }
