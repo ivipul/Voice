@@ -23,6 +23,7 @@ import voice.core.playback.misc.Decibel
 import voice.core.playback.misc.VolumeGain
 import voice.core.playback.session.MediaId
 import voice.core.playback.session.MediaItemProvider
+import voice.core.playback.session.VoiceCoPilotSpike
 import voice.core.playback.session.playbackItemForPosition
 import voice.core.playback.session.positionInMediaItem
 import voice.core.playback.session.toMediaIdOrNull
@@ -48,6 +49,7 @@ class VoicePlayer(
   private val scope: CoroutineScope,
   private val volumeGain: VolumeGain,
   private val sleepTimer: SleepTimer,
+  private val voiceCoPilotSpike: VoiceCoPilotSpike,
   private val analytics: Analytics,
 ) : ForwardingPlayer(player) {
 
@@ -215,6 +217,10 @@ class VoicePlayer(
     analytics.event(if (playWhenReady) "play" else "pause")
 
     if (playWhenReady) {
+      // Any request to resume playback (headset play/pause, in-app button, notification, ...)
+      // while the voice co-pilot spike is mid-flight should cut it off rather than let it
+      // keep talking over the resumed book.
+      voiceCoPilotSpike.interruptIfActive()
       updateLastPlayedAt()
     } else {
       val currentPosition = player.currentPosition.takeUnless { it == C.TIME_UNSET }?.milliseconds ?: ZERO

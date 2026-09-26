@@ -1,6 +1,11 @@
 package voice.core.playback.session
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
+import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -20,6 +25,8 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.guava.future
@@ -43,7 +50,79 @@ class LibrarySessionCallback(
   @CurrentBookStore
   private val currentBookStoreId: DataStore<BookId?>,
   private val bookRepository: BookRepository,
+  private val context: Context,
+  private val voiceCoPilotSpike: VoiceCoPilotSpike,
 ) : MediaLibrarySession.Callback {
+
+  private var pendingHeadsetPressJob: Job? = null
+  private var lastHeadsetPressKeyCode: Int? = null
+  private var lastHeadsetPressAtMs: Long = 0L
+
+  // Bluetooth spike 1 (Phase 3): prove that headset media-button presses can be
+  // intercepted here and disambiguated into single vs. double presses before any
+  // AI/co-pilot action is wired up. Consumes NEXT/PREVIOUS so default seek behavior
+  // doesn't also fire while we're validating detection only.
+  override fun onMediaButtonEvent(
+    session: MediaSession,
+    controllerInfo: ControllerInfo,
+    intent: Intent,
+  ): Boolean {
+    val keyEvent = intent.extractKeyEvent()
+    if (keyEvent == null || keyEvent.action != KeyEvent.ACTION_DOWN) {
+      return super.onMediaButtonEvent(session, controllerInfo, intent)
+    }
+    val keyCode = keyEvent.keyCode
+    if (keyCode in PLAY_PAUSE_KEY_CODES) {
+      // Just confirm we can observe play/pause too; don't consume it, playback
+      // still needs to actually toggle normally.
+      Logger.d("Bluetooth spike: PLAY_PAUSE reachable")
+      Toast.makeText(context, "Bluetooth spike: PLAY_PAUSE reachable", Toast.LENGTH_SHORT).show()
+      return super.onMediaButtonEvent(session, controllerInfo, intent)
+    }
+    if (keyCode != KeyEvent.KEYCODE_MEDIA_NEXT && keyCode != KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
+      return super.onMediaButtonEvent(session, controllerInfo, intent)
+    }
+
+    val now = System.currentTimeMillis()
+    val isDoublePress = keyCode == lastHeadsetPressKeyCode && now - lastHeadsetPressAtMs <= DOUBLE_PRESS_THRESHOLD_MS
+    lastHeadsetPressKeyCode = keyCode
+    lastHeadsetPressAtMs = now
+    pendingHeadsetPressJob?.cancel()
+
+    if (isDoublePress) {
+      lastHeadsetPressKeyCode = null
+      reportHeadsetAction(keyCode, doublePress = true)
+    } else {
+      pendingHeadsetPressJob = scope.launch {
+        delay(DOUBLE_PRESS_THRESHOLD_MS)
+        if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
+          // Single NEXT = Open Mic Co-Pilot. Voice round-trip spike only for now.
+          Logger.d("Bluetooth spike: Single NEXT -> voice round-trip")
+          player.pause()
+          voiceCoPilotSpike.trigger(onFinished = { player.play() })
+        } else {
+          reportHeadsetAction(keyCode, doublePress = false)
+        }
+      }
+    }
+    return true
+  }
+
+  private fun reportHeadsetAction(keyCode: Int, doublePress: Boolean) {
+    val label = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) "NEXT" else "PREVIOUS"
+    val pressType = if (doublePress) "Double" else "Single"
+    val message = "Bluetooth spike: $pressType $label"
+    Logger.d(message)
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+  }
+
+  private fun Intent.extractKeyEvent(): KeyEvent? =
+    if (Build.VERSION.SDK_INT >= 33) {
+      getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+    } else {
+      @Suppress("DEPRECATION")
+      getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+    }
 
   override fun onAddMediaItems(
     mediaSession: MediaSession,
@@ -217,5 +296,14 @@ class LibrarySessionCallback(
     }
 
     return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+  }
+
+  private companion object {
+    const val DOUBLE_PRESS_THRESHOLD_MS = 1500L
+    val PLAY_PAUSE_KEY_CODES = setOf(
+      KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+      KeyEvent.KEYCODE_MEDIA_PLAY,
+      KeyEvent.KEYCODE_MEDIA_PAUSE,
+    )
   }
 }
