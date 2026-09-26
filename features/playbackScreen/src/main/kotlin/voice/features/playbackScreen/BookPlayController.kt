@@ -1,23 +1,32 @@
 package voice.features.playbackScreen
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
+import kotlinx.coroutines.launch
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.features.playbackScreen.view.BookPlayView
+import voice.features.playbackScreen.view.CoPilotFeedOverlay
 import voice.features.sleepTimer.SleepTimerDialog
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
@@ -37,6 +46,29 @@ fun BookPlayScreen(bookId: BookId) {
   val bookmarkAddedMessage = stringResource(StringsR.string.bookmark_added_snackbar)
   val batteryOptimizationMessage = stringResource(StringsR.string.playback_battery_optimization_rationale)
   val batteryOptimizationAction = stringResource(StringsR.string.playback_battery_optimization_action)
+  val microphonePermissionMessage = stringResource(StringsR.string.copilot_permission_microphone_required)
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
+  val microphonePermissionLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.RequestPermission(),
+  ) { granted ->
+    if (granted) {
+      viewModel.onAskClick()
+    } else {
+      coroutineScope.launch {
+        snackbarHostState.showSnackbar(message = microphonePermissionMessage)
+      }
+    }
+  }
+  val onAskClick: () -> Unit = {
+    val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+      PackageManager.PERMISSION_GRANTED
+    if (hasPermission) {
+      viewModel.onAskClick()
+    } else {
+      microphonePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    }
+  }
   LaunchedEffect(viewModel) {
     viewModel.viewEffects.collect { viewEffect ->
       when (viewEffect) {
@@ -73,6 +105,11 @@ fun BookPlayScreen(bookId: BookId) {
     onSkipToNext = viewModel::next,
     onSkipToPrevious = viewModel::previous,
     onCurrentChapterClick = viewModel::onCurrentChapterClick,
+    onGalleryClick = viewModel::onGalleryClick,
+    onCatchMeUpClick = viewModel::onCatchMeUpClick,
+    onAskClick = onAskClick,
+    onSnipClick = viewModel::onSnipClick,
+    onFeedClick = viewModel::onFeedClick,
     useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
     snackbarHostState = snackbarHostState,
   )
@@ -98,6 +135,14 @@ fun BookPlayScreen(bookId: BookId) {
         )
       }
     }
+  }
+  if (viewModel.feedVisible.value) {
+    CoPilotFeedOverlay(
+      messages = viewModel.copilotMessages(),
+      isThinking = viewModel.isThinking.value,
+      onSend = viewModel::onSendFeedMessage,
+      onDismiss = viewModel::onFeedDismiss,
+    )
   }
 }
 

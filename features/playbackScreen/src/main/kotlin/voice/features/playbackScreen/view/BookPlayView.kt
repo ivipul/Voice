@@ -33,6 +33,11 @@ internal fun BookPlayView(
   onSkipToPrevious: () -> Unit,
   onCloseClick: () -> Unit,
   onCurrentChapterClick: () -> Unit,
+  onGalleryClick: () -> Unit,
+  onCatchMeUpClick: () -> Unit,
+  onAskClick: () -> Unit,
+  onSnipClick: () -> Unit,
+  onFeedClick: () -> Unit,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
   Scaffold(
@@ -49,6 +54,7 @@ internal fun BookPlayView(
         onSkipSilenceClick = onSkipSilenceClick,
         onVolumeBoostClick = onVolumeBoostClick,
         onCloseClick = onCloseClick,
+        onGalleryClick = onGalleryClick,
         useLandscapeLayout = useLandscapeLayout,
       )
     },
@@ -64,6 +70,10 @@ internal fun BookPlayView(
         onSkipToNext = onSkipToNext,
         onSkipToPrevious = onSkipToPrevious,
         onCurrentChapterClick = onCurrentChapterClick,
+        onCatchMeUpClick = onCatchMeUpClick,
+        onAskClick = onAskClick,
+        onSnipClick = onSnipClick,
+        onFeedClick = onFeedClick,
         useLandscapeLayout = useLandscapeLayout,
       )
     },
@@ -94,6 +104,11 @@ private fun BookPlayPreview(
       onSkipToPrevious = {},
       onCloseClick = {},
       onCurrentChapterClick = {},
+      onGalleryClick = {},
+      onCatchMeUpClick = {},
+      onAskClick = {},
+      onSnipClick = {},
+      onFeedClick = {},
       useLandscapeLayout = false,
     )
   }

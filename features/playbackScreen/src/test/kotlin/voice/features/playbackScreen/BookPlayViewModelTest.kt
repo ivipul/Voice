@@ -36,6 +36,7 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
+import voice.features.playbackScreen.copilot.CoPilotRepository
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
 import kotlin.test.Test
@@ -110,6 +111,9 @@ class BookPlayViewModelTest {
     dispatcherProvider = DispatcherProvider(scope.coroutineContext, scope.coroutineContext, scope.coroutineContext),
     experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
     kioskModeFeatureFlag = MemoryFeatureFlag(false),
+    copilotRepository = CoPilotRepository(),
+    copilotPipeline = mockk(),
+    speechInputController = mockk(),
   )
 
   @Test
@@ -352,6 +356,9 @@ class BookPlayViewModelTest {
       dispatcherProvider = DispatcherProvider(scope.coroutineContext, scope.coroutineContext, scope.coroutineContext),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(experimentalPlaybackPersistence),
       kioskModeFeatureFlag = MemoryFeatureFlag(kioskMode),
+      copilotRepository = CoPilotRepository(),
+      copilotPipeline = mockk(),
+      speechInputController = mockk(),
     )
   }
 }

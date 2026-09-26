@@ -43,9 +43,14 @@ import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
 import voice.core.ui.formatTime
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
+import voice.features.playbackScreen.copilot.CoPilotMessage
+import voice.features.playbackScreen.copilot.CoPilotPipeline
+import voice.features.playbackScreen.copilot.CoPilotRepository
+import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
 import voice.navigation.Destination
 import voice.navigation.Navigator
+import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -71,6 +76,9 @@ class BookPlayViewModel(
   private val experimentalPlaybackPersistenceFeatureFlag: FeatureFlag<Boolean>,
   @KioskModeFeatureFlagQualifier
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
+  private val copilotRepository: CoPilotRepository,
+  private val copilotPipeline: CoPilotPipeline,
+  private val speechInputController: SpeechInputController,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -82,6 +90,12 @@ class BookPlayViewModel(
 
   internal val dialogState: State<BookPlayDialogViewState?>
     field = mutableStateOf<BookPlayDialogViewState?>(null)
+
+  internal val feedVisible: State<Boolean>
+    field = mutableStateOf(false)
+
+  internal val isThinking: State<Boolean>
+    field = mutableStateOf(false)
 
   init {
     scope.launch {
@@ -317,6 +331,75 @@ class BookPlayViewModel(
 
   fun onBookmarkClick() {
     navigator.goTo(Destination.Bookmarks(bookId))
+  }
+
+  fun onGalleryClick() {
+    navigator.goTo(Destination.Gallery)
+  }
+
+  @Composable
+  fun copilotMessages(): List<CoPilotMessage> {
+    val allMessages by remember { copilotRepository.allMessagesByBook }.collectAsState()
+    return allMessages[bookId].orEmpty()
+  }
+
+  fun onFeedClick() {
+    feedVisible.value = true
+  }
+
+  fun onFeedDismiss() {
+    feedVisible.value = false
+  }
+
+  fun onSendFeedMessage(text: String) {
+    askCoPilot(text)
+  }
+
+  fun onAskClick() {
+    scope.launch {
+      val question = speechInputController.listen().getOrElse { error ->
+        Logger.w("Speech capture failed: ${error.message}")
+        return@launch
+      }
+      feedVisible.value = true
+      askCoPilot(question)
+    }
+  }
+
+  fun onCatchMeUpClick() {
+    feedVisible.value = true
+    askCoPilot("Catch me up on what's happened recently.")
+  }
+
+  fun onSnipClick() {
+    // Snip & Synthesize (PRD Phase 6) reuses the bookmark mechanism as its capture point.
+    onBookmarkLongClick()
+  }
+
+  private fun askCoPilot(question: String) {
+    scope.launch {
+      copilotRepository.addMessage(
+        bookId,
+        CoPilotMessage(
+          id = UUID.randomUUID().toString(),
+          role = CoPilotMessage.Role.User,
+          text = question,
+          timestampMs = System.currentTimeMillis(),
+        ),
+      )
+      isThinking.value = true
+      val answer = copilotPipeline.ask(bookId, question)
+      isThinking.value = false
+      copilotRepository.addMessage(
+        bookId,
+        CoPilotMessage(
+          id = UUID.randomUUID().toString(),
+          role = CoPilotMessage.Role.CoPilot,
+          text = answer,
+          timestampMs = System.currentTimeMillis(),
+        ),
+      )
+    }
   }
 
   fun onBookmarkLongClick() {

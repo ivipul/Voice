@@ -30,9 +30,16 @@ internal fun BookPlayAppBar(
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
   onCloseClick: () -> Unit,
+  onGalleryClick: () -> Unit,
   useLandscapeLayout: Boolean,
 ) {
   val appBarActions: @Composable RowScope.() -> Unit = {
+    IconButton(onClick = onGalleryClick) {
+      Icon(
+        imageVector = VoiceIcons.GridView,
+        contentDescription = stringResource(id = R.string.copilot_action_gallery),
+      )
+    }
     IconButton(onClick = onSleepTimerClick) {
       val sleepTimerIcon = if (viewState.sleepTimerState is BookPlayViewState.SleepTimerViewState.Disabled) {
         VoiceIcons.Bedtime

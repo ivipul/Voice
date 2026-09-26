@@ -54,6 +54,54 @@
     <string name="common.error.generic.message">Something went wrong 😢</string>
     <!-- Retry action shown after a generic error. -->
     <string name="common.error.generic.retry">Retry</string>
+    <!-- Content description for the Ask co-pilot toolbar button. -->
+    <string name="copilot.action.ask">Ask</string>
+    <!-- Content description for the Catch Me Up co-pilot toolbar button. -->
+    <string name="copilot.action.catch_me_up">Catch me up</string>
+    <!-- Content description for the entry point into the co-pilot Feed. -->
+    <string name="copilot.action.feed">Feed</string>
+    <!-- Content description for the entry point into the Gallery. -->
+    <string name="copilot.action.gallery">Gallery</string>
+    <!-- Empty-state message on the Gallery screen before any comic panels exist. -->
+    <string name="copilot.gallery.empty">Generated comic panels will show up here once Snip &amp; Synthesize is wired up.</string>
+    <!-- Content description for the Snip &amp; Synthesize co-pilot toolbar button. -->
+    <string name="copilot.action.snip">Snip</string>
+    <!-- Shown while the co-pilot is listening for a spoken question. -->
+    <string name="copilot.feed.listening">Listening…</string>
+    <!-- Placeholder text for the co-pilot Feed text input. -->
+    <string name="copilot.feed.input.placeholder">Ask a follow-up question…</string>
+    <!-- Content description for sending a typed co-pilot question. -->
+    <string name="copilot.feed.input.send">Send</string>
+    <!-- Empty-state message shown before any co-pilot questions have been asked. -->
+    <string name="copilot.feed.empty">Ask about the story with the mic button on the player, or type a question below.</string>
+    <!-- Title shown at the top of the co-pilot Feed overlay. -->
+    <string name="copilot.feed.title">Feed</string>
+    <!-- Content description for closing the co-pilot Feed overlay. -->
+    <string name="copilot.feed.close">Close</string>
+    <!-- Shown while the co-pilot is thinking of a response. -->
+    <string name="copilot.feed.thinking">Thinking…</string>
+    <!-- Snackbar shown when microphone permission is required for Ask. -->
+    <string name="copilot.permission.microphone_required">Microphone access is needed for Ask</string>
+    <!-- Title for the co-pilot Bluetooth button settings screen. -->
+    <string name="copilot.settings.title">Co-Pilot Button Mapping</string>
+    <!-- Section header for the co-pilot settings screen. -->
+    <string name="copilot.settings.description">Choose what each headset button press does. Wiring these up to real Bluetooth events comes in a later phase — for now this just remembers your choice.</string>
+    <!-- Settings row label for the single-tap NEXT trigger slot. -->
+    <string name="copilot.settings.trigger.single_next">Single tap NEXT</string>
+    <!-- Settings row label for the single-tap PREVIOUS trigger slot. -->
+    <string name="copilot.settings.trigger.single_previous">Single tap PREVIOUS</string>
+    <!-- Settings row label for the double-tap NEXT trigger slot. -->
+    <string name="copilot.settings.trigger.double_next">Double tap NEXT</string>
+    <!-- Settings row label for the double-tap PREVIOUS trigger slot. -->
+    <string name="copilot.settings.trigger.double_previous">Double tap PREVIOUS</string>
+    <!-- Trigger action option: normal skip forward/rewind. -->
+    <string name="copilot.settings.action.standard_skip">Standard Skip</string>
+    <!-- Trigger action option: mic Q&amp;A co-pilot. -->
+    <string name="copilot.settings.action.open_mic">Open Mic Co-Pilot</string>
+    <!-- Trigger action option: zero-voice proper-noun recap. -->
+    <string name="copilot.settings.action.auto_identify">Auto-Identify</string>
+    <!-- Trigger action option: recap of the recent story so far. -->
+    <string name="copilot.settings.action.catch_me_up">Catch-Me-Up Recap</string>
     <!-- Content description for a cover preview that can be selected. -->
     <string name="cover.content_description.selectable">Shows cover to choose</string>
     <!-- Content description for an icon indicating the author in cover search results. -->

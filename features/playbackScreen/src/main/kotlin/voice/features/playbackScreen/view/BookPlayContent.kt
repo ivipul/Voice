@@ -28,6 +28,10 @@ internal fun BookPlayContent(
   onSkipToNext: () -> Unit,
   onSkipToPrevious: () -> Unit,
   onCurrentChapterClick: () -> Unit,
+  onCatchMeUpClick: () -> Unit,
+  onAskClick: () -> Unit,
+  onSnipClick: () -> Unit,
+  onFeedClick: () -> Unit,
   useLandscapeLayout: Boolean,
 ) {
   if (useLandscapeLayout) {
@@ -64,6 +68,14 @@ internal fun BookPlayContent(
           onSeek = onSeek,
         )
         Spacer(modifier = Modifier.size(16.dp))
+        CoPilotToolbar(
+          onCatchMeUpClick = onCatchMeUpClick,
+          onAskClick = onAskClick,
+          onSnipClick = onSnipClick,
+          onFeedClick = onFeedClick,
+          modifier = Modifier.padding(horizontal = 8.dp),
+        )
+        Spacer(modifier = Modifier.size(16.dp))
         PlaybackRow(
           playing = viewState.playing,
           onPlayClick = onPlayClick,
@@ -81,7 +93,7 @@ internal fun BookPlayContent(
         sleepTimerState = viewState.sleepTimerState,
         modifier = Modifier
           .fillMaxWidth()
-          .weight(1F)
+          .weight(0.7F)
           .padding(start = 16.dp, end = 16.dp, top = 8.dp),
       )
       viewState.chapterName?.let { chapterName ->
@@ -99,6 +111,14 @@ internal fun BookPlayContent(
         duration = viewState.duration,
         playedTime = viewState.playedTime,
         onSeek = onSeek,
+      )
+      Spacer(modifier = Modifier.size(16.dp))
+      CoPilotToolbar(
+        onCatchMeUpClick = onCatchMeUpClick,
+        onAskClick = onAskClick,
+        onSnipClick = onSnipClick,
+        onFeedClick = onFeedClick,
+        modifier = Modifier.padding(horizontal = 8.dp),
       )
       Spacer(modifier = Modifier.size(16.dp))
       PlaybackRow(

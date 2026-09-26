@@ -2165,6 +2165,53 @@ object VoiceIcons {
       .build()
 
   /*
+   * Source: https://fonts.gstatic.com/render/v1/Material+Symbols+Outlined/24dp/mic.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50
+   * Generated: 2026-09-26T15:00:00Z
+   */
+  val Mic: ImageVector =
+    ImageVector.Builder(
+      name = "Mic",
+      defaultWidth = 24.dp,
+      defaultHeight = 24.dp,
+      viewportWidth = 24f,
+      viewportHeight = 24f,
+    )
+      .apply {
+        path(
+          fill = SolidColor(Color.Black),
+          fillAlpha = 1f,
+          stroke = null,
+          strokeAlpha = 1f,
+          strokeLineWidth = 1f,
+          strokeLineCap = StrokeCap.Butt,
+          strokeLineJoin = StrokeJoin.Bevel,
+          strokeLineMiter = 1f,
+          pathFillType = PathFillType.NonZero,
+        ) {
+          moveTo(12f, 14f)
+          curveToRelative(1.66f, 0f, 3f, -1.34f, 3f, -3f)
+          verticalLineTo(5f)
+          curveToRelative(0f, -1.66f, -1.34f, -3f, -3f, -3f)
+          reflectiveCurveTo(9f, 3.34f, 9f, 5f)
+          verticalLineToRelative(6f)
+          curveTo(9f, 12.66f, 10.34f, 14f, 12f, 14f)
+          close()
+          moveTo(17f, 11f)
+          curveToRelative(0f, 2.76f, -2.24f, 5f, -5f, 5f)
+          reflectiveCurveToRelative(-5f, -2.24f, -5f, -5f)
+          horizontalLineTo(5f)
+          curveToRelative(0f, 3.53f, 2.61f, 6.43f, 6f, 6.92f)
+          verticalLineTo(21f)
+          horizontalLineToRelative(2f)
+          verticalLineToRelative(-3.08f)
+          curveToRelative(3.39f, -0.49f, 6f, -3.39f, 6f, -6.92f)
+          horizontalLineTo(17f)
+          close()
+        }
+      }
+      .build()
+
+  /*
    * Source: https://fonts.gstatic.com/render/v1/Material+Symbols+Outlined/24dp/more_vert.kt?var=opsz,wght,FILL,GRAD,ROND@24,400,0,0,50
    * Generated: 2026-06-20T11:13:08Z
    */
@@ -2451,6 +2498,41 @@ object VoiceIcons {
           reflectiveQuadTo(5f, 9.5f)
           reflectiveQuadToRelative(1.31f, 3.19f)
           reflectiveQuadTo(9.5f, 14f)
+          close()
+        }
+      }
+      .build()
+
+  /*
+   * Simple up-arrow glyph used as the co-pilot Feed "send" action; not generated from Material Symbols.
+   */
+  val Send: ImageVector =
+    ImageVector.Builder(
+      name = "Send",
+      defaultWidth = 24.dp,
+      defaultHeight = 24.dp,
+      viewportWidth = 24f,
+      viewportHeight = 24f,
+    )
+      .apply {
+        path(
+          fill = SolidColor(Color.Black),
+          fillAlpha = 1f,
+          stroke = null,
+          strokeAlpha = 1f,
+          strokeLineWidth = 1f,
+          strokeLineCap = StrokeCap.Butt,
+          strokeLineJoin = StrokeJoin.Bevel,
+          strokeLineMiter = 1f,
+          pathFillType = PathFillType.NonZero,
+        ) {
+          moveTo(12f, 4f)
+          lineTo(19f, 12f)
+          lineTo(15f, 12f)
+          lineTo(15f, 20f)
+          lineTo(9f, 20f)
+          lineTo(9f, 12f)
+          lineTo(5f, 12f)
           close()
         }
       }

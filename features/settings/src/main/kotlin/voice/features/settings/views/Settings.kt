@@ -108,6 +108,22 @@ private fun Settings(
         }
       }
       item {
+        ListItem(
+          modifier = Modifier.clickable { listener.openCoPilotSettings() },
+          leadingContent = {
+            Icon(
+              imageVector = VoiceIcons.Mic,
+              contentDescription = null,
+            )
+          },
+          supportingContent = {
+            Text(stringResource(StringsR.string.copilot_settings_description))
+          },
+        ) {
+          Text(stringResource(StringsR.string.copilot_settings_title))
+        }
+      }
+      item {
         ThemeModeRow(viewState.themeMode, listener::onThemeModeRowClick)
       }
       if (viewState.showThemeColorSchemePref) {
