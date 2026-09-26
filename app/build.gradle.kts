@@ -177,7 +177,6 @@ dependencies {
   implementation(projects.features.onboarding)
   implementation(projects.features.bookmark)
   implementation(projects.features.widget)
-  implementation(projects.features.gallery)
 
   implementation(libs.appCompat)
   implementation(libs.lifecycle.compose)

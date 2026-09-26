@@ -20,11 +20,6 @@ sealed interface Destination {
   }
 
   @Serializable
-  data object Gallery : Compose {
-    override val trackingName: String get() = "Gallery"
-  }
-
-  @Serializable
   data object CoPilotSettings : Compose {
     override val trackingName: String get() = "CoPilotSettings"
   }

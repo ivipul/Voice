@@ -30,27 +30,9 @@ internal fun BookPlayAppBar(
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
   onCloseClick: () -> Unit,
-  onGalleryClick: () -> Unit,
   useLandscapeLayout: Boolean,
 ) {
   val appBarActions: @Composable RowScope.() -> Unit = {
-    IconButton(onClick = onGalleryClick) {
-      Icon(
-        imageVector = VoiceIcons.GridView,
-        contentDescription = stringResource(id = R.string.copilot_action_gallery),
-      )
-    }
-    IconButton(onClick = onSleepTimerClick) {
-      val sleepTimerIcon = if (viewState.sleepTimerState is BookPlayViewState.SleepTimerViewState.Disabled) {
-        VoiceIcons.Bedtime
-      } else {
-        VoiceIcons.BedtimeOff
-      }
-      Icon(
-        imageVector = sleepTimerIcon,
-        contentDescription = stringResource(id = R.string.sleep_timer_action_open),
-      )
-    }
     Box(
       modifier = Modifier
         .size(40.dp)
@@ -75,6 +57,8 @@ internal fun BookPlayAppBar(
     }
     OverflowMenu(
       skipSilence = viewState.skipSilence,
+      sleepTimerState = viewState.sleepTimerState,
+      onSleepTimerClick = onSleepTimerClick,
       onSkipSilenceClick = onSkipSilenceClick,
       onVolumeBoostClick = onVolumeBoostClick,
     )

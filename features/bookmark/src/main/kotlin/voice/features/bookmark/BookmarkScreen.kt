@@ -3,6 +3,7 @@ package voice.features.bookmark
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,11 +18,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -53,6 +57,11 @@ import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
 import kotlin.uuid.Uuid
 import voice.core.strings.R as StringsR
+
+private enum class BookmarkTab(val labelRes: Int) {
+  Snips(StringsR.string.bookmark_tab_snips),
+  Strips(StringsR.string.bookmark_tab_strips),
+}
 
 @ContributesTo(AppScope::class)
 interface Graph {
@@ -106,6 +115,7 @@ internal fun BookmarkScreen(
   modifier: Modifier = Modifier,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
+  var selectedTab by remember { mutableStateOf(BookmarkTab.Snips) }
 
   Scaffold(
     modifier = modifier,
@@ -126,40 +136,67 @@ internal fun BookmarkScreen(
       )
     },
     floatingActionButton = {
-      FloatingActionButton(
-        onClick = onAdd,
-        content = {
-          Icon(imageVector = VoiceIcons.Add, contentDescription = stringResource(id = StringsR.string.common_action_add))
-        },
-      )
-    },
-  ) { paddingValues ->
-    val lazyListState = rememberLazyListState()
-    LaunchedEffect(viewState.shouldScrollTo, onScrollConfirm) {
-      val index = viewState.bookmarks.indexOfFirst { it.id == viewState.shouldScrollTo }
-      if (index != -1) {
-        lazyListState.animateScrollToItem(index)
-        onScrollConfirm()
-      }
-    }
-    LazyColumn(
-      state = lazyListState,
-      contentPadding = paddingValues,
-    ) {
-      items(
-        items = viewState.bookmarks,
-        key = { it.id.value.toString() },
-      ) { bookmark ->
-        BookmarkItem(
-          modifier = Modifier.animateItem(),
-          bookmark = bookmark,
-          onDelete = onDelete,
-          onEdit = onEdit,
-          onClick = onClick,
+      if (selectedTab == BookmarkTab.Snips) {
+        FloatingActionButton(
+          onClick = onAdd,
+          content = {
+            Icon(imageVector = VoiceIcons.Add, contentDescription = stringResource(id = StringsR.string.common_action_add))
+          },
         )
       }
-      item {
-        Spacer(Modifier.size(88.dp))
+    },
+  ) { paddingValues ->
+    Column(modifier = Modifier.padding(paddingValues)) {
+      SecondaryTabRow(selectedTabIndex = selectedTab.ordinal) {
+        BookmarkTab.entries.forEach { tab ->
+          Tab(
+            selected = selectedTab == tab,
+            onClick = { selectedTab = tab },
+            text = { Text(text = stringResource(id = tab.labelRes)) },
+          )
+        }
+      }
+      when (selectedTab) {
+        BookmarkTab.Snips -> {
+          val lazyListState = rememberLazyListState()
+          LaunchedEffect(viewState.shouldScrollTo, onScrollConfirm) {
+            val index = viewState.bookmarks.indexOfFirst { it.id == viewState.shouldScrollTo }
+            if (index != -1) {
+              lazyListState.animateScrollToItem(index)
+              onScrollConfirm()
+            }
+          }
+          LazyColumn(state = lazyListState) {
+            items(
+              items = viewState.bookmarks,
+              key = { it.id.value.toString() },
+            ) { bookmark ->
+              BookmarkItem(
+                modifier = Modifier.animateItem(),
+                bookmark = bookmark,
+                onDelete = onDelete,
+                onEdit = onEdit,
+                onClick = onClick,
+              )
+            }
+            item {
+              Spacer(Modifier.size(88.dp))
+            }
+          }
+        }
+        BookmarkTab.Strips -> {
+          Box(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(24.dp),
+            contentAlignment = Alignment.Center,
+          ) {
+            Text(
+              text = stringResource(id = StringsR.string.bookmark_strips_empty),
+              style = MaterialTheme.typography.bodyLarge,
+            )
+          }
+        }
       }
     }
   }

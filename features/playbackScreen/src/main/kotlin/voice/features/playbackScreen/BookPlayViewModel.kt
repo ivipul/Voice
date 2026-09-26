@@ -333,10 +333,6 @@ class BookPlayViewModel(
     navigator.goTo(Destination.Bookmarks(bookId))
   }
 
-  fun onGalleryClick() {
-    navigator.goTo(Destination.Gallery)
-  }
-
   @Composable
   fun copilotMessages(): List<CoPilotMessage> {
     val allMessages by remember { copilotRepository.allMessagesByBook }.collectAsState()

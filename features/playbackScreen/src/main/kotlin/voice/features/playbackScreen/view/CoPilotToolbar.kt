@@ -57,7 +57,7 @@ internal fun CoPilotToolbar(
       )
     }
     RoundIconButton(
-      icon = VoiceIcons.AutoAwesome,
+      icon = VoiceIcons.Chat,
       contentDescription = stringResource(id = R.string.copilot_action_feed),
       onClick = onFeedClick,
     )

@@ -33,7 +33,6 @@ internal fun BookPlayView(
   onSkipToPrevious: () -> Unit,
   onCloseClick: () -> Unit,
   onCurrentChapterClick: () -> Unit,
-  onGalleryClick: () -> Unit,
   onCatchMeUpClick: () -> Unit,
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
@@ -54,7 +53,6 @@ internal fun BookPlayView(
         onSkipSilenceClick = onSkipSilenceClick,
         onVolumeBoostClick = onVolumeBoostClick,
         onCloseClick = onCloseClick,
-        onGalleryClick = onGalleryClick,
         useLandscapeLayout = useLandscapeLayout,
       )
     },
@@ -104,7 +102,6 @@ private fun BookPlayPreview(
       onSkipToPrevious = {},
       onCloseClick = {},
       onCurrentChapterClick = {},
-      onGalleryClick = {},
       onCatchMeUpClick = {},
       onAskClick = {},
       onSnipClick = {},

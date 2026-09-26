@@ -105,7 +105,6 @@ fun BookPlayScreen(bookId: BookId) {
     onSkipToNext = viewModel::next,
     onSkipToPrevious = viewModel::previous,
     onCurrentChapterClick = viewModel::onCurrentChapterClick,
-    onGalleryClick = viewModel::onGalleryClick,
     onCatchMeUpClick = viewModel::onCatchMeUpClick,
     onAskClick = onAskClick,
     onSnipClick = viewModel::onSnipClick,
