@@ -27,13 +27,14 @@ import androidx.compose.ui.unit.dp
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
 
-private val RoundButtonSize = 64.dp
+private val RoundButtonSize = 60.dp
 private val RoundButtonIconSize = 24.dp
-private val PillButtonHeight = 64.dp
+private val PillButtonHeight = 60.dp
 private val PillOuterCornerRadius = 999.dp
 private val PillInnerCornerRadius = 40.dp
 private val PillButtonContainerColor = Color.White
 private val PillButtonContentColor = Color(0xFF05090A)
+private val PillButtonIconColor = Color(0xFF06A76F)
 
 @Composable
 internal fun CoPilotToolbar(
@@ -127,6 +128,7 @@ private fun PillButton(
     Icon(
       imageVector = icon,
       contentDescription = null,
+      tint = PillButtonIconColor,
       modifier = Modifier.size(RoundButtonIconSize),
     )
     Spacer(modifier = Modifier.size(6.dp))
