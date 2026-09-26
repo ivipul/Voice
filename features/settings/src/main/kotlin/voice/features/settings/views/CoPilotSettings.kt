@@ -100,7 +100,6 @@ private fun TriggerRow(
 ) {
   var expanded by remember { mutableStateOf(false) }
   ListItem(
-    headlineContent = { Text(text = stringResource(id = slot.labelRes)) },
     supportingContent = { Text(text = stringResource(id = selected.labelRes)) },
     trailingContent = {
       Box {
@@ -120,7 +119,9 @@ private fun TriggerRow(
         }
       }
     },
-  )
+  ) {
+    Text(text = stringResource(id = slot.labelRes))
+  }
 }
 
 @Composable
