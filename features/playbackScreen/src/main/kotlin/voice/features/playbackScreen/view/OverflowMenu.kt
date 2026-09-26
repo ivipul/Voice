@@ -15,12 +15,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
-import voice.features.playbackScreen.BookPlayViewState
 
 @Composable
 internal fun OverflowMenu(
   skipSilence: Boolean,
-  sleepTimerState: BookPlayViewState.SleepTimerViewState,
   onSleepTimerClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
@@ -48,14 +46,6 @@ internal fun OverflowMenu(
         },
         text = {
           Text(text = stringResource(id = R.string.sleep_timer_action_open))
-        },
-        leadingIcon = {
-          val sleepTimerIcon = if (sleepTimerState is BookPlayViewState.SleepTimerViewState.Disabled) {
-            VoiceIcons.Bedtime
-          } else {
-            VoiceIcons.BedtimeOff
-          }
-          Icon(imageVector = sleepTimerIcon, contentDescription = null)
         },
       )
       DropdownMenuItem(

@@ -57,7 +57,6 @@ internal fun BookPlayAppBar(
     }
     OverflowMenu(
       skipSilence = viewState.skipSilence,
-      sleepTimerState = viewState.sleepTimerState,
       onSleepTimerClick = onSleepTimerClick,
       onSkipSilenceClick = onSkipSilenceClick,
       onVolumeBoostClick = onVolumeBoostClick,
