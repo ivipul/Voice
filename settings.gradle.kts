@@ -79,6 +79,7 @@ include(":core:search")
 include(":core:sleeptimer:api")
 include(":core:sleeptimer:impl")
 include(":core:strings")
+include(":core:transcript")
 include(":core:ui")
 
 include(":features:bookOverview")
