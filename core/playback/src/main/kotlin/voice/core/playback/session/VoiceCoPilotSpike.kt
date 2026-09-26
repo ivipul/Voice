@@ -3,6 +3,8 @@ package voice.core.playback.session
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +16,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.widget.Toast
 import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +40,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import voice.core.logging.api.Logger
 import voice.core.playback.BuildConfig
 import voice.core.playback.R
+import voice.core.playback.di.PlaybackScope
 import java.io.IOException
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -49,6 +53,7 @@ import kotlin.coroutines.resumeWithException
  * Co-Pilot implementation yet (no Jev routing, no transcript injection, no Feed logging).
  */
 @Inject
+@SingleIn(PlaybackScope::class)
 class VoiceCoPilotSpike(
   private val context: Context,
   private val scope: CoroutineScope,
@@ -65,6 +70,9 @@ class VoiceCoPilotSpike(
   @Volatile
   private var isActive = false
   private var activeJob: Job? = null
+
+  private val audioManager = context.getSystemService(AudioManager::class.java)
+  private var audioFocusRequest: AudioFocusRequest? = null
 
   private val soundPool = SoundPool.Builder()
     .setMaxStreams(2)
@@ -92,7 +100,14 @@ class VoiceCoPilotSpike(
   }
 
   fun trigger(onFinished: () -> Unit) {
+    Logger.d("Voice spike: trigger() on instance ${System.identityHashCode(this)}")
     isActive = true
+    // Hold audio focus for the whole listening/thinking/speaking session. Without this,
+    // TextToSpeech's own transient focus requests cause ExoPlayer's built-in audio-focus
+    // handling to auto-resume the book internally (bypassing VoicePlayer entirely, since
+    // it's driven by the raw player, not our wrapper) the moment TTS momentarily lets go of
+    // focus between utterances - which fights with us keeping the book paused.
+    requestAudioFocus()
     toast("Voice spike: listening...")
     activeJob = scope.launch {
       try {
@@ -103,6 +118,7 @@ class VoiceCoPilotSpike(
         Logger.d("Voice spike: Gemini replied \"$reply\"")
         speak(reply) {
           isActive = false
+          abandonAudioFocus()
           onFinished()
         }
       } catch (e: CancellationException) {
@@ -111,9 +127,28 @@ class VoiceCoPilotSpike(
         Logger.w(e, "Voice spike failed")
         toast("Voice spike failed: ${e.message}")
         isActive = false
+        abandonAudioFocus()
         onFinished()
       }
     }
+  }
+
+  private fun requestAudioFocus() {
+    val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+      .setAudioAttributes(
+        AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_ASSISTANT)
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build(),
+      )
+      .build()
+    audioFocusRequest = request
+    audioManager.requestAudioFocus(request)
+  }
+
+  private fun abandonAudioFocus() {
+    audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
+    audioFocusRequest = null
   }
 
   /**
@@ -123,13 +158,21 @@ class VoiceCoPilotSpike(
    * resumed book. No-op if nothing is active.
    */
   fun interruptIfActive() {
+    Logger.d(
+      "Voice spike: interruptIfActive on instance ${System.identityHashCode(this)}, isActive=$isActive",
+    )
     if (!isActive) return
     isActive = false
     // If still listening, cancelling the job resumes listen()'s suspendCancellableCoroutine
     // via invokeOnCancellation, which destroys the recognizer for us exactly once.
     activeJob?.cancel()
     activeJob = null
+    // stop() alone isn't reliably cutting audio immediately on-device; shutdown() tears
+    // down the engine connection outright. A fresh TextToSpeech is created next speak() call.
     textToSpeech?.stop()
+    textToSpeech?.shutdown()
+    textToSpeech = null
+    abandonAudioFocus()
     toast("Voice spike: cancelled")
   }
 
@@ -242,26 +285,38 @@ class VoiceCoPilotSpike(
       if (status == TextToSpeech.SUCCESS && tts != null) {
         tts.setOnUtteranceProgressListener(
           object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) = Unit
+            override fun onStart(utteranceId: String?) {
+              Logger.d("Voice spike: TTS onStart")
+            }
 
             override fun onDone(utteranceId: String?) {
+              Logger.d("Voice spike: TTS onDone")
               // Runs on TTS's own binder thread; the Player must only be touched on
               // the main thread, so hop back before resuming playback.
-              mainHandler.post(onDone)
+              mainHandler.post { finishSpeaking(onDone) }
             }
 
             @Deprecated("Deprecated in Java", ReplaceWith(""))
             override fun onError(utteranceId: String?) {
-              mainHandler.post(onDone)
+              Logger.d("Voice spike: TTS onError")
+              mainHandler.post { finishSpeaking(onDone) }
             }
           },
         )
+        Logger.d("Voice spike: TTS speaking ${text.length} chars")
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "voice-copilot-spike")
       } else {
         Logger.w("Voice spike: TTS init failed with status $status")
         mainHandler.post(onDone)
       }
     }
+  }
+
+  private fun finishSpeaking(onDone: () -> Unit) {
+    // Signal that the spoken response is over, then give it a beat before resuming
+    // the book so the cue doesn't get talked over by playback starting immediately.
+    playCue(endListeningSoundId)
+    mainHandler.postDelayed(onDone, RESPONSE_END_PAUSE_MS)
   }
 
   private fun toast(message: String) {
@@ -271,6 +326,7 @@ class VoiceCoPilotSpike(
   private companion object {
     const val MAX_GEMINI_ATTEMPTS = 3
     const val GEMINI_RETRY_BACKOFF_MS = 1000L
+    const val RESPONSE_END_PAUSE_MS = 500L
     const val SYSTEM_PROMPT = "You are a voice assistant answering a spoken question out loud. " +
       "Keep your answer under 15-20 seconds when spoken (roughly 40-50 words), and don't ramble " +
       "or add extra detail beyond what was asked. Respond in plain, natural spoken language only: " +

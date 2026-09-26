@@ -67,16 +67,27 @@ class LibrarySessionCallback(
     controllerInfo: ControllerInfo,
     intent: Intent,
   ): Boolean {
-    val keyEvent = intent.extractKeyEvent()
-    if (keyEvent == null || keyEvent.action != KeyEvent.ACTION_DOWN) {
-      return super.onMediaButtonEvent(session, controllerInfo, intent)
-    }
+    val keyEvent = intent.extractKeyEvent() ?: return super.onMediaButtonEvent(session, controllerInfo, intent)
     val keyCode = keyEvent.keyCode
+
     if (keyCode in PLAY_PAUSE_KEY_CODES) {
-      // Just confirm we can observe play/pause too; don't consume it, playback
-      // still needs to actually toggle normally.
-      Logger.d("Bluetooth spike: PLAY_PAUSE reachable")
-      Toast.makeText(context, "Bluetooth spike: PLAY_PAUSE reachable", Toast.LENGTH_SHORT).show()
+      // Every physical press delivers both ACTION_DOWN and ACTION_UP. Consume both ourselves:
+      // Media3's default onMediaButtonEvent PLAY_PAUSE toggle doesn't reliably resume (observed
+      // calling pause() again even when playWhenReady was already false), and forwarding the
+      // paired ACTION_UP to it would immediately re-toggle whatever ACTION_DOWN just did.
+      if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+        val wasPlaying = player.playWhenReady
+        Logger.d("Bluetooth spike: PLAY_PAUSE toggling (playWhenReady=$wasPlaying -> ${!wasPlaying})")
+        if (wasPlaying) {
+          player.pause()
+        } else {
+          player.play()
+        }
+      }
+      return true
+    }
+
+    if (keyEvent.action != KeyEvent.ACTION_DOWN) {
       return super.onMediaButtonEvent(session, controllerInfo, intent)
     }
     if (keyCode != KeyEvent.KEYCODE_MEDIA_NEXT && keyCode != KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
