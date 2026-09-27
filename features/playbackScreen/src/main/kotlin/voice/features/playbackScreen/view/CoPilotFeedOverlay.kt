@@ -37,21 +37,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.DialogWindowProvider
-import androidx.core.view.WindowCompat
 import voice.core.data.ChapterId
 import voice.core.strings.R
 import voice.core.ui.formatTime
@@ -69,26 +65,14 @@ internal fun CoPilotFeedOverlay(
 ) {
   Dialog(
     onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false),
+    // decorFitsSystemWindows = false hands IME sizing entirely to this content's own
+    // imePadding() below, instead of the dialog's window also resizing itself and double-
+    // counting the keyboard height. Setting it here (applied before the window is shown)
+    // rather than reaching into the window after first composition avoids a race where
+    // focusing the field before that later fix-up ran would briefly let the window resize
+    // itself too, snapping the input bar to the top before settling into place.
+    properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
   ) {
-    // A Dialog's own window resizes itself for the IME by default (decorFitsSystemWindows =
-    // true), which double-counts the keyboard's height on top of this content's own
-    // imePadding() below - that's what pushed the input bar far above the keyboard with a big
-    // empty gap. Telling the window not to fit system windows itself hands IME handling fully
-    // to Compose's inset modifiers, so it's only accounted for once.
-    //
-    // SideEffect, not LaunchedEffect: LaunchedEffect's coroutine is dispatched a frame after
-    // composition, which was late enough that the keyboard's very first appearance (from
-    // focusing the field) still measured against the window's default decorFitsSystemWindows
-    // = true, pinning the input bar to the top until some later recomposition (e.g. typing a
-    // character) forced a relayout against the corrected setting. SideEffect runs
-    // synchronously right after this composition, before that first IME layout pass.
-    val view = LocalView.current
-    SideEffect {
-      (view.parent as? DialogWindowProvider)?.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
-    }
     Surface(modifier = Modifier.fillMaxSize()) {
       Scaffold(
         topBar = {
