@@ -24,6 +24,7 @@ import voice.core.data.store.AnalyticsConsentStore
 import voice.core.data.store.AutoRewindAmountStore
 import voice.core.data.store.DeveloperMenuUnlockedStore
 import voice.core.data.store.GridModeStore
+import voice.core.data.store.SeekForwardTimeStore
 import voice.core.data.store.SeekTimeStore
 import voice.core.data.store.SleepTimerPreferenceStore
 import voice.core.data.store.ThemeColorSchemeStore
@@ -46,6 +47,8 @@ class SettingsViewModel(
   private val autoRewindAmountStore: DataStore<Int>,
   @SeekTimeStore
   private val seekTimeStore: DataStore<Int>,
+  @SeekForwardTimeStore
+  private val seekForwardTimeStore: DataStore<Int>,
   private val navigator: Navigator,
   private val appInfoProvider: AppInfoProvider,
   @GridModeStore
@@ -75,6 +78,7 @@ class SettingsViewModel(
     val themeColorScheme by remember { themeColorSchemeStore.data }.collectAsState(initial = ThemeColorScheme.VoiceBlue)
     val autoRewindAmount by remember { autoRewindAmountStore.data }.collectAsState(initial = 0)
     val seekTime by remember { seekTimeStore.data }.collectAsState(initial = 0)
+    val seekForwardTime by remember { seekForwardTimeStore.data }.collectAsState(initial = 0)
     val gridMode by remember { gridModeStore.data }.collectAsState(initial = GridMode.GRID)
     val autoSleepTimer by remember { sleepTimerPreferenceStore.data }.collectAsState(
       initial = SleepTimerPreference.Default,
@@ -92,6 +96,7 @@ class SettingsViewModel(
       themeColorScheme = themeColorScheme,
       showThemeColorSchemePref = showThemeColorSchemePref,
       seekTimeInSeconds = seekTime,
+      seekForwardTimeInSeconds = seekForwardTime,
       autoRewindInSeconds = autoRewindAmount,
       dialog = dialog.value,
       appVersion = appInfoProvider.versionName,
@@ -163,6 +168,16 @@ class SettingsViewModel(
 
   override fun onSeekAmountRowClick() {
     dialog.value = SettingsViewState.Dialog.SeekTime
+  }
+
+  override fun seekForwardAmountChanged(seconds: Int) {
+    mainScope.launch {
+      seekForwardTimeStore.updateData { seconds }
+    }
+  }
+
+  override fun onSeekForwardAmountRowClick() {
+    dialog.value = SettingsViewState.Dialog.SeekForwardTime
   }
 
   override fun autoRewindAmountChang(seconds: Int) {

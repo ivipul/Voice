@@ -42,7 +42,8 @@ private enum class TriggerSlot(val labelRes: Int) {
 }
 
 private enum class TriggerAction(val labelRes: Int) {
-  StandardSkip(StringsR.string.copilot_settings_action_standard_skip),
+  DefaultRewind(StringsR.string.copilot_settings_action_default_rewind),
+  DefaultForward(StringsR.string.copilot_settings_action_default_forward),
   OpenMic(StringsR.string.copilot_settings_action_open_mic),
   AutoIdentify(StringsR.string.copilot_settings_action_auto_identify),
   CatchMeUp(StringsR.string.copilot_settings_action_catch_me_up),
@@ -57,7 +58,7 @@ fun CoPilotSettingsScreen(navigator: Navigator) {
     mutableStateOf(
       mapOf(
         TriggerSlot.SingleNext to TriggerAction.OpenMic,
-        TriggerSlot.SinglePrevious to TriggerAction.StandardSkip,
+        TriggerSlot.SinglePrevious to TriggerAction.DefaultRewind,
         TriggerSlot.DoubleNext to TriggerAction.AutoIdentify,
         TriggerSlot.DoublePrevious to TriggerAction.CatchMeUp,
       ),

@@ -36,7 +36,8 @@ class SettingsViewModelTest {
   private val themeModeStore = MemoryDataStore(ThemeMode.FollowSystem)
   private val themeColorSchemeStore = MemoryDataStore(ThemeColorScheme.VoiceBlue)
   private val autoRewindAmountStore = MemoryDataStore(10)
-  private val seekTimeStore = MemoryDataStore(30)
+  private val seekTimeStore = MemoryDataStore(15)
+  private val seekForwardTimeStore = MemoryDataStore(30)
   private val gridModeStore = MemoryDataStore(GridMode.GRID)
   private val sleepTimerPreferenceStore = MemoryDataStore(SleepTimerPreference.Default)
   private val analyticsConsentStore = MemoryDataStore(false)
@@ -63,6 +64,7 @@ class SettingsViewModelTest {
     themeColorSchemeStore = themeColorSchemeStore,
     autoRewindAmountStore = autoRewindAmountStore,
     seekTimeStore = seekTimeStore,
+    seekForwardTimeStore = seekForwardTimeStore,
     navigator = navigator,
     appInfoProvider = appInfoProvider,
     gridModeStore = gridModeStore,

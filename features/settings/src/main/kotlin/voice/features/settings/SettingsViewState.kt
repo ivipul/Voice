@@ -9,6 +9,7 @@ data class SettingsViewState(
   val themeColorScheme: ThemeColorScheme,
   val showThemeColorSchemePref: Boolean,
   val seekTimeInSeconds: Int,
+  val seekForwardTimeInSeconds: Int,
   val autoRewindInSeconds: Int,
   val appVersion: String,
   val dialog: Dialog?,
@@ -24,6 +25,7 @@ data class SettingsViewState(
   enum class Dialog {
     AutoRewindAmount,
     SeekTime,
+    SeekForwardTime,
     Theme,
     ColorScheme,
   }
@@ -34,7 +36,8 @@ data class SettingsViewState(
         themeMode = ThemeMode.FollowSystem,
         themeColorScheme = ThemeColorScheme.VoiceBlue,
         showThemeColorSchemePref = true,
-        seekTimeInSeconds = 42,
+        seekTimeInSeconds = 15,
+        seekForwardTimeInSeconds = 30,
         autoRewindInSeconds = 12,
         dialog = null,
         appVersion = "1.2.3",

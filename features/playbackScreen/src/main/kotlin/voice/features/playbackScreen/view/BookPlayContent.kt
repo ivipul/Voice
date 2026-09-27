@@ -78,6 +78,8 @@ internal fun BookPlayContent(
         Spacer(modifier = Modifier.size(16.dp))
         PlaybackRow(
           playing = viewState.playing,
+          skipBackSeconds = viewState.skipBackSeconds,
+          skipForwardSeconds = viewState.skipForwardSeconds,
           onPlayClick = onPlayClick,
           onRewindClick = onRewindClick,
           onFastForwardClick = onFastForwardClick,
@@ -123,6 +125,8 @@ internal fun BookPlayContent(
       Spacer(modifier = Modifier.size(16.dp))
       PlaybackRow(
         playing = viewState.playing,
+        skipBackSeconds = viewState.skipBackSeconds,
+        skipForwardSeconds = viewState.skipForwardSeconds,
         onPlayClick = onPlayClick,
         onRewindClick = onRewindClick,
         onFastForwardClick = onFastForwardClick,

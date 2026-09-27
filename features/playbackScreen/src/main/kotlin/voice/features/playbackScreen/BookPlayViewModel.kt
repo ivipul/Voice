@@ -27,6 +27,8 @@ import voice.core.data.repo.BookRepository
 import voice.core.data.repo.BookmarkRepo
 import voice.core.data.sleeptimer.SleepTimerPreference
 import voice.core.data.store.CurrentBookStore
+import voice.core.data.store.SeekForwardTimeStore
+import voice.core.data.store.SeekTimeStore
 import voice.core.data.store.SleepTimerPreferenceStore
 import voice.core.featureflag.ExperimentalPlaybackPersistenceQualifier
 import voice.core.featureflag.FeatureFlag
@@ -73,6 +75,10 @@ class BookPlayViewModel(
   dispatcherProvider: DispatcherProvider,
   @SleepTimerPreferenceStore
   private val sleepTimerPreferenceStore: DataStore<SleepTimerPreference>,
+  @SeekTimeStore
+  private val seekTimeStore: DataStore<Int>,
+  @SeekForwardTimeStore
+  private val seekForwardTimeStore: DataStore<Int>,
   @ExperimentalPlaybackPersistenceQualifier
   private val experimentalPlaybackPersistenceFeatureFlag: FeatureFlag<Boolean>,
   @KioskModeFeatureFlagQualifier
@@ -142,6 +148,8 @@ class BookPlayViewModel(
 
     val sleepTime = remember { sleepTimer.state }.collectAsState().value
     val hasMoreThanOneChapter = book.chapters.sumOf { it.chapterMarks.count() } > 1
+    val skipBackSeconds by remember { seekTimeStore.data }.collectAsState(initial = 15)
+    val skipForwardSeconds by remember { seekForwardTimeStore.data }.collectAsState(initial = 30)
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -152,6 +160,8 @@ class BookPlayViewModel(
       playedTime = positionInCurrentMark.milliseconds,
       cover = book.content.coverUrl,
       skipSilence = book.content.skipSilence,
+      skipBackSeconds = skipBackSeconds,
+      skipForwardSeconds = skipForwardSeconds,
     )
   }
 
@@ -168,6 +178,8 @@ class BookPlayViewModel(
       playedTime = 10.hours + 24.minutes,
       cover = book.coverUrl,
       skipSilence = false,
+      skipBackSeconds = 15,
+      skipForwardSeconds = 30,
     )
   }
 

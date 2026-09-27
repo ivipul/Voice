@@ -13,6 +13,8 @@ interface SettingsListener {
   fun toggleGrid()
   fun seekAmountChanged(seconds: Int)
   fun onSeekAmountRowClick()
+  fun seekForwardAmountChanged(seconds: Int)
+  fun onSeekForwardAmountRowClick()
   fun autoRewindAmountChang(seconds: Int)
   fun onAutoRewindRowClick()
   fun dismissDialog()
@@ -42,6 +44,8 @@ interface SettingsListener {
       override fun toggleGrid() {}
       override fun seekAmountChanged(seconds: Int) {}
       override fun onSeekAmountRowClick() {}
+      override fun seekForwardAmountChanged(seconds: Int) {}
+      override fun onSeekForwardAmountRowClick() {}
       override fun autoRewindAmountChang(seconds: Int) {}
       override fun onAutoRewindRowClick() {}
       override fun dismissDialog() {}

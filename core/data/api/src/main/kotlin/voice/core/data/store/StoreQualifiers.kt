@@ -15,6 +15,9 @@ public annotation class AutoRewindAmountStore
 public annotation class SeekTimeStore
 
 @Qualifier
+public annotation class SeekForwardTimeStore
+
+@Qualifier
 public annotation class SleepTimerPreferenceStore
 
 @Qualifier

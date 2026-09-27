@@ -100,8 +100,10 @@
     <string name="copilot.settings.trigger.double_next">Double tap NEXT</string>
     <!-- Settings row label for the double-tap PREVIOUS trigger slot. -->
     <string name="copilot.settings.trigger.double_previous">Double tap PREVIOUS</string>
-    <!-- Trigger action option: normal skip forward/rewind. -->
-    <string name="copilot.settings.action.standard_skip">Standard Skip</string>
+    <!-- Trigger action option: the default fixed rewind, same as the on-screen skip-back button's default. -->
+    <string name="copilot.settings.action.default_rewind">Default (-15s)</string>
+    <!-- Trigger action option: the default fixed skip forward, same as the on-screen skip-forward button's default. -->
+    <string name="copilot.settings.action.default_forward">Default (+30s)</string>
     <!-- Trigger action option: mic Q&amp;A co-pilot. -->
     <string name="copilot.settings.action.open_mic">Open Mic Co-Pilot</string>
     <!-- Trigger action option: zero-voice proper-noun recap. -->
@@ -290,8 +292,10 @@
     <string name="settings.library.use_grid.title">Use grid layout</string>
     <!-- Title for the setting that rewinds automatically when playback resumes. -->
     <string name="settings.playback.auto_rewind.title">Auto rewind</string>
-    <!-- Title for the setting that controls skip-forward and rewind duration. -->
-    <string name="settings.playback.seek_time.title">Skip amount</string>
+    <!-- Title for the setting that controls the rewind (skip back) duration. -->
+    <string name="settings.playback.seek_time.title">Skip back amount</string>
+    <!-- Title for the setting that controls the skip-forward duration. -->
+    <string name="settings.playback.seek_forward_time.title">Skip forward amount</string>
     <!-- Settings support row for opening the FAQ. -->
     <string name="settings.support.faq.title">FAQ</string>
     <!-- Settings support row for getting help. -->

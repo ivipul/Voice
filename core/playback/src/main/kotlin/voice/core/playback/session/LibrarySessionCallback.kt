@@ -119,12 +119,13 @@ class LibrarySessionCallback(
     } else {
       pendingHeadsetPressJob = scope.launch {
         delay(DOUBLE_PRESS_THRESHOLD_MS)
-        // Default mapping (Phase 4): Single NEXT = Open Mic, Single PREVIOUS = fixed Rewind.
+        // Default mapping (Phase 4): Single NEXT = Open Mic, Single PREVIOUS = Rewind (same
+        // default/override as the on-screen skip-back button - see SeekTimeStore).
         if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
           triggerCoPilotMode(CoPilotMode.OpenMic)
         } else {
           copilotEngine.interruptIfActive()
-          player.rewindByFixedAmount()
+          player.seekBack()
         }
       }
     }

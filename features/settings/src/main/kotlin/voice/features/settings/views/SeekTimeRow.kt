@@ -14,6 +14,7 @@ import voice.core.strings.R as StringsR
 
 @Composable
 internal fun SeekTimeRow(
+  titleRes: Int,
   seekTimeInSeconds: Int,
   openSeekTimeDialog: () -> Unit,
 ) {
@@ -26,7 +27,7 @@ internal fun SeekTimeRow(
     leadingContent = {
       Icon(
         imageVector = VoiceIcons.Timelapse,
-        contentDescription = stringResource(StringsR.string.settings_playback_seek_time_title),
+        contentDescription = stringResource(titleRes),
       )
     },
     supportingContent = {
@@ -39,18 +40,19 @@ internal fun SeekTimeRow(
       )
     },
   ) {
-    Text(text = stringResource(StringsR.string.settings_playback_seek_time_title))
+    Text(text = stringResource(titleRes))
   }
 }
 
 @Composable
 internal fun SeekAmountDialog(
+  titleRes: Int,
   currentSeconds: Int,
   onSecondsConfirm: (Int) -> Unit,
   onDismiss: () -> Unit,
 ) {
   TimeSettingDialog(
-    title = stringResource(StringsR.string.settings_playback_seek_time_title),
+    title = stringResource(titleRes),
     currentSeconds = currentSeconds,
     minSeconds = 3,
     maxSeconds = 60,

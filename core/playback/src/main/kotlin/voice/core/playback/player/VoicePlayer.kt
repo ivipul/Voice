@@ -17,6 +17,7 @@ import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
 import voice.core.data.store.AutoRewindAmountStore
 import voice.core.data.store.CurrentBookStore
+import voice.core.data.store.SeekForwardTimeStore
 import voice.core.data.store.SeekTimeStore
 import voice.core.logging.api.Logger
 import voice.core.playback.misc.Decibel
@@ -43,6 +44,8 @@ class VoicePlayer(
   private val currentBookStoreId: DataStore<BookId?>,
   @SeekTimeStore
   private val seekTimeStore: DataStore<Int>,
+  @SeekForwardTimeStore
+  private val seekForwardTimeStore: DataStore<Int>,
   @AutoRewindAmountStore
   private val autoRewindAmountStore: DataStore<Int>,
   private val mediaItemProvider: MediaItemProvider,
@@ -147,13 +150,6 @@ class VoicePlayer(
     }
   }
 
-  /** Standard Navigation's fixed Rewind, distinct from the user's configurable seek amount above. */
-  fun rewindByFixedAmount() {
-    scope.launch {
-      seekBackBy(FIXED_REWIND_AMOUNT)
-    }
-  }
-
   private suspend fun seekBackBy(skipAmount: Duration) {
     seekBackBy(
       skipAmount = skipAmount,
@@ -193,7 +189,7 @@ class VoicePlayer(
 
   override fun seekForward() {
     scope.launch {
-      val skipAmount = seekTimeStore.data.first().seconds
+      val skipAmount = seekForwardTimeStore.data.first().seconds
 
       val currentPosition = player.currentPosition.takeUnless { it == C.TIME_UNSET }
         ?.milliseconds
@@ -360,10 +356,6 @@ class VoicePlayer(
   private suspend fun updateBook(update: (BookContent) -> BookContent) {
     val bookId = currentBookStoreId.data.first() ?: return
     repo.updateBook(bookId, update)
-  }
-
-  private companion object {
-    val FIXED_REWIND_AMOUNT = 15.seconds
   }
 }
 

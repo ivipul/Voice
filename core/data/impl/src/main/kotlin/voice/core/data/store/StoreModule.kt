@@ -98,8 +98,18 @@ public interface StoreModule {
   ): DataStore<Int> {
     return factory.int(
       fileName = "seekTime",
-      defaultValue = 20,
+      defaultValue = 15,
       migrations = listOf(intPrefsDataMigration(sharedPreferences, "SEEK_TIME")),
+    )
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @SeekForwardTimeStore
+  private fun seekForwardTime(factory: VoiceDataStoreFactory): DataStore<Int> {
+    return factory.int(
+      fileName = "seekForwardTime",
+      defaultValue = 30,
     )
   }
 

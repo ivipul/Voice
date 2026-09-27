@@ -164,8 +164,20 @@ private fun Settings(
       }
 
       item {
-        SeekTimeRow(viewState.seekTimeInSeconds) {
+        SeekTimeRow(
+          titleRes = StringsR.string.settings_playback_seek_time_title,
+          seekTimeInSeconds = viewState.seekTimeInSeconds,
+        ) {
           listener.onSeekAmountRowClick()
+        }
+      }
+
+      item {
+        SeekTimeRow(
+          titleRes = StringsR.string.settings_playback_seek_forward_time_title,
+          seekTimeInSeconds = viewState.seekForwardTimeInSeconds,
+        ) {
+          listener.onSeekForwardAmountRowClick()
         }
       }
 
@@ -369,8 +381,17 @@ private fun Dialog(
     }
     SettingsViewState.Dialog.SeekTime -> {
       SeekAmountDialog(
+        titleRes = StringsR.string.settings_playback_seek_time_title,
         currentSeconds = viewState.seekTimeInSeconds,
         onSecondsConfirm = listener::seekAmountChanged,
+        onDismiss = listener::dismissDialog,
+      )
+    }
+    SettingsViewState.Dialog.SeekForwardTime -> {
+      SeekAmountDialog(
+        titleRes = StringsR.string.settings_playback_seek_forward_time_title,
+        currentSeconds = viewState.seekForwardTimeInSeconds,
+        onSecondsConfirm = listener::seekForwardAmountChanged,
         onDismiss = listener::dismissDialog,
       )
     }

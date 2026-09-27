@@ -63,6 +63,7 @@ class VoicePlayerTest {
   }
 
   private val seekTimeStore = MemoryDataStore(2)
+  private val seekForwardTimeStore = MemoryDataStore(2)
   private val autoRewindAmountStore = MemoryDataStore(2)
 
   private val internalPlayer = TestExoPlayerBuilder(ApplicationProvider.getApplicationContext())
@@ -104,6 +105,7 @@ class VoicePlayerTest {
       every { data } returns flowOf(bookId)
     },
     seekTimeStore = seekTimeStore,
+    seekForwardTimeStore = seekForwardTimeStore,
     autoRewindAmountStore = autoRewindAmountStore,
     scope = scope,
     mediaItemProvider = mediaItemProvider,
@@ -128,7 +130,7 @@ class VoicePlayerTest {
       ),
     )
 
-    seekTimeStore.updateData { 7 }
+    seekForwardTimeStore.updateData { 7 }
 
     player.prepare()
     awaitReady()
