@@ -1,6 +1,5 @@
 package voice.core.copilot
 
-import android.content.Context
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -8,7 +7,6 @@ import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
 import voice.core.logging.api.Logger
 import voice.core.transcript.TranscriptRepository
-import java.io.File
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -21,7 +19,6 @@ class RealCoPilotPipeline(
   private val jevRouter: JevRouter,
   private val geminiClient: GeminiClient,
   private val coPilotRepository: CoPilotRepository,
-  private val context: Context,
 ) : CoPilotPipeline {
 
   override suspend fun ask(bookId: BookId, question: String): String {
@@ -87,6 +84,13 @@ class RealCoPilotPipeline(
       Logger.w(e, "CoPilot snip() failed")
       return
     }
+    // imagePath is left null for now: real comic-panel image generation is Phase 6's job,
+    // via the Ideogram pipeline described in the PRD (character reference images, scene
+    // planning, etc). An earlier attempt called Gemini's own image-generation endpoint
+    // directly here, but it was never a validated API integration and confirmed on-device
+    // that it doesn't produce an image - removed rather than leave a silently-broken call
+    // in place. snipImagePrompt() in CoPilotPrompts.kt is kept: Phase 6 can reuse it (or a
+    // variant) as the actual Ideogram prompt once that pipeline exists.
     coPilotRepository.addMessage(
       bookId,
       CoPilotMessage(
@@ -95,22 +99,10 @@ class RealCoPilotPipeline(
         text = highlight,
         timestampMs = System.currentTimeMillis(),
         isVisualPriority = true,
-        imagePath = generateSnipImage(highlight),
+        snipChapterId = book.currentChapter.id,
+        snipPositionInChapterMs = book.content.positionInChapter,
       ),
     )
-  }
-
-  private suspend fun generateSnipImage(highlight: String): String? {
-    val imageBytes = geminiClient.generateImage(snipImagePrompt(highlight)) ?: return null
-    return runCatching {
-      val dir = File(context.filesDir, SNIP_IMAGE_DIR).apply { mkdirs() }
-      val file = File(dir, "${UUID.randomUUID()}.png")
-      file.writeBytes(imageBytes)
-      file.absolutePath
-    }.getOrElse { e ->
-      Logger.w(e, "Could not save snip image")
-      null
-    }
   }
 
   private companion object {
@@ -121,6 +113,5 @@ class RealCoPilotPipeline(
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val SNIP_TRANSCRIPT_WINDOW_MS = 3.minutes.inWholeMilliseconds
-    const val SNIP_IMAGE_DIR = "snip_images"
   }
 }

@@ -1,5 +1,6 @@
 package voice.features.playbackScreen.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,12 +43,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowCompat
+import voice.core.data.ChapterId
 import voice.core.strings.R
+import voice.core.ui.formatTime
 import voice.core.ui.icons.VoiceIcons
 import voice.core.copilot.CoPilotMessage
 import java.io.File
@@ -58,11 +64,23 @@ internal fun CoPilotFeedOverlay(
   isThinking: Boolean,
   onSend: (String) -> Unit,
   onDismiss: () -> Unit,
+  onSeekToSnip: (ChapterId, Long) -> Unit,
 ) {
   Dialog(
     onDismissRequest = onDismiss,
     properties = DialogProperties(usePlatformDefaultWidth = false),
   ) {
+    // A Dialog's own window resizes itself for the IME by default (decorFitsSystemWindows =
+    // true), which double-counts the keyboard's height on top of this content's own
+    // imePadding() below - that's what pushed the input bar far above the keyboard with a big
+    // empty gap. Telling the window not to fit system windows itself hands IME handling fully
+    // to Compose's inset modifiers, so it's only accounted for once.
+    val view = LocalView.current
+    LaunchedEffect(view) {
+      (view.parent as? DialogWindowProvider)?.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
     Surface(modifier = Modifier.fillMaxSize()) {
       Scaffold(
         topBar = {
@@ -112,7 +130,7 @@ internal fun CoPilotFeedOverlay(
               .padding(contentPadding),
           ) {
             items(messages, key = { it.id }) { message ->
-              ChatBubble(message)
+              ChatBubble(message, onSeekToSnip = onSeekToSnip)
             }
             if (isThinking) {
               item {
@@ -127,8 +145,10 @@ internal fun CoPilotFeedOverlay(
 }
 
 @Composable
-private fun ChatBubble(message: CoPilotMessage) {
+private fun ChatBubble(message: CoPilotMessage, onSeekToSnip: (ChapterId, Long) -> Unit) {
   val isUser = message.role == CoPilotMessage.Role.User
+  val snipChapterId = message.snipChapterId
+  val snipPositionInChapterMs = message.snipPositionInChapterMs
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
@@ -153,6 +173,31 @@ private fun ChatBubble(message: CoPilotMessage) {
               .aspectRatio(1f)
               .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
           )
+        }
+        if (snipChapterId != null && snipPositionInChapterMs != null) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .clickable { onSeekToSnip(snipChapterId, snipPositionInChapterMs) }
+              .padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Icon(
+              imageVector = VoiceIcons.Timelapse,
+              contentDescription = null,
+              modifier = Modifier.size(14.dp),
+              tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            Text(
+              text = stringResource(
+                id = R.string.copilot_feed_snip_annotation,
+                formatTime(snipPositionInChapterMs),
+              ),
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.primary,
+            )
+          }
         }
         Text(
           text = message.text,

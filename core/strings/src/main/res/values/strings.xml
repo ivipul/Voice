@@ -70,6 +70,8 @@
     <string name="copilot.action.snip">Snip</string>
     <!-- Snackbar shown after Snip &amp; Synthesize saves a summary to the Feed. -->
     <string name="copilot.snip.saved.snackbar">Snipped — summary saved to Feed</string>
+    <!-- Tappable annotation on a Snip message in the Feed, linking back to that moment in the audiobook. %1$s is a timestamp like 1:23:45. -->
+    <string name="copilot.feed.snip.annotation">Snipped moment · %1$s</string>
     <!-- Shown while the co-pilot is listening for a spoken question. -->
     <string name="copilot.feed.listening">Listening…</string>
     <!-- Placeholder text for the co-pilot Feed text input. -->

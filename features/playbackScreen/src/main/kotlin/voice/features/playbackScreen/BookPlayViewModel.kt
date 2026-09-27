@@ -19,6 +19,7 @@ import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.data.Book
 import voice.core.data.BookId
+import voice.core.data.ChapterId
 import voice.core.data.KioskModeDemoData
 import voice.core.data.durationMs
 import voice.core.data.markForPosition
@@ -370,9 +371,15 @@ class BookPlayViewModel(
   }
 
   fun onSnipClick() {
-    // Snip & Synthesize fully replaces plain bookmarking, so both the toolbar Snip button
-    // and the bookmark icon's long-press converge on the same action.
-    onBookmarkLongClick()
+    scope.launch {
+      copilotPipeline.snip(bookId)
+      viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
+    }
+  }
+
+  fun onSnipTimestampClick(chapterId: ChapterId, positionInChapterMs: Long) {
+    player.setPosition(positionInChapterMs, chapterId)
+    feedVisible.value = false
   }
 
   private fun runCoPilotExchange(userText: String, answer: suspend () -> String) {
@@ -403,8 +410,13 @@ class BookPlayViewModel(
 
   fun onBookmarkLongClick() {
     scope.launch {
-      copilotPipeline.snip(bookId)
-      viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
+      val book = currentBook() ?: return@launch
+      bookmarkRepository.addBookmarkAtBookPosition(
+        book = book,
+        title = null,
+        setBySleepTimer = false,
+      )
+      viewEffects.tryEmit(BookPlayViewEffect.BookmarkAdded)
     }
   }
 

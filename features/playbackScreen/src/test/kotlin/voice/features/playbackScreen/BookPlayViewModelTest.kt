@@ -26,6 +26,7 @@ import voice.core.data.Chapter
 import voice.core.data.ChapterId
 import voice.core.data.KioskModeDemoData
 import voice.core.data.MarkData
+import voice.core.data.repo.BookmarkRepo
 import voice.core.data.sleeptimer.SleepTimerPreference
 import voice.core.featureflag.MemoryFeatureFlag
 import voice.core.playback.CurrentBookResolver
@@ -85,6 +86,17 @@ class BookPlayViewModelTest {
   }
   private val copilotRepository = CoPilotRepository()
   private val copilotPipeline = mockk<CoPilotPipeline>()
+  private val bookmarkRepository = mockk<BookmarkRepo> {
+    coEvery { addBookmarkAtBookPosition(book, any(), any()) } returns Bookmark(
+      bookId = book.id,
+      chapterId = book.currentChapter.id,
+      addedAt = Instant.now(),
+      setBySleepTimer = true,
+      id = Bookmark.Id(Uuid.random()),
+      time = 0L,
+      title = null,
+    )
+  }
   private val viewModel = BookPlayViewModel(
     bookRepository = mockk {
       coEvery { get(book.id) } returns book
@@ -98,17 +110,7 @@ class BookPlayViewModelTest {
     playStateManager = playStateManager,
     currentBookStoreId = currentBookStoreId,
     navigator = mockk(),
-    bookmarkRepository = mockk {
-      coEvery { addBookmarkAtBookPosition(book, any(), any()) } returns Bookmark(
-        bookId = book.id,
-        chapterId = book.currentChapter.id,
-        addedAt = Instant.now(),
-        setBySleepTimer = true,
-        id = Bookmark.Id(Uuid.random()),
-        time = 0L,
-        title = null,
-      )
-    },
+    bookmarkRepository = bookmarkRepository,
     volumeGainFormatter = mockk(),
     batteryOptimization = mockk(),
     sleepTimerPreferenceStore = sleepTimerDataStore,
@@ -346,13 +348,23 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `bookmark long-click runs Snip and Synthesize instead of adding a plain bookmark`() = scope.runTest {
-    coEvery { copilotPipeline.snip(book.id) } just Runs
-
+  fun `bookmark long-click adds a plain bookmark, not Snip and Synthesize`() = scope.runTest {
     viewModel.onBookmarkLongClick()
     yield()
 
+    coVerify { bookmarkRepository.addBookmarkAtBookPosition(book, any(), any()) }
+    coVerify(exactly = 0) { copilotPipeline.snip(any()) }
+  }
+
+  @Test
+  fun `Snip button runs Snip and Synthesize, not a plain bookmark`() = scope.runTest {
+    coEvery { copilotPipeline.snip(book.id) } just Runs
+
+    viewModel.onSnipClick()
+    yield()
+
     coVerify { copilotPipeline.snip(book.id) }
+    coVerify(exactly = 0) { bookmarkRepository.addBookmarkAtBookPosition(any(), any(), any()) }
   }
 
   @Test
