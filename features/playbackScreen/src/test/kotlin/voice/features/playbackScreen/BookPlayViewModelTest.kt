@@ -355,6 +355,32 @@ class BookPlayViewModelTest {
     coVerify { copilotPipeline.snip(book.id) }
   }
 
+  @Test
+  fun `Feed view state updates live when another source writes to the shared repository`() = scope.runTest {
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.copilotMessages()
+    }.test {
+      assertEquals(expected = emptyList(), actual = awaitItem())
+
+      // Simulates Open Mic / Snip & Synthesize, which write to CoPilotRepository
+      // directly rather than through onSendFeedMessage.
+      copilotRepository.addMessage(
+        book.id,
+        CoPilotMessage(
+          id = "snip-1",
+          role = CoPilotMessage.Role.CoPilot,
+          text = "Snip summary from a Bluetooth action.",
+          timestampMs = 0L,
+          isVisualPriority = true,
+        ),
+      )
+
+      val withSnip = awaitItem()
+      assertEquals(expected = 1, actual = withSnip.size)
+      assertEquals(expected = "Snip summary from a Bluetooth action.", actual = withSnip.single().text)
+    }
+  }
+
   private fun viewModel(
     book: Book = this.book,
     experimentalPlaybackPersistence: Boolean = false,
