@@ -5,6 +5,7 @@ import app.cash.molecule.launchMolecule
 import app.cash.turbine.test
 import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -36,6 +37,8 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
+import voice.core.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
@@ -80,6 +83,8 @@ class BookPlayViewModelTest {
   private val currentBookResolver = mockk<CurrentBookResolver> {
     coEvery { book(book.id) } returns book
   }
+  private val copilotRepository = CoPilotRepository()
+  private val copilotPipeline = mockk<CoPilotPipeline>()
   private val viewModel = BookPlayViewModel(
     bookRepository = mockk {
       coEvery { get(book.id) } returns book
@@ -111,8 +116,8 @@ class BookPlayViewModelTest {
     dispatcherProvider = DispatcherProvider(scope.coroutineContext, scope.coroutineContext, scope.coroutineContext),
     experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
     kioskModeFeatureFlag = MemoryFeatureFlag(false),
-    copilotRepository = CoPilotRepository(),
-    copilotPipeline = mockk(),
+    copilotRepository = copilotRepository,
+    copilotPipeline = copilotPipeline,
     speechInputController = mockk(),
   )
 
@@ -322,6 +327,32 @@ class BookPlayViewModelTest {
       assertEquals(expected = KioskModeDemoData.currentlyPlaying.chapter, actual = state.chapterName)
       assertEquals(expected = KioskModeDemoData.currentlyPlaying.coverUrl, actual = state.cover)
     }
+  }
+
+  @Test
+  fun `sending a Feed message routes through the same CoPilotPipeline ask as Open Mic`() = scope.runTest {
+    coEvery { copilotPipeline.ask(book.id, "who is Carl?") } returns "Carl is the protagonist."
+
+    viewModel.onSendFeedMessage("who is Carl?")
+    yield()
+    yield()
+
+    val messages = copilotRepository.allMessagesByBook.value.getValue(book.id)
+    assertEquals(2, messages.size)
+    assertEquals(CoPilotMessage.Role.User, messages[0].role)
+    assertEquals("who is Carl?", messages[0].text)
+    assertEquals(CoPilotMessage.Role.CoPilot, messages[1].role)
+    assertEquals("Carl is the protagonist.", messages[1].text)
+  }
+
+  @Test
+  fun `bookmark long-click runs Snip and Synthesize instead of adding a plain bookmark`() = scope.runTest {
+    coEvery { copilotPipeline.snip(book.id) } just Runs
+
+    viewModel.onBookmarkLongClick()
+    yield()
+
+    coVerify { copilotPipeline.snip(book.id) }
   }
 
   private fun viewModel(

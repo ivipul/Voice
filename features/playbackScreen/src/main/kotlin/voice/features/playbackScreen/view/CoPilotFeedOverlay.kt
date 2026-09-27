@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -71,7 +74,7 @@ internal fun CoPilotFeedOverlay(
           )
         },
         bottomBar = {
-          FeedInputBar(onSend = onSend)
+          FeedInputBar(isThinking = isThinking, onSend = onSend)
         },
       ) { contentPadding ->
         if (messages.isEmpty()) {
@@ -163,8 +166,15 @@ private fun ThinkingBubble() {
 }
 
 @Composable
-private fun FeedInputBar(onSend: (String) -> Unit) {
+private fun FeedInputBar(isThinking: Boolean, onSend: (String) -> Unit) {
   var text by remember { mutableStateOf("") }
+  fun send() {
+    val trimmed = text.trim()
+    if (trimmed.isNotEmpty() && !isThinking) {
+      onSend(trimmed)
+      text = ""
+    }
+  }
   Row(
     modifier = Modifier
       .fillMaxWidth()
@@ -180,16 +190,14 @@ private fun FeedInputBar(onSend: (String) -> Unit) {
         .weight(1f),
       placeholder = { Text(text = stringResource(id = R.string.copilot_feed_input_placeholder)) },
       maxLines = 4,
+      enabled = !isThinking,
+      keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+      keyboardActions = KeyboardActions(onSend = { send() }),
     )
     Spacer(modifier = Modifier.size(8.dp))
     IconButton(
-      onClick = {
-        val trimmed = text.trim()
-        if (trimmed.isNotEmpty()) {
-          onSend(trimmed)
-          text = ""
-        }
-      },
+      enabled = !isThinking,
+      onClick = ::send,
     ) {
       Icon(
         imageVector = VoiceIcons.Send,
