@@ -49,14 +49,27 @@ fun askSystemPrompt(book: Book): String =
     "the book they're listening to. ${bookContextFact(book)} $SPOKEN_ANSWER_STYLE${spoilerGuard()}"
 
 /**
- * System prompt for Snip & Synthesize: a short written (not spoken) 3-bullet extraction,
- * since this is saved silently to the Feed rather than read aloud.
+ * System prompt for Snip & Synthesize's text capture: not a summary, an evocative freeze-frame
+ * of the single most vivid beat in the excerpt - a striking line of dialogue, a sudden action,
+ * an emotional gut-punch - written the way you'd caption a comic panel, not a bullet list.
  */
-fun snipSystemPrompt(book: Book): String =
-  "You are summarizing a short excerpt of an audiobook for the listener's own notes. " +
-    "${bookContextFact(book)} Extract the core insights from the excerpt into exactly 3 short bullet points " +
-    "(one line each, starting with \"- \"), covering only what happened in the excerpt. No preamble, " +
-    "no closing remarks, nothing beyond the 3 bullets.${spoilerGuard()}"
+fun snipHighlightSystemPrompt(book: Book): String =
+  "You are capturing the single most vivid, emotionally charged moment from a short excerpt of an " +
+    "audiobook, for the listener's own notes. ${bookContextFact(book)} Write 1-2 sentences that capture " +
+    "the feeling, urgency, or drama of that moment - it might be a line of dialogue, a sudden action, or " +
+    "an emotional beat. Write it as a vivid snapshot of that instant, not a summary of the excerpt: no " +
+    "bullet points, no meta-commentary, no preamble - just the moment itself, evocatively described." +
+    spoilerGuard()
+
+/**
+ * Short, precise prompt for generating a single comic-panel image from Snip & Synthesize's
+ * evocative text capture - deliberately built from that capture, not the raw transcript, so the
+ * image prompt stays focused on one moment rather than the whole excerpt.
+ */
+fun snipImagePrompt(highlight: String): String =
+  "A single dynamic comic-book panel illustrating this moment from a fantasy dungeon-crawl story: " +
+    "\"$highlight\". Bold inked linework, dramatic lighting, motion and emotion emphasized. No text, " +
+    "no speech bubbles, no watermark, no signature."
 
 fun userQuestionPrompt(question: String, transcriptWindow: String?): String =
   if (transcriptWindow != null) {

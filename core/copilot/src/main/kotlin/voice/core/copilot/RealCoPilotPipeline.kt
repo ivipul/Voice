@@ -1,5 +1,6 @@
 package voice.core.copilot
 
+import android.content.Context
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -7,6 +8,7 @@ import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
 import voice.core.logging.api.Logger
 import voice.core.transcript.TranscriptRepository
+import java.io.File
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -19,6 +21,7 @@ class RealCoPilotPipeline(
   private val jevRouter: JevRouter,
   private val geminiClient: GeminiClient,
   private val coPilotRepository: CoPilotRepository,
+  private val context: Context,
 ) : CoPilotPipeline {
 
   override suspend fun ask(bookId: BookId, question: String): String {
@@ -75,9 +78,9 @@ class RealCoPilotPipeline(
   override suspend fun snip(bookId: BookId) {
     val book = bookRepository.get(bookId) ?: return
     val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return
-    val summary = runCatching {
+    val highlight = runCatching {
       geminiClient.ask(
-        systemPrompt = snipSystemPrompt(book),
+        systemPrompt = snipHighlightSystemPrompt(book),
         userPrompt = transcriptOnlyPrompt(transcript),
       )
     }.getOrElse { e ->
@@ -89,11 +92,25 @@ class RealCoPilotPipeline(
       CoPilotMessage(
         id = UUID.randomUUID().toString(),
         role = CoPilotMessage.Role.CoPilot,
-        text = summary,
+        text = highlight,
         timestampMs = System.currentTimeMillis(),
         isVisualPriority = true,
+        imagePath = generateSnipImage(highlight),
       ),
     )
+  }
+
+  private suspend fun generateSnipImage(highlight: String): String? {
+    val imageBytes = geminiClient.generateImage(snipImagePrompt(highlight)) ?: return null
+    return runCatching {
+      val dir = File(context.filesDir, SNIP_IMAGE_DIR).apply { mkdirs() }
+      val file = File(dir, "${UUID.randomUUID()}.png")
+      file.writeBytes(imageBytes)
+      file.absolutePath
+    }.getOrElse { e ->
+      Logger.w(e, "Could not save snip image")
+      null
+    }
   }
 
   private companion object {
@@ -104,5 +121,6 @@ class RealCoPilotPipeline(
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val SNIP_TRANSCRIPT_WINDOW_MS = 3.minutes.inWholeMilliseconds
+    const val SNIP_IMAGE_DIR = "snip_images"
   }
 }

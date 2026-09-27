@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,6 +22,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +50,7 @@ import androidx.compose.ui.window.DialogProperties
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
 import voice.core.copilot.CoPilotMessage
+import java.io.File
 
 @Composable
 internal fun CoPilotFeedOverlay(
@@ -137,11 +142,24 @@ private fun ChatBubble(message: CoPilotMessage) {
       },
       modifier = Modifier.widthIn(max = 320.dp),
     ) {
-      Text(
-        text = message.text,
-        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-        style = MaterialTheme.typography.bodyLarge,
-      )
+      Column {
+        message.imagePath?.let { path ->
+          AsyncImage(
+            model = File(path),
+            contentDescription = message.text,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+              .fillMaxWidth()
+              .aspectRatio(1f)
+              .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+          )
+        }
+        Text(
+          text = message.text,
+          modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+          style = MaterialTheme.typography.bodyLarge,
+        )
+      }
     }
   }
 }

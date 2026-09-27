@@ -6,6 +6,7 @@ data class CoPilotMessage(
   val text: String,
   val timestampMs: Long,
   val isVisualPriority: Boolean = false,
+  val imagePath: String? = null,
 ) {
   enum class Role {
     User,
