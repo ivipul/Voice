@@ -29,7 +29,6 @@ class RealCoPilotPipelineTest {
   private val jevRouter = mockk<JevRouter>()
   private val geminiClient = mockk<GeminiClient>()
   private val coPilotRepository = CoPilotRepository()
-  private val sessionTracker = mockk<CoPilotSessionTracker>(relaxed = true)
 
   private val pipeline = RealCoPilotPipeline(
     bookRepository = bookRepository,
@@ -37,7 +36,6 @@ class RealCoPilotPipelineTest {
     jevRouter = jevRouter,
     geminiClient = geminiClient,
     coPilotRepository = coPilotRepository,
-    sessionTracker = sessionTracker,
   )
 
   @Test
@@ -117,6 +115,29 @@ class RealCoPilotPipelineTest {
     coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
 
     val result = pipeline.autoIdentify(book.id)
+
+    assertEquals("I don't have a transcript for this book yet, so I can't answer that.", result)
+  }
+
+  @Test
+  fun `catchMeUp always summarizes the last 30 minutes with an explicit opening`() = runTest {
+    val systemPrompt = slot<String>()
+    coEvery {
+      transcriptRepository.textForPrecedingWindow(book, 30.minutes.inWholeMilliseconds)
+    } returns "the last 30 minutes of plot"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "In the last 30 minutes, Carl fought a goblin."
+
+    val result = pipeline.catchMeUp(book.id)
+
+    assertEquals("In the last 30 minutes, Carl fought a goblin.", result)
+    assertTrue(systemPrompt.captured.contains("In the last 30 minutes,"))
+  }
+
+  @Test
+  fun `catchMeUp falls back when there's no transcript yet`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
+
+    val result = pipeline.catchMeUp(book.id)
 
     assertEquals("I don't have a transcript for this book yet, so I can't answer that.", result)
   }

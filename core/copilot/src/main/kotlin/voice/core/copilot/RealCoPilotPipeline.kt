@@ -19,7 +19,6 @@ class RealCoPilotPipeline(
   private val jevRouter: JevRouter,
   private val geminiClient: GeminiClient,
   private val coPilotRepository: CoPilotRepository,
-  private val sessionTracker: CoPilotSessionTracker,
 ) : CoPilotPipeline {
 
   override suspend fun ask(bookId: BookId, question: String): String {
@@ -61,32 +60,15 @@ class RealCoPilotPipeline(
 
   override suspend fun catchMeUp(bookId: BookId): String {
     val book = bookRepository.get(bookId) ?: return FALLBACK_ANSWER
-    sessionTracker.snapshotIfNeeded(bookId)
-
-    return if (sessionTracker.isWithinFirst30SecondsOfSession()) {
-      val transcript = transcriptRepository.textForWindow(
-        book = book,
-        endPositionMs = sessionTracker.previousSessionEndPositionMs(bookId),
-        windowMs = CATCH_UP_PREVIOUS_SESSION_WINDOW_MS,
-      ) ?: return FALLBACK_NO_TRANSCRIPT
-      val task = "Give a 3-sentence spoken recap of what happened in the final 5 minutes of the user's " +
-        "previous listening session, shown below."
-      runCatching {
-        geminiClient.ask(spokenAnswerSystemPrompt(book, task), transcriptOnlyPrompt(transcript))
-      }.getOrElse { e ->
-        Logger.w(e, "CoPilot catchMeUp() (previous session) failed")
-        FALLBACK_ANSWER
-      }
-    } else {
-      val transcript = transcriptRepository.textForPrecedingWindow(book, CATCH_UP_CURRENT_SESSION_WINDOW_MS)
-        ?: return FALLBACK_NO_TRANSCRIPT
-      val task = "Give a spoken summary of what happened in the last 30 minutes of the book, shown below."
-      runCatching {
-        geminiClient.ask(spokenAnswerSystemPrompt(book, task), transcriptOnlyPrompt(transcript))
-      }.getOrElse { e ->
-        Logger.w(e, "CoPilot catchMeUp() (current session) failed")
-        FALLBACK_ANSWER
-      }
+    val transcript = transcriptRepository.textForPrecedingWindow(book, CATCH_UP_WINDOW_MS)
+      ?: return FALLBACK_NO_TRANSCRIPT
+    val task = "Give a spoken summary of what happened in the last 30 minutes of the book, shown below. " +
+      "Start your answer with the exact words \"In the last 30 minutes,\" and continue directly from there."
+    return runCatching {
+      geminiClient.ask(spokenAnswerSystemPrompt(book, task), transcriptOnlyPrompt(transcript))
+    }.getOrElse { e ->
+      Logger.w(e, "CoPilot catchMeUp() failed")
+      FALLBACK_ANSWER
     }
   }
 
@@ -120,8 +102,7 @@ class RealCoPilotPipeline(
     val ASK_TRANSCRIPT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val AUTO_IDENTIFY_RECENT_WINDOW_MS = 60.seconds.inWholeMilliseconds
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
-    val CATCH_UP_PREVIOUS_SESSION_WINDOW_MS = 5.minutes.inWholeMilliseconds
-    val CATCH_UP_CURRENT_SESSION_WINDOW_MS = 30.minutes.inWholeMilliseconds
+    val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val SNIP_TRANSCRIPT_WINDOW_MS = 3.minutes.inWholeMilliseconds
   }
 }
