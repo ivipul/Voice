@@ -47,6 +47,21 @@ private enum class TriggerAction(val labelRes: Int) {
   OpenMic(StringsR.string.copilot_settings_action_open_mic),
   AutoIdentify(StringsR.string.copilot_settings_action_auto_identify),
   CatchMeUp(StringsR.string.copilot_settings_action_catch_me_up),
+  Snip(StringsR.string.copilot_settings_action_snip),
+}
+
+/**
+ * Single NEXT/PREVIOUS only offer the fixed-seek direction that matches their physical
+ * gesture (rewind for PREVIOUS, forward for NEXT) - the other direction wouldn't make sense
+ * mapped to that button. Double-tap slots don't offer either: a fixed skip is a single-press
+ * action, not something worth reserving a double-tap for.
+ */
+private fun TriggerSlot.availableActions(): List<TriggerAction> = when (this) {
+  TriggerSlot.SingleNext -> TriggerAction.entries - TriggerAction.DefaultRewind
+  TriggerSlot.SinglePrevious -> TriggerAction.entries - TriggerAction.DefaultForward
+  TriggerSlot.DoubleNext,
+  TriggerSlot.DoublePrevious,
+  -> TriggerAction.entries - TriggerAction.DefaultRewind - TriggerAction.DefaultForward
 }
 
 @Composable
@@ -111,7 +126,7 @@ private fun TriggerRow(
           Icon(imageVector = VoiceIcons.ExpandMore, contentDescription = null)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-          TriggerAction.entries.forEach { action ->
+          slot.availableActions().forEach { action ->
             DropdownMenuItem(
               text = { Text(text = stringResource(id = action.labelRes)) },
               onClick = {

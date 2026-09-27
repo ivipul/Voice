@@ -110,6 +110,8 @@
     <string name="copilot.settings.action.auto_identify">Auto-Identify</string>
     <!-- Trigger action option: recap of the recent story so far. -->
     <string name="copilot.settings.action.catch_me_up">Catch-Me-Up Recap</string>
+    <!-- Trigger action option: silently capture an evocative moment to the Feed. -->
+    <string name="copilot.settings.action.snip">Snip &amp; Synthesize</string>
     <!-- Content description for a cover preview that can be selected. -->
     <string name="cover.content_description.selectable">Shows cover to choose</string>
     <!-- Content description for an icon indicating the author in cover search results. -->
