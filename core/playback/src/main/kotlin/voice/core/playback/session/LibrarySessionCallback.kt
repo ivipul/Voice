@@ -1,11 +1,9 @@
 package voice.core.playback.session
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
-import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -50,18 +48,16 @@ class LibrarySessionCallback(
   @CurrentBookStore
   private val currentBookStoreId: DataStore<BookId?>,
   private val bookRepository: BookRepository,
-  private val context: Context,
-  private val voiceCoPilotSpike: VoiceCoPilotSpike,
+  private val copilotEngine: CoPilotEngine,
 ) : MediaLibrarySession.Callback {
 
   private var pendingHeadsetPressJob: Job? = null
   private var lastHeadsetPressKeyCode: Int? = null
   private var lastHeadsetPressAtMs: Long = 0L
 
-  // Bluetooth spike 1 (Phase 3): prove that headset media-button presses can be
-  // intercepted here and disambiguated into single vs. double presses before any
-  // AI/co-pilot action is wired up. Consumes NEXT/PREVIOUS so default seek behavior
-  // doesn't also fire while we're validating detection only.
+  // Intercepts headset NEXT/PREVIOUS to disambiguate single vs. double presses (Phase 3) and
+  // dispatch the default co-pilot mapping (Phase 4). Consumes both so the default seek
+  // behavior doesn't also fire underneath our own handling.
   override fun onMediaButtonEvent(
     session: MediaSession,
     controllerInfo: ControllerInfo,
@@ -77,7 +73,7 @@ class LibrarySessionCallback(
       // paired ACTION_UP to it would immediately re-toggle whatever ACTION_DOWN just did.
       if (keyEvent.action == KeyEvent.ACTION_DOWN) {
         val wasPlaying = player.playWhenReady
-        Logger.d("Bluetooth spike: PLAY_PAUSE toggling (playWhenReady=$wasPlaying -> ${!wasPlaying})")
+        Logger.d("PLAY_PAUSE toggling (playWhenReady=$wasPlaying -> ${!wasPlaying})")
         if (wasPlaying) {
           player.pause()
         } else {
@@ -102,29 +98,38 @@ class LibrarySessionCallback(
 
     if (isDoublePress) {
       lastHeadsetPressKeyCode = null
-      reportHeadsetAction(keyCode, doublePress = true)
+      // Default mapping (Phase 4): Double NEXT = Auto-Identify, Double PREVIOUS = Catch-Me-Up.
+      // Persisting a user-configurable mapping is follow-up work (see CoPilotSettingsScreen).
+      if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
+        triggerCoPilotMode(CoPilotMode.AutoIdentify)
+      } else {
+        triggerCoPilotMode(CoPilotMode.CatchMeUp)
+      }
     } else {
       pendingHeadsetPressJob = scope.launch {
         delay(DOUBLE_PRESS_THRESHOLD_MS)
+        // Default mapping (Phase 4): Single NEXT = Open Mic, Single PREVIOUS = fixed Rewind.
         if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
-          // Single NEXT = Open Mic Co-Pilot. Voice round-trip spike only for now.
-          Logger.d("Bluetooth spike: Single NEXT -> voice round-trip")
-          player.pause()
-          voiceCoPilotSpike.trigger(onFinished = { player.play() })
+          triggerCoPilotMode(CoPilotMode.OpenMic)
         } else {
-          reportHeadsetAction(keyCode, doublePress = false)
+          copilotEngine.interruptIfActive()
+          player.rewindByFixedAmount()
         }
       }
     }
     return true
   }
 
-  private fun reportHeadsetAction(keyCode: Int, doublePress: Boolean) {
-    val label = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) "NEXT" else "PREVIOUS"
-    val pressType = if (doublePress) "Double" else "Single"
-    val message = "Bluetooth spike: $pressType $label"
-    Logger.d(message)
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+  /**
+   * Every mapped button press interrupts whichever co-pilot mode is currently active (if any)
+   * before starting its own action fresh, rather than queuing behind it - this is also how a
+   * different mode's Single NEXT reads as "that's not what I wanted, ask me something else"
+   * instead of just bailing out to the book.
+   */
+  private fun triggerCoPilotMode(mode: CoPilotMode) {
+    copilotEngine.interruptIfActive()
+    player.pause()
+    copilotEngine.trigger(mode, onFinished = { player.play() })
   }
 
   private fun Intent.extractKeyEvent(): KeyEvent? =

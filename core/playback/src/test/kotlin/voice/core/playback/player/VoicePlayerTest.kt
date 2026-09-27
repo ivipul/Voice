@@ -109,6 +109,7 @@ class VoicePlayerTest {
     mediaItemProvider = mediaItemProvider,
     volumeGain = mockk(relaxed = true),
     sleepTimer = sleepTimer,
+    copilotEngine = mockk(relaxed = true),
     analytics = mockk(relaxed = true),
   )
 

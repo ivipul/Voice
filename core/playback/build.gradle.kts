@@ -8,21 +8,6 @@ android {
   androidResources {
     enable = true
   }
-
-  buildFeatures {
-    buildConfig = true
-  }
-
-  // Bluetooth voice round-trip spike only (Phase 4 groundwork): set gemini.apiKey in
-  // ~/.gradle/gradle.properties (outside the repo, never committed) to test the
-  // mic -> Gemini -> TTS pipeline on-device.
-  defaultConfig {
-    buildConfigField(
-      type = "String",
-      name = "GEMINI_API_KEY",
-      value = "\"${providers.gradleProperty("gemini.apiKey").getOrElse("")}\"",
-    )
-  }
 }
 
 dependencies {
@@ -32,6 +17,9 @@ dependencies {
   implementation(projects.core.sleeptimer.api)
   implementation(projects.core.data.api)
   implementation(projects.core.analytics.api)
+  // api, not implementation: Metro needs CoPilotPipeline/CoPilotRepository's @ContributesBinding
+  // hints visible on :app's compile classpath, two hops away through this module.
+  api(projects.core.copilot)
 
   implementation(libs.androidxCore)
   implementation(libs.coil)

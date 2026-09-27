@@ -1,4 +1,4 @@
-package voice.features.playbackScreen.copilot
+package voice.core.copilot
 
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject

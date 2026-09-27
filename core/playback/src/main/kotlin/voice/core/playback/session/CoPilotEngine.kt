@@ -14,56 +14,58 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.widget.Toast
+import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.addJsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import voice.core.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotPipeline
+import voice.core.copilot.CoPilotRepository
+import voice.core.data.BookId
+import voice.core.data.store.CurrentBookStore
 import voice.core.logging.api.Logger
-import voice.core.playback.BuildConfig
 import voice.core.playback.R
 import voice.core.playback.di.PlaybackScope
-import java.io.IOException
 import java.util.Locale
-import java.util.concurrent.TimeUnit
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+/** Which Bluetooth-triggered co-pilot action is running. */
+sealed interface CoPilotMode {
+  data object OpenMic : CoPilotMode
+  data object AutoIdentify : CoPilotMode
+  data object CatchMeUp : CoPilotMode
+}
+
 /**
- * Bluetooth voice round-trip spike (Phase 4 groundwork): proves mic -> Gemini -> TTS works
- * end to end on real hardware, triggered from a headset button. Not the real Open Mic
- * Co-Pilot implementation yet (no Jev routing, no transcript injection, no Feed logging).
+ * Owns the pause -> (listen ->) Jev/Gemini -> speak -> resume round trip shared by every
+ * Bluetooth-triggered co-pilot mode. The Gemini/transcript/Jev logic itself lives in
+ * [CoPilotPipeline] (core:copilot) so the Feed's typed Ask flow can share it; this class is
+ * only responsible for the Android-side mechanics: SpeechRecognizer, TextToSpeech, audio
+ * focus, and being interruptible mid-flight (see [interruptIfActive]).
+ *
+ * Originally a spike proving mic -> Gemini -> TTS worked on hardware (see git history for
+ * `VoiceCoPilotSpike`); generalized here to cover Open Mic, Auto-Identify, and Catch-Me-Up.
+ * Snip & Synthesize doesn't pause playback or speak, so it isn't one of these modes - it
+ * calls into [CoPilotPipeline.snip] directly from the UI layer instead.
  */
 @Inject
 @SingleIn(PlaybackScope::class)
-class VoiceCoPilotSpike(
+class CoPilotEngine(
   private val context: Context,
   private val scope: CoroutineScope,
+  private val copilotPipeline: CoPilotPipeline,
+  private val copilotRepository: CoPilotRepository,
+  @CurrentBookStore
+  private val currentBookStoreId: DataStore<BookId?>,
 ) {
 
-  private val httpClient = OkHttpClient.Builder()
-    .connectTimeout(15, TimeUnit.SECONDS)
-    .writeTimeout(15, TimeUnit.SECONDS)
-    .readTimeout(30, TimeUnit.SECONDS)
-    .build()
   private val mainHandler = Handler(Looper.getMainLooper())
   private var textToSpeech: TextToSpeech? = null
 
@@ -99,38 +101,66 @@ class VoiceCoPilotSpike(
     }
   }
 
-  fun trigger(onFinished: () -> Unit) {
-    Logger.d("Voice spike: trigger() on instance ${System.identityHashCode(this)}")
+  fun trigger(mode: CoPilotMode, onFinished: () -> Unit) {
+    Logger.d("CoPilotEngine: trigger($mode) on instance ${System.identityHashCode(this)}")
     isActive = true
-    // Hold audio focus for the whole listening/thinking/speaking session. Without this,
+    // Hold audio focus for the whole listening/thinking/speaking round trip. Without this,
     // TextToSpeech's own transient focus requests cause ExoPlayer's built-in audio-focus
     // handling to auto-resume the book internally (bypassing VoicePlayer entirely, since
     // it's driven by the raw player, not our wrapper) the moment TTS momentarily lets go of
     // focus between utterances - which fights with us keeping the book paused.
     requestAudioFocus()
-    toast("Voice spike: listening...")
     activeJob = scope.launch {
       try {
-        val heard = listen()
-        Logger.d("Voice spike: heard \"$heard\"")
-        toast("Heard: $heard")
-        val reply = withContext(Dispatchers.IO) { askGemini(heard) }
-        Logger.d("Voice spike: Gemini replied \"$reply\"")
-        speak(reply) {
-          isActive = false
-          abandonAudioFocus()
-          onFinished()
+        val bookId = currentBookStoreId.data.first()
+        if (bookId == null) {
+          finish(onFinished)
+          return@launch
         }
+        val answer = when (mode) {
+          CoPilotMode.OpenMic -> runOpenMic(bookId)
+          CoPilotMode.AutoIdentify -> copilotPipeline.autoIdentify(bookId)
+          CoPilotMode.CatchMeUp -> copilotPipeline.catchMeUp(bookId)
+        }
+        speak(answer) { finish(onFinished) }
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
-        Logger.w(e, "Voice spike failed")
-        toast("Voice spike failed: ${e.message}")
-        isActive = false
-        abandonAudioFocus()
-        onFinished()
+        Logger.w(e, "CoPilotEngine: $mode failed")
+        speak("Sorry, something went wrong.") { finish(onFinished) }
       }
     }
+  }
+
+  private suspend fun runOpenMic(bookId: BookId): String {
+    val heard = listen()
+    Logger.d("CoPilotEngine: heard \"$heard\"")
+    copilotRepository.addMessage(
+      bookId,
+      CoPilotMessage(
+        id = UUID.randomUUID().toString(),
+        role = CoPilotMessage.Role.User,
+        text = heard,
+        timestampMs = System.currentTimeMillis(),
+      ),
+    )
+    val answer = copilotPipeline.ask(bookId, heard)
+    copilotRepository.addMessage(
+      bookId,
+      CoPilotMessage(
+        id = UUID.randomUUID().toString(),
+        role = CoPilotMessage.Role.CoPilot,
+        text = answer,
+        timestampMs = System.currentTimeMillis(),
+      ),
+    )
+    return answer
+  }
+
+  private fun finish(onFinished: () -> Unit) {
+    isActive = false
+    abandonAudioFocus()
+    onFinished()
   }
 
   private fun requestAudioFocus() {
@@ -153,13 +183,14 @@ class VoiceCoPilotSpike(
 
   /**
    * Called from [voice.core.playback.player.VoicePlayer] whenever playback is about to
-   * resume (headset play/pause, in-app play/pause button, notification, etc.) — if a voice
-   * round trip is in progress, stop it immediately rather than let it keep talking over the
-   * resumed book. No-op if nothing is active.
+   * resume (headset play/pause, in-app play/pause button, notification, etc.), and from
+   * [LibrarySessionCallback] whenever a different mapped button starts its own action -
+   * every mapped press interrupts whichever mode is currently active before doing its own
+   * thing, never queuing behind it. No-op if nothing is active.
    */
   fun interruptIfActive() {
     Logger.d(
-      "Voice spike: interruptIfActive on instance ${System.identityHashCode(this)}, isActive=$isActive",
+      "CoPilotEngine: interruptIfActive on instance ${System.identityHashCode(this)}, isActive=$isActive",
     )
     if (!isActive) return
     isActive = false
@@ -173,7 +204,6 @@ class VoiceCoPilotSpike(
     textToSpeech?.shutdown()
     textToSpeech = null
     abandonAudioFocus()
-    toast("Voice spike: cancelled")
   }
 
   private suspend fun listen(): String = suspendCancellableCoroutine { cont ->
@@ -219,65 +249,6 @@ class VoiceCoPilotSpike(
     recognizer.startListening(intent)
   }
 
-  private fun askGemini(prompt: String): String {
-    val apiKey = BuildConfig.GEMINI_API_KEY
-    check(apiKey.isNotBlank()) { "GEMINI_API_KEY not set in ~/.gradle/gradle.properties" }
-
-    val requestJson = buildJsonObject {
-      putJsonObject("systemInstruction") {
-        putJsonArray("parts") {
-          addJsonObject { put("text", SYSTEM_PROMPT) }
-        }
-      }
-      putJsonArray("contents") {
-        addJsonObject {
-          putJsonArray("parts") {
-            addJsonObject { put("text", prompt) }
-          }
-        }
-      }
-      // Low thinking level: this is a quick spoken Q&A, not a task needing deep reasoning,
-      // so trade reasoning depth for lower latency.
-      putJsonObject("generationConfig") {
-        putJsonObject("thinkingConfig") {
-          put("thinkingLevel", "LOW")
-        }
-      }
-    }
-    val request = Request.Builder()
-      .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent")
-      .addHeader("x-goog-api-key", apiKey)
-      .post(requestJson.toString().toRequestBody("application/json".toMediaType()))
-      .build()
-
-    var lastError: Exception? = null
-    for (attempt in 0 until MAX_GEMINI_ATTEMPTS) {
-      if (attempt > 0) {
-        Logger.d("Voice spike: retrying Gemini request (attempt ${attempt + 1}/$MAX_GEMINI_ATTEMPTS)")
-        Thread.sleep(GEMINI_RETRY_BACKOFF_MS * attempt)
-      }
-      try {
-        httpClient.newCall(request).execute().use { response ->
-          val responseBody = response.body.string()
-          check(response.isSuccessful) { "Gemini request failed: ${response.code} $responseBody" }
-          val json = Json.parseToJsonElement(responseBody).jsonObject
-          return json.getValue("candidates").jsonArray[0].jsonObject
-            .getValue("content").jsonObject
-            .getValue("parts").jsonArray[0].jsonObject
-            .getValue("text").jsonPrimitive.content
-        }
-      } catch (e: IOException) {
-        // Network hiccup / timeout - worth a retry.
-        lastError = e
-      } catch (e: IllegalStateException) {
-        // Non-2xx response - only worth retrying if it's a transient overload (503).
-        if (e.message?.startsWith("Gemini request failed: 503") != true) throw e
-        lastError = e
-      }
-    }
-    throw lastError ?: IllegalStateException("Gemini request failed after $MAX_GEMINI_ATTEMPTS attempts")
-  }
-
   private fun speak(text: String, onDone: () -> Unit) {
     textToSpeech?.shutdown()
     textToSpeech = TextToSpeech(context) { status ->
@@ -286,11 +257,11 @@ class VoiceCoPilotSpike(
         tts.setOnUtteranceProgressListener(
           object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-              Logger.d("Voice spike: TTS onStart")
+              Logger.d("CoPilotEngine: TTS onStart")
             }
 
             override fun onDone(utteranceId: String?) {
-              Logger.d("Voice spike: TTS onDone")
+              Logger.d("CoPilotEngine: TTS onDone")
               // Runs on TTS's own binder thread; the Player must only be touched on
               // the main thread, so hop back before resuming playback.
               mainHandler.post { finishSpeaking(onDone) }
@@ -298,15 +269,15 @@ class VoiceCoPilotSpike(
 
             @Deprecated("Deprecated in Java", ReplaceWith(""))
             override fun onError(utteranceId: String?) {
-              Logger.d("Voice spike: TTS onError")
+              Logger.d("CoPilotEngine: TTS onError")
               mainHandler.post { finishSpeaking(onDone) }
             }
           },
         )
-        Logger.d("Voice spike: TTS speaking ${text.length} chars")
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "voice-copilot-spike")
+        Logger.d("CoPilotEngine: TTS speaking ${text.length} chars")
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "voice-copilot")
       } else {
-        Logger.w("Voice spike: TTS init failed with status $status")
+        Logger.w("CoPilotEngine: TTS init failed with status $status")
         mainHandler.post(onDone)
       }
     }
@@ -319,18 +290,7 @@ class VoiceCoPilotSpike(
     mainHandler.postDelayed(onDone, RESPONSE_END_PAUSE_MS)
   }
 
-  private fun toast(message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-  }
-
   private companion object {
-    const val MAX_GEMINI_ATTEMPTS = 3
-    const val GEMINI_RETRY_BACKOFF_MS = 1000L
     const val RESPONSE_END_PAUSE_MS = 500L
-    const val SYSTEM_PROMPT = "You are a voice assistant answering a spoken question out loud. " +
-      "Keep your answer under 15-20 seconds when spoken (roughly 40-50 words), and don't ramble " +
-      "or add extra detail beyond what was asked. Respond in plain, natural spoken language only: " +
-      "no markdown, no headings, no bullet points, no asterisks, no URLs or links, no code, and no " +
-      "text that wouldn't make sense read aloud by a text-to-speech engine."
   }
 }

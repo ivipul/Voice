@@ -42,7 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
-import voice.features.playbackScreen.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotMessage
 
 @Composable
 internal fun CoPilotFeedOverlay(

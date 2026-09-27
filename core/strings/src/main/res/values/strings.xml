@@ -68,6 +68,8 @@
     <string name="copilot.action.feed">Feed</string>
     <!-- Content description for the Snip &amp; Synthesize co-pilot toolbar button. -->
     <string name="copilot.action.snip">Snip</string>
+    <!-- Snackbar shown after Snip &amp; Synthesize saves a summary to the Feed. -->
+    <string name="copilot.snip.saved.snackbar">Snipped — summary saved to Feed</string>
     <!-- Shown while the co-pilot is listening for a spoken question. -->
     <string name="copilot.feed.listening">Listening…</string>
     <!-- Placeholder text for the co-pilot Feed text input. -->
@@ -87,7 +89,7 @@
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
     <string name="copilot.settings.title">Co-Pilot Button Mapping</string>
     <!-- Section header for the co-pilot settings screen. -->
-    <string name="copilot.settings.description">Choose what each headset button press does. Wiring these up to real Bluetooth events comes in a later phase — for now this just remembers your choice.</string>
+    <string name="copilot.settings.description">Choose what each headset button press does. This currently shows the default mapping; live edits here don\'t yet change what your headset buttons actually trigger.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
     <string name="copilot.settings.trigger.single_next">Single tap NEXT</string>
     <!-- Settings row label for the single-tap PREVIOUS trigger slot. -->

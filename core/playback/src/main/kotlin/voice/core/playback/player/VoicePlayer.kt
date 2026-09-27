@@ -21,9 +21,9 @@ import voice.core.data.store.SeekTimeStore
 import voice.core.logging.api.Logger
 import voice.core.playback.misc.Decibel
 import voice.core.playback.misc.VolumeGain
+import voice.core.playback.session.CoPilotEngine
 import voice.core.playback.session.MediaId
 import voice.core.playback.session.MediaItemProvider
-import voice.core.playback.session.VoiceCoPilotSpike
 import voice.core.playback.session.playbackItemForPosition
 import voice.core.playback.session.positionInMediaItem
 import voice.core.playback.session.toMediaIdOrNull
@@ -49,7 +49,7 @@ class VoicePlayer(
   private val scope: CoroutineScope,
   private val volumeGain: VolumeGain,
   private val sleepTimer: SleepTimer,
-  private val voiceCoPilotSpike: VoiceCoPilotSpike,
+  private val copilotEngine: CoPilotEngine,
   private val analytics: Analytics,
 ) : ForwardingPlayer(player) {
 
@@ -147,6 +147,13 @@ class VoicePlayer(
     }
   }
 
+  /** Standard Navigation's fixed Rewind, distinct from the user's configurable seek amount above. */
+  fun rewindByFixedAmount() {
+    scope.launch {
+      seekBackBy(FIXED_REWIND_AMOUNT)
+    }
+  }
+
   private suspend fun seekBackBy(skipAmount: Duration) {
     seekBackBy(
       skipAmount = skipAmount,
@@ -218,9 +225,9 @@ class VoicePlayer(
 
     if (playWhenReady) {
       // Any request to resume playback (headset play/pause, in-app button, notification, ...)
-      // while the voice co-pilot spike is mid-flight should cut it off rather than let it
-      // keep talking over the resumed book.
-      voiceCoPilotSpike.interruptIfActive()
+      // while a co-pilot mode is mid-flight should cut it off rather than let it keep
+      // talking over the resumed book.
+      copilotEngine.interruptIfActive()
       updateLastPlayedAt()
     } else {
       val currentPosition = player.currentPosition.takeUnless { it == C.TIME_UNSET }?.milliseconds ?: ZERO
@@ -353,6 +360,10 @@ class VoicePlayer(
   private suspend fun updateBook(update: (BookContent) -> BookContent) {
     val bookId = currentBookStoreId.data.first() ?: return
     repo.updateBook(bookId, update)
+  }
+
+  private companion object {
+    val FIXED_REWIND_AMOUNT = 15.seconds
   }
 }
 

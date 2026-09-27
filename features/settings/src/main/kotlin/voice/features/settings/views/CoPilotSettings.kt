@@ -50,12 +50,15 @@ private enum class TriggerAction(val labelRes: Int) {
 
 @Composable
 fun CoPilotSettingsScreen(navigator: Navigator) {
+  // Matches the hardcoded default in LibrarySessionCallback (core:playback). Changing the
+  // selection here doesn't yet change what the headset buttons actually trigger - see that
+  // file's dispatch logic and the description text below.
   var mapping by remember {
     mutableStateOf(
       mapOf(
-        TriggerSlot.SingleNext to TriggerAction.StandardSkip,
+        TriggerSlot.SingleNext to TriggerAction.OpenMic,
         TriggerSlot.SinglePrevious to TriggerAction.StandardSkip,
-        TriggerSlot.DoubleNext to TriggerAction.OpenMic,
+        TriggerSlot.DoubleNext to TriggerAction.AutoIdentify,
         TriggerSlot.DoublePrevious to TriggerAction.CatchMeUp,
       ),
     )

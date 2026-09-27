@@ -36,7 +36,7 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
-import voice.features.playbackScreen.copilot.CoPilotRepository
+import voice.core.copilot.CoPilotRepository
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
 import kotlin.test.Test

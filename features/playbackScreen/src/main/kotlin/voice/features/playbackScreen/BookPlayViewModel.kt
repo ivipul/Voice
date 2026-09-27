@@ -42,10 +42,10 @@ import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
 import voice.core.ui.formatTime
+import voice.core.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotPipeline
+import voice.core.copilot.CoPilotRepository
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
-import voice.features.playbackScreen.copilot.CoPilotMessage
-import voice.features.playbackScreen.copilot.CoPilotPipeline
-import voice.features.playbackScreen.copilot.CoPilotRepository
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
 import voice.navigation.Destination
@@ -348,7 +348,7 @@ class BookPlayViewModel(
   }
 
   fun onSendFeedMessage(text: String) {
-    askCoPilot(text)
+    runCoPilotExchange(userText = text) { copilotPipeline.ask(bookId, text) }
   }
 
   fun onAskClick() {
@@ -358,40 +358,43 @@ class BookPlayViewModel(
         return@launch
       }
       feedVisible.value = true
-      askCoPilot(question)
+      runCoPilotExchange(userText = question) { copilotPipeline.ask(bookId, question) }
     }
   }
 
   fun onCatchMeUpClick() {
     feedVisible.value = true
-    askCoPilot("Catch me up on what's happened recently.")
+    runCoPilotExchange(userText = "Catch me up on what's happened recently.") {
+      copilotPipeline.catchMeUp(bookId)
+    }
   }
 
   fun onSnipClick() {
-    // Snip & Synthesize (PRD Phase 6) reuses the bookmark mechanism as its capture point.
+    // Snip & Synthesize fully replaces plain bookmarking, so both the toolbar Snip button
+    // and the bookmark icon's long-press converge on the same action.
     onBookmarkLongClick()
   }
 
-  private fun askCoPilot(question: String) {
+  private fun runCoPilotExchange(userText: String, answer: suspend () -> String) {
     scope.launch {
       copilotRepository.addMessage(
         bookId,
         CoPilotMessage(
           id = UUID.randomUUID().toString(),
           role = CoPilotMessage.Role.User,
-          text = question,
+          text = userText,
           timestampMs = System.currentTimeMillis(),
         ),
       )
       isThinking.value = true
-      val answer = copilotPipeline.ask(bookId, question)
+      val result = answer()
       isThinking.value = false
       copilotRepository.addMessage(
         bookId,
         CoPilotMessage(
           id = UUID.randomUUID().toString(),
           role = CoPilotMessage.Role.CoPilot,
-          text = answer,
+          text = result,
           timestampMs = System.currentTimeMillis(),
         ),
       )
@@ -400,13 +403,8 @@ class BookPlayViewModel(
 
   fun onBookmarkLongClick() {
     scope.launch {
-      val book = currentBook() ?: return@launch
-      bookmarkRepository.addBookmarkAtBookPosition(
-        book = book,
-        title = null,
-        setBySleepTimer = false,
-      )
-      viewEffects.tryEmit(BookPlayViewEffect.BookmarkAdded)
+      copilotPipeline.snip(bookId)
+      viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
     }
   }
 

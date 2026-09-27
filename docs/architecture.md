@@ -39,6 +39,10 @@ Core modules provide the underlying services and abstractions:
 
   * `:core:playback` – Audio playback logic using ExoPlayer
   * `:core:sleeptimer:api` & `:core:sleeptimer:impl` – Sleep timer contracts and implementation
+  * `:core:transcript` – Local transcript JSON parsing and time-window lookups
+  * `:core:copilot` – Jev/Gemini routing pipeline behind every AI co-pilot action, shared by
+    the Bluetooth-triggered modes (`:core:playback`) and the Feed's typed/spoken interactions
+    (`:features:playbackScreen`)
 
 * **Utility Modules**
 
