@@ -13,7 +13,7 @@ interface CoPilotPipeline {
   /** Open Mic Co-Pilot / Feed Ask: answers a listener's question, spoken-length by default. */
   suspend fun ask(bookId: BookId, question: String): String
 
-  /** Auto-Identify: names and summarizes the most consequential thing from the last 60s. */
+  /** Auto-Identify: explains what's happening in the last 60s, using up to 30m as context. */
   suspend fun autoIdentify(bookId: BookId): String
 
   /** Catch-Me-Up: recaps either the previous session's tail or this session's last 30 minutes. */

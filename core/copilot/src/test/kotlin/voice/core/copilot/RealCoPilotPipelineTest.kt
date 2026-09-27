@@ -15,6 +15,8 @@ import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid
 
 class RealCoPilotPipelineTest {
@@ -75,6 +77,48 @@ class RealCoPilotPipelineTest {
     val result = pipeline.ask(book.id, "who is Carl?")
 
     assertTrue(result.isNotBlank())
+  }
+
+  @Test
+  fun `autoIdentify prioritizes the last 60 seconds over the 30-minute context`() = runTest {
+    val userPrompt = slot<String>()
+    coEvery {
+      transcriptRepository.textForPrecedingWindow(book, 60.seconds.inWholeMilliseconds)
+    } returns "the last 60 seconds"
+    coEvery {
+      transcriptRepository.textForPrecedingWindow(book, 30.minutes.inWholeMilliseconds)
+    } returns "the last 30 minutes"
+    coEvery { geminiClient.ask(any(), capture(userPrompt)) } returns "here's what's happening"
+
+    val result = pipeline.autoIdentify(book.id)
+
+    assertEquals("here's what's happening", result)
+    assertTrue(userPrompt.captured.contains("the last 60 seconds"))
+    assertTrue(userPrompt.captured.contains("the last 30 minutes"))
+  }
+
+  @Test
+  fun `autoIdentify still answers when there's no 30-minute context yet`() = runTest {
+    coEvery {
+      transcriptRepository.textForPrecedingWindow(book, 60.seconds.inWholeMilliseconds)
+    } returns "the last 60 seconds"
+    coEvery {
+      transcriptRepository.textForPrecedingWindow(book, 30.minutes.inWholeMilliseconds)
+    } returns null
+    coEvery { geminiClient.ask(any(), any()) } returns "here's what's happening"
+
+    val result = pipeline.autoIdentify(book.id)
+
+    assertEquals("here's what's happening", result)
+  }
+
+  @Test
+  fun `autoIdentify falls back when there's no transcript at all`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
+
+    val result = pipeline.autoIdentify(book.id)
+
+    assertEquals("I don't have a transcript for this book yet, so I can't answer that.", result)
   }
 
   @Test

@@ -69,11 +69,16 @@ fun transcriptOnlyPrompt(transcriptWindow: String): String =
   "Excerpt from the book:\n\"\"\"\n$transcriptWindow\n\"\"\""
 
 /**
- * Auto-Identify's prompt shows the full last-60s window plus the final ~20s again on their
- * own, with an explicit instruction to weight that final slice more heavily - a cheap way to
- * get recency-weighted judgment out of a single Gemini call without any real scoring model.
+ * Auto-Identify's prompt: up to ~30 minutes of context (so Gemini knows who/what is involved)
+ * plus the last 60 seconds called out separately as the thing to actually explain. The system
+ * prompt's task text is what tells Gemini to prioritize the 60s block over the context.
  */
-fun autoIdentifyPrompt(last60Seconds: String, last20Seconds: String): String =
-  "Last 60 seconds of the book:\n\"\"\"\n$last60Seconds\n\"\"\"\n\n" +
-    "The final ~20 seconds of that same excerpt (weight this part most heavily when judging " +
-    "what's currently most relevant):\n\"\"\"\n$last20Seconds\n\"\"\""
+fun autoIdentifyPrompt(last30Minutes: String?, last60Seconds: String): String {
+  val contextBlock = if (last30Minutes != null) {
+    "Context - roughly the last 30 minutes of the book, for background only:\n\"\"\"\n$last30Minutes\n\"\"\"\n\n"
+  } else {
+    ""
+  }
+  return contextBlock +
+    "What to explain - the last 60 seconds:\n\"\"\"\n$last60Seconds\n\"\"\""
+}

@@ -42,17 +42,16 @@ class RealCoPilotPipeline(
 
   override suspend fun autoIdentify(bookId: BookId): String {
     val book = bookRepository.get(bookId) ?: return FALLBACK_ANSWER
-    val last60Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_WINDOW_MS)
+    val last60Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_RECENT_WINDOW_MS)
       ?: return FALLBACK_NO_TRANSCRIPT
-    val last20Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_RECENCY_WEIGHT_MS)
-      ?: last60Seconds
-    val task = "Identify the single most relevant, important, or consequential character, location, item, " +
-      "or recurring concept from the excerpt below - not simply whatever was most recently mentioned. Then give " +
-      "a 2-sentence spoken summary of it."
+    val last30Minutes = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_CONTEXT_WINDOW_MS)
+    val task = "Explain what is happening right now in the book, based specifically on the last 60 seconds " +
+      "provided below. Use the last 30 minutes of context only to understand who or what is involved - don't " +
+      "summarize that older context itself, focus your explanation on the current moment."
     return runCatching {
       geminiClient.ask(
         systemPrompt = spokenAnswerSystemPrompt(book, task),
-        userPrompt = autoIdentifyPrompt(last60Seconds, last20Seconds),
+        userPrompt = autoIdentifyPrompt(last30Minutes, last60Seconds),
       )
     }.getOrElse { e ->
       Logger.w(e, "CoPilot autoIdentify() failed")
@@ -119,8 +118,8 @@ class RealCoPilotPipeline(
     const val FALLBACK_ANSWER = "Sorry, I couldn't get an answer just now."
     const val FALLBACK_NO_TRANSCRIPT = "I don't have a transcript for this book yet, so I can't answer that."
     val ASK_TRANSCRIPT_WINDOW_MS = 30.minutes.inWholeMilliseconds
-    val AUTO_IDENTIFY_WINDOW_MS = 60.seconds.inWholeMilliseconds
-    val AUTO_IDENTIFY_RECENCY_WEIGHT_MS = 20.seconds.inWholeMilliseconds
+    val AUTO_IDENTIFY_RECENT_WINDOW_MS = 60.seconds.inWholeMilliseconds
+    val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_PREVIOUS_SESSION_WINDOW_MS = 5.minutes.inWholeMilliseconds
     val CATCH_UP_CURRENT_SESSION_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val SNIP_TRANSCRIPT_WINDOW_MS = 3.minutes.inWholeMilliseconds
