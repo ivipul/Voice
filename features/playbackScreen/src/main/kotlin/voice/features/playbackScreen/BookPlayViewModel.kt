@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Assisted
@@ -48,6 +49,9 @@ import voice.core.ui.formatTime
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.xray.XRayManifest
+import voice.core.xray.XRayRepository
+import voice.core.xray.activeEntities
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -86,6 +90,7 @@ class BookPlayViewModel(
   private val copilotRepository: CoPilotRepository,
   private val copilotPipeline: CoPilotPipeline,
   private val speechInputController: SpeechInputController,
+  private val xrayRepository: XRayRepository,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -150,6 +155,12 @@ class BookPlayViewModel(
     val hasMoreThanOneChapter = book.chapters.sumOf { it.chapterMarks.count() } > 1
     val skipBackSeconds by remember { seekTimeStore.data }.collectAsState(initial = 15)
     val skipForwardSeconds by remember { seekForwardTimeStore.data }.collectAsState(initial = 30)
+    val xrayManifest by produceState<XRayManifest?>(initialValue = null, book.currentChapter.id) {
+      value = xrayRepository.manifestFor(book)
+    }
+    val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
+      BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
+    }.orEmpty()
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -162,6 +173,7 @@ class BookPlayViewModel(
       skipSilence = book.content.skipSilence,
       skipBackSeconds = skipBackSeconds,
       skipForwardSeconds = skipForwardSeconds,
+      xrayChips = xrayChips,
     )
   }
 
@@ -180,6 +192,7 @@ class BookPlayViewModel(
       skipSilence = false,
       skipBackSeconds = 15,
       skipForwardSeconds = 30,
+      xrayChips = emptyList(),
     )
   }
 
@@ -344,6 +357,18 @@ class BookPlayViewModel(
 
   fun onBookmarkClick() {
     navigator.goTo(Destination.Bookmarks(bookId))
+  }
+
+  fun onXRayChipClick(id: String) {
+    scope.launch {
+      val book = currentBook() ?: return@launch
+      val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
+      dialogState.value = BookPlayDialogViewState.XRayEntityDialog(
+        title = entity.title,
+        description = entity.description,
+        image = entity.image,
+      )
+    }
   }
 
   @Composable

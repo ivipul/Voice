@@ -18,7 +18,10 @@ data class BookPlayViewState(
   val skipSilence: Boolean,
   val skipBackSeconds: Int,
   val skipForwardSeconds: Int,
+  val xrayChips: List<XRayChipViewState>,
 ) {
+
+  data class XRayChipViewState(val id: String, val label: String)
 
   sealed interface SleepTimerViewState {
     data object Disabled : SleepTimerViewState
@@ -62,4 +65,10 @@ internal sealed interface BookPlayDialogViewState {
 
   @JvmInline
   value class SleepTimer(val viewState: SleepTimerViewState) : BookPlayDialogViewState
+
+  data class XRayEntityDialog(
+    val title: String,
+    val description: String,
+    val image: String?,
+  ) : BookPlayDialogViewState
 }

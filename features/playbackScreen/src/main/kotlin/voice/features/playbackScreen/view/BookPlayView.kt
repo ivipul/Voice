@@ -37,6 +37,7 @@ internal fun BookPlayView(
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
   onFeedClick: () -> Unit,
+  onXRayChipClick: (String) -> Unit,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
   Scaffold(
@@ -72,6 +73,7 @@ internal fun BookPlayView(
         onAskClick = onAskClick,
         onSnipClick = onSnipClick,
         onFeedClick = onFeedClick,
+        onXRayChipClick = onXRayChipClick,
         useLandscapeLayout = useLandscapeLayout,
       )
     },
@@ -106,6 +108,7 @@ private fun BookPlayPreview(
       onAskClick = {},
       onSnipClick = {},
       onFeedClick = {},
+      onXRayChipClick = {},
       useLandscapeLayout = false,
     )
   }
@@ -125,6 +128,10 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
       skipForwardSeconds = 30,
       sleepTimerState = BookPlayViewState.SleepTimerViewState.Disabled,
       title = "Das Ende der Welt",
+      xrayChips = listOf(
+        BookPlayViewState.XRayChipViewState(id = "carl", label = "Carl"),
+        BookPlayViewState.XRayChipViewState(id = "donut", label = "Princess Donut"),
+      ),
     )
     yield(initial)
     yield(
@@ -135,5 +142,6 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
       ),
     )
     yield(initial.copy(chapterName = null))
+    yield(initial.copy(xrayChips = emptyList()))
   }
 }

@@ -123,6 +123,9 @@ class BookPlayViewModelTest {
     copilotRepository = copilotRepository,
     copilotPipeline = copilotPipeline,
     speechInputController = mockk(),
+    xrayRepository = mockk {
+      coEvery { manifestFor(any()) } returns null
+    },
   )
 
   @Test
@@ -432,6 +435,9 @@ class BookPlayViewModelTest {
       copilotRepository = CoPilotRepository(),
       copilotPipeline = mockk(),
       speechInputController = mockk(),
+      xrayRepository = mockk {
+        coEvery { manifestFor(any()) } returns null
+      },
     )
   }
 }
