@@ -31,7 +31,10 @@ import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import voice.core.data.Book
 import voice.core.data.BookId
+import voice.core.data.CoPilotButtonMapping
+import voice.core.data.CoPilotTriggerAction
 import voice.core.data.repo.BookRepository
+import voice.core.data.store.CoPilotButtonMappingStore
 import voice.core.data.store.CurrentBookStore
 import voice.core.logging.api.Logger
 import voice.core.playback.player.VoicePlayer
@@ -49,6 +52,8 @@ class LibrarySessionCallback(
   private val currentBookStoreId: DataStore<BookId?>,
   private val bookRepository: BookRepository,
   private val copilotEngine: CoPilotEngine,
+  @CoPilotButtonMappingStore
+  private val copilotButtonMappingStore: DataStore<CoPilotButtonMapping>,
 ) : MediaLibrarySession.Callback {
 
   private var pendingHeadsetPressJob: Job? = null
@@ -57,8 +62,9 @@ class LibrarySessionCallback(
   private var lastNextOrPreviousAtMs: Long = 0L
 
   // Intercepts headset NEXT/PREVIOUS to disambiguate single vs. double presses (Phase 3) and
-  // dispatch the default co-pilot mapping (Phase 4). Consumes both so the default seek
-  // behavior doesn't also fire underneath our own handling.
+  // dispatch whatever action the user has mapped to that slot (CoPilotButtonMappingStore, set
+  // via CoPilotSettingsScreen). Consumes both so the default seek behavior doesn't also fire
+  // underneath our own handling.
   override fun onMediaButtonEvent(
     session: MediaSession,
     controllerInfo: ControllerInfo,
@@ -109,24 +115,17 @@ class LibrarySessionCallback(
 
     if (isDoublePress) {
       lastHeadsetPressKeyCode = null
-      // Default mapping (Phase 4): Double NEXT = Auto-Identify, Double PREVIOUS = Catch-Me-Up.
-      // Persisting a user-configurable mapping is follow-up work (see CoPilotSettingsScreen).
-      if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
-        triggerCoPilotMode(CoPilotMode.AutoIdentify)
-      } else {
-        triggerCoPilotMode(CoPilotMode.CatchMeUp)
+      scope.launch {
+        val mapping = copilotButtonMappingStore.data.first()
+        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.doubleNext else mapping.doublePrevious
+        performAction(action)
       }
     } else {
       pendingHeadsetPressJob = scope.launch {
         delay(DOUBLE_PRESS_THRESHOLD_MS)
-        // Default mapping (Phase 4): Single NEXT = Open Mic, Single PREVIOUS = Rewind (same
-        // default/override as the on-screen skip-back button - see SeekTimeStore).
-        if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) {
-          triggerCoPilotMode(CoPilotMode.OpenMic)
-        } else {
-          copilotEngine.interruptIfActive()
-          player.seekBack()
-        }
+        val mapping = copilotButtonMappingStore.data.first()
+        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.singleNext else mapping.singlePrevious
+        performAction(action)
       }
     }
     return true
@@ -138,8 +137,19 @@ class LibrarySessionCallback(
    * different mode's Single NEXT reads as "that's not what I wanted, ask me something else"
    * instead of just bailing out to the book.
    */
-  private fun triggerCoPilotMode(mode: CoPilotMode) {
+  private fun performAction(action: CoPilotTriggerAction) {
     copilotEngine.interruptIfActive()
+    when (action) {
+      CoPilotTriggerAction.DefaultRewind -> player.seekBack()
+      CoPilotTriggerAction.DefaultForward -> player.seekForward()
+      CoPilotTriggerAction.OpenMic -> startMode(CoPilotMode.OpenMic)
+      CoPilotTriggerAction.AutoIdentify -> startMode(CoPilotMode.AutoIdentify)
+      CoPilotTriggerAction.CatchMeUp -> startMode(CoPilotMode.CatchMeUp)
+      CoPilotTriggerAction.Snip -> copilotEngine.snip()
+    }
+  }
+
+  private fun startMode(mode: CoPilotMode) {
     player.pause()
     copilotEngine.trigger(mode, onFinished = { player.play() })
   }

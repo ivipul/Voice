@@ -91,7 +91,7 @@
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
     <string name="copilot.settings.title">Co-Pilot Button Mapping</string>
     <!-- Section header for the co-pilot settings screen. -->
-    <string name="copilot.settings.description">Choose what each headset button press does. This currently shows the default mapping; live edits here don\'t yet change what your headset buttons actually trigger.</string>
+    <string name="copilot.settings.description">Choose what each headset button press does.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
     <string name="copilot.settings.trigger.single_next">Single tap NEXT</string>
     <!-- Settings row label for the single-tap PREVIOUS trigger slot. -->

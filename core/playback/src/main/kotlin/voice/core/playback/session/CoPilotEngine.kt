@@ -132,6 +132,17 @@ class CoPilotEngine(
     }
   }
 
+  /**
+   * Snip & Synthesize: unlike [trigger]'s modes, this doesn't pause playback or speak - it's a
+   * silent background capture, so it doesn't touch [isActive]/audio focus at all.
+   */
+  fun snip() {
+    scope.launch {
+      val bookId = currentBookStoreId.data.first() ?: return@launch
+      copilotPipeline.snip(bookId)
+    }
+  }
+
   private suspend fun runOpenMic(bookId: BookId): String {
     val heard = listen()
     Logger.d("CoPilotEngine: heard \"$heard\"")

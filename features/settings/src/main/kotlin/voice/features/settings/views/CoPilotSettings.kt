@@ -13,19 +13,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
+import kotlinx.coroutines.launch
+import voice.core.data.CoPilotButtonMapping
+import voice.core.data.CoPilotTriggerAction
+import voice.core.data.store.CoPilotButtonMappingStore
 import voice.core.ui.VoiceTheme
 import voice.core.ui.icons.VoiceIcons
 import voice.navigation.Destination
@@ -33,7 +40,7 @@ import voice.navigation.NavEntryProvider
 import voice.navigation.Navigator
 import voice.core.strings.R as StringsR
 
-/** Which trigger slot a headset button press maps to. Wiring these to real Bluetooth events is Phase 3. */
+/** Which headset button gesture a slot represents. */
 private enum class TriggerSlot(val labelRes: Int) {
   SingleNext(StringsR.string.copilot_settings_trigger_single_next),
   SinglePrevious(StringsR.string.copilot_settings_trigger_single_previous),
@@ -41,14 +48,15 @@ private enum class TriggerSlot(val labelRes: Int) {
   DoublePrevious(StringsR.string.copilot_settings_trigger_double_previous),
 }
 
-private enum class TriggerAction(val labelRes: Int) {
-  DefaultRewind(StringsR.string.copilot_settings_action_default_rewind),
-  DefaultForward(StringsR.string.copilot_settings_action_default_forward),
-  OpenMic(StringsR.string.copilot_settings_action_open_mic),
-  AutoIdentify(StringsR.string.copilot_settings_action_auto_identify),
-  CatchMeUp(StringsR.string.copilot_settings_action_catch_me_up),
-  Snip(StringsR.string.copilot_settings_action_snip),
-}
+private val CoPilotTriggerAction.labelRes: Int
+  get() = when (this) {
+    CoPilotTriggerAction.DefaultRewind -> StringsR.string.copilot_settings_action_default_rewind
+    CoPilotTriggerAction.DefaultForward -> StringsR.string.copilot_settings_action_default_forward
+    CoPilotTriggerAction.OpenMic -> StringsR.string.copilot_settings_action_open_mic
+    CoPilotTriggerAction.AutoIdentify -> StringsR.string.copilot_settings_action_auto_identify
+    CoPilotTriggerAction.CatchMeUp -> StringsR.string.copilot_settings_action_catch_me_up
+    CoPilotTriggerAction.Snip -> StringsR.string.copilot_settings_action_snip
+  }
 
 /**
  * Single NEXT/PREVIOUS only offer the fixed-seek direction that matches their physical
@@ -56,35 +64,59 @@ private enum class TriggerAction(val labelRes: Int) {
  * mapped to that button. Double-tap slots don't offer either: a fixed skip is a single-press
  * action, not something worth reserving a double-tap for.
  */
-private fun TriggerSlot.availableActions(): List<TriggerAction> = when (this) {
-  TriggerSlot.SingleNext -> TriggerAction.entries - TriggerAction.DefaultRewind
-  TriggerSlot.SinglePrevious -> TriggerAction.entries - TriggerAction.DefaultForward
+private fun TriggerSlot.availableActions(): List<CoPilotTriggerAction> = when (this) {
+  TriggerSlot.SingleNext -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultRewind
+  TriggerSlot.SinglePrevious -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultForward
   TriggerSlot.DoubleNext,
   TriggerSlot.DoublePrevious,
-  -> TriggerAction.entries - TriggerAction.DefaultRewind - TriggerAction.DefaultForward
+  -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultRewind - CoPilotTriggerAction.DefaultForward
+}
+
+private fun CoPilotButtonMapping.get(slot: TriggerSlot): CoPilotTriggerAction = when (slot) {
+  TriggerSlot.SingleNext -> singleNext
+  TriggerSlot.SinglePrevious -> singlePrevious
+  TriggerSlot.DoubleNext -> doubleNext
+  TriggerSlot.DoublePrevious -> doublePrevious
+}
+
+private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerAction): CoPilotButtonMapping =
+  when (slot) {
+    TriggerSlot.SingleNext -> copy(singleNext = action)
+    TriggerSlot.SinglePrevious -> copy(singlePrevious = action)
+    TriggerSlot.DoubleNext -> copy(doubleNext = action)
+    TriggerSlot.DoublePrevious -> copy(doublePrevious = action)
+  }
+
+@Composable
+fun CoPilotSettingsScreen(
+  navigator: Navigator,
+  mappingStore: DataStore<CoPilotButtonMapping>,
+) {
+  val mapping by remember { mappingStore.data }.collectAsState(initial = CoPilotButtonMapping())
+  val coroutineScope = rememberCoroutineScope()
+  CoPilotSettingsScreen(
+    mapping = mapping,
+    onClose = navigator::goBack,
+    onSelect = { slot, action ->
+      coroutineScope.launch {
+        mappingStore.updateData { it.with(slot, action) }
+      }
+    },
+  )
 }
 
 @Composable
-fun CoPilotSettingsScreen(navigator: Navigator) {
-  // Matches the hardcoded default in LibrarySessionCallback (core:playback). Changing the
-  // selection here doesn't yet change what the headset buttons actually trigger - see that
-  // file's dispatch logic and the description text below.
-  var mapping by remember {
-    mutableStateOf(
-      mapOf(
-        TriggerSlot.SingleNext to TriggerAction.OpenMic,
-        TriggerSlot.SinglePrevious to TriggerAction.DefaultRewind,
-        TriggerSlot.DoubleNext to TriggerAction.AutoIdentify,
-        TriggerSlot.DoublePrevious to TriggerAction.CatchMeUp,
-      ),
-    )
-  }
+private fun CoPilotSettingsScreen(
+  mapping: CoPilotButtonMapping,
+  onClose: () -> Unit,
+  onSelect: (TriggerSlot, CoPilotTriggerAction) -> Unit,
+) {
   Scaffold(
     topBar = {
       TopAppBar(
         title = { Text(text = stringResource(id = StringsR.string.copilot_settings_title)) },
         navigationIcon = {
-          IconButton(onClick = navigator::goBack) {
+          IconButton(onClick = onClose) {
             Icon(
               imageVector = VoiceIcons.Close,
               contentDescription = stringResource(id = StringsR.string.common_action_close),
@@ -103,8 +135,8 @@ fun CoPilotSettingsScreen(navigator: Navigator) {
       TriggerSlot.entries.forEach { slot ->
         TriggerRow(
           slot = slot,
-          selected = mapping.getValue(slot),
-          onSelect = { action -> mapping = mapping + (slot to action) },
+          selected = mapping.get(slot),
+          onSelect = { action -> onSelect(slot, action) },
         )
       }
     }
@@ -114,8 +146,8 @@ fun CoPilotSettingsScreen(navigator: Navigator) {
 @Composable
 private fun TriggerRow(
   slot: TriggerSlot,
-  selected: TriggerAction,
-  onSelect: (TriggerAction) -> Unit,
+  selected: CoPilotTriggerAction,
+  onSelect: (CoPilotTriggerAction) -> Unit,
 ) {
   var expanded by remember { mutableStateOf(false) }
   ListItem(
@@ -147,7 +179,11 @@ private fun TriggerRow(
 @Preview
 private fun CoPilotSettingsPreview() {
   VoiceTheme {
-    CoPilotSettingsScreen(navigator = Navigator())
+    CoPilotSettingsScreen(
+      mapping = CoPilotButtonMapping(),
+      onClose = {},
+      onSelect = { _, _ -> },
+    )
   }
 }
 
@@ -156,10 +192,13 @@ interface CoPilotSettingsProvider {
 
   @Provides
   @IntoSet
-  fun coPilotSettingsNavEntryProvider(navigator: Navigator): NavEntryProvider<*> =
+  fun coPilotSettingsNavEntryProvider(
+    navigator: Navigator,
+    @CoPilotButtonMappingStore mappingStore: DataStore<CoPilotButtonMapping>,
+  ): NavEntryProvider<*> =
     NavEntryProvider<Destination.CoPilotSettings> { key ->
       NavEntry(key) {
-        CoPilotSettingsScreen(navigator = navigator)
+        CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore)
       }
     }
 }

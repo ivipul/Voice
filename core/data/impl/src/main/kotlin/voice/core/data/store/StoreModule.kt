@@ -14,6 +14,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import voice.core.data.BookId
+import voice.core.data.CoPilotButtonMapping
 import voice.core.data.GridMode
 import voice.core.data.ThemeColorScheme
 import voice.core.data.ThemeMode
@@ -110,6 +111,17 @@ public interface StoreModule {
     return factory.int(
       fileName = "seekForwardTime",
       defaultValue = 30,
+    )
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @CoPilotButtonMappingStore
+  private fun copilotButtonMapping(factory: VoiceDataStoreFactory): DataStore<CoPilotButtonMapping> {
+    return factory.create(
+      serializer = CoPilotButtonMapping.serializer(),
+      defaultValue = CoPilotButtonMapping(),
+      fileName = "copilotButtonMapping",
     )
   }
 
