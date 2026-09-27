@@ -9,13 +9,18 @@ android {
     buildConfig = true
   }
 
-  // Set gemini.apiKey in ~/.gradle/gradle.properties (outside the repo, never committed)
-  // to enable the co-pilot's Gemini calls.
+  // Set gemini.apiKey / openrouter.apiKey in ~/.gradle/gradle.properties (outside the repo,
+  // never committed) to enable the co-pilot's Gemini and Jev router calls.
   defaultConfig {
     buildConfigField(
       type = "String",
       name = "GEMINI_API_KEY",
       value = "\"${providers.gradleProperty("gemini.apiKey").getOrElse("")}\"",
+    )
+    buildConfigField(
+      type = "String",
+      name = "OPENROUTER_API_KEY",
+      value = "\"${providers.gradleProperty("openrouter.apiKey").getOrElse("")}\"",
     )
   }
 }
