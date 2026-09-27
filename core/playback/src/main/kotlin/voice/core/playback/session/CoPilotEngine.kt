@@ -89,6 +89,14 @@ class CoPilotEngine(
   private val startListeningSoundId = soundPool.load(context, R.raw.voice_spike_start_listening, 1)
   private val endListeningSoundId = soundPool.load(context, R.raw.voice_spike_end_listening, 1)
 
+  // Auto-Identify has no listening phase to cue (it never calls listen()), so it gets its own
+  // sound at the moment it starts instead - a two-note ascending "recognizing" ping, distinct
+  // from Open Mic's single-tone start/end blips. Snip never pauses or speaks, so without this
+  // it would be completely silent; its cue plays once the capture finishes, as a quiet "got it"
+  // confirmation layered over the still-playing book.
+  private val autoIdentifyStartSoundId = soundPool.load(context, R.raw.copilot_auto_identify, 1)
+  private val snipCapturedSoundId = soundPool.load(context, R.raw.copilot_snip, 1)
+
   init {
     soundPool.setOnLoadCompleteListener { _, sampleId, status ->
       if (status == 0) loadedSoundIds += sampleId
@@ -110,6 +118,9 @@ class CoPilotEngine(
     // it's driven by the raw player, not our wrapper) the moment TTS momentarily lets go of
     // focus between utterances - which fights with us keeping the book paused.
     requestAudioFocus()
+    if (mode == CoPilotMode.AutoIdentify) {
+      playCue(autoIdentifyStartSoundId)
+    }
     activeJob = scope.launch {
       try {
         val bookId = currentBookStoreId.data.first()
@@ -140,6 +151,7 @@ class CoPilotEngine(
     scope.launch {
       val bookId = currentBookStoreId.data.first() ?: return@launch
       copilotPipeline.snip(bookId)
+      playCue(snipCapturedSoundId)
     }
   }
 
