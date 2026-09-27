@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,8 +76,15 @@ internal fun CoPilotFeedOverlay(
     // imePadding() below - that's what pushed the input bar far above the keyboard with a big
     // empty gap. Telling the window not to fit system windows itself hands IME handling fully
     // to Compose's inset modifiers, so it's only accounted for once.
+    //
+    // SideEffect, not LaunchedEffect: LaunchedEffect's coroutine is dispatched a frame after
+    // composition, which was late enough that the keyboard's very first appearance (from
+    // focusing the field) still measured against the window's default decorFitsSystemWindows
+    // = true, pinning the input bar to the top until some later recomposition (e.g. typing a
+    // character) forced a relayout against the corrected setting. SideEffect runs
+    // synchronously right after this composition, before that first IME layout pass.
     val view = LocalView.current
-    LaunchedEffect(view) {
+    SideEffect {
       (view.parent as? DialogWindowProvider)?.window?.let { window ->
         WindowCompat.setDecorFitsSystemWindows(window, false)
       }
