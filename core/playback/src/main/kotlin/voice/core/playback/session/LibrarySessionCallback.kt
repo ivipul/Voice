@@ -54,6 +54,7 @@ class LibrarySessionCallback(
   private var pendingHeadsetPressJob: Job? = null
   private var lastHeadsetPressKeyCode: Int? = null
   private var lastHeadsetPressAtMs: Long = 0L
+  private var lastNextOrPreviousAtMs: Long = 0L
 
   // Intercepts headset NEXT/PREVIOUS to disambiguate single vs. double presses (Phase 3) and
   // dispatch the default co-pilot mapping (Phase 4). Consumes both so the default seek
@@ -72,12 +73,21 @@ class LibrarySessionCallback(
       // calling pause() again even when playWhenReady was already false), and forwarding the
       // paired ACTION_UP to it would immediately re-toggle whatever ACTION_DOWN just did.
       if (keyEvent.action == KeyEvent.ACTION_DOWN) {
-        val wasPlaying = player.playWhenReady
-        Logger.d("PLAY_PAUSE toggling (playWhenReady=$wasPlaying -> ${!wasPlaying})")
-        if (wasPlaying) {
-          player.pause()
+        if (System.currentTimeMillis() - lastNextOrPreviousAtMs <= NEXT_PREVIOUS_ECHO_WINDOW_MS) {
+          // Some Bluetooth peripherals (observed on Pixel Buds' double-tap-to-skip gesture)
+          // send a PLAY key event automatically right after NEXT/PREVIOUS as their own
+          // "keep playing" signal, not as a separate deliberate press. Without this, that
+          // synthetic PLAY reaches us ~10ms later and immediately interrupts whichever
+          // co-pilot mode NEXT/PREVIOUS just triggered, before the user hears anything.
+          Logger.d("Ignoring PLAY_PAUSE echo shortly after NEXT/PREVIOUS")
         } else {
-          player.play()
+          val wasPlaying = player.playWhenReady
+          Logger.d("PLAY_PAUSE toggling (playWhenReady=$wasPlaying -> ${!wasPlaying})")
+          if (wasPlaying) {
+            player.pause()
+          } else {
+            player.play()
+          }
         }
       }
       return true
@@ -94,6 +104,7 @@ class LibrarySessionCallback(
     val isDoublePress = keyCode == lastHeadsetPressKeyCode && now - lastHeadsetPressAtMs <= DOUBLE_PRESS_THRESHOLD_MS
     lastHeadsetPressKeyCode = keyCode
     lastHeadsetPressAtMs = now
+    lastNextOrPreviousAtMs = now
     pendingHeadsetPressJob?.cancel()
 
     if (isDoublePress) {
@@ -316,6 +327,7 @@ class LibrarySessionCallback(
 
   private companion object {
     const val DOUBLE_PRESS_THRESHOLD_MS = 1500L
+    const val NEXT_PREVIOUS_ECHO_WINDOW_MS = 500L
     val PLAY_PAUSE_KEY_CODES = setOf(
       KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
       KeyEvent.KEYCODE_MEDIA_PLAY,
