@@ -113,6 +113,7 @@ fun BookPlayScreen(bookId: BookId) {
     onAskClick = onAskClick,
     onSnipClick = viewModel::onSnipClick,
     onFeedClick = viewModel::onFeedClick,
+    onXRayChipClick = viewModel::onXRayChipClick,
     useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
     snackbarHostState = snackbarHostState,
   )
@@ -126,6 +127,9 @@ fun BookPlayScreen(bookId: BookId) {
       }
       is BookPlayDialogViewState.SelectChapterDialog -> {
         SelectChapterDialog(dialogState, viewModel)
+      }
+      is BookPlayDialogViewState.XRayEntityDialog -> {
+        XRayEntityBottomSheet(dialogState, viewModel)
       }
       is BookPlayDialogViewState.SleepTimer -> {
         SleepTimerDialog(

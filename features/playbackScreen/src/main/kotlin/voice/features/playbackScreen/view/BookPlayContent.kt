@@ -32,6 +32,7 @@ internal fun BookPlayContent(
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
   onFeedClick: () -> Unit,
+  onXRayChipClick: (String) -> Unit,
   useLandscapeLayout: Boolean,
 ) {
   if (useLandscapeLayout) {
@@ -60,6 +61,10 @@ internal fun BookPlayContent(
             onSkipToPrevious = onSkipToPrevious,
             onCurrentChapterClick = onCurrentChapterClick,
           )
+        }
+        if (viewState.xrayChips.isNotEmpty()) {
+          Spacer(modifier = Modifier.size(12.dp))
+          XRayChipRow(chips = viewState.xrayChips, onChipClick = onXRayChipClick)
         }
         Spacer(modifier = Modifier.size(20.dp))
         SliderRow(
@@ -107,6 +112,10 @@ internal fun BookPlayContent(
           onSkipToPrevious = onSkipToPrevious,
           onCurrentChapterClick = onCurrentChapterClick,
         )
+      }
+      if (viewState.xrayChips.isNotEmpty()) {
+        Spacer(modifier = Modifier.size(12.dp))
+        XRayChipRow(chips = viewState.xrayChips, onChipClick = onXRayChipClick)
       }
       Spacer(modifier = Modifier.size(20.dp))
       SliderRow(
