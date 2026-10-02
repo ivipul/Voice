@@ -48,6 +48,7 @@ import voice.core.xray.card.PlayerCardEntry
 import voice.core.xray.card.PlayerCardFields
 import voice.core.xray.card.PlayerCardRepository
 import voice.core.xray.card.PlayerCardSet
+import voice.core.xray.card.composeAt
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
 import kotlin.test.Test
@@ -482,6 +483,48 @@ class BookPlayViewModelTest {
     yield()
 
     assertIs<BookPlayDialogViewState.XRayEntityDialog>(viewModel.dialogState.value)
+  }
+
+  @Test
+  fun `the open card follows the live playback position when it is available`() = scope.runTest {
+    val liveFlow = MutableStateFlow<LivePlaybackState?>(null)
+    val viewModel = viewModel(experimentalPlaybackPersistence = true, livePlaybackFlow = liveFlow)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.cardPositionMs(openedAtMs = 1L)
+    }.test {
+      assertEquals(expected = 1L, actual = awaitItem())
+      assertEquals(expected = book.content.positionInChapter, actual = awaitItem())
+
+      liveFlow.value = LivePlaybackState(
+        bookId = book.id,
+        chapterId = book.chapters.first().id,
+        positionMs = 3.minutes.inWholeMilliseconds,
+        isPlaying = true,
+        playbackSpeed = 1F,
+      )
+      assertEquals(expected = 3.minutes.inWholeMilliseconds, actual = awaitItem())
+    }
+  }
+
+  @Test
+  fun `the open card dialog keeps the raw card so it can be composed at any position`() = scope.runTest {
+    val data = PlayerCardData(
+      id = "carl",
+      entries = listOf(
+        PlayerCardEntry(ms = 1.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "3"),
+        PlayerCardEntry(ms = 10.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9"),
+      ),
+    )
+    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = PlayerCardSet(mapOf("carl" to data), imageFolder = null))
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = 2.5.minutes.inWholeMilliseconds, actual = dialog.openedAtMs)
+    assertEquals(expected = 3, actual = dialog.card.level)
+    assertEquals(expected = 9, actual = dialog.data.composeAt(11.minutes.inWholeMilliseconds).level)
   }
 
   private val carlManifest = XRayManifest(

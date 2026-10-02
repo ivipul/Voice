@@ -133,7 +133,11 @@ fun BookPlayScreen(bookId: BookId) {
         XRayEntityBottomSheet(dialogState, viewModel)
       }
       is BookPlayDialogViewState.XRayCardDialog -> {
-        HoloCardDialog(dialogState, onDismiss = viewModel::dismissDialog)
+        HoloCardDialog(
+          dialogState = dialogState,
+          positionMs = viewModel.cardPositionMs(dialogState.openedAtMs),
+          onDismiss = viewModel::dismissDialog,
+        )
       }
       is BookPlayDialogViewState.SleepTimer -> {
         SleepTimerDialog(

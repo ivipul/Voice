@@ -381,15 +381,31 @@ class BookPlayViewModel(
     entity: XRayEntityInfo,
   ): BookPlayDialogViewState.XRayCardDialog? = withContext(dispatcherProvider.io) {
     val cards = playerCardRepository.cardsFor(book) ?: return@withContext null
-    val card = cards.card(entity.id)
-      ?.composeAt(book.content.positionInChapter)
-      ?.takeIf { it.hasRevealedData }
-      ?: return@withContext null
+    val data = cards.card(entity.id) ?: return@withContext null
+    val positionMs = book.content.positionInChapter
+    if (!data.composeAt(positionMs).hasRevealedData) return@withContext null
     BookPlayDialogViewState.XRayCardDialog(
       name = entity.title,
-      card = card,
-      lookImage = card.look?.image?.let(cards::imageUri)?.toString(),
+      data = data,
+      imageUris = data.entries
+        .mapNotNull { it.image }
+        .distinct()
+        .mapNotNull { path -> cards.imageUri(path)?.let { path to it.toString() } }
+        .toMap(),
+      openedAtMs = positionMs,
     )
+  }
+
+  /** The playback position the open holo card follows, so stats and looks reveal as the book plays. */
+  @Composable
+  fun cardPositionMs(openedAtMs: Long): Long {
+    val persisted by remember(bookId) { bookRepository.flow(bookId).filterNotNull() }.collectAsState(initial = null)
+    val live = if (experimentalPlaybackPersistenceFeatureFlag.get()) {
+      remember(bookId) { player.livePlaybackStateFlow(bookId) }.collectAsState(null).value
+    } else {
+      null
+    }
+    return live?.positionMs ?: persisted?.content?.positionInChapter ?: openedAtMs
   }
 
   @Composable

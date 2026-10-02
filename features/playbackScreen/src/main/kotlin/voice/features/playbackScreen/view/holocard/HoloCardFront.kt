@@ -1,5 +1,8 @@
 package voice.features.playbackScreen.view.holocard
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +77,7 @@ internal fun HoloCardFront(
   name: String,
   card: ComposedPlayerCard,
   lookImage: String?,
+  animate: Boolean,
   tilt: HoloTiltState,
   u: CardUnit,
   modifier: Modifier = Modifier,
@@ -82,7 +91,7 @@ internal fun HoloCardFront(
       .holoFoil(tilt),
   ) {
     ArtWindow(palette = palette, tilt = tilt, u = u, modifier = Modifier.cardRect(u, WindowLeft, WindowTop, WindowWidth, WindowHeight))
-    Figure(name = name, lookImage = lookImage, palette = palette, tilt = tilt, u = u)
+    Figure(name = name, lookImage = lookImage, animate = animate, palette = palette, tilt = tilt, u = u)
     Banner(name = name, epithet = card.epithet, palette = palette, tilt = tilt, u = u)
     Badge(
       label = stringResource(R.string.holo_card_level),
@@ -100,7 +109,7 @@ internal fun HoloCardFront(
       u = u,
       modifier = Modifier.cardRect(u, 79.5f, 3.5f, 17f, 17f),
     )
-    StatPanel(card = card, palette = palette, u = u)
+    StatPanel(card = card, palette = palette, animate = animate, u = u)
   }
 }
 
@@ -252,6 +261,7 @@ private fun DrawScope.drawHalo(
 private fun Figure(
   name: String,
   lookImage: String?,
+  animate: Boolean,
   palette: FloorPalette,
   tilt: HoloTiltState,
   u: CardUnit,
@@ -267,23 +277,27 @@ private fun Figure(
       },
     contentAlignment = Alignment.BottomCenter,
   ) {
-    if (lookImage != null) {
-      AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(lookImage).crossfade(false).build(),
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
-        alignment = Alignment.BottomCenter,
-        modifier = Modifier.fillMaxSize(),
-      )
-    } else {
-      CardText(
-        text = name.take(1).uppercase(),
-        size = u.sp(40f),
-        color = palette.accent,
-        fontFamily = DisplayFont,
-        weight = FontWeight.Black,
-        modifier = Modifier.padding(bottom = u.dp(20f)),
-      )
+    Crossfade(targetState = lookImage, animationSpec = if (animate) tween(400) else snap(), label = "look") { image ->
+      if (image != null) {
+        AsyncImage(
+          model = ImageRequest.Builder(LocalContext.current).data(image).crossfade(false).build(),
+          contentDescription = null,
+          contentScale = ContentScale.Fit,
+          alignment = Alignment.BottomCenter,
+          modifier = Modifier.fillMaxSize(),
+        )
+      } else {
+        Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
+          CardText(
+            text = name.take(1).uppercase(),
+            size = u.sp(40f),
+            color = palette.accent,
+            fontFamily = DisplayFont,
+            weight = FontWeight.Black,
+            modifier = Modifier.padding(bottom = u.dp(20f)),
+          )
+        }
+      }
     }
   }
 }
@@ -402,6 +416,7 @@ private fun Badge(
 private fun StatPanel(
   card: ComposedPlayerCard,
   palette: FloorPalette,
+  animate: Boolean,
   u: CardUnit,
 ) {
   Box(
@@ -445,7 +460,7 @@ private fun StatPanel(
       horizontalArrangement = Arrangement.spacedBy(u.dp(1.2f)),
     ) {
       card.stats.forEach { stat ->
-        StatHexagon(stat = stat, palette = palette, u = u, modifier = Modifier.weight(1f))
+        StatHexagon(stat = stat, palette = palette, animate = animate, u = u, modifier = Modifier.weight(1f))
       }
     }
   }
@@ -473,14 +488,32 @@ private fun DrawScope.drawPanelShape(u: CardUnit) {
 private fun StatHexagon(
   stat: ComposedPlayerCard.Stat,
   palette: FloorPalette,
+  animate: Boolean,
   u: CardUnit,
   modifier: Modifier = Modifier,
 ) {
   val locked = stat.locked
+  val pop = remember { Animatable(0f) }
+  var shownValue by remember { mutableStateOf(stat.value) }
+  LaunchedEffect(stat.value) {
+    if (animate && stat.value != null && stat.value != shownValue) {
+      pop.snapTo(1f)
+      pop.animateTo(0f, tween(900))
+    }
+    shownValue = stat.value
+  }
   Column(
     modifier = modifier
       .aspectRatio(1f / 1.1f)
-      .drawBehind { drawHexagonFrame(palette, locked, u) },
+      .graphicsLayer {
+        val scale = 1f + 0.14f * sin(pop.value * PI.toFloat())
+        scaleX = scale
+        scaleY = scale
+      }
+      .drawBehind {
+        drawHexagonFrame(palette, locked, u)
+        if (pop.value > 0f) drawPath(hexagonPath(size.width, size.height), Color.White.copy(alpha = 0.45f * pop.value))
+      },
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {

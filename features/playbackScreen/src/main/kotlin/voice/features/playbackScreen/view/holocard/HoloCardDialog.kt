@@ -46,6 +46,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import voice.core.strings.R
+import voice.core.xray.card.composeAt
 import voice.features.playbackScreen.BookPlayDialogViewState
 
 private val MaxCardWidth = 380.dp
@@ -63,6 +64,7 @@ private const val TapTimeoutMillis = 500L
 @Composable
 internal fun HoloCardDialog(
   dialogState: BookPlayDialogViewState.XRayCardDialog,
+  positionMs: Long,
   onDismiss: () -> Unit,
 ) {
   Dialog(
@@ -94,6 +96,7 @@ internal fun HoloCardDialog(
       val cardWidth = minOf(maxWidth * 0.86f, maxHeight * 0.74f * 5f / 7f, MaxCardWidth)
       HoloCard(
         dialogState = dialogState,
+        positionMs = positionMs,
         width = cardWidth,
         reducedMotion = reducedMotion,
         onDismiss = onDismiss,
@@ -105,6 +108,7 @@ internal fun HoloCardDialog(
 @Composable
 private fun HoloCard(
   dialogState: BookPlayDialogViewState.XRayCardDialog,
+  positionMs: Long,
   width: Dp,
   reducedMotion: Boolean,
   onDismiss: () -> Unit,
@@ -116,6 +120,8 @@ private fun HoloCard(
   val flip = remember { Animatable(FlipFrontDegrees) }
   val appear = remember { Animatable(if (reducedMotion) 1f else 0f) }
   var showingBack by remember { mutableStateOf(false) }
+  val card = remember(dialogState.data, positionMs) { dialogState.data.composeAt(positionMs) }
+  val lookImage = card.look?.image?.let(dialogState.imageUris::get)
 
   LaunchedEffect(tilt) {
     var lastNanos = 0L
@@ -174,14 +180,15 @@ private fun HoloCard(
         if (angle < 90f || angle > 270f) {
           HoloCardFront(
             name = dialogState.name,
-            card = dialogState.card,
-            lookImage = dialogState.lookImage,
+            card = card,
+            lookImage = lookImage,
+            animate = !reducedMotion,
             tilt = tilt,
             u = u,
           )
         } else {
           HoloCardBack(
-            card = dialogState.card,
+            card = card,
             tilt = tilt,
             u = u,
             modifier = Modifier.graphicsLayer { rotationY = 180f },
