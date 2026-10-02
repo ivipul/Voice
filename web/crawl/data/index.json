@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-02T22:41:13Z",
- "sample": true,
+ "generated": "2026-10-02T23:17:39Z",
+ "sample": false,
  "books": [
   {
    "n": 1,
@@ -19,27 +19,27 @@
   },
   {
    "n": 4,
-   "title": null,
+   "title": "The Gate of the Feral Gods",
    "durationMs": 64527000
   },
   {
    "n": 5,
-   "title": null,
+   "title": "The Butcher's Masquerade",
    "durationMs": 84224000
   },
   {
    "n": 6,
-   "title": null,
+   "title": "The Eye of the Bedlam Bride",
    "durationMs": 96309000
   },
   {
    "n": 7,
-   "title": null,
+   "title": "This Inevitable Ruin",
    "durationMs": 103121000
   },
   {
    "n": 8,
-   "title": null,
+   "title": "A Parade of Horribles",
    "durationMs": 73189000
   }
  ],

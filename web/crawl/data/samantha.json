@@ -2,38 +2,159 @@
  "slug": "samantha",
  "name": "Samantha",
  "epithet": null,
- "sample": true,
- "realLookTimes": false,
+ "sample": false,
  "looks": [
   {
    "seq": 1,
-   "book": 1,
-   "ms": 0,
-   "t": "00:00:00",
-   "description": "Placeholder silhouette until the Mac bundles the real looks.",
+   "book": 4,
+   "ms": 41542560,
+   "t": "11:32:22",
+   "description": "A decapitated latex sex-doll head modeled on a half-Nyad, with an open mouth, wide eyes, and heavy, garish, hooker-tier makeup, full lips painted bright red. Two sharp, vampire-like fangs hang down from its mouth. It has a full head of bone-white, silky-looking hair. A half-set of gills runs either side of its neck, cut short and jagged at the point of decapitation, with the cut end of the neck made of solid latex. Its chin is badly chipped. Its jaw is poseable and hinged, able to be opened and closed by hand.",
+   "change": "Initial look with chipped chin and hinged jaw",
    "images": {
-    "standing": "looks/samantha/placeholder-front.png",
-    "action": "looks/samantha/placeholder-front.png"
+    "standing": "looks/samantha/look-001-standing.webp",
+    "action": "looks/samantha/look-001-action.webp"
    }
   },
   {
    "seq": 2,
-   "book": 1,
-   "ms": 25200000,
-   "t": "07:00:00",
-   "description": "Placeholder silhouette (second look).",
+   "book": 5,
+   "ms": 24262500,
+   "t": "06:44:22",
+   "description": "A decapitated, reanimated love doll head that looks mostly human, with a latex-like head and latex fangs. Her long, bone-colored hair is on fire and needs brushing. A rocket is duct-taped to the side of her head.",
+   "change": "Hair on fire, rocket taped to her head",
    "images": {
-    "standing": "looks/samantha/placeholder-tilt.png",
-    "action": "looks/samantha/placeholder-tilt.png"
+    "standing": "looks/samantha/look-002-standing.webp",
+    "action": "looks/samantha/look-002-action.webp"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 5,
+   "ms": 53985200,
+   "t": "14:59:45",
+   "description": "A decapitated, reanimated love doll head that looks mostly human, cleaned up and fresh from the factory, with a latex-like head, latex fangs, a wide mouth, brighter makeup and a smooth, undamaged chin. Her gleaming white hair is put up in wavy pigtails.",
+   "change": "Factory-fresh with wavy pigtails and brighter makeup",
+   "images": {
+    "standing": "looks/samantha/look-003-standing.webp",
+    "action": "looks/samantha/look-003-action.webp"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 5,
+   "ms": 78795280,
+   "t": "21:53:15",
+   "description": "A decapitated, reanimated love doll head that looks mostly human, with a latex-like head, latex fangs and a wide mouth. Her hair has all burned off, so she looks like a Barbie head pulled from a house fire. She carries a gray, desiccated hand in her mouth.",
+   "change": "Hair burned off, holding a gray hand in her mouth",
+   "images": {
+    "standing": "looks/samantha/look-004-standing.webp",
+    "action": "looks/samantha/look-004-action.webp"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 6,
+   "ms": 3354000,
+   "t": "00:55:54",
+   "description": "A sex doll head with long bone-white hair and a mongo feather in her hair.",
+   "change": "Hair regrown, mongo feather in it",
+   "images": {
+    "standing": "looks/samantha/look-005-standing.webp",
+    "action": "looks/samantha/look-005-action.webp"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 6,
+   "ms": 47541820,
+   "t": "13:12:21",
+   "description": "A sex doll head hovering off the ground, covered in dripping gore. She has a tattoo on her neck, and the flesh at the bottom of her neck is like uneven latex, like a soft ripped-in-half children's toy.",
+   "change": "Hovering, covered in gore, neck tattoo",
+   "images": {
+    "standing": "looks/samantha/look-006-standing.webp",
+    "action": "looks/samantha/look-006-action.webp"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 7,
+   "ms": 7682800,
+   "t": "02:08:02",
+   "description": "A decapitated sex doll head, only a head with no body. She rolls rather than floats, and she is really fast. The neck is a stump that wriggles back and forth.",
+   "change": "Rolling, wriggling neck stump (standing look)",
+   "images": {
+    "standing": "looks/samantha/look-007-standing.webp",
+    "action": "looks/samantha/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 7,
+   "ms": 60723520,
+   "t": "16:52:03",
+   "description": "A decapitated latex sex-doll head, only a head with no body, rolling rather than floating. The neck is a wriggling stump. She looks like she caught a face-first jet blast: a charred black husk with smoldering hair. The smeared \"Miss Me\" is still intact, shining bright in the center of her charred forehead.",
+   "change": "Charred black with smoldering hair, \"Miss Me\" on forehead",
+   "images": {
+    "standing": "looks/samantha/look-008-standing.webp",
+    "action": "looks/samantha/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 7,
+   "ms": 68083880,
+   "t": "18:54:43",
+   "description": "A decapitated latex sex-doll head, only a head with no body, rolling rather than floating. The neck is a wriggling stump. Her hair is in a complicated 1940s style with two giant swirls (Victory Rolls).",
+   "change": "Hair in 1940s Victory Rolls",
+   "images": {
+    "standing": "looks/samantha/look-009-standing.webp",
+    "action": "looks/samantha/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 7,
+   "ms": 93289440,
+   "t": "25:54:49",
+   "description": "A round decapitated sex doll head, only a head with no body. The neck is a wriggling stump. Her hair is ruined, with a single white curl remaining.",
+   "change": "Hair ruined down to a single white curl",
+   "images": {
+    "standing": "looks/samantha/look-010-standing.webp",
+    "action": "looks/samantha/look-010-action.webp"
+   }
+  },
+  {
+   "seq": 11,
+   "book": 8,
+   "ms": 9837000,
+   "t": "02:43:57",
+   "description": "A doll head with bright red lips, floating about a foot off the ground and holding a controller in her mouth. She has a neck hole with a screaming candelabra-like thing dangling from it, and can roll onto her head and wiggle her neck.",
+   "change": "Floating, controller in mouth, thing dangling from neck hole",
+   "images": {
+    "standing": "looks/samantha/look-011-standing.webp",
+    "action": "looks/samantha/look-011-action.webp"
+   }
+  },
+  {
+   "seq": 12,
+   "book": 8,
+   "ms": 63796000,
+   "t": "17:43:16",
+   "description": "A doll head with bright red lips wearing a Gurkha hat whose brim keeps her from rolling properly.",
+   "change": "Wearing a Gurkha hat",
+   "images": {
+    "standing": "looks/samantha/look-012-standing.webp",
+    "action": "looks/samantha/look-012-action.webp"
    }
   }
  ],
  "card": [
   {
-   "field": "floor",
-   "book": 1,
-   "ms": 0,
-   "value": 1
+   "field": "race",
+   "book": 5,
+   "ms": 16666000,
+   "value": "Half-nigh-ad"
   }
  ]
 }

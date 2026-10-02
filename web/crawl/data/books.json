@@ -1,13 +1,45 @@
 {
-  "_source": "Durations are the start of the last track in audiobook-copilot/chapter-timestamps-book{n}.json (Vipul's app chapter screenshots, 2026-10-01). Titles for books 4-8 are filled in by tools/build_data.py from the audio file names when it runs on the Mac.",
-  "books": [
-    { "n": 1, "title": "Dungeon Crawler Carl", "durationMs": 48558000 },
-    { "n": 2, "title": "Carl's Doomsday Scenario", "durationMs": 41013000 },
-    { "n": 3, "title": "The Dungeon Anarchist's Cookbook", "durationMs": 60430000 },
-    { "n": 4, "title": null, "durationMs": 64527000 },
-    { "n": 5, "title": null, "durationMs": 84224000 },
-    { "n": 6, "title": null, "durationMs": 96309000 },
-    { "n": 7, "title": null, "durationMs": 103121000 },
-    { "n": 8, "title": null, "durationMs": 73189000 }
-  ]
+ "_source": "see tools/build_data.py",
+ "books": [
+  {
+   "n": 1,
+   "title": "Dungeon Crawler Carl",
+   "durationMs": 48558000
+  },
+  {
+   "n": 2,
+   "title": "Carl's Doomsday Scenario",
+   "durationMs": 41013000
+  },
+  {
+   "n": 3,
+   "title": "The Dungeon Anarchist's Cookbook",
+   "durationMs": 60430000
+  },
+  {
+   "n": 4,
+   "title": "The Gate of the Feral Gods",
+   "durationMs": 64527000
+  },
+  {
+   "n": 5,
+   "title": "The Butcher's Masquerade",
+   "durationMs": 84224000
+  },
+  {
+   "n": 6,
+   "title": "The Eye of the Bedlam Bride",
+   "durationMs": 96309000
+  },
+  {
+   "n": 7,
+   "title": "This Inevitable Ruin",
+   "durationMs": 103121000
+  },
+  {
+   "n": 8,
+   "title": "A Parade of Horribles",
+   "durationMs": 73189000
+  }
+ ]
 }

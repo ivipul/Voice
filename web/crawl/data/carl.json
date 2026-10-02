@@ -2,309 +2,1605 @@
  "slug": "carl",
  "name": "Carl",
  "epithet": null,
- "sample": true,
- "realLookTimes": true,
+ "sample": false,
  "looks": [
   {
    "seq": 1,
    "book": 1,
-   "ms": 93000,
+   "ms": 93800,
    "t": "00:01:33",
-   "description": "Open black leather jacket, grey boxer shorts, bare legs, pink rubber crocs.",
+   "description": "A man wearing boxers, a leather jacket, and pink croc sandals that barely fit on his feet, with no pants.",
+   "change": "Initial appearance",
    "images": {
-    "standing": "looks/carl/placeholder-stand.png",
-    "action": "looks/carl/placeholder-stand.png"
+    "standing": "looks/carl/look-001-standing.webp",
+    "action": "looks/carl/look-001-action.webp"
    }
   },
   {
    "seq": 2,
    "book": 1,
-   "ms": 3330000,
+   "ms": 3330860,
    "t": "00:55:30",
-   "description": "Leather jacket, boxer shorts, now barefoot. The crocs are gone.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing boxers and a leather jacket with no pants, barefoot.",
+   "change": "Barefoot from chapter 3 onward (no more pink croc sandals); height and weight established.",
    "images": {
-    "standing": "looks/carl/placeholder-walk.png",
-    "action": "looks/carl/placeholder-walk.png"
+    "standing": "looks/carl/look-002-standing.webp",
+    "action": "looks/carl/look-002-action.webp"
    }
   },
   {
    "seq": 3,
    "book": 1,
-   "ms": 6436000,
+   "ms": 6436624,
    "t": "01:47:16",
-   "description": "Hooded cloak with pointed ear shapes, toe ring, goblin-pass tattoo on the forearm.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing boxers, a leather jacket, and a hooded cloak with pointed ear things on either side, with no pants, bare feet, a toe ring on the index toe of his right foot, and a goblin pass tattooed on his forearm.",
+   "change": "Adds height, build, hooded cloak, toe ring, goblin pass tattoo; bare feet",
    "images": {
-    "standing": "looks/carl/placeholder-action.png",
-    "action": "looks/carl/placeholder-action.png"
+    "standing": "looks/carl/look-003-standing.webp",
+    "action": "looks/carl/look-003-action.webp"
    }
   },
   {
    "seq": 4,
    "book": 1,
-   "ms": 10525000,
+   "ms": 10525100,
    "t": "02:55:25",
-   "description": "Adds a troll-skin shirt. Broken left hand, scraped right hand, cut scalp.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing boxers, a leather jacket, a troll skin shirt, and a hooded cloak with pointed ear things on either side, with no pants, bare feet, a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, a broken left hand, abrasions on his right hand, and a deep cut in his scalp with blood seeping from it.",
+   "change": "Adds troll skin shirt; broken left hand, abrasions and scalp cut (this scene only)",
    "images": {
-    "standing": "looks/carl/placeholder-crouch.png",
-    "action": "looks/carl/placeholder-crouch.png"
+    "standing": "looks/carl/look-004-standing.webp",
+    "action": "looks/carl/look-004-action.webp"
    }
   },
   {
    "seq": 5,
    "book": 1,
-   "ms": 13699000,
+   "ms": 13699160,
    "t": "03:48:19",
-   "description": "Jacket's right arm melted away, spiked knee pads of skin and fur, right arm red and bubbling.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing boxers, a leather jacket with its right arm melted away, a troll skin shirt, a hooded cloak with pointed ear things on either side, and enchanted spiked knee pads made of skin and fur with needle-like spikes, with no pants, bare feet, a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, and his right arm red, bubbling, and in pain with its fingerless glove dissolved.",
+   "change": "Adds spiked knee pads; melted jacket arm and red bubbling right arm (this scene only)",
    "images": {
-    "standing": "looks/carl/placeholder-armsUp.png",
-    "action": "looks/carl/placeholder-armsUp.png"
+    "standing": "looks/carl/look-005-standing.webp",
+    "action": "looks/carl/look-005-action.webp"
    }
   },
   {
    "seq": 6,
    "book": 1,
-   "ms": 22980000,
+   "ms": 22980320,
    "t": "06:23:00",
-   "description": "Charcoal bracer on the wrist, one hand now a black angular gauntlet with gleaming spikes.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing boxers, a leather jacket, a troll skin shirt, a hooded cloak with pointed ear things on either side, enchanted spiked knee pads made of skin and fur with needle-like spikes, and a charcoal-colored bracer on his wrist, with no pants, bare feet, a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, and his hand transformed into a black, angular gauntlet with multiple gleaming spikes.",
+   "change": "Adds charcoal bracer and black spiked gauntlet",
    "images": {
-    "standing": "looks/carl/placeholder-action.png",
-    "action": "looks/carl/placeholder-action.png"
+    "standing": "looks/carl/look-006-standing.webp",
+    "action": "looks/carl/look-006-action.webp"
    }
   },
   {
    "seq": 7,
    "book": 1,
-   "ms": 43172000,
+   "ms": 43172080,
    "t": "11:59:32",
-   "description": "White heart-print boxers, tactical boots, a dagger tattoo on the neck.",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing a white pair of boxers covered in little red hearts, a leather jacket, a troll skin shirt, a hooded cloak with pointed ear things on either side, enchanted spiked knee pads made of skin and fur with needle-like spikes, a brand new pair of Bates Zip-Up Tactical Boots, and a charcoal-colored bracer on his wrist, with a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, a neck tattoo called The Desperado Club featuring a dagger, and his hand transformed into a black, angular gauntlet with multiple gleaming spikes.",
+   "change": "Adds heart boxers, tactical boots, Desperado Club neck tattoo",
    "images": {
-    "standing": "looks/carl/placeholder-stand.png",
-    "action": "looks/carl/placeholder-stand.png"
+    "standing": "looks/carl/look-007-standing.webp",
+    "action": "looks/carl/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 2,
+   "ms": 10890280,
+   "t": "03:01:30",
+   "description": "A man wearing boxers and knee pads.",
+   "change": "Reduced to boxers and knee pads",
+   "images": {
+    "standing": "looks/carl/look-008-standing.webp",
+    "action": "looks/carl/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 2,
+   "ms": 15043167,
+   "t": "04:10:43",
+   "description": "A man wearing boxers and knee pads. A spell effect makes him look wispy, ethereal, and druid-like.",
+   "change": "Wispy, druid-like spell look (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-009-standing.webp",
+    "action": "looks/carl/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 2,
+   "ms": 39029830,
+   "t": "10:50:29",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing a white pair of boxers covered in little red hearts, a leather jacket, a troll skin shirt, a hooded cloak with pointed ear things on either side, enchanted spiked knee pads made of skin and fur with needle-like spikes, a brand new pair of Bates Zip-Up Tactical Boots, and a charcoal-colored bracer on his wrist, with a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, a neck tattoo called The Desperado Club featuring a dagger, and his hand transformed into a black, angular gauntlet with multiple gleaming spikes.",
+   "change": "Uses the same look as look 6 (the look 9/10 text is too sparse to draw from, so the look 6 appearance carries over; standing image copied from look 6)",
+   "images": {
+    "standing": "looks/carl/look-010-standing.webp",
+    "action": "looks/carl/look-010-action.webp"
+   }
+  },
+  {
+   "seq": 11,
+   "book": 3,
+   "ms": 5983980,
+   "t": "01:39:43",
+   "description": "A man standing six-foot, three inches tall, weighing about 230 pounds with built muscle mass, wearing a white pair of boxers covered in little red hearts, a leather jacket, a troll skin shirt, a hooded cloak with pointed ear things on either side, enchanted spiked knee pads made of skin and fur with needle-like spikes, a brand new pair of Bates Zip-Up Tactical Boots, and a charcoal-colored bracer on his wrist, with a toe ring on the index toe of his right foot, a goblin pass tattooed on his forearm, a neck tattoo called The Desperado Club featuring a dagger, and his hand transformed into a black, angular gauntlet with multiple gleaming spikes.",
+   "change": "Uses the same look as look 6 (the look 9/10 text is too sparse to draw from, so the look 6 appearance carries over; standing image copied from look 6)",
+   "images": {
+    "standing": "looks/carl/look-011-standing.webp",
+    "action": "looks/carl/look-011-action.webp"
+   }
+  },
+  {
+   "seq": 12,
+   "book": 3,
+   "ms": 19363460,
+   "t": "05:22:43",
+   "description": "A man. He is Primal in nature. A gauntlet is forming over one of his hands. His face has torn flesh where razor blades scraped across it.",
+   "change": "Gauntlet forming and torn face (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-012-standing.webp",
+    "action": "looks/carl/look-012-action.webp"
+   }
+  },
+  {
+   "seq": 13,
+   "book": 3,
+   "ms": 24453620,
+   "t": "06:47:33",
+   "description": "A man. He is Primal in nature. He wears boots and sports a purple mohawk.",
+   "change": "Adds boots and purple mohawk",
+   "images": {
+    "standing": "looks/carl/look-013-standing.webp",
+    "action": "looks/carl/look-013-action.webp"
+   }
+  },
+  {
+   "seq": 14,
+   "book": 3,
+   "ms": 39255620,
+   "t": "10:54:15",
+   "description": "A man. He is Primal in nature. One of his hands is armored, encased in a gauntlet. He wears boots and sports a purple mohawk. He wears a cloak. He also wears a Trollskin shirt. He wears a ring on his left index finger.",
+   "change": "Adds armored hand, cloak, Trollskin shirt, ring",
+   "images": {
+    "standing": "looks/carl/look-014-standing.webp",
+    "action": "looks/carl/look-014-action.webp"
+   }
+  },
+  {
+   "seq": 15,
+   "book": 4,
+   "ms": 2963800,
+   "t": "00:49:23",
+   "description": "A man. He wears an enchanted toe-ring on the smallest toe of his left foot.",
+   "change": "Toe-ring on left smallest toe",
+   "images": {
+    "standing": "looks/carl/look-015-standing.webp",
+    "action": "looks/carl/look-015-action.webp"
+   }
+  },
+  {
+   "seq": 16,
+   "book": 4,
+   "ms": 28011704,
+   "t": "07:46:51",
+   "description": "A man. He wears an enchanted toe-ring on the smallest toe of his left foot. He has three tattoos: a goblin-pass tattoo, a desperado-club-pass tattoo, and a barely noticeable, tiny tattoo just below his left eye shaped like a lizard's (gecko's) foot. He carries a shield device (an auto-buckler) that can extend out from his left arm. He wears a gauntlet whose spikes are slightly longer after being treated with a sharpening stone. He is covered in blood up to his knee pads, from stomping through a swarm of gerbils. A burning line cuts across his arm and face from a fresh wound. Two barbed puncture wounds mark his face from another attack. A further stinging wound line marches across his face and neck. He has lost vision in his left eye due to his injuries.",
+   "change": "Adds tattoos, auto-buckler, longer-spiked gauntlet; fresh wounds and blood (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-016-standing.webp",
+    "action": "looks/carl/look-016-action.webp"
+   }
+  },
+  {
+   "seq": 17,
+   "book": 4,
+   "ms": 49066360,
+   "t": "13:37:46",
+   "description": "A man. He wears an enchanted toe-ring on the smallest toe of his left foot. He has three tattoos: a goblin-pass tattoo, a desperado-club-pass tattoo, and a barely noticeable, tiny tattoo just below his left eye shaped like a lizard's (gecko's) foot. He carries a shield device (an auto-buckler) that can extend out from his left arm. He wears a gauntlet whose spikes are slightly longer after being treated with a sharpening stone. He wears a black, sleeveless canvas jacket, having replaced his old leather jacket. His white, paisley-patterned bandana is tied around his head. Metal has pierced his leg, and a shard of glass has pierced his hand.",
+   "change": "Black sleeveless canvas jacket, bandana tied on head; leg and hand piercings (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-017-standing.webp",
+    "action": "looks/carl/look-017-action.webp"
+   }
+  },
+  {
+   "seq": 18,
+   "book": 4,
+   "ms": 61362520,
+   "t": "17:02:42",
+   "description": "A man. He wears an enchanted toe-ring on the smallest toe of his left foot. He has three tattoos: a goblin-pass tattoo, a desperado-club-pass tattoo, and a barely noticeable, tiny tattoo just below his left eye shaped like a lizard's (gecko's) foot. He carries a shield device (an auto-buckler) that can extend out from his left arm. He wears a gauntlet whose spikes are slightly longer after being treated with a sharpening stone. He wears a black, sleeveless canvas jacket, having replaced his old leather jacket. He has pulled his white, paisley-patterned bandana up over his face like a mask, and pulled up the hood of his cloak. He is also wearing a trollskin shirt, underneath or alongside his jacket. He has two new tattoos, one on the back of each hand: round, tribal-style sun designs, black and orange, nearly identical to one another -- the rays on his right hand curled, the rays on his left hand shaped like little triangles. He wears two additional rings -- a simple plus-two ring of strength and an amber-stoned ring named Rockard's Ring of Sniping -- bringing his total to five rings worn. He has a bleeding hole in his neck where a parasite has just violently burst out of him, blood having sprayed down him.",
+   "change": "Sun tattoos on hands, five rings, trollskin shirt; masked bandana and neck wound (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-018-standing.webp",
+    "action": "looks/carl/look-018-action.webp"
+   }
+  },
+  {
+   "seq": 19,
+   "book": 5,
+   "ms": 1925000,
+   "t": "00:32:05",
+   "description": "A man wearing boxers and a jacket, with a necklace bearing a small charm set with a yellow gem.",
+   "change": "Baseline boxers, jacket, gem charm necklace",
+   "images": {
+    "standing": "looks/carl/look-019-standing.webp",
+    "action": "looks/carl/look-019-action.webp"
+   }
+  },
+  {
+   "seq": 20,
+   "book": 5,
+   "ms": 7452000,
+   "t": "02:04:12",
+   "description": "A man wearing boxers and a jacket, with a necklace bearing a small charm set with a yellow gem. He wears a ring on his finger and a second toe ring on his left foot. A barbed crossbow bolt is buried in his shoulder, another has shattered his leg and burst out the front, and he is completely soaked in blood.",
+   "change": "Adds ring and second toe ring; crossbow wounds and blood (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-020-standing.webp",
+    "action": "looks/carl/look-020-action.webp"
+   }
+  },
+  {
+   "seq": 21,
+   "book": 5,
+   "ms": 8654000,
+   "t": "02:24:14",
+   "description": "A man wearing boxers and a magical jacket that appears unharmed, with anti-piercing knee pads, and a necklace bearing a small charm set with a yellow gem. He wears a second toe ring on his left foot, and the ring has been taken off his finger.",
+   "change": "Magical jacket, anti-piercing knee pads; ring off finger",
+   "images": {
+    "standing": "looks/carl/look-021-standing.webp",
+    "action": "looks/carl/look-021-action.webp"
+   }
+  },
+  {
+   "seq": 22,
+   "book": 5,
+   "ms": 27691220,
+   "t": "07:41:31",
+   "description": "A man wearing boxers, a shirt and a magical jacket, with anti-piercing knee pads, no pants, and a necklace in the form of a charm set with a yellow gem. He wears a second toe ring on his left foot and a ring on his finger. He has a faded, green-tinted, poorly drawn spider web tattoo on his left elbow, its individual strands segmented and worm-like and a goblin tattoo. His feet hover a foot off the ground.",
+   "change": "Adds shirt, spider web and goblin tattoos; hovering feet (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-022-standing.webp",
+    "action": "looks/carl/look-022-action.webp"
+   }
+  },
+  {
+   "seq": 23,
+   "book": 5,
+   "ms": 29773260,
+   "t": "08:16:13",
+   "description": "A man wearing boxers, a shirt and a magical jacket, with anti-piercing knee pads, no pants, and a necklace in the form of a charm set with a yellow gem. He wears a second toe ring on his left foot and a water-breathing ring on his finger, and gills have formed on his neck, flecked with lizard gore. He has a faded, green-tinted, poorly drawn spider web tattoo on his left elbow, its individual strands segmented and worm-like and a goblin tattoo.",
+   "change": "Water-breathing ring; gills on neck (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-023-standing.webp",
+    "action": "looks/carl/look-023-action.webp"
+   }
+  },
+  {
+   "seq": 24,
+   "book": 5,
+   "ms": 40440900,
+   "t": "11:14:00",
+   "description": "A man wearing boxers, a shirt and a jacket, barefoot, with a necklace in the form of a charm set with a yellow gem. He wears a second toe ring on his left foot and the ring of divine suffering on his finger. He has a flaming ball of snakes tattoo on his left upper arm curled around the spider web tattoo on his elbow, along with a goblin tattoo, giving him nearly a whole sleeve on his left arm. The spider web tattoo is faded, green-tinted and poorly drawn, with segmented, worm-like strands. His enchanted jacket holds patches: a planet Earth patch on the shoulder, an arrow patch showing a dozen flaming arrows clutched in an eagle claw in Sailor Jerry style sewn next to it, and a white rectangular patch with a little circular bomb hand-stitched in fine black thread at the bottom left of the jacket front along the hemline. His arms are swollen and his chest bulges with muscle.",
+   "change": "Ball of snakes sleeve tattoo, jacket patches; swollen arms and chest (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-024-standing.webp",
+    "action": "looks/carl/look-024-action.webp"
+   }
+  },
+  {
+   "seq": 25,
+   "book": 5,
+   "ms": 51304480,
+   "t": "14:15:04",
+   "description": "A man wearing boxers, a shirt and a jacket, barefoot, with a necklace in the form of a charm set with a yellow gem and a sapphire. He wears a second toe ring on his left foot and the ring of divine suffering on his finger. A gauntlet has formed over his clenched right fist. He has a faded, green-tinted spider web tattoo with segmented, worm-like strands on his left elbow, a flaming ball of snakes tattoo curled around it, a goblin tattoo, nearly a whole sleeve on his left arm, and twin sun disc tattoos on the backs of his hands. His enchanted jacket holds an Earth patch and an arrow patch on the shoulder, and a bomb patch and a goat head patch along the bottom left hemline.",
+   "change": "Sapphire on necklace, goat head patch, sun disc hand tattoos; gauntlet over fist (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-025-standing.webp",
+    "action": "looks/carl/look-025-action.webp"
+   }
+  },
+  {
+   "seq": 26,
+   "book": 5,
+   "ms": 61589640,
+   "t": "17:06:29",
+   "description": "A muscular man in heart-print boxers and a Trollskin shirt, barefoot, wearing a cape and a jacket, with a necklace in the form of a charm set with a yellow gem and a sapphire. He wears a second toe ring on his left foot and the ring of divine suffering on his finger, and has a needle-pierced ring in his left nipple. He has a faded, green-tinted spider web tattoo with segmented, worm-like strands on his left elbow, a flaming ball of snakes tattoo curled around it, a goblin tattoo, nearly a whole sleeve on his left arm, and twin sun disc tattoos on the backs of his hands. His enchanted jacket holds an Earth patch and an arrow patch on the shoulder, and a bomb patch and a goat head patch along the bottom left hemline.",
+   "change": "Heart boxers, Trollskin shirt, cape, nipple ring",
+   "images": {
+    "standing": "looks/carl/look-026-standing.webp",
+    "action": "looks/carl/look-026-action.webp"
+   }
+  },
+  {
+   "seq": 27,
+   "book": 5,
+   "ms": 62984760,
+   "t": "17:29:44",
+   "description": "A muscular man in heart-print boxers and a Trollskin shirt, barefoot, wearing a cape and a jacket, with a necklace in the form of a charm set with a yellow gem and a sapphire. He wears a second toe ring on his left foot and the ring of divine suffering on his finger, and has a needle-pierced ring in his left nipple. He has a faded, green-tinted spider web tattoo with segmented, worm-like strands on his left elbow, a flaming ball of snakes tattoo curled around it, a goblin tattoo, nearly a whole sleeve on his left arm, and twin sun disc tattoos on the backs of his hands. His enchanted jacket holds an Earth patch and an arrow patch on the shoulder, and a bomb patch and a goat head patch along the bottom left hemline. The skin on his arm bubbles and cracks.",
+   "change": "Bubbling, cracking arm skin (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-027-standing.webp",
+    "action": "looks/carl/look-027-action.webp"
+   }
+  },
+  {
+   "seq": 28,
+   "book": 5,
+   "ms": 80943560,
+   "t": "22:29:03",
+   "description": "A man without pants, barefoot, wearing a Trollskin shirt and a jacket, with a necklace in the form of a charm set with a yellow gem and a sapphire. He wears a second toe ring on his left foot, the ring of divine suffering on his finger, and a wrist bracer that forms a grul gauntlet. He has a faded, green-tinted spider web tattoo with segmented, worm-like strands on his left elbow, a flaming ball of snakes tattoo curled around it, a goblin tattoo, nearly a whole sleeve on his left arm, and twin sun disc tattoos on the backs of his hands. His enchanted jacket holds an Earth patch and an arrow patch on the shoulder, and a bomb patch and a goat head patch along the bottom left hemline. His shattered arm bone rips through his skin, an arrow has burst through his left forearm and buried itself in his chest, and an arrow is buried in the back of his leg.",
+   "change": "No pants, grul gauntlet bracer; arrow and bone wounds (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-028-standing.webp",
+    "action": "looks/carl/look-028-action.webp"
+   }
+  },
+  {
+   "seq": 29,
+   "book": 6,
+   "ms": 5577667,
+   "t": "01:32:57",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. A Scavenger's Daughter back patch is sewn onto the jacket.",
+   "change": "Baseline Enchanted Anarchist's Battlerattle jacket, grul gauntlet, patches",
+   "images": {
+    "standing": "looks/carl/look-029-standing.webp",
+    "action": "looks/carl/look-029-action.webp"
+   }
+  },
+  {
+   "seq": 30,
+   "book": 6,
+   "ms": 10261760,
+   "t": "02:51:01",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. A Scavenger's Daughter back patch is sewn onto the jacket. He has drunk an invisibility potion and is invisible.",
+   "change": "Invisible after potion (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-030-standing.webp",
+    "action": "looks/carl/look-030-action.webp"
+   }
+  },
+  {
+   "seq": 31,
+   "book": 6,
+   "ms": 11412310,
+   "t": "03:10:12",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has brown stitches around a pile of skulls, and the aardvark image on his back has gone away. His gauntlet forms on his hand. He wears a cape-like garment.",
+   "change": "Skull-pile back patch, cape-like garment; gauntlet forming (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-031-standing.webp",
+    "action": "looks/carl/look-031-action.webp"
+   }
+  },
+  {
+   "seq": 32,
+   "book": 6,
+   "ms": 46108040,
+   "t": "12:48:28",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has brown stitches around a pile of skulls, and the aardvark image on his back has gone away. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. His left index finger is broken. Boils mark his arm, neck and upper thigh, and the one on the back of his hand has popped. He is bleeding from a blow to the side of his head, his hand coming away bloody, and he is invisible, his outline made observable by the gore and soup on him.",
+   "change": "Spiderweb, goblin, snake tattoos, nipple ring, troll-skin shirt, pin-back button; broken finger, boils, head wound, invisibility (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-032-standing.webp",
+    "action": "looks/carl/look-032-action.webp"
+   }
+  },
+  {
+   "seq": 33,
+   "book": 6,
+   "ms": 55976400,
+   "t": "15:32:56",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him.",
+   "change": "Back patch gains a soul bar",
+   "images": {
+    "standing": "looks/carl/look-033-standing.webp",
+    "action": "looks/carl/look-033-action.webp"
+   }
+  },
+  {
+   "seq": 34,
+   "book": 6,
+   "ms": 59386300,
+   "t": "16:29:46",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. He wears a nightgaunt cloak. A tiny extinction sigil tattoo is under his eye. He wears a ring disguised as his strength ring. He is pierced in the arms, the stomach, the legs and the neck, with blood spurting from dozens of wounds, and he looks like he was dragged through a pile of wet corpses.",
+   "change": "Nightgaunt cloak, extinction sigil tattoo under eye, disguised ring; pierced wounds (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-034-standing.webp",
+    "action": "looks/carl/look-034-action.webp"
+   }
+  },
+  {
+   "seq": 35,
+   "book": 6,
+   "ms": 68666320,
+   "t": "19:04:26",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. He wears a cloak made out of the flesh of one of a nightgaunt's friends. A tiny extinction sigil tattoo is under his eye. He wears a ring disguised as his strength ring. He shaves his face every day and is clean-shaven. He is not wearing pants.",
+   "change": "Flesh cloak, clean-shaven, no pants",
+   "images": {
+    "standing": "looks/carl/look-035-standing.webp",
+    "action": "looks/carl/look-035-action.webp"
+   }
+  },
+  {
+   "seq": 36,
+   "book": 6,
+   "ms": 85089500,
+   "t": "23:38:09",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. He wears a cloak made out of the flesh of one of a nightgaunt's friends. A tiny extinction sigil tattoo is under his eye. He has pulled off his strength ring and slipped an enchanted ring onto his finger. He shaves his face every day and is clean-shaven. He is not wearing pants. A round pin-back button resembling the planet Saturn (a Valte Persa Shield) is clipped to him. He has twin tattoos on the back of his hands. He has downed an invisibility potion and is invisible. A pile of cards is stuffed into the waistband of his boxers.",
+   "change": "Enchanted ring, Saturn pin-back button, hand tattoos; invisible, cards in waistband (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-036-standing.webp",
+    "action": "looks/carl/look-036-action.webp"
+   }
+  },
+  {
+   "seq": 37,
+   "book": 6,
+   "ms": 89128360,
+   "t": "24:45:28",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears a troll-skin shirt and boxers. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. He wears a cloak made out of the flesh of one of a nightgaunt's friends. A tiny extinction sigil tattoo is under his eye. He has pulled off his strength ring and slipped an enchanted ring onto his finger. He shaves his face every day and is clean-shaven. He is not wearing pants. A round pin-back button resembling the planet Saturn (a Valte Persa Shield) is clipped to him. He has twin tattoos on the back of his hands. He holds a new nighty-night wand. He wears a new tech-based shield.",
+   "change": "Holds nighty-night wand, tech-based shield (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-037-standing.webp",
+    "action": "looks/carl/look-037-action.webp"
+   }
+  },
+  {
+   "seq": 38,
+   "book": 6,
+   "ms": 92344560,
+   "t": "25:39:04",
+   "description": "A man wearing a sleeveless jacket called the Enchanted Anarchist's Battlerattle. He has disgusting tattoos, including a spiderweb tattoo on his elbow (a Guild of Suffering tattoo), a goblin tattoo, and a large tattoo of a ball of snakes on his left arm. He wears a grul gauntlet, with the enchanted auto-buckler removed from his left arm. A peace symbol patch is sewn onto the bottom of the jacket next to the bomb symbol. The Scavenger's Daughter back patch on the jacket has a soul bar. His gauntlet appears when he forms a fist. He wears a cape-like garment. He wears a goat patch. He has a new nipple ring. He wears boxers. His chest is bare, the troll-skin shirt removed. The tattooed eye in the center of his chest, just above the sternum, has blinked and closed, disappearing against his skin, so the tattoo is invisible. He is not wearing shoes. A little pin-back button reading certified pole dancer is pinned on him. He wears a cloak made out of the flesh of one of a nightgaunt's friends. A tiny extinction sigil tattoo is under his eye. He has pulled off his strength ring and slipped an enchanted ring onto his finger. He shaves his face every day and is clean-shaven. He is not wearing pants. A round pin-back button resembling the planet Saturn (a Valte Persa Shield) is clipped to him. He has twin tattoos on the back of his hands. His hair is all gone, burned off, and his eyebrows too.",
+   "change": "Bare chest, closed chest eye tattoo, hair and eyebrows burned off (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-038-standing.webp",
+    "action": "looks/carl/look-038-action.webp"
+   }
+  },
+  {
+   "seq": 39,
+   "book": 7,
+   "ms": 175360,
+   "t": "00:02:55",
+   "description": "A man with a tattoo on his chest. He wears a ring and is barefoot.",
+   "change": "Baseline: chest tattoo, ring, barefoot",
+   "images": {
+    "standing": "looks/carl/look-039-standing.webp",
+    "action": "looks/carl/look-039-action.webp"
+   }
+  },
+  {
+   "seq": 40,
+   "book": 7,
+   "ms": 6489600,
+   "t": "01:48:09",
+   "description": "A bald man with no eyebrows, his hair singed off, with a tattoo on his chest. He wears a ring, wears no pants, and is barefoot.",
+   "change": "Bald with no eyebrows (this scene only), no pants",
+   "images": {
+    "standing": "looks/carl/look-040-standing.webp",
+    "action": "looks/carl/look-040-action.webp"
+   }
+  },
+  {
+   "seq": 41,
+   "book": 7,
+   "ms": 16147280,
+   "t": "04:29:07",
+   "description": "A man with long, wavy, shining hair down to his waist, worn in a ponytail, with eyebrow hair sprouting. He has filthy tattoos, including a bedlam bride tattoo on his chest and one on his sternum. He wears a ring and a toe ring on his left pinky toe, wears no pants, and is barefoot.",
+   "change": "Long wavy ponytail hair, filthy chest and sternum tattoos, toe ring",
+   "images": {
+    "standing": "looks/carl/look-041-standing.webp",
+    "action": "looks/carl/look-041-action.webp"
+   }
+  },
+  {
+   "seq": 42,
+   "book": 7,
+   "ms": 25990480,
+   "t": "07:13:10",
+   "description": "A giant spider, transformed from a man who had long, wavy, shining hair down to his waist, worn in a ponytail.",
+   "change": "Giant spider form (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-042-standing.webp",
+    "action": "looks/carl/look-042-action.webp"
+   }
+  },
+  {
+   "seq": 43,
+   "book": 7,
+   "ms": 28507520,
+   "t": "07:55:07",
+   "description": "A man with long, wavy, shining hair down to his waist, worn in a ponytail. He wears a jacket with a disgusting patch. He has eyebrow hair sprouting and filthy tattoos, including a bedlam bride tattoo on his chest, the chest tattoo being an eye that is open and blinking, and one on his sternum. He wears a ring, a toe ring on his left pinky toe and a second toe ring that gives the mind balance skill, wears no pants, and is barefoot.",
+   "change": "Adds jacket with patch, open blinking chest eye, second toe ring",
+   "images": {
+    "standing": "looks/carl/look-043-standing.webp",
+    "action": "looks/carl/look-043-action.webp"
+   }
+  },
+  {
+   "seq": 44,
+   "book": 7,
+   "ms": 34170560,
+   "t": "09:29:30",
+   "description": "A man with long, wavy, shining hair down to his waist, worn in a ponytail. He wears a jacket with a disgusting patch and a ring of divine suffering on his finger, and a gauntlet forms on his hand. He has three eyes, eyebrow hair sprouting, and filthy tattoos, including a bedlam bride tattoo on his chest, the chest tattoo being an eye that is open and blinking, and one on his sternum. He also wears a ring, a toe ring on his left pinky toe and a second toe ring that gives the mind balance skill, wears no pants, and is barefoot.",
+   "change": "Ring of divine suffering; three eyes and forming gauntlet (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-044-standing.webp",
+    "action": "looks/carl/look-044-action.webp"
+   }
+  },
+  {
+   "seq": 45,
+   "book": 7,
+   "ms": 60368180,
+   "t": "16:46:08",
+   "description": "A man with long hair loose, his skin bubbling like microwaved cheese and with only one good eye; dozens of chains rip out of his flesh, tearing his skin. He cannot bend his legs, has suction cups at the ends of his fingers, a big boil on his back from slug pox, and screaming worms flowing from his nose. The eye on his chest is open. He has several filthy tattoos on his left arm, a tattoo on his right forearm, a Chain Dragon tattoo, a bedlam bride tattoo on his chest, and one on his sternum. He wears a jacket with a disgusting patch and a metal spiked gauntlet, a ring, a toe ring on his left pinky toe and a second toe ring, and is barefoot.",
+   "change": "Loose hair, Chain Dragon tattoo, spiked gauntlet; bubbling skin, chains, worms (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-045-standing.webp",
+    "action": "looks/carl/look-045-action.webp"
+   }
+  },
+  {
+   "seq": 46,
+   "book": 7,
+   "ms": 65624520,
+   "t": "18:13:44",
+   "description": "A man with long hair loose. He has emberous tattoos. The eye on his chest is open. He has several filthy tattoos on his left arm, a tattoo on his right forearm, a Chain Dragon tattoo, a bedlam bride tattoo on his chest, and one on his sternum. He wears a jacket with a disgusting patch and a metal spiked gauntlet, a ring, a toe ring on his left pinky toe and a second toe ring, and is barefoot.",
+   "change": "Emberous tattoos; injuries of prior scene gone",
+   "images": {
+    "standing": "looks/carl/look-046-standing.webp",
+    "action": "looks/carl/look-046-action.webp"
+   }
+  },
+  {
+   "seq": 47,
+   "book": 7,
+   "ms": 84210600,
+   "t": "23:23:30",
+   "description": "A man with long hair loose, his shoulder pushed into his chest, folded in half by a gale blast, with an arm bent backward with shattered bones. He wears the ring of divine suffering and the embers ring, and has emberous tattoos and bare feet. The eye on his chest is open. He has several filthy tattoos on his left arm, a tattoo on his right forearm, a Chain Dragon tattoo, a bedlam bride tattoo on his chest, and one on his sternum. He wears a jacket with a disgusting patch and a metal spiked gauntlet, a ring, a toe ring on his left pinky toe and a second toe ring.",
+   "change": "Ring of divine suffering and embers ring; folded shoulder and shattered arm (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-047-standing.webp",
+    "action": "looks/carl/look-047-action.webp"
+   }
+  },
+  {
+   "seq": 48,
+   "book": 7,
+   "ms": 101718080,
+   "t": "28:15:18",
+   "description": "A man covered in ash and blood, with long hair loose, his pinky snapped, his left arm broken with burned skin and broken bones, and an eye on his chest. He wears the ring of divine suffering and the embers ring, and has emberous tattoos and bare feet. He has several filthy tattoos on his left arm, a tattoo on his right forearm, a Chain Dragon tattoo, a bedlam bride tattoo on his chest, and one on his sternum. He wears a jacket with a disgusting patch and a metal spiked gauntlet, a ring, a toe ring on his left pinky toe and a second toe ring.",
+   "change": "Ash, blood, snapped pinky, broken left arm (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-048-standing.webp",
+    "action": "looks/carl/look-048-action.webp"
+   }
+  },
+  {
+   "seq": 49,
+   "book": 8,
+   "ms": 84000,
+   "t": "00:01:24",
+   "description": "A bald man with no eyebrows and a gross scar on his head, wearing only his underwear.",
+   "change": "Bald, no eyebrows, scar on head, only underwear",
+   "images": {
+    "standing": "looks/carl/look-049-standing.webp",
+    "action": "looks/carl/look-049-action.webp"
+   }
+  },
+  {
+   "seq": 50,
+   "book": 8,
+   "ms": 16254000,
+   "t": "04:30:54",
+   "description": "A man with a gross scar on his head, wearing a kangaroo costume with his boxers and knee pads on the outside of it, a jacket on the inside and a cloak around his neck.",
+   "change": "Kangaroo costume over jacket, boxers and knee pads on outside (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-050-standing.webp",
+    "action": "looks/carl/look-050-action.webp"
+   }
+  },
+  {
+   "seq": 51,
+   "book": 8,
+   "ms": 24135667,
+   "t": "06:42:15",
+   "description": "A man with a gross scar on his head, with his feet on fire and his arms and legs broken. The wide head of a dead joey sits atop his own head. He wears boxers and knee pads, a jacket, a cloak around his neck, and a gauntlet on his fist.",
+   "change": "Burning feet, broken limbs, joey head on his head (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-051-standing.webp",
+    "action": "looks/carl/look-051-action.webp"
+   }
+  },
+  {
+   "seq": 52,
+   "book": 8,
+   "ms": 25905500,
+   "t": "07:11:45",
+   "description": "A man with a gross scar on his head, in a shirt, with bare legs. He wears boxers and knee pads, a jacket, a cloak around his neck that smolders at a fairy's touch, and a gauntlet on his fist. The long-dormant eye of the bedlam bride on his chest is open, burning a hole in his shirt.",
+   "change": "Shirt, bare legs, smoldering cloak, open chest eye (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-052-standing.webp",
+    "action": "looks/carl/look-052-action.webp"
+   }
+  },
+  {
+   "seq": 53,
+   "book": 8,
+   "ms": 60516000,
+   "t": "16:48:36",
+   "description": "A long-haired dachshund (wiener dog) with ridiculously short, stubby legs, no thumbs, paws and a wagging tail, wearing resized boxers that sit awkwardly, a jacket, a cloak and a bandana hanging around its neck, with rings and the gauntlet unequipped. A swirl tattoo is on a palm.",
+   "change": "Dachshund form (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-053-standing.webp",
+    "action": "looks/carl/look-053-action.webp"
+   }
+  },
+  {
+   "seq": 54,
+   "book": 8,
+   "ms": 67885000,
+   "t": "18:51:25",
+   "description": "A man with a swirl tattoo on his palm, wearing a jacket and a cloak. A four-leaf clover patch is sewn onto the jacket above a Midnight Epicure patch. He wears an enormous, struggling pig against his chest in a backpack carrier.",
+   "change": "Four-leaf clover and Midnight Epicure patches; pig in backpack carrier (this scene only)",
+   "images": {
+    "standing": "looks/carl/look-054-standing.webp",
+    "action": "looks/carl/look-054-action.webp"
    }
   }
  ],
  "card": [
   {
+   "field": "floor",
+   "book": 1,
+   "ms": 1259160,
+   "value": 1
+  },
+  {
    "field": "race",
    "book": 1,
-   "ms": 93000,
+   "ms": 1646400,
    "value": "Human"
   },
   {
    "field": "level",
    "book": 1,
-   "ms": 93000,
+   "ms": 1648680,
    "value": 1
-  },
-  {
-   "field": "floor",
-   "book": 1,
-   "ms": 93000,
-   "value": 1
-  },
-  {
-   "field": "str",
-   "book": 1,
-   "ms": 2400000,
-   "value": 7
-  },
-  {
-   "field": "dex",
-   "book": 1,
-   "ms": 2400000,
-   "value": 6
-  },
-  {
-   "field": "con",
-   "book": 1,
-   "ms": 2400000,
-   "value": 7
-  },
-  {
-   "field": "int",
-   "book": 1,
-   "ms": 2400000,
-   "value": 5
   },
   {
    "field": "cha",
    "book": 1,
-   "ms": 2400000,
+   "ms": 4203360,
    "value": 4
   },
   {
-   "field": "gear:feet",
-   "book": 1,
-   "ms": 93000,
-   "value": "Pink crocs"
-  },
-  {
-   "field": "gear:body",
-   "book": 1,
-   "ms": 93000,
-   "value": "Leather jacket"
-  },
-  {
-   "field": "level",
-   "book": 1,
-   "ms": 3120000,
-   "value": 3
-  },
-  {
-   "field": "str",
-   "book": 1,
-   "ms": 3120000,
-   "value": 8
-  },
-  {
    "field": "con",
    "book": 1,
-   "ms": 3120000,
-   "value": 9
-  },
-  {
-   "field": "gear:feet",
-   "book": 1,
-   "ms": 3330000,
-   "value": null
-  },
-  {
-   "field": "skill:Sample skill A",
-   "book": 1,
-   "ms": 3480000,
-   "value": 1
-  },
-  {
-   "field": "level",
-   "book": 1,
-   "ms": 6300000,
+   "ms": 4203360,
    "value": 5
-  },
-  {
-   "field": "str",
-   "book": 1,
-   "ms": 6300000,
-   "value": 10
-  },
-  {
-   "field": "con",
-   "book": 1,
-   "ms": 6300000,
-   "value": 11
-  },
-  {
-   "field": "gear:head",
-   "book": 1,
-   "ms": 6436000,
-   "value": "Hooded cloak"
-  },
-  {
-   "field": "skill:Sample skill B",
-   "book": 1,
-   "ms": 7800000,
-   "value": 2
-  },
-  {
-   "field": "level",
-   "book": 1,
-   "ms": 10500000,
-   "value": 7
-  },
-  {
-   "field": "gear:body",
-   "book": 1,
-   "ms": 10525000,
-   "value": "Troll-skin shirt"
-  },
-  {
-   "field": "skill:Sample skill A",
-   "book": 1,
-   "ms": 12000000,
-   "value": 3
-  },
-  {
-   "field": "level",
-   "book": 1,
-   "ms": 13680000,
-   "value": 9
-  },
-  {
-   "field": "str",
-   "book": 1,
-   "ms": 13680000,
-   "value": 12
   },
   {
    "field": "dex",
    "book": 1,
-   "ms": 13680000,
-   "value": 8
+   "ms": 4203360,
+   "value": 5
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 4203360,
+   "value": 3
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 4203360,
+   "value": 6
+  },
+  {
+   "field": "skill:Basic Electrical Repair",
+   "book": 1,
+   "ms": 4890860,
+   "value": 6
+  },
+  {
+   "field": "skill:Swimming",
+   "book": 1,
+   "ms": 4890860,
+   "value": 4
+  },
+  {
+   "field": "skill:Unarmed Combat",
+   "book": 1,
+   "ms": 4890860,
+   "value": 3
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 5826360,
+   "value": 2
+  },
+  {
+   "field": "gear:hands",
+   "book": 1,
+   "ms": 6411380,
+   "value": "Fingerless Gloves"
+  },
+  {
+   "field": "skill:Regeneration",
+   "book": 1,
+   "ms": 6601640,
+   "value": 7
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 6630800,
+   "value": 9
+  },
+  {
+   "field": "gear:finger",
+   "book": 1,
+   "ms": 6684680,
+   "value": "Enchanted Toe Ring of the Splatter Skunk"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 8841520,
+   "value": 3
+  },
+  {
+   "field": "skill:Smush",
+   "book": 1,
+   "ms": 8866920,
+   "value": 3
+  },
+  {
+   "field": "gear:finger",
+   "book": 1,
+   "ms": 9505560,
+   "value": "Silver Ring"
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 9509400,
+   "value": 10
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 10361400,
+   "value": 5
+  },
+  {
+   "field": "skill:Foot Soldier",
+   "book": 1,
+   "ms": 10373960,
+   "value": 5
+  },
+  {
+   "field": "skill:Pugilism",
+   "book": 1,
+   "ms": 10373960,
+   "value": 5
+  },
+  {
+   "field": "skill:Unarmed Combat",
+   "book": 1,
+   "ms": 10373960,
+   "value": 5
+  },
+  {
+   "field": "gear:hands",
+   "book": 1,
+   "ms": 11635360,
+   "value": "Chain"
+  },
+  {
+   "field": "skill:Iron Punch",
+   "book": 1,
+   "ms": 12000640,
+   "value": 3
   },
   {
    "field": "gear:legs",
    "book": 1,
-   "ms": 13699000,
-   "value": "Spiked knee pads"
+   "ms": 12169480,
+   "value": "Enchanted Spiked Knee Pads of the Shade Gnoll Riot Forces"
   },
   {
-   "field": "floor",
+   "field": "gear:hands",
    "book": 1,
-   "ms": 19800000,
-   "value": 2
-  },
-  {
-   "field": "level",
-   "book": 1,
-   "ms": 22800000,
-   "value": 11
-  },
-  {
-   "field": "int",
-   "book": 1,
-   "ms": 22800000,
-   "value": 7
-  },
-  {
-   "field": "gear:hand",
-   "book": 1,
-   "ms": 22980000,
-   "value": "Black spiked gauntlet"
-  },
-  {
-   "field": "class",
-   "book": 1,
-   "ms": 28800000,
-   "value": "Sample class"
+   "ms": 13739880,
+   "value": "Steel Chain"
   },
   {
    "field": "level",
    "book": 1,
-   "ms": 42600000,
-   "value": 13
+   "ms": 15659120,
+   "value": 8
   },
   {
-   "field": "con",
+   "field": "skill:Dangerous Explosives Handling",
    "book": 1,
-   "ms": 42600000,
-   "value": 14
+   "ms": 16276040,
+   "value": 5
   },
   {
-   "field": "cha",
+   "field": "skill:Explosives Handling",
    "book": 1,
-   "ms": 42600000,
+   "ms": 16276040,
+   "value": 5
+  },
+  {
+   "field": "skill:Goblin Explosives",
+   "book": 1,
+   "ms": 16276040,
+   "value": 5
+  },
+  {
+   "field": "skill:IED",
+   "book": 1,
+   "ms": 16283040,
+   "value": 3
+  },
+  {
+   "field": "gear:finger",
+   "book": 1,
+   "ms": 16605840,
+   "value": "Ring of Constitution"
+  },
+  {
+   "field": "skill:Chopper Pilot",
+   "book": 1,
+   "ms": 18625820,
+   "value": 5
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 20846680,
+   "value": 9
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 22158360,
+   "value": 9
+  },
+  {
+   "field": "skill:Bare Knuckle",
+   "book": 1,
+   "ms": 22672880,
    "value": 6
   },
   {
-   "field": "gear:feet",
+   "field": "skill:Smush",
    "book": 1,
-   "ms": 43172000,
-   "value": "Tactical boots"
+   "ms": 22672880,
+   "value": 6
+  },
+  {
+   "field": "skill:Iron Punch",
+   "book": 1,
+   "ms": 22678160,
+   "value": 5
+  },
+  {
+   "field": "skill:Determined Value",
+   "book": 1,
+   "ms": 22846780,
+   "value": 2
+  },
+  {
+   "field": "gear:wrist",
+   "book": 1,
+   "ms": 22871800,
+   "value": "Enchanted War Gauntlet of the Exalted Grawl"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 24887280,
+   "value": 10
   },
   {
    "field": "floor",
    "book": 1,
-   "ms": 46800000,
+   "ms": 25650160,
+   "value": 2
+  },
+  {
+   "field": "gear:hands",
+   "book": 1,
+   "ms": 27993280,
+   "value": "Gauntlet"
+  },
+  {
+   "field": "skill:Pugilism",
+   "book": 1,
+   "ms": 28775420,
+   "value": 10
+  },
+  {
+   "field": "skill:Slingshot",
+   "book": 1,
+   "ms": 30360840,
    "value": 3
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 31743600,
+   "value": 11
+  },
+  {
+   "field": "skill:Aiming",
+   "book": 1,
+   "ms": 31749120,
+   "value": 4
+  },
+  {
+   "field": "skill:Explosives Handling",
+   "book": 1,
+   "ms": 33884080,
+   "value": 7
+  },
+  {
+   "field": "skill:IED",
+   "book": 1,
+   "ms": 33884080,
+   "value": 7
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 44748880,
+   "value": 12
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 47251040,
+   "value": 13
+  },
+  {
+   "field": "gear:ranged",
+   "book": 1,
+   "ms": 47277680,
+   "value": "Slingshot"
+  },
+  {
+   "field": "floor",
+   "book": 2,
+   "ms": 169000,
+   "value": 3
+  },
+  {
+   "field": "gear:feet",
+   "book": 2,
+   "ms": 3088000,
+   "value": "Toe Ring"
+  },
+  {
+   "field": "gear:finger",
+   "book": 2,
+   "ms": 3099000,
+   "value": "Ring"
+  },
+  {
+   "field": "gear:legs",
+   "book": 2,
+   "ms": 3099000,
+   "value": "Boxers"
+  },
+  {
+   "field": "gear:torso",
+   "book": 2,
+   "ms": 3099000,
+   "value": "Shirt"
+  },
+  {
+   "field": "con",
+   "book": 2,
+   "ms": 3099000,
+   "value": 10
+  },
+  {
+   "field": "int",
+   "book": 2,
+   "ms": 3099000,
+   "value": 5
+  },
+  {
+   "field": "gear:hands",
+   "book": 2,
+   "ms": 3111000,
+   "value": "Gauntlet"
+  },
+  {
+   "field": "cha",
+   "book": 2,
+   "ms": 3111000,
+   "value": 25
+  },
+  {
+   "field": "dex",
+   "book": 2,
+   "ms": 3111000,
+   "value": 10
+  },
+  {
+   "field": "class",
+   "book": 2,
+   "ms": 3313000,
+   "value": "Compensated Anarchist"
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 3313000,
+   "value": 13
+  },
+  {
+   "field": "race",
+   "book": 2,
+   "ms": 3313000,
+   "value": "Primal"
+  },
+  {
+   "field": "skill:Sestapunta",
+   "book": 2,
+   "ms": 5793000,
+   "value": 3
+  },
+  {
+   "field": "skill:Bomb Surgeon",
+   "book": 2,
+   "ms": 5975000,
+   "value": 1
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 8687520,
+   "value": 14
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 12346520,
+   "value": 15
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 15766620,
+   "value": 18
+  },
+  {
+   "field": "skill:Fear Spell",
+   "book": 2,
+   "ms": 16937040,
+   "value": 3
+  },
+  {
+   "field": "str",
+   "book": 2,
+   "ms": 18723520,
+   "value": 30
+  },
+  {
+   "field": "skill:Iron Punch",
+   "book": 2,
+   "ms": 19846000,
+   "value": 10
+  },
+  {
+   "field": "skill:Alchemy",
+   "book": 2,
+   "ms": 23312840,
+   "value": 3
+  },
+  {
+   "field": "gear:wrist",
+   "book": 2,
+   "ms": 23792040,
+   "value": "Cheetah"
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 26486420,
+   "value": 19
+  },
+  {
+   "field": "skill:Dangerous Explosives Handling",
+   "book": 2,
+   "ms": 29997160,
+   "value": 9
+  },
+  {
+   "field": "skill:Explosives Handling",
+   "book": 2,
+   "ms": 29997160,
+   "value": 9
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 33413580,
+   "value": 21
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 40449040,
+   "value": 27
+  },
+  {
+   "field": "floor",
+   "book": 3,
+   "ms": 48520,
+   "value": 4
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 2661420,
+   "value": 27
+  },
+  {
+   "field": "str",
+   "book": 3,
+   "ms": 4092380,
+   "value": 41
+  },
+  {
+   "field": "cha",
+   "book": 3,
+   "ms": 4100180,
+   "value": 25
+  },
+  {
+   "field": "con",
+   "book": 3,
+   "ms": 4100180,
+   "value": 34
+  },
+  {
+   "field": "dex",
+   "book": 3,
+   "ms": 4100180,
+   "value": 23
+  },
+  {
+   "field": "int",
+   "book": 3,
+   "ms": 4100180,
+   "value": 15
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 6009620,
+   "value": "Compensated Anarchist"
+  },
+  {
+   "field": "race",
+   "book": 3,
+   "ms": 6009620,
+   "value": "Primal"
+  },
+  {
+   "field": "skill:Bear Knuckles",
+   "book": 3,
+   "ms": 6495860,
+   "value": 8
+  },
+  {
+   "field": "gear:feet",
+   "book": 3,
+   "ms": 17085620,
+   "value": "Enchanted Toe Ring of the Splatterskunk"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 18006500,
+   "value": 29
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 25524660,
+   "value": 32
+  },
+  {
+   "field": "gear:torso",
+   "book": 3,
+   "ms": 27177380,
+   "value": "Trollskin Shirt"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 40391780,
+   "value": 34
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 46690180,
+   "value": 35
+  },
+  {
+   "field": "skill:Explosives Handling",
+   "book": 3,
+   "ms": 46699700,
+   "value": 11
+  },
+  {
+   "field": "gear:wrist",
+   "book": 3,
+   "ms": 50100660,
+   "value": "Enchanted Auto-buckler of the Peach Pit"
+  },
+  {
+   "field": "gear:extinction sigil tattoo",
+   "book": 4,
+   "ms": 3029520,
+   "value": "Extinction Sigil Tattoo"
+  },
+  {
+   "field": "skill:Powerful Strike",
+   "book": 4,
+   "ms": 3218440,
+   "value": 13
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 3328560,
+   "value": 41
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 8392800,
+   "value": "Compensated Anarchist"
+  },
+  {
+   "field": "race",
+   "book": 4,
+   "ms": 8392800,
+   "value": "Primal"
+  },
+  {
+   "field": "gear:chisterra",
+   "book": 4,
+   "ms": 21991160,
+   "value": "Chisterra"
+  },
+  {
+   "field": "gear:hands",
+   "book": 4,
+   "ms": 22552360,
+   "value": "Gauntlet"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 28773480,
+   "value": 44
+  },
+  {
+   "field": "dex",
+   "book": 4,
+   "ms": 38112040,
+   "value": 32
+  },
+  {
+   "field": "gear:toe ring",
+   "book": 4,
+   "ms": 38121800,
+   "value": "Toe Ring"
+  },
+  {
+   "field": "str",
+   "book": 4,
+   "ms": 38427240,
+   "value": 80
+  },
+  {
+   "field": "skill:Powerful Strike",
+   "book": 4,
+   "ms": 42316600,
+   "value": 14
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 48289160,
+   "value": 47
+  },
+  {
+   "field": "gear:head",
+   "book": 4,
+   "ms": 55233640,
+   "value": "Bandana"
+  },
+  {
+   "field": "gear:torso",
+   "book": 4,
+   "ms": 55233640,
+   "value": "Jacket"
+  },
+  {
+   "field": "gear:finger",
+   "book": 4,
+   "ms": 55831400,
+   "value": "Plus-two Ring of Strength"
+  },
+  {
+   "field": "gear:finger",
+   "book": 4,
+   "ms": 55852840,
+   "value": "Rockard's Ring of Sniping"
+  },
+  {
+   "field": "str",
+   "book": 4,
+   "ms": 60538760,
+   "value": 75
+  },
+  {
+   "field": "floor",
+   "book": 5,
+   "ms": 54000,
+   "value": 6
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 1085000,
+   "value": 47
+  },
+  {
+   "field": "gear:legs",
+   "book": 5,
+   "ms": 1935000,
+   "value": "Boxers"
+  },
+  {
+   "field": "gear:torso",
+   "book": 5,
+   "ms": 1935000,
+   "value": "Jacket"
+  },
+  {
+   "field": "int",
+   "book": 5,
+   "ms": 1935000,
+   "value": 17
+  },
+  {
+   "field": "class",
+   "book": 5,
+   "ms": 1970000,
+   "value": "Agent Provocateur"
+  },
+  {
+   "field": "gear:finger",
+   "book": 5,
+   "ms": 5212000,
+   "value": "Ring of Divine Suffering"
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 8032000,
+   "value": 54
+  },
+  {
+   "field": "skill:Fear",
+   "book": 5,
+   "ms": 9747000,
+   "value": 10
+  },
+  {
+   "field": "race",
+   "book": 5,
+   "ms": 10620000,
+   "value": "Primal"
+  },
+  {
+   "field": "gear:finger",
+   "book": 5,
+   "ms": 28882200,
+   "value": "Water-breathing Ring"
+  },
+  {
+   "field": "skill:Dangerous Explosives Handling",
+   "book": 5,
+   "ms": 40504280,
+   "value": 10
+  },
+  {
+   "field": "str",
+   "book": 5,
+   "ms": 40584320,
+   "value": 100
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 43361960,
+   "value": 56
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 63469000,
+   "value": 59
+  },
+  {
+   "field": "floor",
+   "book": 5,
+   "ms": 82567960,
+   "value": 7
+  },
+  {
+   "field": "floor",
+   "book": 6,
+   "ms": 19490040,
+   "value": 8
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 32183800,
+   "value": 65
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 53566560,
+   "value": 68
+  },
+  {
+   "field": "skill:Fear",
+   "book": 6,
+   "ms": 58341160,
+   "value": 11
+  },
+  {
+   "field": "gear:finger",
+   "book": 6,
+   "ms": 59271920,
+   "value": "Strength Ring"
+  },
+  {
+   "field": "skill:Self-immolation",
+   "book": 6,
+   "ms": 65239360,
+   "value": 10
+  },
+  {
+   "field": "skill:Wand Casting",
+   "book": 6,
+   "ms": 67095720,
+   "value": 5
+  },
+  {
+   "field": "floor",
+   "book": 7,
+   "ms": 2089680,
+   "value": 9
+  },
+  {
+   "field": "gear:finger",
+   "book": 7,
+   "ms": 2483280,
+   "value": "Emberous Ring"
+  },
+  {
+   "field": "skill:Gloomwraith Phase",
+   "book": 7,
+   "ms": 7259200,
+   "value": 13
+  },
+  {
+   "field": "skill:Mind Balance",
+   "book": 7,
+   "ms": 18978720,
+   "value": 9
+  },
+  {
+   "field": "gear:finger",
+   "book": 7,
+   "ms": 19005840,
+   "value": "Toe Ring"
+  },
+  {
+   "field": "level",
+   "book": 7,
+   "ms": 56235440,
+   "value": 75
+  },
+  {
+   "field": "skill:Heathen Scald",
+   "book": 7,
+   "ms": 57160080,
+   "value": 15
+  },
+  {
+   "field": "skill:Pugilism",
+   "book": 7,
+   "ms": 66253680,
+   "value": 15
+  },
+  {
+   "field": "skill:Mind Balance",
+   "book": 7,
+   "ms": 73440720,
+   "value": 16
+  },
+  {
+   "field": "skill:Pied Piper",
+   "book": 7,
+   "ms": 88220560,
+   "value": 15
+  },
+  {
+   "field": "level",
+   "book": 7,
+   "ms": 89440880,
+   "value": 81
+  },
+  {
+   "field": "floor",
+   "book": 8,
+   "ms": 2244000,
+   "value": 10
+  },
+  {
+   "field": "level",
+   "book": 8,
+   "ms": 16743000,
+   "value": 84
+  },
+  {
+   "field": "skill:Fur Sona",
+   "book": 8,
+   "ms": 19072000,
+   "value": 8
+  },
+  {
+   "field": "gear:torso",
+   "book": 8,
+   "ms": 48455000,
+   "value": "Epicure Patch"
+  },
+  {
+   "field": "gear:finger",
+   "book": 8,
+   "ms": 58099000,
+   "value": "Emberus Ring"
+  },
+  {
+   "field": "gear:back",
+   "book": 8,
+   "ms": 67885000,
+   "value": "Special Backpack"
   }
  ]
 }

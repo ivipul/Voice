@@ -2,62 +2,219 @@
  "slug": "mordecai",
  "name": "Mordecai",
  "epithet": null,
- "sample": true,
- "realLookTimes": true,
+ "sample": false,
  "looks": [
   {
    "seq": 1,
    "book": 1,
-   "ms": 2237000,
+   "ms": 2237960,
    "t": "00:37:17",
-   "description": "Bearded ratkin hooligan, a head shorter than a tall man. Black vest, blue pants, worn sandals.",
+   "description": "A bearded, rat-like creature and ratkin hooligan standing about a head shorter than a tall man, with furry rat hands and a rat arm, wearing a black vest, blue pants, and a pair of well-worn sandals.",
+   "change": "Baseline ratkin look",
    "images": {
-    "standing": "looks/mordecai/placeholder-stand.png",
-    "action": "looks/mordecai/placeholder-stand.png"
+    "standing": "looks/mordecai/look-001-standing.webp",
+    "action": "looks/mordecai/look-001-action.webp"
    }
   },
   {
    "seq": 2,
    "book": 1,
-   "ms": 46482000,
+   "ms": 46482240,
    "t": "12:54:42",
-   "description": "Much larger obsidian bugaboo form: a neckless bear with enormous owlish eyes and comically skinny legs.",
+   "description": "A much larger, hairier, and obsidian bugaboo creature resembling a bear with no neck, featuring enormous, owlish eyes, comically skinny legs, a shaggy face, thick fur, and furry hands.",
+   "change": "Large obsidian bugaboo bear form",
    "images": {
-    "standing": "looks/mordecai/placeholder-bugaboo.png",
-    "action": "looks/mordecai/placeholder-bugaboo.png"
+    "standing": "looks/mordecai/look-002-standing.webp",
+    "action": "looks/mordecai/look-002-action.webp"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 2,
+   "ms": 100000,
+   "t": "00:01:40",
+   "description": "A man with dusky gray skin, short devil horns jutting from his forehead, and long gray-and-black hair held back in a ponytail. A barbed tail pokes from the rear of his tuxedo, and a pair of black, bat-like wings sits folded tightly against his back.",
+   "change": "Gray-skinned horned devil man in tuxedo",
+   "images": {
+    "standing": "looks/mordecai/look-003-standing.webp",
+    "action": "looks/mordecai/look-003-action.webp"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 3,
+   "ms": 12702740,
+   "t": "03:31:42",
+   "description": "A toad-like creature about five feet tall, mud-colored and slimy, with hanging jowls, a throat pouch beneath its wide face that looks as if it could fill with air, webbed hands, frog-like arms, a long frog tongue and a frog-like face.",
+   "change": "Mud-colored toad creature",
+   "images": {
+    "standing": "looks/mordecai/look-004-standing.webp",
+    "action": "looks/mordecai/look-004-action.webp"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 4,
+   "ms": 1375000,
+   "t": "00:22:55",
+   "description": "A bird resembling an eagle (a skyfowl), with light brown and beige feathers. Like a regular eagle, it has no arms, only feet and wings.",
+   "change": "Brown and beige eagle-like skyfowl",
+   "images": {
+    "standing": "looks/mordecai/look-005-standing.webp",
+    "action": "looks/mordecai/look-005-action.webp"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 5,
+   "ms": 2868000,
+   "t": "00:47:48",
+   "description": "A small, chubby, fuzzy bear-like creature with brown-and-white fur, elf ears, a monkey tail, ridiculously huge eyes like a baby's, and buck teeth. It stands on two legs, knee-height, with fuzzy hands, a fuzzy face and a little furry head, and looks like a bootleg monchichi.",
+   "change": "Small fuzzy monchichi-like creature",
+   "images": {
+    "standing": "looks/mordecai/look-006-standing.webp",
+    "action": "looks/mordecai/look-006-action.webp"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 6,
+   "ms": 1120000,
+   "t": "00:18:40",
+   "description": "A bipedal ratkin brute with a rat face.",
+   "change": "Bipedal ratkin brute",
+   "images": {
+    "standing": "looks/mordecai/look-007-standing.webp",
+    "action": "looks/mordecai/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 6,
+   "ms": 12485040,
+   "t": "03:28:05",
+   "description": "A large, bald, bright pink cyclops with a cone-shaped, furrowed forehead and a pointy head. He has a single brown eye the size of an ostrich egg with a caterpillar-like eyebrow stretched across his head. His wide belly stretches his white shirt to its limits, and his fingers look like fat, wrinkly sausages.",
+   "change": "Large bald pink cyclops",
+   "images": {
+    "standing": "looks/mordecai/look-008-standing.webp",
+    "action": "looks/mordecai/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 7,
+   "ms": 3909840,
+   "t": "01:05:09",
+   "description": "A man wearing a snowsuit and a raccoon hat, with glasses and a pasty hand.",
+   "change": "Man in snowsuit and raccoon hat",
+   "images": {
+    "standing": "looks/mordecai/look-009-standing.webp",
+    "action": "looks/mordecai/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 8,
+   "ms": 7254500,
+   "t": "02:00:54",
+   "description": "A Grim Reaper-style monster with very long arms and desiccated, undead-like skeletal hands, wearing dark canvas-like robes that float lazily in the air and a black hood over his head. When the hood falls back it reveals not a skull but an enormous eyeball that is on fire.",
+   "change": "Grim Reaper form with burning eyeball",
+   "images": {
+    "standing": "looks/mordecai/look-010-standing.webp",
+    "action": "looks/mordecai/look-010-action.webp"
    }
   }
  ],
  "card": [
   {
-   "field": "race",
+   "field": "level",
    "book": 1,
-   "ms": 2237000,
-   "value": "Ratkin"
-  },
-  {
-   "field": "floor",
-   "book": 1,
-   "ms": 2237000,
-   "value": 1
-  },
-  {
-   "field": "floor",
-   "book": 1,
-   "ms": 19800000,
-   "value": 2
+   "ms": 2699160,
+   "value": 50
   },
   {
    "field": "race",
    "book": 1,
-   "ms": 46482000,
+   "ms": 33456480,
    "value": "Bugaboo"
   },
   {
-   "field": "floor",
-   "book": 1,
-   "ms": 46800000,
-   "value": 3
+   "field": "level",
+   "book": 2,
+   "ms": 137000,
+   "value": 50
+  },
+  {
+   "field": "race",
+   "book": 2,
+   "ms": 137000,
+   "value": "Incubus"
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 2522180,
+   "value": "Infantry"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 2522180,
+   "value": 50
+  },
+  {
+   "field": "race",
+   "book": 3,
+   "ms": 2522180,
+   "value": "Grolki"
+  },
+  {
+   "field": "race",
+   "book": 4,
+   "ms": 1406880,
+   "value": "Rock-edge Skyfowl"
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 1461200,
+   "value": "Cleric"
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 3204000,
+   "value": 50
+  },
+  {
+   "field": "race",
+   "book": 6,
+   "ms": 3204000,
+   "value": "Hills Cyclops"
+  },
+  {
+   "field": "level",
+   "book": 7,
+   "ms": 3935760,
+   "value": 50
+  },
+  {
+   "field": "race",
+   "book": 7,
+   "ms": 3935760,
+   "value": "Human"
+  },
+  {
+   "field": "level",
+   "book": 8,
+   "ms": 7192000,
+   "value": 50
+  },
+  {
+   "field": "race",
+   "book": 8,
+   "ms": 62159000,
+   "value": "Animistic Spirit"
   }
  ]
 }

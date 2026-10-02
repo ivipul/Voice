@@ -32,7 +32,7 @@ CHARACTERS = [
     ("princess-donut", "Princess Donut", ["princess donut", "donut"], "#FF4FA3", "#FFB3D9", "cat"),
     ("katya-grim", "Katya Grim", ["katya grim", "katia grim", "katya", "katia"], "#5CC8FF", "#BFE9FF", "human"),
     ("mongo", "Mongo", ["mongo"], "#7CFF5A", "#CFFFC2", "raptor"),
-    ("samantha", "Samantha", ["samantha"], "#B48CFF", "#E0D0FF", "head"),
+    ("samantha", "Samantha", ["samantha", "samantha sex doll head"], "#B48CFF", "#E0D0FF", "head"),
     ("mordecai", "Mordecai", ["mordecai"], "#FFC43D", "#FFE4A3", "ratkin"),
 ]
 BOOK_TITLES = {
@@ -172,7 +172,7 @@ def build_looks(copilot, images_root, slug, name, aliases, out_root, max_px, dry
                 src = guess if os.path.exists(guess) else None
             elif src and not os.path.isabs(src):
                 # paths in the tracker are relative to the Mac project folder
-                for base in (os.path.dirname(copilot), copilot):
+                for base in (os.path.dirname(path), os.path.dirname(copilot), copilot):
                     cand = os.path.join(base, src)
                     if os.path.exists(cand):
                         src = cand
@@ -198,104 +198,77 @@ def build_looks(copilot, images_root, slug, name, aliases, out_root, max_px, dry
 # ---------------------------------------------------------------- player cards
 
 def adapt_player_cards(copilot, aliases, report, name):
-    """Returns field-level entries [{field, book, ms, value, label?, quote?}].
+    """Returns field-level entries [{field, book, ms, value, label?}] from
+    player-cards/book-N/entries.json (rows: entity, field, value,
+    timestamp_start (book-relative ms), quote, optional key / modifier_only).
 
-    Finish this against the real files: it accepts dicts with a field name
-    (field/stat/key/attribute), a book-relative time (ms/first_ms/timestamp/time)
-    and a value, nested anywhere under a crawler whose name matches an alias.
-    Skills become 'skill:<Name>' with the rank as value; gear becomes
-    'gear:<slot>' with the item as value.
+    LEVEL/FLOOR 'Level 5' -> 5; STAT_* numeric ('base / +mod' keeps the base; modifier-only
+    '+3' rows are skipped); SKILL 'Name (Rank 6)' -> skill:Name = 6; GEAR 'Item (slot)' ->
+    gear:<slot> = Item. CALL_SIGN has no field on the site and is skipped.
     """
     root = os.path.join(copilot, "player-cards")
     out = []
+    skipped = {}
     if not os.path.isdir(root):
         report.append("player-cards folder not found at %s" % root)
         return out
-    unknown = 0
     for bd in sorted(os.listdir(root)):
         m = re.match(r"book-(\d+)$", bd)
         if not m:
             continue
         book = int(m.group(1))
-        bdir = os.path.join(root, bd)
-        for dirpath, _, files in os.walk(bdir):
-            for fn in files:
-                if not fn.endswith(".json") or fn.startswith("_"):
-                    continue
-                try:
-                    data = json.load(open(os.path.join(dirpath, fn)))
-                except Exception as ex:
-                    report.append("could not parse %s: %s" % (fn, ex))
-                    continue
-                for crawler, entries in iter_crawlers(data, fn):
-                    if norm(crawler) not in aliases and not any(a in norm(crawler) for a in aliases):
-                        continue
-                    for e in entries:
-                        rec = to_entry(e, book)
-                        if rec:
-                            out.append(rec)
-                        else:
-                            unknown += 1
-    if unknown:
-        report.append("%s: %d player-card records not understood (adapt to_entry)" % (name, unknown))
-    report.append("%s: %d card entries" % (name, len(out)))
+        path = os.path.join(root, bd, "entries.json")
+        if not os.path.exists(path):
+            report.append("%s: no entries.json in %s" % (name, bd))
+            continue
+        for e in json.load(open(path)):
+            if norm(e.get("entity")) not in aliases:
+                continue
+            rec, why = to_entry(e, book)
+            if rec:
+                out.append(rec)
+            else:
+                skipped[why] = skipped.get(why, 0) + 1
+    out.sort(key=lambda r: (r["book"], r["ms"]))
+    report.append("%s: %d card entries (skipped: %s)" % (name, len(out), ", ".join("%s x%d" % kv for kv in sorted(skipped.items())) or "none"))
     return out
 
 
-def iter_crawlers(data, fn):
-    """Yields (crawler name, list of raw entries) from the common layouts."""
-    if isinstance(data, dict):
-        if isinstance(data.get("entries"), list):
-            yield (data.get("crawler") or data.get("name") or data.get("entity") or fn[:-5], data["entries"])
-            return
-        if isinstance(data.get("crawlers"), list):
-            for c in data["crawlers"]:
-                yield (c.get("name") or c.get("crawler") or "", c.get("entries") or c.get("fields") or [])
-            return
-        if isinstance(data.get("fields"), list):
-            yield (data.get("crawler") or data.get("name") or fn[:-5], data["fields"])
-            return
-        # dict of crawler -> entries
-        for k, v in data.items():
-            if isinstance(v, list) and v and isinstance(v[0], dict):
-                yield (k, v)
-            elif isinstance(v, dict) and isinstance(v.get("entries"), list):
-                yield (k, v["entries"])
-    elif isinstance(data, list):
-        yield (fn[:-5], data)
-
-
 def to_entry(e, book):
-    if not isinstance(e, dict):
-        return None
-    field = e.get("field") or e.get("stat") or e.get("key") or e.get("attribute")
-    kind = (e.get("kind") or e.get("type") or "").lower()
-    t = None
-    for k in ("ms", "first_ms", "time_ms", "timestamp_ms"):
-        if k in e and e[k] is not None:
-            t = int(e[k])
-            break
+    """(entry, None) or (None, reason)."""
+    field = (e.get("field") or "").upper()
+    value = (e.get("value") or "").strip()
+    t = e.get("timestamp_start")
     if t is None:
-        for k in ("timestamp", "time", "at", "from"):
-            if e.get(k):
-                t = hms_to_ms(e[k])
-                break
-    if t is None or field is None:
-        return None
-    value = e.get("value") if "value" in e else e.get("rank") if "rank" in e else e.get("item")
-    f = norm(field)
-    if kind == "skill" or f.startswith("skill"):
-        nm = e.get("name") or e.get("skill") or re.sub(r"^skill[: ]*", "", field)
-        return {"field": "skill:%s" % nm, "book": book, "ms": t, "value": value}
-    if kind == "gear" or f.startswith("gear") or e.get("slot"):
-        slot = e.get("slot") or re.sub(r"^gear[: ]*", "", field)
-        return {"field": "gear:%s" % norm(slot), "book": book, "ms": t, "value": value}
-    if f in STAT_FIELDS:
-        rec = {"field": STAT_FIELDS[f], "book": book, "ms": t, "value": value}
-        if e.get("label") or e.get("floor_name") or e.get("name"):
-            rec["label"] = e.get("label") or e.get("floor_name") or e.get("name")
-        return rec
-    return None
+        return None, "no timestamp"
+    t = int(t)
+    if field in ("LEVEL", "FLOOR"):
+        m = re.search(r"(\d+)", value)
+        if not m:
+            return None, "unparsed " + field.lower()
+        return {"field": field.lower(), "book": book, "ms": t, "value": int(m.group(1))}, None
+    if field in ("RACE", "CLASS"):
+        return {"field": field.lower(), "book": book, "ms": t, "value": value}, None
+    if field.startswith("STAT_"):
+        if e.get("modifier_only"):
+            return None, "stat modifier"
+        m = re.fullmatch(r"(\d+)(?:\s*/\s*\+\d+)?", value)
+        if not m:
+            return None, "unparsed stat"
+        return {"field": field[5:].lower(), "book": book, "ms": t, "value": int(m.group(1))}, None
+    if field == "SKILL":
+        m = re.fullmatch(r"(.*?)\s*\(Rank\s*(\d+)\)", value, re.I)
+        if not m:
+            return None, "unparsed skill"
+        return {"field": "skill:" + m.group(1).strip(), "book": book, "ms": t, "value": int(m.group(2))}, None
+    if field == "GEAR":
+        m = re.fullmatch(r"(.*?)\s*\(([^()]*)\)", value)
+        slot = e.get("key") or (m.group(2) if m else None)
+        item = m.group(1).strip() if m else value
+        if not slot:
+            return None, "gear without slot"
+        return {"field": "gear:" + norm(slot), "book": book, "ms": t, "value": item}, None
+    return None, field.lower() or "no field"
 
 
 # ---------------------------------------------------------------- main
@@ -317,9 +290,11 @@ def main():
         b["title"] = b.get("title") or BOOK_TITLES.get(b["n"])
     if a.audiobooks and os.path.isdir(a.audiobooks):
         for fn in os.listdir(a.audiobooks):
-            m = re.search(r"(?:book\s*)?0?8\b[^a-z0-9]*([A-Za-z].*?)\.(m4b|mp3|m4a|json)$", fn, re.I)
-            if m and not next((b for b in books if b["n"] == 8), {}).get("title"):
-                next(b for b in books if b["n"] == 8)["title"] = m.group(1).strip()
+            m = re.match(r"(.+?) - Dungeon Crawler Carl, Book (\d+)\.(?:m4b|mp3|m4a)$", fn)
+            if m:
+                for b in books:
+                    if b["n"] == int(m.group(2)) and not b.get("title"):
+                        b["title"] = m.group(1).strip()
     report = []
     chars_out = []
     for slug, name, aliases, accent, accent2, kind in CHARACTERS:
