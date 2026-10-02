@@ -137,6 +137,7 @@ class MediaItemProvider(
     mediaId = MediaId.Book(book.id),
     browsable = false,
     isPlayable = true,
+    subtitle = book.content.author,
     imageUri = book.content.cover?.toProvidedUri(),
     mediaType = MediaType.AudioBook,
   )
@@ -151,6 +152,8 @@ class MediaItemProvider(
     isPlayable = true,
     sourceUri = chapter.id.toUri(),
     imageUri = content.cover?.toProvidedUri(),
+    album = content.name,
+    subtitle = content.name,
     artist = content.author,
     mediaType = MediaType.AudioBookChapter,
   )
@@ -167,6 +170,8 @@ class MediaItemProvider(
     isPlayable = true,
     sourceUri = playbackItem.chapter.id.toUri(),
     imageUri = content.cover?.toProvidedUri(),
+    album = content.name,
+    subtitle = content.name,
     artist = content.author,
     durationMs = playbackItem.mark.durationMs,
     clippingConfiguration = ClippingConfiguration.Builder()
