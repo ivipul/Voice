@@ -38,19 +38,25 @@ half4 main(float2 fragCoord) {
   float2 uv = fragCoord / size;
   float diagonal = uv.x * 0.9 + uv.y * 0.5;
   float center = 0.15 + light.x * 0.8 + light.y * 0.2;
-  float band = 1.0 - smoothstep(0.0, 0.38, abs(diagonal - center));
+  float band = 1.0 - smoothstep(0.0, 0.3, abs(diagonal - center));
+  band = band * band;
   float hue = diagonal * 1.7 - light.x * 1.3;
   float3 rainbow = 0.5 + 0.5 * cos(6.2831 * (hue + float3(0.0, 0.33, 0.67)));
-  float amount = 0.28 + strength * 0.55;
+  float amount = 0.1 + strength * 0.35;
   float3 color = rainbow * band * amount;
 
-  float2 cell = floor(fragCoord / (size.x * 0.018));
+  float cellSize = size.x * 0.022;
+  float2 cellPos = fragCoord / cellSize;
+  float2 cell = floor(cellPos);
   float n = hash(cell);
-  float sparkle = step(0.985, n) * smoothstep(0.05, 0.6, band + strength * 0.4);
-  color += float3(sparkle * (0.5 + 0.5 * sin(n * 60.0 + light.x * 14.0)));
+  float2 jitter = float2(hash(cell + 7.1), hash(cell + 13.7)) - 0.5;
+  float dotRadius = length(fract(cellPos) - 0.5 - jitter * 0.5);
+  float twinkle = 0.5 + 0.5 * sin(n * 60.0 + light.x * 14.0 + light.y * 9.0);
+  float sparkle = step(0.9, n) * (1.0 - smoothstep(0.0, 0.14, dotRadius)) * twinkle;
+  color += float3(sparkle * (0.12 + band * 0.7 * (0.3 + strength)));
 
   float glare = 1.0 - smoothstep(0.0, 0.7, distance(uv, light));
-  color += float3(glare * 0.12);
+  color += float3(glare * 0.06);
   return half4(half3(color), 1.0);
 }
 """

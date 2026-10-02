@@ -269,7 +269,7 @@ private fun Figure(
   ) {
     if (lookImage != null) {
       AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(lookImage).crossfade(true).build(),
+        model = ImageRequest.Builder(LocalContext.current).data(lookImage).crossfade(false).build(),
         contentDescription = null,
         contentScale = ContentScale.Fit,
         alignment = Alignment.BottomCenter,
@@ -382,17 +382,18 @@ private fun Badge(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    CardText(text = label.uppercase(), size = u.sp(2.5f), minSize = u.sp(1.8f), color = InkDimColor, letterSpacingEm = 0.14f)
+    CardText(text = label.uppercase(), size = u.sp(2.3f), minSize = u.sp(1.6f), color = InkDimColor, letterSpacingEm = 0.14f, lineHeightMultiple = 1f)
     CardText(
       text = value ?: "–",
-      size = u.sp(9.5f),
-      minSize = u.sp(5f),
+      size = u.sp(8.4f),
+      minSize = u.sp(4.5f),
+      lineHeightMultiple = 1f,
       color = if (value == null) Color(0xFF3B4A52) else InkColor,
       fontFamily = DisplayFont,
       weight = FontWeight.Black,
     )
     if (caption != null) {
-      CardText(text = caption, size = u.sp(2.2f), minSize = u.sp(1.5f), color = InkDimColor)
+      CardText(text = caption, size = u.sp(2f), minSize = u.sp(1.4f), color = InkDimColor, lineHeightMultiple = 1f)
     }
   }
 }
@@ -485,24 +486,27 @@ private fun StatHexagon(
   ) {
     CardText(
       text = stat.stat.abbreviation,
-      size = u.sp(2.6f),
+      size = u.sp(2.4f),
       color = if (locked) InkDimColor.copy(alpha = 0.6f) else mix(palette.accent, Color.White, 0.85f),
       letterSpacingEm = 0.12f,
+      lineHeightMultiple = 1f,
     )
     CardText(
       text = stat.value?.toString() ?: "–",
-      size = u.sp(8.6f),
+      size = u.sp(8f),
       minSize = u.sp(4.5f),
       color = if (locked) Color(0xFF3B4A52) else InkColor,
       fontFamily = DisplayFont,
       weight = FontWeight.Black,
+      lineHeightMultiple = 1f,
       modifier = Modifier.padding(horizontal = u.dp(1.5f)),
     )
     CardText(
       text = stat.modifier.orEmpty().takeIf { !locked } ?: " ",
-      size = u.sp(2.5f),
+      size = u.sp(2.4f),
       minSize = u.sp(1.6f),
       color = PositiveColor,
+      lineHeightMultiple = 1f,
     )
   }
 }

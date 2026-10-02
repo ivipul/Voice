@@ -102,6 +102,7 @@ internal fun CardText(
   letterSpacingEm: Float = 0f,
   align: TextAlign = TextAlign.Center,
   maxLines: Int = 1,
+  lineHeightMultiple: Float = 1.2f,
 ) {
   BasicText(
     text = text,
@@ -113,7 +114,7 @@ internal fun CardText(
       fontFamily = fontFamily,
       letterSpacing = letterSpacingEm.em,
       textAlign = align,
-      lineHeight = size * 1.2f,
+      lineHeight = size * lineHeightMultiple,
     ),
     maxLines = maxLines,
     softWrap = maxLines > 1,
