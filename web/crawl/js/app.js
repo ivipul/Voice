@@ -63,7 +63,7 @@
       b.type = 'button'; b.style.setProperty('--char', c.accent);
       b.setAttribute('aria-label', c.name);
       var first = docs[c.slug].looks[0];
-      var src = imgFor(first, 'standing');
+      var src = imgFor(first, 'action');
       b.innerHTML = '<span class="med">' + (src ? '<img alt="" src="' + esc(src) + '">' : '') + '</span><span class="lbl">' + esc(c.name) + '</span>';
       b.addEventListener('click', function () { select(i, b); });
       li.appendChild(b); els.roster.appendChild(li);
@@ -342,7 +342,7 @@
       df.btn.style.display = '';
       df.btn.style.left = s.x + '%'; df.btn.style.bottom = s.b + '%'; df.btn.style.height = s.h + '%';
       var looks = docs[c.slug].looks, li = C.lookIndexAt(looks, state.g);
-      df.fig.set(imgFor(li >= 0 ? looks[li] : looks[0], 'standing'));
+      df.fig.set(imgFor(li >= 0 ? looks[li] : looks[0], 'action'));
     });
   }
 
@@ -361,7 +361,7 @@
   function updateMembers() {
     memberEls.forEach(function (m) {
       var c = chars[m.idx], d = docs[c.slug], li = C.lookIndexAt(d.looks, state.g);
-      m.fig.set(imgFor(li >= 0 ? d.looks[li] : d.looks[0], 'standing'));
+      m.fig.set(imgFor(li >= 0 ? d.looks[li] : d.looks[0], 'action'));
       var comp = C.composeAt(d.card, state.g);
       m.btn.querySelector('.lv').textContent = comp.level ? 'LVL ' + comp.level.value : (d.card.length ? 'LVL –' : 'NO STATS');
       if (m.idx === state.idx) m.btn.setAttribute('aria-current', 'true'); else m.btn.removeAttribute('aria-current');
