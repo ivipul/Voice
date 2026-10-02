@@ -1,0 +1,170 @@
+{
+ "slug": "princess-donut",
+ "name": "Princess Donut",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": true,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 121000,
+   "t": "00:02:01",
+   "description": "Tortoiseshell Persian, warm brown coat, orange eyes. No collar or crown.",
+   "images": {
+    "standing": "looks/princess-donut/placeholder-sit.png",
+    "action": "looks/princess-donut/placeholder-sit.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 9965000,
+   "t": "02:46:05",
+   "description": "A small jeweled crown with smoky gems and a deep purple stone, a bell and a silver butterfly collar charm.",
+   "images": {
+    "standing": "looks/princess-donut/placeholder-pounce.png",
+    "action": "looks/princess-donut/placeholder-pounce.png"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 1,
+   "ms": 16692000,
+   "t": "04:38:12",
+   "description": "Tiara, bell, butterfly charm, silver-scale armour over her back half, a gold mark over the right shoulder blade.",
+   "images": {
+    "standing": "looks/princess-donut/placeholder-loaf.png",
+    "action": "looks/princess-donut/placeholder-loaf.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "race",
+   "book": 1,
+   "ms": 121000,
+   "value": "Cat"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 1800000,
+   "value": 1
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 121000,
+   "value": 1
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 2700000,
+   "value": 3
+  },
+  {
+   "field": "dex",
+   "book": 1,
+   "ms": 2700000,
+   "value": 12
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 2700000,
+   "value": 4
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 2700000,
+   "value": 9
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 2700000,
+   "value": 15
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 3600000,
+   "value": 4
+  },
+  {
+   "field": "skill:Sample skill C",
+   "book": 1,
+   "ms": 4200000,
+   "value": 1
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 9600000,
+   "value": 8
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 9600000,
+   "value": 18
+  },
+  {
+   "field": "gear:head",
+   "book": 1,
+   "ms": 9965000,
+   "value": "Jeweled crown"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 16200000,
+   "value": 10
+  },
+  {
+   "field": "dex",
+   "book": 1,
+   "ms": 16200000,
+   "value": 14
+  },
+  {
+   "field": "gear:head",
+   "book": 1,
+   "ms": 16692000,
+   "value": "Tiara"
+  },
+  {
+   "field": "gear:body",
+   "book": 1,
+   "ms": 16692000,
+   "value": "Silver-scale armour"
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 19800000,
+   "value": 2
+  },
+  {
+   "field": "class",
+   "book": 1,
+   "ms": 28800000,
+   "value": "Sample class"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 43200000,
+   "value": 14
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 46800000,
+   "value": 3
+  }
+ ]
+}

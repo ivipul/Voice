@@ -1,0 +1,39 @@
+{
+ "slug": "samantha",
+ "name": "Samantha",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 0,
+   "t": "00:00:00",
+   "description": "Placeholder silhouette until the Mac bundles the real looks.",
+   "images": {
+    "standing": "looks/samantha/placeholder-front.png",
+    "action": "looks/samantha/placeholder-front.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 25200000,
+   "t": "07:00:00",
+   "description": "Placeholder silhouette (second look).",
+   "images": {
+    "standing": "looks/samantha/placeholder-tilt.png",
+    "action": "looks/samantha/placeholder-tilt.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 0,
+   "value": 1
+  }
+ ]
+}

@@ -1,0 +1,310 @@
+{
+ "slug": "carl",
+ "name": "Carl",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": true,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 93000,
+   "t": "00:01:33",
+   "description": "Open black leather jacket, grey boxer shorts, bare legs, pink rubber crocs.",
+   "images": {
+    "standing": "looks/carl/placeholder-stand.png",
+    "action": "looks/carl/placeholder-stand.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 3330000,
+   "t": "00:55:30",
+   "description": "Leather jacket, boxer shorts, now barefoot. The crocs are gone.",
+   "images": {
+    "standing": "looks/carl/placeholder-walk.png",
+    "action": "looks/carl/placeholder-walk.png"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 1,
+   "ms": 6436000,
+   "t": "01:47:16",
+   "description": "Hooded cloak with pointed ear shapes, toe ring, goblin-pass tattoo on the forearm.",
+   "images": {
+    "standing": "looks/carl/placeholder-action.png",
+    "action": "looks/carl/placeholder-action.png"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 1,
+   "ms": 10525000,
+   "t": "02:55:25",
+   "description": "Adds a troll-skin shirt. Broken left hand, scraped right hand, cut scalp.",
+   "images": {
+    "standing": "looks/carl/placeholder-crouch.png",
+    "action": "looks/carl/placeholder-crouch.png"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 1,
+   "ms": 13699000,
+   "t": "03:48:19",
+   "description": "Jacket's right arm melted away, spiked knee pads of skin and fur, right arm red and bubbling.",
+   "images": {
+    "standing": "looks/carl/placeholder-armsUp.png",
+    "action": "looks/carl/placeholder-armsUp.png"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 1,
+   "ms": 22980000,
+   "t": "06:23:00",
+   "description": "Charcoal bracer on the wrist, one hand now a black angular gauntlet with gleaming spikes.",
+   "images": {
+    "standing": "looks/carl/placeholder-action.png",
+    "action": "looks/carl/placeholder-action.png"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 1,
+   "ms": 43172000,
+   "t": "11:59:32",
+   "description": "White heart-print boxers, tactical boots, a dagger tattoo on the neck.",
+   "images": {
+    "standing": "looks/carl/placeholder-stand.png",
+    "action": "looks/carl/placeholder-stand.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "race",
+   "book": 1,
+   "ms": 93000,
+   "value": "Human"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 93000,
+   "value": 1
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 93000,
+   "value": 1
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 2400000,
+   "value": 7
+  },
+  {
+   "field": "dex",
+   "book": 1,
+   "ms": 2400000,
+   "value": 6
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 2400000,
+   "value": 7
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 2400000,
+   "value": 5
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 2400000,
+   "value": 4
+  },
+  {
+   "field": "gear:feet",
+   "book": 1,
+   "ms": 93000,
+   "value": "Pink crocs"
+  },
+  {
+   "field": "gear:body",
+   "book": 1,
+   "ms": 93000,
+   "value": "Leather jacket"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 3120000,
+   "value": 3
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 3120000,
+   "value": 8
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 3120000,
+   "value": 9
+  },
+  {
+   "field": "gear:feet",
+   "book": 1,
+   "ms": 3330000,
+   "value": null
+  },
+  {
+   "field": "skill:Sample skill A",
+   "book": 1,
+   "ms": 3480000,
+   "value": 1
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 6300000,
+   "value": 5
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 6300000,
+   "value": 10
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 6300000,
+   "value": 11
+  },
+  {
+   "field": "gear:head",
+   "book": 1,
+   "ms": 6436000,
+   "value": "Hooded cloak"
+  },
+  {
+   "field": "skill:Sample skill B",
+   "book": 1,
+   "ms": 7800000,
+   "value": 2
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 10500000,
+   "value": 7
+  },
+  {
+   "field": "gear:body",
+   "book": 1,
+   "ms": 10525000,
+   "value": "Troll-skin shirt"
+  },
+  {
+   "field": "skill:Sample skill A",
+   "book": 1,
+   "ms": 12000000,
+   "value": 3
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 13680000,
+   "value": 9
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 13680000,
+   "value": 12
+  },
+  {
+   "field": "dex",
+   "book": 1,
+   "ms": 13680000,
+   "value": 8
+  },
+  {
+   "field": "gear:legs",
+   "book": 1,
+   "ms": 13699000,
+   "value": "Spiked knee pads"
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 19800000,
+   "value": 2
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 22800000,
+   "value": 11
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 22800000,
+   "value": 7
+  },
+  {
+   "field": "gear:hand",
+   "book": 1,
+   "ms": 22980000,
+   "value": "Black spiked gauntlet"
+  },
+  {
+   "field": "class",
+   "book": 1,
+   "ms": 28800000,
+   "value": "Sample class"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 42600000,
+   "value": 13
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 42600000,
+   "value": 14
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 42600000,
+   "value": 6
+  },
+  {
+   "field": "gear:feet",
+   "book": 1,
+   "ms": 43172000,
+   "value": "Tactical boots"
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 46800000,
+   "value": 3
+  }
+ ]
+}

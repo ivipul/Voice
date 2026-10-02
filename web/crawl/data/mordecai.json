@@ -1,0 +1,63 @@
+{
+ "slug": "mordecai",
+ "name": "Mordecai",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": true,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 2237000,
+   "t": "00:37:17",
+   "description": "Bearded ratkin hooligan, a head shorter than a tall man. Black vest, blue pants, worn sandals.",
+   "images": {
+    "standing": "looks/mordecai/placeholder-stand.png",
+    "action": "looks/mordecai/placeholder-stand.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 46482000,
+   "t": "12:54:42",
+   "description": "Much larger obsidian bugaboo form: a neckless bear with enormous owlish eyes and comically skinny legs.",
+   "images": {
+    "standing": "looks/mordecai/placeholder-bugaboo.png",
+    "action": "looks/mordecai/placeholder-bugaboo.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "race",
+   "book": 1,
+   "ms": 2237000,
+   "value": "Ratkin"
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 2237000,
+   "value": 1
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 19800000,
+   "value": 2
+  },
+  {
+   "field": "race",
+   "book": 1,
+   "ms": 46482000,
+   "value": "Bugaboo"
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 46800000,
+   "value": 3
+  }
+ ]
+}

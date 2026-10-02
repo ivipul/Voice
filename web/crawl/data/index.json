@@ -1,0 +1,96 @@
+{
+ "generated": "2026-10-02T22:41:13Z",
+ "sample": true,
+ "books": [
+  {
+   "n": 1,
+   "title": "Dungeon Crawler Carl",
+   "durationMs": 48558000
+  },
+  {
+   "n": 2,
+   "title": "Carl's Doomsday Scenario",
+   "durationMs": 41013000
+  },
+  {
+   "n": 3,
+   "title": "The Dungeon Anarchist's Cookbook",
+   "durationMs": 60430000
+  },
+  {
+   "n": 4,
+   "title": null,
+   "durationMs": 64527000
+  },
+  {
+   "n": 5,
+   "title": null,
+   "durationMs": 84224000
+  },
+  {
+   "n": 6,
+   "title": null,
+   "durationMs": 96309000
+  },
+  {
+   "n": 7,
+   "title": null,
+   "durationMs": 103121000
+  },
+  {
+   "n": 8,
+   "title": null,
+   "durationMs": 73189000
+  }
+ ],
+ "characters": [
+  {
+   "slug": "carl",
+   "name": "Carl",
+   "kind": "human",
+   "accent": "#FF6A1F",
+   "accent2": "#FFB184",
+   "file": "data/carl.json"
+  },
+  {
+   "slug": "princess-donut",
+   "name": "Princess Donut",
+   "kind": "cat",
+   "accent": "#FF4FA3",
+   "accent2": "#FFB3D9",
+   "file": "data/princess-donut.json"
+  },
+  {
+   "slug": "katya-grim",
+   "name": "Katya Grim",
+   "kind": "human",
+   "accent": "#5CC8FF",
+   "accent2": "#BFE9FF",
+   "file": "data/katya-grim.json"
+  },
+  {
+   "slug": "mongo",
+   "name": "Mongo",
+   "kind": "raptor",
+   "accent": "#7CFF5A",
+   "accent2": "#CFFFC2",
+   "file": "data/mongo.json"
+  },
+  {
+   "slug": "samantha",
+   "name": "Samantha",
+   "kind": "head",
+   "accent": "#B48CFF",
+   "accent2": "#E0D0FF",
+   "file": "data/samantha.json"
+  },
+  {
+   "slug": "mordecai",
+   "name": "Mordecai",
+   "kind": "ratkin",
+   "accent": "#FFC43D",
+   "accent2": "#FFE4A3",
+   "file": "data/mordecai.json"
+  }
+ ]
+}

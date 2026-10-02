@@ -1,0 +1,39 @@
+{
+ "slug": "mongo",
+ "name": "Mongo",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 0,
+   "t": "00:00:00",
+   "description": "Placeholder silhouette until the Mac bundles the real looks.",
+   "images": {
+    "standing": "looks/mongo/placeholder-stand.png",
+    "action": "looks/mongo/placeholder-stand.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 21600000,
+   "t": "06:00:00",
+   "description": "Placeholder silhouette (second look).",
+   "images": {
+    "standing": "looks/mongo/placeholder-run.png",
+    "action": "looks/mongo/placeholder-run.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 0,
+   "value": 1
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "slug": "katya-grim",
+ "name": "Katya Grim",
+ "epithet": null,
+ "sample": true,
+ "realLookTimes": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 0,
+   "t": "00:00:00",
+   "description": "Placeholder silhouette until the Mac bundles the real looks.",
+   "images": {
+    "standing": "looks/katya-grim/placeholder-stand.png",
+    "action": "looks/katya-grim/placeholder-stand.png"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 18000000,
+   "t": "05:00:00",
+   "description": "Placeholder silhouette (second look).",
+   "images": {
+    "standing": "looks/katya-grim/placeholder-action.png",
+    "action": "looks/katya-grim/placeholder-action.png"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 0,
+   "value": 1
+  }
+ ]
+}
