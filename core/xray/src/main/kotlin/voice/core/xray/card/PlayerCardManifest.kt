@@ -55,3 +55,19 @@ object PlayerCardFields {
   const val GEAR = "GEAR"
   const val LOOK = "LOOK"
 }
+
+/**
+ * The equipment slots a card shows, in display order. Gear entries with any other [PlayerCardEntry.key] are not shown.
+ */
+object PlayerCardSlots {
+  const val HEAD = "head"
+  const val NECK = "neck"
+  const val CHEST = "chest"
+  const val HANDS = "hands"
+  const val RING = "ring"
+  const val LEGS = "legs"
+  const val FEET = "feet"
+  const val WEAPON = "weapon"
+
+  val ordered: List<String> = listOf(HEAD, NECK, CHEST, HANDS, RING, LEGS, FEET, WEAPON)
+}

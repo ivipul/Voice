@@ -2,6 +2,7 @@ package voice.features.playbackScreen
 
 import androidx.compose.runtime.Immutable
 import voice.core.playback.misc.Decibel
+import voice.core.xray.card.ComposedPlayerCard
 import voice.features.sleepTimer.SleepTimerViewState
 import kotlin.time.Duration
 
@@ -70,5 +71,11 @@ internal sealed interface BookPlayDialogViewState {
     val title: String,
     val description: String,
     val image: String?,
+  ) : BookPlayDialogViewState
+
+  data class XRayCardDialog(
+    val name: String,
+    val card: ComposedPlayerCard,
+    val lookImage: String?,
   ) : BookPlayDialogViewState
 }

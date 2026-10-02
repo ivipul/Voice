@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" tools:locale="en">
+  <string name="holo_card_level">Level</string>
+  <string name="holo_card_floor">Floor</string>
+  <string name="holo_card_crawler_id">Crawler #%1$s</string>
+  <string name="holo_card_abilities">Signature abilities</string>
+  <string name="holo_card_no_abilities">No abilities revealed yet.</string>
+  <string name="holo_card_rank">Rank %1$d</string>
+  <string name="holo_card_loadout">Equipped loadout</string>
+  <string name="holo_card_current_look">Current look</string>
+  <string name="holo_card_hint_front">Tap the card to flip it</string>
+  <string name="holo_card_hint_back">Tap the card to flip it back</string>
+  <string name="holo_card_flip">Flip card</string>
+  <string name="holo_card_description">%1$s player card</string>
+  <string name="holo_card_slot_head">Head</string>
+  <string name="holo_card_slot_neck">Neck</string>
+  <string name="holo_card_slot_chest">Chest</string>
+  <string name="holo_card_slot_hands">Hands</string>
+  <string name="holo_card_slot_ring">Ring</string>
+  <string name="holo_card_slot_legs">Legs</string>
+  <string name="holo_card_slot_feet">Feet</string>
+  <string name="holo_card_slot_weapon">Weapon</string>
+</resources>

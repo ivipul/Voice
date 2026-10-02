@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.data.Book
@@ -49,9 +50,12 @@ import voice.core.ui.formatTime
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
+import voice.core.xray.card.PlayerCardRepository
+import voice.core.xray.card.composeAt
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -76,7 +80,7 @@ class BookPlayViewModel(
   private val bookmarkRepository: BookmarkRepo,
   private val volumeGainFormatter: VolumeGainFormatter,
   private val batteryOptimization: BatteryOptimization,
-  dispatcherProvider: DispatcherProvider,
+  private val dispatcherProvider: DispatcherProvider,
   @SleepTimerPreferenceStore
   private val sleepTimerPreferenceStore: DataStore<SleepTimerPreference>,
   @SeekTimeStore
@@ -91,6 +95,7 @@ class BookPlayViewModel(
   private val copilotPipeline: CoPilotPipeline,
   private val speechInputController: SpeechInputController,
   private val xrayRepository: XRayRepository,
+  private val playerCardRepository: PlayerCardRepository,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -363,12 +368,28 @@ class BookPlayViewModel(
     scope.launch {
       val book = currentBook() ?: return@launch
       val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
-      dialogState.value = BookPlayDialogViewState.XRayEntityDialog(
+      dialogState.value = playerCardDialog(book, entity) ?: BookPlayDialogViewState.XRayEntityDialog(
         title = entity.title,
         description = entity.description,
         image = entity.image,
       )
     }
+  }
+
+  private suspend fun playerCardDialog(
+    book: Book,
+    entity: XRayEntityInfo,
+  ): BookPlayDialogViewState.XRayCardDialog? = withContext(dispatcherProvider.io) {
+    val cards = playerCardRepository.cardsFor(book) ?: return@withContext null
+    val card = cards.card(entity.id)
+      ?.composeAt(book.content.positionInChapter)
+      ?.takeIf { it.hasRevealedData }
+      ?: return@withContext null
+    BookPlayDialogViewState.XRayCardDialog(
+      name = entity.title,
+      card = card,
+      lookImage = card.look?.image?.let(cards::imageUri)?.toString(),
+    )
   }
 
   @Composable
