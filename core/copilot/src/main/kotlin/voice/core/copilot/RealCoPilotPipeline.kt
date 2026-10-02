@@ -3,6 +3,8 @@ package voice.core.copilot
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
+import voice.core.copilot.frame.FrameRequest
+import voice.core.copilot.frame.SnipFrameRunner
 import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
 import voice.core.logging.api.Logger
@@ -19,6 +21,7 @@ class RealCoPilotPipeline(
   private val jevRouter: JevRouter,
   private val geminiClient: GeminiClient,
   private val coPilotRepository: CoPilotRepository,
+  private val snipFrameRunner: SnipFrameRunner,
 ) : CoPilotPipeline {
 
   override suspend fun ask(bookId: BookId, question: String): String {
@@ -84,25 +87,28 @@ class RealCoPilotPipeline(
       Logger.w(e, "CoPilot snip() failed")
       return
     }
-    // imagePath is left null for now: real comic-panel image generation is Phase 6's job,
-    // via the Ideogram pipeline described in the PRD (character reference images, scene
-    // planning, etc). An earlier attempt called Gemini's own image-generation endpoint
-    // directly here, but it was never a validated API integration and confirmed on-device
-    // that it doesn't produce an image - removed rather than leave a silently-broken call
-    // in place. snipImagePrompt() in CoPilotPrompts.kt is kept: Phase 6 can reuse it (or a
-    // variant) as the actual Ideogram prompt once that pipeline exists.
+    val messageId = UUID.randomUUID().toString()
+    val drawFrame = snipFrameRunner.isAvailable()
     coPilotRepository.addMessage(
       bookId,
       CoPilotMessage(
-        id = UUID.randomUUID().toString(),
+        id = messageId,
         role = CoPilotMessage.Role.CoPilot,
         text = highlight,
         timestampMs = System.currentTimeMillis(),
         isVisualPriority = true,
+        isGeneratingImage = drawFrame,
         snipChapterId = book.currentChapter.id,
         snipPositionInChapterMs = book.content.positionInChapter,
       ),
     )
+    if (drawFrame) {
+      snipFrameRunner.start(
+        bookId,
+        messageId,
+        FrameRequest(book = book, highlight = highlight, transcript = transcript, positionMs = book.position),
+      )
+    }
   }
 
   private companion object {

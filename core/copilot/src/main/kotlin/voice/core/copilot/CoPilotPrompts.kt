@@ -61,16 +61,6 @@ fun snipHighlightSystemPrompt(book: Book): String =
     "bullet points, no meta-commentary, no preamble - just the moment itself, evocatively described." +
     spoilerGuard()
 
-/**
- * Short, precise prompt for generating a single comic-panel image from Snip & Synthesize's
- * evocative text capture - deliberately built from that capture, not the raw transcript, so the
- * image prompt stays focused on one moment rather than the whole excerpt.
- */
-fun snipImagePrompt(highlight: String): String =
-  "A single dynamic comic-book panel illustrating this moment from a fantasy dungeon-crawl story: " +
-    "\"$highlight\". Bold inked linework, dramatic lighting, motion and emotion emphasized. No text, " +
-    "no speech bubbles, no watermark, no signature."
-
 fun userQuestionPrompt(question: String, transcriptWindow: String?): String =
   if (transcriptWindow != null) {
     "Recent excerpt from the book:\n\"\"\"\n$transcriptWindow\n\"\"\"\n\nQuestion: $question"

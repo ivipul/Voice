@@ -6,6 +6,7 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import voice.core.data.BookId
 
 /**
@@ -21,6 +22,13 @@ class CoPilotRepository {
   fun addMessage(bookId: BookId, message: CoPilotMessage) {
     messagesByBook.value = messagesByBook.value.toMutableMap().apply {
       put(bookId, (get(bookId).orEmpty() + message))
+    }
+  }
+
+  fun updateMessage(bookId: BookId, messageId: String, transform: (CoPilotMessage) -> CoPilotMessage) {
+    messagesByBook.update { all ->
+      val messages = all[bookId] ?: return@update all
+      all + (bookId to messages.map { if (it.id == messageId) transform(it) else it })
     }
   }
 

@@ -3,7 +3,9 @@ package voice.core.copilot
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
+import voice.core.copilot.frame.SnipFrameRunner
 import voice.core.data.Book
 import voice.core.data.BookContent
 import voice.core.data.BookId
@@ -14,6 +16,7 @@ import voice.core.transcript.TranscriptRepository
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -29,6 +32,9 @@ class RealCoPilotPipelineTest {
   private val jevRouter = mockk<JevRouter>()
   private val geminiClient = mockk<GeminiClient>()
   private val coPilotRepository = CoPilotRepository()
+  private val snipFrameRunner = mockk<SnipFrameRunner>(relaxed = true) {
+    coEvery { isAvailable() } returns false
+  }
 
   private val pipeline = RealCoPilotPipeline(
     bookRepository = bookRepository,
@@ -36,6 +42,7 @@ class RealCoPilotPipelineTest {
     jevRouter = jevRouter,
     geminiClient = geminiClient,
     coPilotRepository = coPilotRepository,
+    snipFrameRunner = snipFrameRunner,
   )
 
   @Test
@@ -156,6 +163,36 @@ class RealCoPilotPipelineTest {
     assertEquals("Carl's blade froze mid-swing as the goblin laughed.", saved.text)
     assertEquals(book.currentChapter.id, saved.snipChapterId)
     assertEquals(book.content.positionInChapter, saved.snipPositionInChapterMs)
+  }
+
+  @Test
+  fun `snip hands the moment to the frame runner when frames can be drawn`() = runTest {
+    coEvery { snipFrameRunner.isAvailable() } returns true
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(any(), any()) } returns "Carl's blade froze mid-swing."
+
+    pipeline.snip(book.id)
+
+    val saved = coPilotRepository.allMessagesByBook.value.getValue(book.id).single()
+    assertTrue(saved.isGeneratingImage)
+    verify {
+      snipFrameRunner.start(
+        book.id,
+        saved.id,
+        match { it.highlight == "Carl's blade froze mid-swing." && it.transcript == "the last three minutes" && it.positionMs == book.position },
+      )
+    }
+  }
+
+  @Test
+  fun `snip saves plain text and starts nothing when frames cannot be drawn`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(any(), any()) } returns "Carl's blade froze mid-swing."
+
+    pipeline.snip(book.id)
+
+    assertFalse(coPilotRepository.allMessagesByBook.value.getValue(book.id).single().isGeneratingImage)
+    verify(exactly = 0) { snipFrameRunner.start(any(), any(), any()) }
   }
 
   @Test

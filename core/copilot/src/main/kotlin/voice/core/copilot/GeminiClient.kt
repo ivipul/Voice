@@ -20,6 +20,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import voice.core.logging.api.Logger
 import java.io.IOException
+import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,10 +40,20 @@ class GeminiClient {
     .build()
 
   suspend fun ask(systemPrompt: String, userPrompt: String): String = withContext(Dispatchers.IO) {
-    askBlocking(systemPrompt, userPrompt)
+    askBlocking(systemPrompt, userPrompt, images = emptyList(), json = false)
   }
 
-  private fun askBlocking(systemPrompt: String, userPrompt: String): String {
+  /**
+   * Same call as [ask] but the reply is constrained to JSON, and [images] (PNG or JPEG bytes)
+   * are sent alongside the text. Used by the frame pipeline for structured creative fields and
+   * for the bounding-box vision step.
+   */
+  suspend fun askJson(systemPrompt: String, userPrompt: String, images: List<ByteArray> = emptyList()): String =
+    withContext(Dispatchers.IO) {
+      askBlocking(systemPrompt, userPrompt, images, json = true)
+    }
+
+  private fun askBlocking(systemPrompt: String, userPrompt: String, images: List<ByteArray>, json: Boolean): String {
     val apiKey = BuildConfig.GEMINI_API_KEY
     check(apiKey.isNotBlank()) { "GEMINI_API_KEY not set in ~/.gradle/gradle.properties" }
 
@@ -55,6 +66,14 @@ class GeminiClient {
       putJsonArray("contents") {
         addJsonObject {
           putJsonArray("parts") {
+            images.forEach { image ->
+              addJsonObject {
+                putJsonObject("inlineData") {
+                  put("mimeType", image.mimeType())
+                  put("data", Base64.getEncoder().encodeToString(image))
+                }
+              }
+            }
             addJsonObject { put("text", userPrompt) }
           }
         }
@@ -62,6 +81,7 @@ class GeminiClient {
       // Low thinking level: these are quick spoken/spot answers, not tasks needing deep
       // reasoning, so trade reasoning depth for lower latency.
       putJsonObject("generationConfig") {
+        if (json) put("responseMimeType", "application/json")
         putJsonObject("thinkingConfig") {
           put("thinkingLevel", "LOW")
         }
@@ -106,3 +126,6 @@ class GeminiClient {
     const val RETRY_BACKOFF_MS = 1000L
   }
 }
+
+private fun ByteArray.mimeType(): String =
+  if (size > 3 && this[0] == 0xFF.toByte() && this[1] == 0xD8.toByte()) "image/jpeg" else "image/png"

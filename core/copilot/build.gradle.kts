@@ -9,8 +9,9 @@ android {
     buildConfig = true
   }
 
-  // Set gemini.apiKey / openrouter.apiKey in ~/.gradle/gradle.properties (outside the repo,
-  // never committed) to enable the co-pilot's Gemini and Jev router calls.
+  // Set gemini.apiKey / openrouter.apiKey / ideogram.apiKey in ~/.gradle/gradle.properties
+  // (outside the repo, never committed) to enable the co-pilot's Gemini and Jev router calls
+  // and the Snip comic-frame image generation.
   defaultConfig {
     buildConfigField(
       type = "String",
@@ -21,6 +22,11 @@ android {
       type = "String",
       name = "OPENROUTER_API_KEY",
       value = "\"${providers.gradleProperty("openrouter.apiKey").getOrElse("")}\"",
+    )
+    buildConfigField(
+      type = "String",
+      name = "IDEOGRAM_API_KEY",
+      value = "\"${providers.gradleProperty("ideogram.apiKey").getOrElse("")}\"",
     )
   }
 }

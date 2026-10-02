@@ -84,6 +84,10 @@
     <string name="copilot.feed.title">Feed</string>
     <!-- Content description for closing the co-pilot Feed overlay. -->
     <string name="copilot.feed.close">Close</string>
+    <!-- Shown over the empty comic-frame placeholder while a Snip's image is being drawn. -->
+    <string name="copilot.feed.frame.drawing">Drawing the frame…</string>
+    <!-- Click label for a Snip's comic frame in the Feed; opens it as a large card. -->
+    <string name="copilot.feed.frame.open">View comic frame</string>
     <!-- Shown while the co-pilot is thinking of a response. -->
     <string name="copilot.feed.thinking">Thinking…</string>
     <!-- Snackbar shown when microphone permission is required for Ask. -->
