@@ -52,7 +52,7 @@ fun PlayButton(
 }
 
 @Composable
-private fun rememberPlayIconPainter(playing: Boolean): Painter {
+fun rememberPlayIconPainter(playing: Boolean): Painter {
   return rememberAnimatedVectorPainter(
     animatedImageVector = AnimatedImageVector.animatedVectorResource(
       id = R.drawable.avd_pause_to_play,

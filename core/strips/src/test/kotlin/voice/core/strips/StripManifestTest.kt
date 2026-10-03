@@ -33,6 +33,13 @@ class StripManifestTest {
   }
 
   @Test
+  fun stripImageIsOptional() {
+    assertEquals(null, lenientJson.decodeFromString<StripManifest>(json).stripImage)
+    val withImage = json.replace("\"unknown_field\": true,", "\"strip_image\": \"ch01-strip.png\",")
+    assertEquals("ch01-strip.png", lenientJson.decodeFromString<StripManifest>(withImage).stripImage)
+  }
+
+  @Test
   fun heroFallsBackToFirstFrameWhenNoHeroListed() {
     assertEquals(1, manifest(starts = listOf(0L, 5L), holdMs = 1L).heroFrame().frame)
   }
