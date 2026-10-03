@@ -14,12 +14,12 @@ class MediaButtonPreferencesTest {
   private val buttons = mediaButtonPreferences(ApplicationProvider.getApplicationContext())
 
   @Test
-  fun `layout is Rewind, Ask, Snip, Forward`() {
+  fun `layout is Rewind in back, then Ask, Snip, Forward in overflow`() {
     assertEquals(
       expected = listOf(
         CommandButton.SLOT_BACK,
-        CommandButton.SLOT_FORWARD,
-        CommandButton.SLOT_FORWARD_SECONDARY,
+        CommandButton.SLOT_OVERFLOW,
+        CommandButton.SLOT_OVERFLOW,
         CommandButton.SLOT_OVERFLOW,
       ),
       actual = buttons.map { it.slots[0] },
