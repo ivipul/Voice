@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import voice.features.playbackScreen.view.HoloFrameSlot
+import voice.features.playbackScreen.view.HoloImageLoader
 import voice.core.strings.R as StringsR
 
 @Composable
@@ -52,7 +52,7 @@ internal fun SnipBottomSheet(
         )
         Spacer(modifier = Modifier.size(16.dp))
         if (frame != SnipFrameViewState.None) {
-          HoloFrameSlot(imagePath = (frame as? SnipFrameViewState.Image)?.path)
+          HoloImageLoader(imagePath = (frame as? SnipFrameViewState.Image)?.path, contentDescription = null)
           Spacer(modifier = Modifier.size(16.dp))
         }
         when (state) {

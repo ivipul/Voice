@@ -22,20 +22,19 @@ internal val RainbowColors = listOf(
   Color(0xFFA77BFF),
 )
 
-/** Where the shimmer band and the glare sit follows the light, which moves with the tilt. */
-private const val FoilShaderSource = """
-uniform float2 size;
-uniform float2 light;
-uniform float strength;
-
+/**
+ * The foil colour at a point: a rainbow band and sparkles, with the band and the glare sitting where the light is.
+ * Shared by the card's foil and by the snip image loader's shader.
+ */
+internal const val FoilShaderFunctions = """
 float hash(float2 p) {
   p = fract(p * float2(123.34, 456.21));
   p += dot(p, p + 45.32);
   return fract(p.x * p.y);
 }
 
-half4 main(float2 fragCoord) {
-  float2 uv = fragCoord / size;
+float3 foilColor(float2 fragCoord, float2 extent, float2 light, float strength) {
+  float2 uv = fragCoord / extent;
   float diagonal = uv.x * 0.9 + uv.y * 0.5;
   float center = 0.15 + light.x * 0.8 + light.y * 0.2;
   float band = 1.0 - smoothstep(0.0, 0.3, abs(diagonal - center));
@@ -45,7 +44,7 @@ half4 main(float2 fragCoord) {
   float amount = 0.1 + strength * 0.35;
   float3 color = rainbow * band * amount;
 
-  float cellSize = size.x * 0.022;
+  float cellSize = extent.x * 0.022;
   float2 cellPos = fragCoord / cellSize;
   float2 cell = floor(cellPos);
   float n = hash(cell);
@@ -57,7 +56,18 @@ half4 main(float2 fragCoord) {
 
   float glare = 1.0 - smoothstep(0.0, 0.7, distance(uv, light));
   color += float3(glare * 0.06);
-  return half4(half3(color), 1.0);
+  return color;
+}
+"""
+
+/** Where the shimmer band and the glare sit follows the light, which moves with the tilt. */
+private const val FoilShaderSource = """
+uniform float2 size;
+uniform float2 light;
+uniform float strength;
+$FoilShaderFunctions
+half4 main(float2 fragCoord) {
+  return half4(half3(foilColor(fragCoord, size, light, strength)), 1.0);
 }
 """
 

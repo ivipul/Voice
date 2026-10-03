@@ -173,8 +173,9 @@ private fun ChatBubble(
     ) {
       Column {
         if (hasFrame) {
-          HoloFrameSlot(
+          HoloImageLoader(
             imagePath = message.imagePath,
+            contentDescription = message.text,
             modifier = if (message.imagePath != null) {
               Modifier.clickable(onClickLabel = stringResource(id = R.string.copilot_feed_frame_open), onClick = onOpenFrame)
             } else {
