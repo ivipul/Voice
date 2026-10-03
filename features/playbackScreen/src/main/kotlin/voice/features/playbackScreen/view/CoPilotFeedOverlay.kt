@@ -25,6 +25,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import coil.compose.AsyncImage
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -55,6 +61,8 @@ import voice.core.ui.icons.VoiceIcons
 import voice.core.copilot.CoPilotMessage
 import java.io.File
 
+private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
+
 @Composable
 internal fun CoPilotFeedOverlay(
   messages: List<CoPilotMessage>,
@@ -64,6 +72,7 @@ internal fun CoPilotFeedOverlay(
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
 ) {
+  var viewedFrame by remember { mutableStateOf<CoPilotMessage?>(null) }
   Dialog(
     onDismissRequest = onDismiss,
     // decorFitsSystemWindows = false hands IME sizing entirely to this content's own
@@ -75,6 +84,13 @@ internal fun CoPilotFeedOverlay(
     properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
   ) {
     Surface(modifier = Modifier.fillMaxSize()) {
+      viewedFrame?.imagePath?.let { path ->
+        FrameCardViewer(
+          imagePath = path,
+          contentDescription = viewedFrame?.text.orEmpty(),
+          onDismiss = { viewedFrame = null },
+        )
+      }
       Scaffold(
         topBar = {
           TopAppBar(
@@ -123,7 +139,12 @@ internal fun CoPilotFeedOverlay(
               .padding(contentPadding),
           ) {
             items(messages, key = { it.id }) { message ->
-              ChatBubble(message, onSeekToSnip = onSeekToSnip, snipLocationLabel = snipLocationLabel)
+              ChatBubble(
+                message,
+                onSeekToSnip = onSeekToSnip,
+                snipLocationLabel = snipLocationLabel,
+                onOpenFrame = { viewedFrame = message },
+              )
             }
             if (isThinking) {
               item {
@@ -142,10 +163,12 @@ private fun ChatBubble(
   message: CoPilotMessage,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
+  onOpenFrame: () -> Unit,
 ) {
   val isUser = message.role == CoPilotMessage.Role.User
   val snipChapterId = message.snipChapterId
   val snipPositionInChapterMs = message.snipPositionInChapterMs
+  val hasFrame = message.imagePath != null || message.isGeneratingImage
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
@@ -157,7 +180,7 @@ private fun ChatBubble(
       } else {
         MaterialTheme.colorScheme.surfaceVariant
       },
-      modifier = Modifier.widthIn(max = 320.dp),
+      modifier = Modifier.widthIn(max = if (hasFrame) FRAME_BUBBLE_MAX_WIDTH else 320.dp),
     ) {
       Column {
         message.imagePath?.let { path ->
@@ -167,9 +190,13 @@ private fun ChatBubble(
             contentScale = ContentScale.Crop,
             modifier = Modifier
               .fillMaxWidth()
-              .aspectRatio(1f)
-              .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+              .aspectRatio(FRAME_ASPECT)
+              .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+              .clickable(onClickLabel = stringResource(id = R.string.copilot_feed_frame_open), onClick = onOpenFrame),
           )
+        }
+        if (message.isGeneratingImage && message.imagePath == null) {
+          FramePlaceholder()
         }
         if (snipChapterId != null && snipPositionInChapterMs != null) {
           Row(
@@ -202,6 +229,35 @@ private fun ChatBubble(
           style = MaterialTheme.typography.bodyLarge,
         )
       }
+    }
+  }
+}
+
+@Composable
+private fun FramePlaceholder() {
+  val transition = rememberInfiniteTransition(label = "frame-placeholder")
+  val alpha by transition.animateFloat(
+    initialValue = 0.35f,
+    targetValue = 0.75f,
+    animationSpec = infiniteRepeatable(tween(durationMillis = 1200), RepeatMode.Reverse),
+    label = "frame-placeholder-alpha",
+  )
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .aspectRatio(FRAME_ASPECT)
+      .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+      .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha * 0.2f)),
+    contentAlignment = Alignment.Center,
+  ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+      Spacer(modifier = Modifier.size(8.dp))
+      Text(
+        text = stringResource(id = R.string.copilot_feed_frame_drawing),
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
     }
   }
 }
