@@ -13,4 +13,4 @@ fun StripManifest.nextSeekMs(index: Int): Long? = frames.getOrNull(index + 1)?.s
 
 fun StripManifest.previousSeekMs(index: Int): Long = frames[(index - 1).coerceAtLeast(0)].startMs
 
-fun AvailableStrip.isUnlockedAt(bookMs: Long): Boolean = bookMs > manifest.frames.first().startMs
+fun AvailableStrip.isUnlockedAt(bookMs: Long): Boolean = bookMs >= manifest.frames.first().startMs

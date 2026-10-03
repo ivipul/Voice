@@ -14,10 +14,11 @@ class StripTimelineTest {
   )
 
   @Test
-  fun stripUnlocksOnlyOnceListeningIsBeyondItsFirstFrame() {
+  fun stripLocksBeforeItsFirstFrameAndUnlocksFromItsStart() {
     val available = AvailableStrip(strip, java.io.File("strip"))
-    assertFalse(available.isUnlockedAt(1_000L))
-    assertTrue(available.isUnlockedAt(1_001L))
+    assertFalse(available.isUnlockedAt(999L))
+    assertTrue(available.isUnlockedAt(1_000L))
+    assertTrue(available.isUnlockedAt(5_000L))
   }
 
   @Test

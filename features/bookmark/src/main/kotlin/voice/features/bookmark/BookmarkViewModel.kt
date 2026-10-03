@@ -3,6 +3,7 @@ package voice.features.bookmark
 import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import voice.core.playback.playstate.PlayStateManager
 import voice.core.strings.R
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
+import voice.core.strips.bookPositionOf
 import voice.core.strips.isUnlockedAt
 import voice.core.ui.formatTime
 import voice.navigation.Navigator
@@ -60,6 +62,8 @@ class BookmarkViewModel(
   private var bookmarks by mutableStateOf<List<Bookmark>>(emptyList())
   private var chapters by mutableStateOf<List<Chapter>>(emptyList())
   private var strips by mutableStateOf<List<AvailableStrip>>(emptyList())
+  private var savedBookPosition by mutableStateOf(0L)
+  private var unlockedStripChapters by mutableStateOf<Set<Int>>(emptySet())
   private var activeStrip by mutableStateOf<AvailableStrip?>(null)
 
   private var shouldScrollTo by mutableStateOf<Bookmark.Id?>(null)
@@ -76,9 +80,17 @@ class BookmarkViewModel(
         bookmarks = bookmarkRepo.bookmarks(book.content)
           .sortedByDescending { it.addedAt }
         chapters = book.chapters
+        savedBookPosition = book.position
         strips = stripRepository.stripsFor(book.content.name)
-          .filter { it.isUnlockedAt(book.position) }
       }
+    }
+    val livePlayback by remember(bookId) { playerController.livePlaybackStateFlow(bookId) }
+      .collectAsState(initial = null)
+    val currentBookPosition = livePlayback?.let { chapters.bookPositionOf(it.chapterId, it.positionMs) }
+      ?: savedBookPosition
+    LaunchedEffect(currentBookPosition, strips) {
+      val reached = strips.filter { it.isUnlockedAt(currentBookPosition) }.map { it.manifest.chapter }
+      unlockedStripChapters = unlockedStripChapters + reached
     }
     return BookmarkViewState(
       bookmarks = bookmarks.map { bookmark ->
@@ -112,7 +124,7 @@ class BookmarkViewModel(
       },
       shouldScrollTo = shouldScrollTo,
       dialogViewState = dialogViewState,
-      strips = strips,
+      strips = strips.filter { it.manifest.chapter in unlockedStripChapters },
       activeStrip = activeStrip,
     )
   }
