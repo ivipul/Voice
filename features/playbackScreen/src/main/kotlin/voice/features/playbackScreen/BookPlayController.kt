@@ -3,6 +3,7 @@ package voice.features.playbackScreen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.SnackbarDuration
@@ -17,6 +18,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
@@ -70,11 +74,17 @@ fun BookPlayScreen(bookId: BookId) {
       microphonePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
   }
+  val lifecycleOwner = LocalLifecycleOwner.current
+  LaunchedEffect(viewModel, lifecycleOwner) {
+    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      viewModel.collectSnipEvents()
+    }
+  }
   LaunchedEffect(viewModel) {
     viewModel.viewEffects.collect { viewEffect ->
       when (viewEffect) {
         BookPlayViewEffect.SnipSaved -> {
-          snackbarHostState.showSnackbar(message = snipSavedMessage)
+          Toast.makeText(context, snipSavedMessage, Toast.LENGTH_SHORT).show()
         }
         BookPlayViewEffect.BookmarkAdded -> {
           snackbarHostState.showSnackbar(message = bookmarkAddedMessage)
@@ -150,7 +160,11 @@ fun BookPlayScreen(bookId: BookId) {
       onSend = viewModel::onSendFeedMessage,
       onDismiss = viewModel::onFeedDismiss,
       onSeekToSnip = viewModel::onSnipTimestampClick,
+      snipLocationLabel = viewModel.snipLocationLabel(),
     )
+  }
+  viewModel.snipSheet.value?.let { snipSheet ->
+    SnipBottomSheet(snipSheet, onDismiss = viewModel::onSnipSheetDismiss)
   }
 }
 

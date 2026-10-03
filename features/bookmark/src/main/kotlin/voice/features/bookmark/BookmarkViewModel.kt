@@ -18,7 +18,9 @@ import voice.core.data.BookId
 import voice.core.data.Bookmark
 import voice.core.data.Chapter
 import voice.core.data.KioskModeDemoData
+import voice.core.data.formatted
 import voice.core.data.markForPosition
+import voice.core.data.snipLocation
 import voice.core.data.repo.BookRepository
 import voice.core.data.repo.BookmarkRepo
 import voice.core.data.store.CurrentBookStore
@@ -97,7 +99,8 @@ class BookmarkViewModel(
 
         BookmarkItemViewState(
           title = title,
-          subtitle = formatTime(bookmark.time),
+          subtitle = chapters.snipLocation(bookmark.chapterId, bookmark.time)?.formatted()
+            ?: formatTime(bookmark.time),
           id = bookmark.id,
           showSleepIcon = bookmark.setBySleepTimer,
         )

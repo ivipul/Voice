@@ -73,8 +73,9 @@ class RealCoPilotPipeline(
   }
 
   override suspend fun snip(bookId: BookId) {
-    val book = bookRepository.get(bookId) ?: return
-    val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return
+    coPilotRepository.emitSnipEvent(SnipEvent.Started)
+    val book = bookRepository.get(bookId) ?: return snipFailed()
+    val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return snipFailed()
     val highlight = runCatching {
       geminiClient.ask(
         systemPrompt = snipHighlightSystemPrompt(book),
@@ -82,7 +83,7 @@ class RealCoPilotPipeline(
       )
     }.getOrElse { e ->
       Logger.w(e, "CoPilot snip() failed")
-      return
+      return snipFailed()
     }
     // imagePath is left null for now: real comic-panel image generation is Phase 6's job,
     // via the Ideogram pipeline described in the PRD (character reference images, scene
@@ -103,7 +104,10 @@ class RealCoPilotPipeline(
         snipPositionInChapterMs = book.content.positionInChapter,
       ),
     )
+    coPilotRepository.emitSnipEvent(SnipEvent.Ready(highlight))
   }
+
+  private fun snipFailed() = coPilotRepository.emitSnipEvent(SnipEvent.Failed)
 
   private companion object {
     const val FALLBACK_ANSWER = "Sorry, I couldn't get an answer just now."

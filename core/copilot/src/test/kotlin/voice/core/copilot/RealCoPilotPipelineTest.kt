@@ -3,6 +3,7 @@ package voice.core.copilot
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
+import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import voice.core.data.Book
 import voice.core.data.BookContent
@@ -156,6 +157,44 @@ class RealCoPilotPipelineTest {
     assertEquals("Carl's blade froze mid-swing as the goblin laughed.", saved.text)
     assertEquals(book.currentChapter.id, saved.snipChapterId)
     assertEquals(book.content.positionInChapter, saved.snipPositionInChapterMs)
+  }
+
+  @Test
+  fun `snip reports started then the saved text`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(any(), any()) } returns "Carl's blade froze mid-swing."
+
+    coPilotRepository.snipEvents.test {
+      pipeline.snip(book.id)
+
+      assertEquals(SnipEvent.Started, awaitItem())
+      assertEquals(SnipEvent.Ready("Carl's blade froze mid-swing."), awaitItem())
+    }
+  }
+
+  @Test
+  fun `snip reports failure when Gemini fails`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(any(), any()) } throws IllegalStateException("network down")
+
+    coPilotRepository.snipEvents.test {
+      pipeline.snip(book.id)
+
+      assertEquals(SnipEvent.Started, awaitItem())
+      assertEquals(SnipEvent.Failed, awaitItem())
+    }
+  }
+
+  @Test
+  fun `snip events with no listener are dropped, not replayed later`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(any(), any()) } returns "Carl's blade froze mid-swing."
+
+    pipeline.snip(book.id)
+
+    coPilotRepository.snipEvents.test {
+      expectNoEvents()
+    }
   }
 
   @Test
