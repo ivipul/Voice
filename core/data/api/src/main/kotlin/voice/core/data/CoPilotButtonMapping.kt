@@ -14,11 +14,12 @@ public enum class CoPilotTriggerAction {
   Snip,
 }
 
-/** Persisted headset button -> co-pilot action mapping (single/double tap NEXT/PREVIOUS). */
+/** Persisted headset button -> co-pilot action mapping (single/double/triple tap NEXT, single/double tap PREVIOUS). */
 @Serializable
 public data class CoPilotButtonMapping(
   val singleNext: CoPilotTriggerAction = CoPilotTriggerAction.OpenMic,
   val singlePrevious: CoPilotTriggerAction = CoPilotTriggerAction.DefaultRewind,
   val doubleNext: CoPilotTriggerAction = CoPilotTriggerAction.AutoIdentify,
   val doublePrevious: CoPilotTriggerAction = CoPilotTriggerAction.CatchMeUp,
+  val tripleNext: CoPilotTriggerAction = CoPilotTriggerAction.AutoIdentify,
 )

@@ -57,11 +57,10 @@ class LibrarySessionCallback(
 ) : MediaLibrarySession.Callback {
 
   private var pendingHeadsetPressJob: Job? = null
-  private var lastHeadsetPressKeyCode: Int? = null
-  private var lastHeadsetPressAtMs: Long = 0L
+  private val headsetPressCounter = HeadsetPressCounter(DOUBLE_PRESS_THRESHOLD_MS)
   private var lastNextOrPreviousAtMs: Long = 0L
 
-  // Intercepts headset NEXT/PREVIOUS to disambiguate single vs. double presses (Phase 3) and
+  // Intercepts headset NEXT/PREVIOUS to disambiguate single, double and (NEXT only) triple presses and
   // dispatch whatever action the user has mapped to that slot (CoPilotButtonMappingStore, set
   // via CoPilotSettingsScreen). Consumes both so the default seek behavior doesn't also fire
   // underneath our own handling.
@@ -107,25 +106,21 @@ class LibrarySessionCallback(
     }
 
     val now = System.currentTimeMillis()
-    val isDoublePress = keyCode == lastHeadsetPressKeyCode && now - lastHeadsetPressAtMs <= DOUBLE_PRESS_THRESHOLD_MS
-    lastHeadsetPressKeyCode = keyCode
-    lastHeadsetPressAtMs = now
+    val isNext = keyCode == KeyEvent.KEYCODE_MEDIA_NEXT
+    val presses = headsetPressCounter.press(keyCode, now)
     lastNextOrPreviousAtMs = now
     pendingHeadsetPressJob?.cancel()
 
-    if (isDoublePress) {
-      lastHeadsetPressKeyCode = null
+    if (isLastPossiblePress(isNext, presses)) {
+      headsetPressCounter.reset()
       scope.launch {
-        val mapping = copilotButtonMappingStore.data.first()
-        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.doubleNext else mapping.doublePrevious
-        performAction(action)
+        performAction(copilotButtonMappingStore.data.first().actionFor(isNext, presses))
       }
     } else {
+      // More taps may still follow, so wait out the gap before settling on what was pressed.
       pendingHeadsetPressJob = scope.launch {
         delay(DOUBLE_PRESS_THRESHOLD_MS)
-        val mapping = copilotButtonMappingStore.data.first()
-        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.singleNext else mapping.singlePrevious
-        performAction(action)
+        performAction(copilotButtonMappingStore.data.first().actionFor(isNext, presses))
       }
     }
     return true

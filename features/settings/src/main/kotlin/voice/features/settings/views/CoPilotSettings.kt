@@ -49,6 +49,7 @@ private enum class TriggerSlot(val labelRes: Int) {
   SinglePrevious(StringsR.string.copilot_settings_trigger_single_previous),
   DoubleNext(StringsR.string.copilot_settings_trigger_double_next),
   DoublePrevious(StringsR.string.copilot_settings_trigger_double_previous),
+  TripleNext(StringsR.string.copilot_settings_trigger_triple_next),
 }
 
 private val CoPilotTriggerAction.labelRes: Int
@@ -72,6 +73,7 @@ private fun TriggerSlot.availableActions(): List<CoPilotTriggerAction> = when (t
   TriggerSlot.SinglePrevious -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultForward
   TriggerSlot.DoubleNext,
   TriggerSlot.DoublePrevious,
+  TriggerSlot.TripleNext,
   -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultRewind - CoPilotTriggerAction.DefaultForward
 }
 
@@ -80,6 +82,7 @@ private fun CoPilotButtonMapping.get(slot: TriggerSlot): CoPilotTriggerAction = 
   TriggerSlot.SinglePrevious -> singlePrevious
   TriggerSlot.DoubleNext -> doubleNext
   TriggerSlot.DoublePrevious -> doublePrevious
+  TriggerSlot.TripleNext -> tripleNext
 }
 
 private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerAction): CoPilotButtonMapping =
@@ -88,6 +91,7 @@ private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerA
     TriggerSlot.SinglePrevious -> copy(singlePrevious = action)
     TriggerSlot.DoubleNext -> copy(doubleNext = action)
     TriggerSlot.DoublePrevious -> copy(doublePrevious = action)
+    TriggerSlot.TripleNext -> copy(tripleNext = action)
   }
 
 @Composable
