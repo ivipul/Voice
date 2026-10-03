@@ -39,6 +39,9 @@ class RealCoPilotPipeline(
   private suspend fun fallbackNoTranscript(): String =
     if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_NO_TRANSCRIPT else FALLBACK_NO_TRANSCRIPT
 
+  override suspend fun failureMessage(): String =
+    if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_ANSWER else GENERIC_FAILURE
+
   override suspend fun ask(bookId: BookId, question: String): String {
     val book = bookRepository.get(bookId) ?: return fallbackAnswer()
     val transcript = if (jevRouter.needsTranscriptContext(question)) {
@@ -100,7 +103,7 @@ class RealCoPilotPipeline(
     val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return snipFailed()
     val highlight = runCatching {
       geminiClient.ask(
-        systemPrompt = snipHighlightSystemPrompt(book),
+        systemPrompt = snipHighlightSystemPrompt(book, voiceSettingsStore.data.first(), pickSnipFlavor(random)),
         userPrompt = transcriptOnlyPrompt(transcript),
       )
     }.getOrElse { e ->
@@ -134,6 +137,7 @@ class RealCoPilotPipeline(
   private companion object {
     const val FALLBACK_ANSWER = "Sorry, I couldn't get an answer just now."
     const val FALLBACK_NO_TRANSCRIPT = "I don't have a transcript for this book yet, so I can't answer that."
+    const val GENERIC_FAILURE = "Sorry, something went wrong."
     const val SYSTEM_FALLBACK_ANSWER = "System message. Something went wrong on our end. Try again in a moment, crawler."
     const val SYSTEM_FALLBACK_NO_TRANSCRIPT =
       "Warning! No transcript on file for this book. Nothing to look up. Good luck."

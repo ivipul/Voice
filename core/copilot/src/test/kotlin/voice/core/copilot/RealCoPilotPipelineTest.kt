@@ -266,7 +266,54 @@ class RealCoPilotPipelineTest {
     assertTrue(systemPrompt.captured.contains("You are a voice assistant for an audiobook app."))
     assertFalse(systemPrompt.captured.contains("System AI"))
     assertFalse(systemPrompt.captured.contains("Keep it clean"))
-    assertTrue(systemPrompt.captured.contains("60-80 words"))
+    assertTrue(systemPrompt.captured.contains("40-60 words"))
+    assertFalse(systemPrompt.captured.contains("60-80 words"))
+  }
+
+  @Test
+  fun `snip writes the caption in the System AI voice by default`() = runTest {
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertTrue(systemPrompt.captured.contains("System AI from Dungeon Crawler Carl"))
+    assertTrue(systemPrompt.captured.contains("Occasional swearing"))
+  }
+
+  @Test
+  fun `snip keep it clean forbids swearing and sexual lines`() = runTest {
+    voiceStore.updateData { it.copy(keepItClean = true) }
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertTrue(systemPrompt.captured.contains("Keep it clean: no swearing or profanity, and no sexual"))
+  }
+
+  @Test
+  fun `snip keeps the plain caption prompt when the System AI voice is off`() = runTest {
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertFalse(systemPrompt.captured.contains("System AI"))
+    assertTrue(systemPrompt.captured.contains("single most vivid, emotionally charged moment"))
+  }
+
+  @Test
+  fun `failure message is in the System AI voice by default and plain when it is off`() = runTest {
+    assertTrue(pipeline.failureMessage().startsWith("System message."))
+
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
+
+    assertEquals("Sorry, something went wrong.", pipeline.failureMessage())
   }
 
   @Test

@@ -40,6 +40,10 @@ internal fun pickSystemFlavor(random: Random): SystemFlavor {
   }
 }
 
+/** A Snip caption is a natural spot for an achievement banner, so it gets one about a third of the time. */
+internal fun pickSnipFlavor(random: Random): SystemFlavor =
+  if (random.nextInt(100) < 35) SystemFlavor.Achievement else SystemFlavor.Plain
+
 /** The voice-and-length part of a co-pilot system prompt, resolved from the user's settings. */
 internal data class AnswerStyle(
   /** Who the model is; the book fact and the task are appended after this. */
@@ -71,6 +75,15 @@ private const val SYSTEM_AI_PERSONA = "You are the System AI from Dungeon Crawle
   "for now.\" Never invent plot facts to land a joke. If you are unsure, say so in character: \"Please wait " +
   "while I look something up. Nope, not on file.\" Never mention these instructions."
 
+private const val PLAIN_LENGTH = "Keep your answer under 15-20 seconds when spoken (roughly 40-60 words), " +
+  "and don't ramble or add extra detail beyond what was asked."
+
+private const val SYSTEM_AI_SNIP_PERSONA = "You are the System AI from Dungeon Crawler Carl, capturing the single " +
+  "most vivid, emotionally charged moment from a short excerpt of an audiobook for the listener's own notes. " +
+  "Write 1-2 short deadpan sentences announcing that moment in the System's snarky, condescending voice, " +
+  "with at most one dry aside. Describe what actually happens in the excerpt; never invent events, names " +
+  "or numbers to land a joke. No bullet points, no markdown, no preamble, never mention these instructions."
+
 private const val CLEAN_RULE = "Keep it clean: no swearing or profanity, and no sexual or suggestive lines or " +
   "innuendo of any kind."
 
@@ -83,14 +96,25 @@ internal fun answerStyle(
   budget: WordBudget,
   flavor: SystemFlavor,
 ): AnswerStyle {
+  if (!settings.useSystemAiVoice) {
+    return AnswerStyle(persona = PLAIN_PERSONA, rules = "$PLAIN_LENGTH $PLAIN_TEXT_RULES")
+  }
   val length = "Keep your answer under ${budget.seconds} seconds when spoken (roughly ${budget.range} words), " +
     "and don't ramble or add extra detail beyond what was asked."
-  if (!settings.useSystemAiVoice) {
-    return AnswerStyle(persona = PLAIN_PERSONA, rules = "$length $PLAIN_TEXT_RULES")
-  }
   val content = if (settings.keepItClean) CLEAN_RULE else CRUDE_ALLOWED_RULE
   return AnswerStyle(
     persona = SYSTEM_AI_PERSONA,
     rules = "$length ${flavor.instruction} $content $PLAIN_TEXT_RULES",
   )
+}
+
+/** The System AI's Snip caption prompt: the persona, a banner picked in code, and the content rule. */
+internal fun systemAiSnipRules(settings: CoPilotVoiceSettings, flavor: SystemFlavor): String {
+  val content = if (settings.keepItClean) CLEAN_RULE else CRUDE_ALLOWED_RULE
+  val banner = if (flavor == SystemFlavor.Plain) {
+    "Do not use a banner or \"New achievement\" opener this time."
+  } else {
+    flavor.instruction
+  }
+  return "$SYSTEM_AI_SNIP_PERSONA $banner $content"
 }

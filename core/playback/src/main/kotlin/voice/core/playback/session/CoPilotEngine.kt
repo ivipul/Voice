@@ -143,7 +143,9 @@ class CoPilotEngine(
         throw e
       } catch (e: Exception) {
         Logger.w(e, "CoPilotEngine: $mode failed")
-        speak("Sorry, something went wrong.") { finish(onFinished) }
+        val message = runCatching { copilotPipeline.failureMessage() }
+          .getOrDefault("Sorry, something went wrong.")
+        speak(message) { finish(onFinished) }
       }
     }
   }

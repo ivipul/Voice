@@ -1,6 +1,7 @@
 package voice.core.copilot
 
 import voice.core.data.Book
+import voice.core.data.CoPilotVoiceSettings
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -48,7 +49,14 @@ internal fun askSystemPrompt(book: Book, style: AnswerStyle): String =
  * of the single most vivid beat in the excerpt - a striking line of dialogue, a sudden action,
  * an emotional gut-punch - written the way you'd caption a comic panel, not a bullet list.
  */
-fun snipHighlightSystemPrompt(book: Book): String =
+internal fun snipHighlightSystemPrompt(book: Book, settings: CoPilotVoiceSettings, flavor: SystemFlavor): String =
+  if (settings.useSystemAiVoice) {
+    "${bookContextFact(book)} ${systemAiSnipRules(settings, flavor)}${spoilerGuard()}"
+  } else {
+    plainSnipHighlightSystemPrompt(book)
+  }
+
+private fun plainSnipHighlightSystemPrompt(book: Book): String =
   "You are capturing the single most vivid, emotionally charged moment from a short excerpt of an " +
     "audiobook, for the listener's own notes. ${bookContextFact(book)} Write 1-2 sentences that capture " +
     "the feeling, urgency, or drama of that moment - it might be a line of dialogue, a sudden action, or " +
