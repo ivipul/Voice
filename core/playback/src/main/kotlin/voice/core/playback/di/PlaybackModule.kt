@@ -107,26 +107,34 @@ interface PlaybackModule {
   ): MediaLibraryService.MediaLibrarySession {
     return MediaLibraryService.MediaLibrarySession.Builder(service, player, callback)
       .setSessionActivity(mainActivityIntentProvider.toCurrentBook())
-      .setMediaButtonPreferences(
-        listOf(
-          CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
-            .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
-            .setPlayerCommand(Player.COMMAND_SEEK_BACK)
-            .setSlots(CommandButton.SLOT_BACK)
-            .build(),
-          CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
-            .setDisplayName(context.getString(StringsR.string.playback_action_fast_forward))
-            .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
-            .setSlots(CommandButton.SLOT_FORWARD)
-            .build(),
-          CommandButton.Builder(CommandButton.ICON_UNDEFINED)
-            .setCustomIconResId(R.drawable.ic_copilot_ask)
-            .setDisplayName(context.getString(StringsR.string.copilot_action_ask))
-            .setSessionCommand(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
-            .setSlots(CommandButton.SLOT_OVERFLOW)
-            .build(),
-        ),
-      )
+      .setMediaButtonPreferences(mediaButtonPreferences(context))
       .build()
   }
 }
+
+// Android Auto lays these out left to right: Rewind, then Ask and Snip, with Forward at the far
+// right. Ask takes the forward slot and Snip/Forward share the overflow slot, in this order.
+internal fun mediaButtonPreferences(context: Context): List<CommandButton> = listOf(
+  CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
+    .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
+    .setPlayerCommand(Player.COMMAND_SEEK_BACK)
+    .setSlots(CommandButton.SLOT_BACK)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_ask)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_ask))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_FORWARD)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_snip)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_snip))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
+    .setDisplayName(context.getString(StringsR.string.playback_action_fast_forward))
+    .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
+    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .build(),
+)
