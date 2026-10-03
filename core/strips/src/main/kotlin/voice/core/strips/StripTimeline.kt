@@ -12,3 +12,5 @@ fun StripManifest.segmentEndMs(index: Int): Long = frames.getOrNull(index + 1)?.
 fun StripManifest.nextSeekMs(index: Int): Long? = frames.getOrNull(index + 1)?.startMs
 
 fun StripManifest.previousSeekMs(index: Int): Long = frames[(index - 1).coerceAtLeast(0)].startMs
+
+fun AvailableStrip.isUnlockedAt(bookMs: Long): Boolean = bookMs > manifest.frames.first().startMs

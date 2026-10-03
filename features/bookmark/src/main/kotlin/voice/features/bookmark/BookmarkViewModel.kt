@@ -29,6 +29,7 @@ import voice.core.playback.playstate.PlayStateManager
 import voice.core.strings.R
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
+import voice.core.strips.isUnlockedAt
 import voice.core.ui.formatTime
 import voice.navigation.Navigator
 import java.time.Instant
@@ -76,6 +77,7 @@ class BookmarkViewModel(
           .sortedByDescending { it.addedAt }
         chapters = book.chapters
         strips = stripRepository.stripsFor(book.content.name)
+          .filter { it.isUnlockedAt(book.position) }
       }
     }
     return BookmarkViewState(

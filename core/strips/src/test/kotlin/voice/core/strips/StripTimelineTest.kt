@@ -2,7 +2,9 @@ package voice.core.strips
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class StripTimelineTest {
 
@@ -10,6 +12,13 @@ class StripTimelineTest {
     starts = listOf(1_000L, 3_000L, 6_000L),
     holdMs = 10_000L,
   )
+
+  @Test
+  fun stripUnlocksOnlyOnceListeningIsBeyondItsFirstFrame() {
+    val available = AvailableStrip(strip, java.io.File("strip"))
+    assertFalse(available.isUnlockedAt(1_000L))
+    assertTrue(available.isUnlockedAt(1_001L))
+  }
 
   @Test
   fun frameIndexIsTheLastFrameStartedAtOrBeforePosition() {
