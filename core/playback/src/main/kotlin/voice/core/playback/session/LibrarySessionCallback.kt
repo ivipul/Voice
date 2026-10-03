@@ -254,6 +254,33 @@ class LibrarySessionCallback(
     }
   }
 
+  override fun onSearch(
+    session: MediaLibrarySession,
+    browser: ControllerInfo,
+    query: String,
+    params: LibraryParams?,
+  ): ListenableFuture<LibraryResult<Void>> = scope.future {
+    Logger.d("onSearch(query=$query)")
+    session.notifySearchResultChanged(browser, query, bookSearchHandler.searchAll(query).size, params)
+    LibraryResult.ofVoid()
+  }
+
+  override fun onGetSearchResult(
+    session: MediaLibrarySession,
+    browser: ControllerInfo,
+    query: String,
+    page: Int,
+    pageSize: Int,
+    params: LibraryParams?,
+  ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = scope.future {
+    Logger.d("onGetSearchResult(query=$query, page=$page, pageSize=$pageSize)")
+    val items = bookSearchHandler.searchAll(query)
+      .drop((page.toLong() * pageSize).coerceAtMost(Int.MAX_VALUE.toLong()).toInt())
+      .take(pageSize)
+      .map(mediaItemProvider::mediaItem)
+    LibraryResult.ofItemList(items, params)
+  }
+
   override fun onPlaybackResumption(
     mediaSession: MediaSession,
     controller: ControllerInfo,
@@ -295,6 +322,8 @@ class LibrarySessionCallback(
     val sessionCommands = connectionResult.availableSessionCommands
       .buildUpon()
       .add(SessionCommand(CustomCommand.CUSTOM_COMMAND_ACTION, Bundle.EMPTY))
+      .add(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
+      .add(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
       .build()
     return ConnectionResult.accept(
       sessionCommands,
@@ -316,6 +345,14 @@ class LibrarySessionCallback(
     customCommand: SessionCommand,
     args: Bundle,
   ): ListenableFuture<SessionResult> {
+    if (customCommand.customAction == CustomCommand.COPILOT_ASK_ACTION) {
+      performAction(CoPilotTriggerAction.OpenMic)
+      return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+    }
+    if (customCommand.customAction == CustomCommand.COPILOT_SNIP_ACTION) {
+      performAction(CoPilotTriggerAction.Snip)
+      return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+    }
     val command = CustomCommand.parse(customCommand, args)
       ?: return super.onCustomCommand(session, controller, customCommand, args)
     when (command) {

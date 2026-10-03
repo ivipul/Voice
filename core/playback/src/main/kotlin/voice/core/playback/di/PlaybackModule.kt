@@ -1,6 +1,7 @@
 package voice.core.playback.di
 
 import android.content.Context
+import android.os.Bundle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
@@ -12,6 +13,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.SessionCommand
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
@@ -20,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import voice.core.featureflag.FeatureFlag
 import voice.core.featureflag.Media3AudioOffloadFeatureFlagQualifier
+import voice.core.playback.R
 import voice.core.playback.misc.VolumeGain
 import voice.core.playback.notification.MainActivityIntentProvider
 import voice.core.playback.player.DurationInconsistenciesUpdater
@@ -28,6 +31,7 @@ import voice.core.playback.player.VoicePlayer
 import voice.core.playback.player.onAudioSessionIdChanged
 import voice.core.playback.playstate.PlayStateDelegatingListener
 import voice.core.playback.playstate.PositionUpdater
+import voice.core.playback.session.CustomCommand
 import voice.core.playback.session.LibrarySessionCallback
 import voice.core.playback.session.PlaybackService
 import voice.core.strings.R as StringsR
@@ -103,20 +107,34 @@ interface PlaybackModule {
   ): MediaLibraryService.MediaLibrarySession {
     return MediaLibraryService.MediaLibrarySession.Builder(service, player, callback)
       .setSessionActivity(mainActivityIntentProvider.toCurrentBook())
-      .setMediaButtonPreferences(
-        listOf(
-          CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
-            .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
-            .setPlayerCommand(Player.COMMAND_SEEK_BACK)
-            .setSlots(CommandButton.SLOT_BACK)
-            .build(),
-          CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
-            .setDisplayName(context.getString(StringsR.string.playback_action_fast_forward))
-            .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
-            .setSlots(CommandButton.SLOT_FORWARD)
-            .build(),
-        ),
-      )
+      .setMediaButtonPreferences(mediaButtonPreferences(context))
       .build()
   }
 }
+
+// Android Auto lays these out left to right: Rewind, then Ask and Snip, with Forward at the far
+// right. Ask takes the forward slot and Snip/Forward share the overflow slot, in this order.
+internal fun mediaButtonPreferences(context: Context): List<CommandButton> = listOf(
+  CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
+    .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
+    .setPlayerCommand(Player.COMMAND_SEEK_BACK)
+    .setSlots(CommandButton.SLOT_BACK)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_ask)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_ask))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_FORWARD)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_snip)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_snip))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
+    .setDisplayName(context.getString(StringsR.string.playback_action_fast_forward))
+    .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
+    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .build(),
+)

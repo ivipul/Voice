@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
@@ -23,7 +24,9 @@ import voice.core.data.BookId
 import voice.core.data.ChapterId
 import voice.core.data.KioskModeDemoData
 import voice.core.data.durationMs
+import voice.core.data.formatted
 import voice.core.data.markForPosition
+import voice.core.data.snipLocation
 import voice.core.data.repo.BookRepository
 import voice.core.data.repo.BookmarkRepo
 import voice.core.data.sleeptimer.SleepTimerPreference
@@ -49,6 +52,7 @@ import voice.core.ui.formatTime
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.SnipEvent
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
@@ -108,6 +112,9 @@ class BookPlayViewModel(
 
   internal val isThinking: State<Boolean>
     field = mutableStateOf(false)
+
+  internal val snipSheet: State<SnipSheetViewState?>
+    field = mutableStateOf<SnipSheetViewState?>(null)
 
   init {
     scope.launch {
@@ -377,6 +384,16 @@ class BookPlayViewModel(
     return allMessages[bookId].orEmpty()
   }
 
+  @Composable
+  fun snipLocationLabel(): (ChapterId, Long) -> String? {
+    val chapters by remember(bookId) {
+      bookRepository.flow(bookId).filterNotNull().map { it.chapters }
+    }.collectAsState(initial = emptyList())
+    return remember(chapters) {
+      { chapterId, positionInChapterMs -> chapters.snipLocation(chapterId, positionInChapterMs)?.formatted() }
+    }
+  }
+
   fun onFeedClick() {
     feedVisible.value = true
   }
@@ -410,8 +427,38 @@ class BookPlayViewModel(
   fun onSnipClick() {
     scope.launch {
       copilotPipeline.snip(bookId)
-      viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
     }
+  }
+
+  /**
+   * Run only while the screen is visible: snips captured while it isn't (e.g. from the headset
+   * with the screen off) are dropped by the shared stream and never show a toast or sheet.
+   */
+  suspend fun collectSnipEvents() {
+    try {
+      copilotRepository.snipEvents.collect(::onSnipEvent)
+    } finally {
+      if (snipSheet.value == SnipSheetViewState.Loading) snipSheet.value = null
+    }
+  }
+
+  private fun onSnipEvent(event: SnipEvent) {
+    when (event) {
+      SnipEvent.Started -> {
+        snipSheet.value = SnipSheetViewState.Loading
+        viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
+      }
+      is SnipEvent.Ready -> if (snipSheet.value == SnipSheetViewState.Loading) {
+        snipSheet.value = SnipSheetViewState.Ready(event.text)
+      }
+      SnipEvent.Failed -> if (snipSheet.value == SnipSheetViewState.Loading) {
+        snipSheet.value = null
+      }
+    }
+  }
+
+  fun onSnipSheetDismiss() {
+    snipSheet.value = null
   }
 
   fun onSnipTimestampClick(chapterId: ChapterId, positionInChapterMs: Long) {

@@ -19,6 +19,7 @@ internal fun MediaItem(
   isPlayable: Boolean,
   browsable: Boolean,
   album: String? = null,
+  subtitle: String? = null,
   artist: String? = null,
   genre: String? = null,
   sourceUri: Uri? = null,
@@ -30,6 +31,7 @@ internal fun MediaItem(
   val metadata =
     MediaMetadata.Builder()
       .setAlbumTitle(album)
+      .setSubtitle(subtitle)
       .setTitle(title)
       .setArtist(artist)
       .setGenre(genre)
