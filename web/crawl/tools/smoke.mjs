@@ -74,6 +74,25 @@ await run('phone', { width: 390, height: 844 }, async (page) => {
   await page.keyboard.press('p');
   await page.waitForTimeout(600);
   await page.screenshot({ path: join(out, 'phone-3-party.png') });
+});
+
+// A tall phone on a look with a long description: the card must stay clear of the text.
+await run('tallphone', { width: 430, height: 790 }, async (page) => {
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(900);
+  const clamped = await page.evaluate(() => document.getElementById('title').classList.contains('clamped'));
+  const geo = await page.evaluate(() => {
+    const r = (id) => document.getElementById(id).getBoundingClientRect();
+    return { whenBottom: r('when').bottom, cardTop: r('flip').top, cardH: r('flip').height };
+  });
+  console.log('tallphone', { clamped, ...geo });
+  await page.screenshot({ path: join(out, 'phone-4-longdesc.png') });
+  if (geo.cardTop < geo.whenBottom) problems.push('[tallphone] card overlaps the title block');
+  await page.click('#desc');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: join(out, 'phone-5-descfull.png') });
+  const shown = await page.evaluate(() => !document.getElementById('descFull').hidden);
+  if (clamped && !shown) problems.push('[tallphone] tapping the clamped description did not open it');
   console.log('scroll', await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, bodyH: document.body.scrollHeight, h: innerHeight })));
 });
 

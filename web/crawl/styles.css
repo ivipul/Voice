@@ -67,7 +67,13 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent
 .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .18em; color: var(--accent); text-transform: uppercase; }
 .name { font-family: var(--display); font-weight: 900; font-size: min(120px, 19cqi); line-height: .86; letter-spacing: .01em; text-transform: uppercase; margin-left: -3px; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; hyphens: none; }
 .name.long { font-size: min(96px, 15cqi); }
-.desc { font-size: 16px; color: #B9B6AE; max-width: 32ch; line-height: 1.45; }
+.desc { font-size: 16px; color: #B9B6AE; max-width: 32ch; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden; }
+.title.clamped .desc { cursor: pointer; }
+.more { display: none; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); cursor: pointer; margin-top: -4px; }
+.title.clamped .more { display: block; }
+.descfull { position: absolute; z-index: 8; left: 48px; top: 72px; max-height: calc(100% - 88px); width: min(560px, calc(100% - 96px)); overflow: auto; padding: 22px 24px; background: rgba(10,10,14,.92); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 6px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 30px 60px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 14px; cursor: pointer; }
+.descfull p { margin: 0; font-size: 17px; line-height: 1.5; color: var(--ink); }
+.descfull .close { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); margin-top: auto; }
 .when { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; color: var(--ink-dim); text-transform: uppercase; }
 .topbar { position: absolute; right: 48px; top: 28px; z-index: 6; display: flex; gap: 10px; }
 .pill { height: 44px; padding: 0 16px 0 12px; display: inline-flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid rgba(236,233,226,.26); border-radius: 22px; font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; backdrop-filter: blur(6px); transition: border-color .3s; }
@@ -277,13 +283,16 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent
   .scene { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); align-items: start; gap: 8px; padding: 16px 16px 4px; }
   .title { gap: 4px; }
   .name { font-size: clamp(44px, 16vw, 72px); }
-  .desc { font-size: 13px; max-width: 60vw; }
+  .desc { font-size: 13px; max-width: none; -webkit-line-clamp: 3; }
+  .descfull { left: 16px; right: 16px; top: 16px; max-height: calc(100% - 32px); width: auto; padding: 18px; }
+  .descfull p { font-size: 15px; }
   .topbar { right: 16px; top: 16px; }
   .pill span { display: none; }
   .pill { padding: 0 12px; }
   .depth { display: none; }
-  .card-col { align-self: end; justify-self: center; gap: 10px; padding-bottom: 6px; }
-  .scene3d { width: min(78vw, 40vh * 5 / 7); margin-top: calc(min(78vw, 40vh * 5 / 7) * .2); }
+  /* the card sizes itself to whatever height the title leaves (the figure needs 20% of the width above the card) */
+  .card-col { align-self: stretch; justify-content: flex-end; gap: 10px; padding-bottom: 6px; min-height: 0; container-type: size; }
+  .scene3d { width: min(78vw, 60cqh); margin-top: calc(min(78vw, 60cqh) * .2); }
   .card-hint { display: none; }
   .timeline { grid-column: 1; padding: 30px 16px calc(14px + env(safe-area-inset-bottom, 0px)); gap: 10px; }
   .track { height: 54px; }

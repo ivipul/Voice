@@ -10,7 +10,7 @@
   ['roster', 'depth', 'eyebrow', 'name', 'desc', 'when', 'cardName', 'cardEp', 'bLv', 'bFl', 'bFlName', 'line1Look', 'line1Time', 'hexes',
     'figure', 'hero', 'empty', 'skills', 'skillCount', 'loadout', 'calloutT', 'calloutB', 'log', 'sampleChip', 'lookSeq', 'lookText', 'lookFile',
     'track', 'segs', 'ticks', 'head', 'headLbl', 'bookLbl', 'total', 'party', 'partyWhen', 'members', 'scene3d', 'tilt', 'flip', 'hint',
-    'btnParty', 'btnClose', 'btnPrev', 'btnNext', 'btnPlay', 'playIcon', 'loading', 'scene'].forEach(function (k) { els[k] = $(k); });
+    'btnParty', 'btnClose', 'btnPrev', 'btnNext', 'btnPlay', 'playIcon', 'loading', 'scene', 'title', 'more', 'descFull', 'descFullEyebrow', 'descFullText', 'descFullWhen'].forEach(function (k) { els[k] = $(k); });
 
   function cur() { return chars[state.idx]; }
   function doc() { return docs[cur().slug]; }
@@ -44,7 +44,7 @@
     // warm the textures of every first look so switching never shows a blank
     chars.forEach(function (c) { var l = docs[c.slug].looks; if (morph && l.length) morph.preload(imgFor(l[0], 'action')); });
     select(i, null, true);
-    wireCard(); wireTimeline(); wireKeys();
+    wireCard(); wireTimeline(); wireKeys(); wireDesc();
     els.btnParty.addEventListener('click', function () { setParty(!state.party); });
     els.btnClose.addEventListener('click', function () { setParty(false); });
     els.btnPrev.addEventListener('click', function () { stepLook(-1); });
@@ -213,6 +213,8 @@
       if (morph) morph.show(url, charChanged && state.lastSel === null);
       els.empty.hidden = !!url;
       els.desc.textContent = look ? look.description : (looks.length ? 'Before the first recorded look.' : 'No looks bundled for this crawler yet.');
+      els.descFull.hidden = true;
+      checkClamp();
       els.eyebrow.textContent = look ? 'Crawler · look ' + pad2(li + 1) + ' / ' + pad2(looks.length) : 'Crawler · ' + looks.length + ' looks';
       els.line1Look.textContent = look ? 'Look ' + pad2(li + 1) + ' / ' + pad2(looks.length) : 'Look – / ' + pad2(looks.length);
       els.calloutT.textContent = look ? 'Look ' + pad2(li + 1) + ' · B' + look.book + ' ' + look.t : 'No look yet';
@@ -413,6 +415,23 @@
     els.flip.classList.toggle('back', state.flipped);
     els.hint.textContent = state.flipped ? 'Tap to flip back · skills and gear so far' : 'Tap the card to flip · drag to tilt';
   }
+  function checkClamp() {
+    els.title.classList.toggle('clamped', els.desc.scrollHeight > els.desc.clientHeight + 1);
+  }
+  function wireDesc() {
+    function open() {
+      if (!els.title.classList.contains('clamped')) return;
+      els.descFullEyebrow.textContent = els.eyebrow.textContent;
+      els.descFullText.textContent = els.desc.textContent;
+      els.descFullWhen.textContent = els.when.textContent;
+      els.descFull.hidden = false;
+    }
+    els.desc.addEventListener('click', open);
+    els.more.addEventListener('click', open);
+    els.descFull.addEventListener('click', function () { els.descFull.hidden = true; });
+    addEventListener('resize', checkClamp);
+  }
+
   function wireKeys() {
     document.addEventListener('keydown', function (e) {
       if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
@@ -424,7 +443,7 @@
         case 'ArrowDown': select(state.idx + 1, els.roster.children[(state.idx + 1) % chars.length].firstChild); e.preventDefault(); break;
         case ' ': if (e.target !== els.scene3d) { doFlip(); e.preventDefault(); } break;
         case 'p': case 'P': setParty(!state.party); break;
-        case 'Escape': if (state.party) setParty(false); break;
+        case 'Escape': if (!els.descFull.hidden) els.descFull.hidden = true; else if (state.party) setParty(false); break;
       }
     });
   }
