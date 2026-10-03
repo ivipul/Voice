@@ -184,6 +184,7 @@ private fun HoloCard(
             plain = dialogState.plain,
             card = card,
             lookImage = lookImage,
+            portrait = dialogState.portrait?.toImageModel(),
             animate = !reducedMotion,
             tilt = tilt,
             u = u,

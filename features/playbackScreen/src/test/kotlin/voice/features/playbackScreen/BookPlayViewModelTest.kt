@@ -529,23 +529,41 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `tapping a chip keeps the bottom sheet when the entity has no card`() = scope.runTest {
+  fun `tapping a chip without card data opens a plain card from the X-Ray entity`() = scope.runTest {
     val viewModel = viewModel(
-      xrayManifest = carlManifest,
+      xrayManifest = XRayManifest(
+        entities = listOf(XRayEntityInfo(id = "beatrice", title = "Beatrice", description = "A guide.", image = "book-1/beatrice.jpg")),
+        timeline = emptyList(),
+      ),
       playerCards = PlayerCardSet(cards = emptyMap(), imageFolder = null),
     )
+
+    viewModel.onXRayChipClick("beatrice")
+    yield()
+
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = "Beatrice", actual = dialog.name)
+    assertEquals(expected = "A guide.", actual = dialog.description)
+    assertEquals(expected = "book-1/beatrice.jpg", actual = dialog.portrait)
+    assertEquals(expected = null, actual = dialog.lookImage)
+    assertEquals(expected = true, actual = dialog.plain)
+  }
+
+  @Test
+  fun `tapping a chip opens a card even when the book has no cards file or the entity has no image`() = scope.runTest {
+    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = null)
 
     viewModel.onXRayChipClick("carl")
     yield()
 
-    assertEquals(
-      expected = BookPlayDialogViewState.XRayEntityDialog(title = "Carl", description = "A crawler.", image = null),
-      actual = viewModel.dialogState.value,
-    )
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = null, actual = dialog.portrait)
+    assertEquals(expected = emptyList(), actual = dialog.data.entries)
+    assertEquals(expected = true, actual = dialog.plain)
   }
 
   @Test
-  fun `tapping a chip keeps the bottom sheet when nothing on the card is revealed yet`() = scope.runTest {
+  fun `a crawler card is not plain even before anything is revealed`() = scope.runTest {
     val viewModel = viewModel(
       xrayManifest = carlManifest,
       playerCards = PlayerCardSet(
@@ -562,17 +580,9 @@ class BookPlayViewModelTest {
     viewModel.onXRayChipClick("carl")
     yield()
 
-    assertIs<BookPlayDialogViewState.XRayEntityDialog>(viewModel.dialogState.value)
-  }
-
-  @Test
-  fun `tapping a chip keeps the bottom sheet when the book has no cards file`() = scope.runTest {
-    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = null)
-
-    viewModel.onXRayChipClick("carl")
-    yield()
-
-    assertIs<BookPlayDialogViewState.XRayEntityDialog>(viewModel.dialogState.value)
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = false, actual = dialog.plain)
+    assertEquals(expected = null, actual = dialog.card.level)
   }
 
   @Test

@@ -139,9 +139,6 @@ fun BookPlayScreen(bookId: BookId) {
       is BookPlayDialogViewState.SelectChapterDialog -> {
         SelectChapterDialog(dialogState, viewModel)
       }
-      is BookPlayDialogViewState.XRayEntityDialog -> {
-        XRayEntityBottomSheet(dialogState, viewModel)
-      }
       is BookPlayDialogViewState.XRayCardDialog -> {
         HoloCardDialog(
           dialogState = dialogState,
