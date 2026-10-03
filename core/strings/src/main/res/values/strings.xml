@@ -64,6 +64,8 @@
     <string name="copilot.action.ask">Ask</string>
     <!-- Content description for the Catch Me Up co-pilot toolbar button. -->
     <string name="copilot.action.catch_me_up">Catch me up</string>
+    <!-- Name of the Smart Recap button on the Android Auto player. -->
+    <string name="copilot.action.recap">Recap</string>
     <!-- Content description for the entry point into the co-pilot Feed. -->
     <string name="copilot.action.feed">Feed</string>
     <!-- Content description for the Snip &amp; Synthesize co-pilot toolbar button. -->
