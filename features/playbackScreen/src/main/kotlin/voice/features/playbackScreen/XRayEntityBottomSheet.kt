@@ -50,7 +50,7 @@ internal fun XRayEntityBottomSheet(
         if (dialogState.image != null) {
           Spacer(modifier = Modifier.size(16.dp))
           AsyncImage(
-            model = dialogState.image,
+            model = dialogState.image.toImageModel(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -67,4 +67,15 @@ internal fun XRayEntityBottomSheet(
       }
     },
   )
+}
+
+/**
+ * X-Ray entity images are bundled into the app as assets (see `:core:xray`'s `assets/xray/`),
+ * referenced by a path relative to that folder. A full `http(s)` URL is still accepted as a
+ * fallback for an entity whose image hasn't been bundled yet.
+ */
+private fun String.toImageModel(): String = if (startsWith("http://") || startsWith("https://")) {
+  this
+} else {
+  "file:///android_asset/xray/$this"
 }
