@@ -11,10 +11,13 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import voice.core.common.DispatcherProvider
@@ -41,6 +44,7 @@ import voice.core.sleeptimer.SleepTimerState
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.SnipEvent
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
 import kotlin.test.Test
@@ -370,6 +374,92 @@ class BookPlayViewModelTest {
 
     coVerify { copilotPipeline.snip(book.id) }
     coVerify(exactly = 0) { bookmarkRepository.addBookmarkAtBookPosition(any(), any(), any()) }
+  }
+
+  @Test
+  fun `one snip shows one toast effect and a sheet that fills in when the text is ready`() = scope.runTest {
+    val effects = mutableListOf<BookPlayViewEffect>()
+    backgroundScope.launch { viewModel.collectSnipEvents() }
+    backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
+    runCurrent()
+
+    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    runCurrent()
+    assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.SnipSaved), effects)
+    assertEquals(SnipSheetViewState.Loading, viewModel.snipSheet.value)
+
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("Carl's blade froze mid-swing."))
+    runCurrent()
+    assertEquals(SnipSheetViewState.Ready("Carl's blade froze mid-swing."), viewModel.snipSheet.value)
+    assertEquals(1, effects.size)
+  }
+
+  @Test
+  fun `Snip button itself emits no toast, only the shared stream does`() = scope.runTest {
+    coEvery { copilotPipeline.snip(book.id) } just Runs
+    val effects = mutableListOf<BookPlayViewEffect>()
+    backgroundScope.launch { viewModel.collectSnipEvents() }
+    backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
+    runCurrent()
+
+    viewModel.onSnipClick()
+    runCurrent()
+
+    assertEquals(emptyList(), effects)
+  }
+
+  @Test
+  fun `snips captured while nothing is collecting are dropped`() = scope.runTest {
+    val effects = mutableListOf<BookPlayViewEffect>()
+    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("missed"))
+
+    backgroundScope.launch { viewModel.collectSnipEvents() }
+    backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
+    runCurrent()
+
+    assertEquals(emptyList(), effects)
+    assertEquals(null, viewModel.snipSheet.value)
+  }
+
+  @Test
+  fun `a failed snip closes the loading sheet`() = scope.runTest {
+    backgroundScope.launch { viewModel.collectSnipEvents() }
+    runCurrent()
+
+    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    runCurrent()
+    assertEquals(SnipSheetViewState.Loading, viewModel.snipSheet.value)
+
+    copilotRepository.emitSnipEvent(SnipEvent.Failed)
+    runCurrent()
+    assertEquals(null, viewModel.snipSheet.value)
+  }
+
+  @Test
+  fun `a dismissed sheet is not reopened when the text arrives`() = scope.runTest {
+    backgroundScope.launch { viewModel.collectSnipEvents() }
+    runCurrent()
+
+    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    runCurrent()
+    viewModel.onSnipSheetDismiss()
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("late"))
+    runCurrent()
+
+    assertEquals(null, viewModel.snipSheet.value)
+  }
+
+  @Test
+  fun `leaving the screen while capturing clears the loading sheet`() = scope.runTest {
+    val collector = backgroundScope.launch { viewModel.collectSnipEvents() }
+    runCurrent()
+    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    runCurrent()
+
+    collector.cancelAndJoin()
+
+    assertEquals(null, viewModel.snipSheet.value)
   }
 
   @Test

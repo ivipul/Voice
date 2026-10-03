@@ -3,8 +3,11 @@ package voice.core.copilot
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import voice.core.data.BookId
 
@@ -25,4 +28,18 @@ class CoPilotRepository {
   }
 
   val allMessagesByBook: StateFlow<Map<BookId, List<CoPilotMessage>>> get() = messagesByBook.asStateFlow()
+
+  // No replay: a snip that happens while no screen is collecting (app in the background or screen
+  // off) is dropped instead of showing up later.
+  private val snipEventFlow = MutableSharedFlow<SnipEvent>(extraBufferCapacity = SNIP_EVENT_BUFFER)
+
+  val snipEvents: SharedFlow<SnipEvent> get() = snipEventFlow.asSharedFlow()
+
+  fun emitSnipEvent(event: SnipEvent) {
+    snipEventFlow.tryEmit(event)
+  }
+
+  private companion object {
+    const val SNIP_EVENT_BUFFER = 8
+  }
 }

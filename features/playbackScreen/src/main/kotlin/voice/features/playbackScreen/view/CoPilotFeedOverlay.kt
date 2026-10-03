@@ -62,6 +62,7 @@ internal fun CoPilotFeedOverlay(
   onSend: (String) -> Unit,
   onDismiss: () -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
+  snipLocationLabel: (ChapterId, Long) -> String?,
 ) {
   Dialog(
     onDismissRequest = onDismiss,
@@ -122,7 +123,7 @@ internal fun CoPilotFeedOverlay(
               .padding(contentPadding),
           ) {
             items(messages, key = { it.id }) { message ->
-              ChatBubble(message, onSeekToSnip = onSeekToSnip)
+              ChatBubble(message, onSeekToSnip = onSeekToSnip, snipLocationLabel = snipLocationLabel)
             }
             if (isThinking) {
               item {
@@ -137,7 +138,11 @@ internal fun CoPilotFeedOverlay(
 }
 
 @Composable
-private fun ChatBubble(message: CoPilotMessage, onSeekToSnip: (ChapterId, Long) -> Unit) {
+private fun ChatBubble(
+  message: CoPilotMessage,
+  onSeekToSnip: (ChapterId, Long) -> Unit,
+  snipLocationLabel: (ChapterId, Long) -> String?,
+) {
   val isUser = message.role == CoPilotMessage.Role.User
   val snipChapterId = message.snipChapterId
   val snipPositionInChapterMs = message.snipPositionInChapterMs
@@ -184,7 +189,7 @@ private fun ChatBubble(message: CoPilotMessage, onSeekToSnip: (ChapterId, Long) 
             Text(
               text = stringResource(
                 id = R.string.copilot_feed_snip_annotation,
-                formatTime(snipPositionInChapterMs),
+                snipLocationLabel(snipChapterId, snipPositionInChapterMs) ?: formatTime(snipPositionInChapterMs),
               ),
               style = MaterialTheme.typography.labelMedium,
               color = MaterialTheme.colorScheme.primary,

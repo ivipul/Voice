@@ -68,6 +68,7 @@ class CoPilotEngine(
 
   private val mainHandler = Handler(Looper.getMainLooper())
   private var textToSpeech: TextToSpeech? = null
+  private var noSpeechTimeout: Runnable? = null
 
   @Volatile
   private var isActive = false
@@ -133,6 +134,10 @@ class CoPilotEngine(
           CoPilotMode.AutoIdentify -> copilotPipeline.autoIdentify(bookId)
           CoPilotMode.CatchMeUp -> copilotPipeline.catchMeUp(bookId)
         }
+        if (answer == null) {
+          finish(onFinished)
+          return@launch
+        }
         speak(answer) { finish(onFinished) }
       } catch (e: CancellationException) {
         throw e
@@ -155,8 +160,15 @@ class CoPilotEngine(
     }
   }
 
-  private suspend fun runOpenMic(bookId: BookId): String {
-    val heard = listen()
+  /** Returns null when the listener said nothing, so there is nothing to answer or speak. */
+  private suspend fun runOpenMic(bookId: BookId): String? {
+    val heard = when (val result = listen()) {
+      is ListenResult.Heard -> result.text
+      ListenResult.Silence -> {
+        Logger.d("CoPilotEngine: no speech heard, resuming")
+        return null
+      }
+    }
     Logger.d("CoPilotEngine: heard \"$heard\"")
     copilotRepository.addMessage(
       bookId,
@@ -229,37 +241,61 @@ class CoPilotEngine(
     abandonAudioFocus()
   }
 
-  private suspend fun listen(): String = suspendCancellableCoroutine { cont ->
+  private suspend fun listen(): ListenResult = suspendCancellableCoroutine { cont ->
     val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
       putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
       putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
     }
+    var settled = false
+    var endCuePlayed = false
+    fun settleSilently() {
+      if (settled) return
+      settled = true
+      cancelNoSpeechTimeout()
+      recognizer.destroy()
+      if (!endCuePlayed) playCue(endListeningSoundId)
+      cont.resume(ListenResult.Silence)
+    }
     recognizer.setRecognitionListener(
       object : RecognitionListener {
         override fun onResults(results: Bundle) {
-          val text = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
+          if (settled) return
+          settled = true
+          cancelNoSpeechTimeout()
           recognizer.destroy()
-          if (text != null) {
-            cont.resume(text)
-          } else {
-            cont.resumeWithException(IllegalStateException("No speech recognized"))
-          }
+          cont.resume(listenResultFor(results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)))
         }
 
         override fun onError(error: Int) {
+          if (recognizerErrorIsSilence(error)) {
+            settleSilently()
+            return
+          }
+          if (settled) return
+          settled = true
+          cancelNoSpeechTimeout()
           recognizer.destroy()
           cont.resumeWithException(IllegalStateException("SpeechRecognizer error $error"))
         }
 
-        override fun onReadyForSpeech(params: Bundle?) = Unit
-        override fun onBeginningOfSpeech() = Unit
+        override fun onReadyForSpeech(params: Bundle?) {
+          // The recognizer's own no-speech timeout varies by device and engine, so cap the
+          // wait explicitly.
+          cancelNoSpeechTimeout()
+          val timeout = Runnable { settleSilently() }
+          noSpeechTimeout = timeout
+          mainHandler.postDelayed(timeout, NO_SPEECH_TIMEOUT_MS)
+        }
+
+        override fun onBeginningOfSpeech() = cancelNoSpeechTimeout()
         override fun onRmsChanged(rmsdB: Float) = Unit
         override fun onBufferReceived(buffer: ByteArray?) = Unit
 
         override fun onEndOfSpeech() {
           // Recognizer stopped listening and is about to hand back results / start
           // processing what it heard.
+          endCuePlayed = true
           playCue(endListeningSoundId)
         }
 
@@ -267,9 +303,17 @@ class CoPilotEngine(
         override fun onEvent(eventType: Int, params: Bundle?) = Unit
       },
     )
-    cont.invokeOnCancellation { recognizer.destroy() }
+    cont.invokeOnCancellation {
+      cancelNoSpeechTimeout()
+      recognizer.destroy()
+    }
     playCue(startListeningSoundId)
     recognizer.startListening(intent)
+  }
+
+  private fun cancelNoSpeechTimeout() {
+    noSpeechTimeout?.let(mainHandler::removeCallbacks)
+    noSpeechTimeout = null
   }
 
   private fun speak(text: String, onDone: () -> Unit) {
@@ -315,5 +359,6 @@ class CoPilotEngine(
 
   private companion object {
     const val RESPONSE_END_PAUSE_MS = 500L
+    const val NO_SPEECH_TIMEOUT_MS = 5_000L
   }
 }
