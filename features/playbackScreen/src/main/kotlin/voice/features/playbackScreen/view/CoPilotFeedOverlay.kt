@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,15 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import coil.compose.AsyncImage
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,7 +49,6 @@ import voice.core.strings.R
 import voice.core.ui.formatTime
 import voice.core.ui.icons.VoiceIcons
 import voice.core.copilot.CoPilotMessage
-import java.io.File
 
 private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
 
@@ -183,20 +172,16 @@ private fun ChatBubble(
       modifier = Modifier.widthIn(max = if (hasFrame) FRAME_BUBBLE_MAX_WIDTH else 320.dp),
     ) {
       Column {
-        message.imagePath?.let { path ->
-          AsyncImage(
-            model = File(path),
-            contentDescription = message.text,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-              .fillMaxWidth()
-              .aspectRatio(FRAME_ASPECT)
-              .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-              .clickable(onClickLabel = stringResource(id = R.string.copilot_feed_frame_open), onClick = onOpenFrame),
+        if (hasFrame) {
+          HoloFrameSlot(
+            imagePath = message.imagePath,
+            modifier = if (message.imagePath != null) {
+              Modifier.clickable(onClickLabel = stringResource(id = R.string.copilot_feed_frame_open), onClick = onOpenFrame)
+            } else {
+              Modifier
+            },
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
           )
-        }
-        if (message.isGeneratingImage && message.imagePath == null) {
-          FramePlaceholder()
         }
         if (snipChapterId != null && snipPositionInChapterMs != null) {
           Row(
@@ -229,35 +214,6 @@ private fun ChatBubble(
           style = MaterialTheme.typography.bodyLarge,
         )
       }
-    }
-  }
-}
-
-@Composable
-private fun FramePlaceholder() {
-  val transition = rememberInfiniteTransition(label = "frame-placeholder")
-  val alpha by transition.animateFloat(
-    initialValue = 0.35f,
-    targetValue = 0.75f,
-    animationSpec = infiniteRepeatable(tween(durationMillis = 1200), RepeatMode.Reverse),
-    label = "frame-placeholder-alpha",
-  )
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-      .aspectRatio(FRAME_ASPECT)
-      .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-      .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha * 0.2f)),
-    contentAlignment = Alignment.Center,
-  ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-      Spacer(modifier = Modifier.size(8.dp))
-      Text(
-        text = stringResource(id = R.string.copilot_feed_frame_drawing),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
     }
   }
 }
