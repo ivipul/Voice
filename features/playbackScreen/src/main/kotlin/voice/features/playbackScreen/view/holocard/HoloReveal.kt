@@ -109,6 +109,9 @@ half4 main(float2 fragCoord) {
   float3 accent = 0.5 + 0.5 * cos(6.2831 * (th * 1.7 + time * 0.25 + float3(0.0, 0.33, 0.67)));
   c = mix(c, accent, front * 0.7) + accent * front * 0.45;
   c += accent * env * env * 0.1;
+  float glarePos = t * 1.8 - 0.4;
+  float glare = 1.0 - smoothstep(0.0, 0.14, abs(uv.x * 0.8 + uv.y * 0.6 - glarePos));
+  c += float3(1.0, 0.95, 0.9) * glare * 0.35 * sin(3.14159 * clamp(t * 1.1, 0.0, 1.0));
   return half4(half3(c), 1.0);
 }
 """

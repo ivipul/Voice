@@ -22,11 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.PI
+import kotlin.math.sin
 import androidx.compose.ui.unit.dp
 import voice.features.playbackScreen.view.holocard.holoReveal
 import voice.core.strings.R as StringsR
@@ -68,6 +71,11 @@ internal fun HoloImageLoader(
     modifier = modifier
       .fillMaxWidth()
       .aspectRatio(FRAME_ASPECT)
+      .graphicsLayer {
+        val scale = revealScale(reveal.value)
+        scaleX = scale
+        scaleY = scale
+      }
       .clip(shape)
       .semantics { contentDescription?.let { this.contentDescription = it } }
       .holoReveal(bitmap = bitmap, reveal = { reveal.value }, time = { time }),
@@ -82,6 +90,9 @@ internal fun HoloImageLoader(
     }
   }
 }
+
+/** A slight dip and spring back while the frame flourishes in: 1 at both ends, 0.96 in the middle. */
+internal fun revealScale(progress: Float): Float = 1f - 0.04f * sin(PI.toFloat() * progress.coerceIn(0f, 1f))
 
 /** The reveal plays only for an image that arrives while the loader is on screen, not for one already there. */
 internal fun shouldPlayReveal(imagePathOnFirstComposition: String?): Boolean = imagePathOnFirstComposition == null

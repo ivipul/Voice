@@ -1,6 +1,7 @@
 package voice.features.playbackScreen
 
 import voice.core.copilot.CoPilotMessage
+import voice.features.playbackScreen.view.FRAME_ASPECT
 
 internal sealed interface SnipSheetViewState {
   data class Loading(val drawsFrame: Boolean) : SnipSheetViewState
@@ -37,5 +38,10 @@ internal fun snipFrameHeightDp(screenHeightDp: Int): Int {
   return minOf(roomLeft, screenHeightDp * 2 / 5).coerceAtLeast(MIN_SNIP_FRAME_DP)
 }
 
+/** The frame is about 62% of the sheet's width, unless that would push the text below the fold. */
+internal fun snipFrameWidthDp(availableWidthDp: Float, screenHeightDp: Int): Float =
+  minOf(availableWidthDp * SNIP_FRAME_WIDTH_FRACTION, snipFrameHeightDp(screenHeightDp) * FRAME_ASPECT)
+
+private const val SNIP_FRAME_WIDTH_FRACTION = 0.62f
 private const val SNIP_SHEET_CHROME_DP = 260
 private const val MIN_SNIP_FRAME_DP = 160

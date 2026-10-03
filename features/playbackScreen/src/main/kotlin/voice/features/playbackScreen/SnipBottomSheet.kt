@@ -1,7 +1,7 @@
 package voice.features.playbackScreen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,8 +56,8 @@ internal fun SnipBottomSheet(
         )
         Spacer(modifier = Modifier.size(16.dp))
         if (frame != SnipFrameViewState.None) {
-          val imageWidth = (snipFrameHeightDp(LocalConfiguration.current.screenHeightDp) * FRAME_ASPECT).dp
-          Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+          BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            val imageWidth = snipFrameWidthDp(maxWidth.value, LocalConfiguration.current.screenHeightDp).dp
             HoloImageLoader(
               imagePath = (frame as? SnipFrameViewState.Image)?.path,
               contentDescription = null,

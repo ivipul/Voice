@@ -2,6 +2,7 @@ package voice.features.playbackScreen
 
 import voice.core.copilot.CoPilotMessage
 import kotlin.test.Test
+import voice.features.playbackScreen.view.FRAME_ASPECT
 import kotlin.test.assertEquals
 
 class SnipSheetViewStateTest {
@@ -55,5 +56,14 @@ class SnipSheetViewStateTest {
     assertEquals(480, snipFrameHeightDp(1200))
     // A short screen still gets a usable frame.
     assertEquals(160, snipFrameHeightDp(500))
+  }
+
+  @Test
+  fun `the frame is about 62 percent of the sheet width when there is room, else limited by height`() {
+    // Folded Pixel-like screen: 363 dp of content width, 915 dp tall. 62% would be 225 dp wide (401 dp tall),
+    // but the height cap of 350 dp limits it to 350 * aspect.
+    assertEquals(snipFrameHeightDp(915) * FRAME_ASPECT, snipFrameWidthDp(363f, 915), 0.01f)
+    // A very wide, tall screen: 62% of the width is the smaller.
+    assertEquals(100f * 0.62f, snipFrameWidthDp(100f, 2000), 0.01f)
   }
 }
