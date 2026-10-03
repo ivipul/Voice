@@ -180,6 +180,8 @@ private fun HoloCard(
         if (angle < 90f || angle > 270f) {
           HoloCardFront(
             name = dialogState.name,
+            description = dialogState.description,
+            plain = dialogState.plain,
             card = card,
             lookImage = lookImage,
             animate = !reducedMotion,
@@ -189,6 +191,8 @@ private fun HoloCard(
         } else {
           HoloCardBack(
             card = card,
+            description = dialogState.description,
+            plain = dialogState.plain,
             tilt = tilt,
             u = u,
             modifier = Modifier.graphicsLayer { rotationY = 180f },

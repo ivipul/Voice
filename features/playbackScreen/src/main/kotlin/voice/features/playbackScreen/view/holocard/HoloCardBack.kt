@@ -49,6 +49,8 @@ private const val MaxAbilities = 3
 @Composable
 internal fun HoloCardBack(
   card: ComposedPlayerCard,
+  description: String,
+  plain: Boolean,
   tilt: HoloTiltState,
   u: CardUnit,
   modifier: Modifier = Modifier,
@@ -62,10 +64,23 @@ internal fun HoloCardBack(
       .holoFoil(tilt, mirrored = true),
   ) {
     Emblem(tilt = tilt, palette = palette, u = u)
-    Heading(text = stringResource(R.string.holo_card_abilities), top = 38f, palette = palette, u = u)
-    Abilities(abilities = card.abilities.take(MaxAbilities), palette = palette, u = u)
-    Heading(text = stringResource(R.string.holo_card_loadout), top = 72f, palette = palette, u = u)
-    Loadout(loadout = card.loadout, palette = palette, u = u)
+    if (plain) {
+      Heading(text = stringResource(R.string.holo_card_about), top = 38f, palette = palette, u = u)
+      CardText(
+        text = description,
+        size = u.sp(3.4f),
+        color = InkColor,
+        weight = FontWeight.Normal,
+        align = TextAlign.Start,
+        maxLines = 12,
+        modifier = Modifier.cardRect(u, 7f, 44.5f, 86f, 62f),
+      )
+    } else {
+      Heading(text = stringResource(R.string.holo_card_abilities), top = 38f, palette = palette, u = u)
+      Abilities(abilities = card.abilities.take(MaxAbilities), palette = palette, u = u)
+      Heading(text = stringResource(R.string.holo_card_loadout), top = 72f, palette = palette, u = u)
+      Loadout(loadout = card.loadout, palette = palette, u = u)
+    }
     Callout(description = card.look?.description, u = u, modifier = Modifier.align(Alignment.BottomCenter))
   }
 }

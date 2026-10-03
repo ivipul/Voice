@@ -173,4 +173,17 @@ class PlayerCardComposerTest {
     assertNull(composed.level)
     assertEquals("4,122", composed.crawlerId)
   }
+
+  @Test
+  fun cardsWithOnlyLooksAndLabelsHaveNoGameStats() {
+    val lookOnly = card(
+      entry(0, PlayerCardFields.LOOK, image = "zev/look-001.webp", note = "A man."),
+      entry(0, PlayerCardFields.RACE, value = "Human"),
+      entry(0, PlayerCardFields.CALL_SIGN, value = "Guide"),
+    )
+    assertFalse(lookOnly.hasGameStats)
+    assertTrue(card(entry(0, PlayerCardFields.GEAR, key = "head", value = "Crown")).hasGameStats)
+    assertTrue(card(entry(0, PlayerCardFields.STAT_STR, value = "9")).hasGameStats)
+    assertTrue(card(entry(0, PlayerCardFields.LEVEL, value = "2")).hasGameStats)
+  }
 }

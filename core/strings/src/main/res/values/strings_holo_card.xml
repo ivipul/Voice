@@ -6,6 +6,7 @@
   <string name="holo_card_abilities">Signature abilities</string>
   <string name="holo_card_no_abilities">No abilities revealed yet.</string>
   <string name="holo_card_rank">Rank %1$d</string>
+  <string name="holo_card_about">About</string>
   <string name="holo_card_loadout">Equipped loadout</string>
   <string name="holo_card_current_look">Current look</string>
   <string name="holo_card_hint_front">Tap the card to flip it</string>

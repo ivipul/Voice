@@ -386,6 +386,7 @@ class BookPlayViewModel(
     if (!data.composeAt(positionMs).hasRevealedData) return@withContext null
     BookPlayDialogViewState.XRayCardDialog(
       name = entity.title,
+      description = entity.description,
       data = data,
       imageUris = data.entries
         .mapNotNull { it.image }

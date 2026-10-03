@@ -5,6 +5,7 @@ import voice.core.playback.misc.Decibel
 import voice.core.xray.card.ComposedPlayerCard
 import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.composeAt
+import voice.core.xray.card.hasGameStats
 import voice.features.sleepTimer.SleepTimerViewState
 import kotlin.time.Duration
 
@@ -81,12 +82,15 @@ internal sealed interface BookPlayDialogViewState {
    */
   data class XRayCardDialog(
     val name: String,
+    val description: String,
     val data: PlayerCardData,
     val imageUris: Map<String, String>,
     val openedAtMs: Long,
   ) : BookPlayDialogViewState {
 
     val card: ComposedPlayerCard get() = data.composeAt(openedAtMs)
+
+    val plain: Boolean get() = !data.hasGameStats
 
     val lookImage: String? get() = card.look?.image?.let(imageUris::get)
   }

@@ -87,3 +87,21 @@ fun PlayerCardData.composeAt(positionMs: Long): ComposedPlayerCard {
     look = look?.let { ComposedPlayerCard.Look(image = it.image, description = it.note) },
   )
 }
+
+private val gameStatFields = setOf(
+  PlayerCardFields.LEVEL,
+  PlayerCardFields.FLOOR,
+  PlayerCardFields.STAT_STR,
+  PlayerCardFields.STAT_DEX,
+  PlayerCardFields.STAT_CON,
+  PlayerCardFields.STAT_INT,
+  PlayerCardFields.STAT_CHA,
+  PlayerCardFields.SKILL,
+  PlayerCardFields.GEAR,
+)
+
+/**
+ * Whether this card ever has level, floor, stats, skills or gear. A card without any (a monster, an NPC) is shown as
+ * a plain look-only card instead of a sheet of locked stats.
+ */
+val PlayerCardData.hasGameStats: Boolean get() = entries.any { it.field in gameStatFields }

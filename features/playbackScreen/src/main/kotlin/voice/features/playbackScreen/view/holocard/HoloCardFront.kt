@@ -75,6 +75,8 @@ private const val FigureHeight = 87f
 @Composable
 internal fun HoloCardFront(
   name: String,
+  description: String,
+  plain: Boolean,
   card: ComposedPlayerCard,
   lookImage: String?,
   animate: Boolean,
@@ -92,24 +94,30 @@ internal fun HoloCardFront(
   ) {
     ArtWindow(palette = palette, tilt = tilt, u = u, modifier = Modifier.cardRect(u, WindowLeft, WindowTop, WindowWidth, WindowHeight))
     Figure(name = name, lookImage = lookImage, animate = animate, palette = palette, tilt = tilt, u = u)
-    Banner(name = name, epithet = card.epithet, palette = palette, tilt = tilt, u = u)
-    Badge(
-      label = stringResource(R.string.holo_card_level),
-      value = card.level?.toString(),
-      caption = null,
-      palette = palette,
-      u = u,
-      modifier = Modifier.cardRect(u, 3.5f, 3.5f, 17f, 17f),
-    )
-    Badge(
-      label = stringResource(R.string.holo_card_floor),
-      value = card.floor?.toString(),
-      caption = card.floorName,
-      palette = palette,
-      u = u,
-      modifier = Modifier.cardRect(u, 79.5f, 3.5f, 17f, 17f),
-    )
-    StatPanel(card = card, palette = palette, animate = animate, u = u)
+    Banner(name = name, epithet = card.epithet, wide = plain, palette = palette, tilt = tilt, u = u)
+    if (!plain) {
+      Badge(
+        label = stringResource(R.string.holo_card_level),
+        value = card.level?.toString(),
+        caption = null,
+        palette = palette,
+        u = u,
+        modifier = Modifier.cardRect(u, 3.5f, 3.5f, 17f, 17f),
+      )
+      Badge(
+        label = stringResource(R.string.holo_card_floor),
+        value = card.floor?.toString(),
+        caption = card.floorName,
+        palette = palette,
+        u = u,
+        modifier = Modifier.cardRect(u, 79.5f, 3.5f, 17f, 17f),
+      )
+    }
+    if (plain) {
+      AboutPanel(race = card.race, description = description, u = u)
+    } else {
+      StatPanel(card = card, palette = palette, animate = animate, u = u)
+    }
   }
 }
 
@@ -306,13 +314,14 @@ private fun Figure(
 private fun Banner(
   name: String,
   epithet: String?,
+  wide: Boolean,
   palette: FloorPalette,
   tilt: HoloTiltState,
   u: CardUnit,
 ) {
   Column(
     modifier = Modifier
-      .cardRect(u, 21f, 5f, 58f, 12f)
+      .cardRect(u, if (wide) 8f else 21f, 5f, if (wide) 84f else 58f, 12f)
       .clip(RoundedCornerShape(u.dp(2.2f)))
       .background(Brush.verticalGradient(listOf(Color(0xD9050E12), Color(0x99050E12))))
       .drawBehind {
@@ -557,4 +566,40 @@ private fun DrawScope.drawHexagonFrame(
   }
   drawPath(outer, borderBrush)
   drawPath(hexagonPath(size.width, size.height, inset = u.px(0.7f)), Color(0xFF08141A))
+}
+
+@Composable
+private fun AboutPanel(
+  race: String?,
+  description: String,
+  u: CardUnit,
+) {
+  Column(
+    modifier = Modifier
+      .cardRect(u, 0f, PanelTopEdge - 5f, 100f, CardHeightUnits - PanelTopEdge + 5f)
+      .drawBehind { drawPanelShape(u) }
+      .padding(start = u.dp(6f), end = u.dp(6f), top = u.dp(6.5f), bottom = u.dp(4f)),
+    verticalArrangement = Arrangement.spacedBy(u.dp(1f)),
+  ) {
+    if (race != null) {
+      CardText(
+        text = race.uppercase(),
+        size = u.sp(3f),
+        minSize = u.sp(2f),
+        color = InkDimColor,
+        letterSpacingEm = 0.14f,
+        align = androidx.compose.ui.text.style.TextAlign.Start,
+        modifier = Modifier.fillMaxWidth(),
+      )
+    }
+    CardText(
+      text = description,
+      size = u.sp(3f),
+      color = InkColor,
+      weight = FontWeight.Normal,
+      align = androidx.compose.ui.text.style.TextAlign.Start,
+      maxLines = if (race != null) 5 else 6,
+      modifier = Modifier.fillMaxWidth(),
+    )
+  }
 }
