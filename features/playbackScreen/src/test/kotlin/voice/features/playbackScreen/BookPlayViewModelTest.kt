@@ -45,11 +45,20 @@ import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.core.copilot.SnipEvent
+import voice.core.xray.XRayEntityInfo
+import voice.core.xray.XRayManifest
+import voice.core.xray.card.PlayerCardData
+import voice.core.xray.card.PlayerCardEntry
+import voice.core.xray.card.PlayerCardFields
+import voice.core.xray.card.PlayerCardRepository
+import voice.core.xray.card.PlayerCardSet
+import voice.core.xray.card.composeAt
 import voice.features.sleepTimer.SleepTimerViewState
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid
@@ -129,6 +138,9 @@ class BookPlayViewModelTest {
     speechInputController = mockk(),
     xrayRepository = mockk {
       coEvery { manifestFor(any()) } returns null
+    },
+    playerCardRepository = mockk {
+      coEvery { cardsFor(any()) } returns null
     },
   )
 
@@ -488,12 +500,136 @@ class BookPlayViewModelTest {
     }
   }
 
+  @Test
+  fun `tapping a chip with card data opens the holo card composed at the playback position`() = scope.runTest {
+    val viewModel = viewModel(
+      xrayManifest = carlManifest,
+      playerCards = PlayerCardSet(
+        cards = mapOf(
+          "carl" to PlayerCardData(
+            id = "carl",
+            entries = listOf(
+              PlayerCardEntry(ms = 1.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "3"),
+              PlayerCardEntry(ms = 2.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "4"),
+              PlayerCardEntry(ms = 10.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9"),
+            ),
+          ),
+        ),
+        imageFolder = null,
+      ),
+    )
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = "Carl", actual = dialog.name)
+    assertEquals(expected = 4, actual = dialog.card.level)
+    assertEquals(expected = null, actual = dialog.lookImage)
+  }
+
+  @Test
+  fun `tapping a chip keeps the bottom sheet when the entity has no card`() = scope.runTest {
+    val viewModel = viewModel(
+      xrayManifest = carlManifest,
+      playerCards = PlayerCardSet(cards = emptyMap(), imageFolder = null),
+    )
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    assertEquals(
+      expected = BookPlayDialogViewState.XRayEntityDialog(title = "Carl", description = "A crawler.", image = null),
+      actual = viewModel.dialogState.value,
+    )
+  }
+
+  @Test
+  fun `tapping a chip keeps the bottom sheet when nothing on the card is revealed yet`() = scope.runTest {
+    val viewModel = viewModel(
+      xrayManifest = carlManifest,
+      playerCards = PlayerCardSet(
+        cards = mapOf(
+          "carl" to PlayerCardData(
+            id = "carl",
+            entries = listOf(PlayerCardEntry(ms = 1.hours.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9")),
+          ),
+        ),
+        imageFolder = null,
+      ),
+    )
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    assertIs<BookPlayDialogViewState.XRayEntityDialog>(viewModel.dialogState.value)
+  }
+
+  @Test
+  fun `tapping a chip keeps the bottom sheet when the book has no cards file`() = scope.runTest {
+    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = null)
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    assertIs<BookPlayDialogViewState.XRayEntityDialog>(viewModel.dialogState.value)
+  }
+
+  @Test
+  fun `the open card follows the live playback position when it is available`() = scope.runTest {
+    val liveFlow = MutableStateFlow<LivePlaybackState?>(null)
+    val viewModel = viewModel(experimentalPlaybackPersistence = true, livePlaybackFlow = liveFlow)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.cardPositionMs(openedAtMs = 1L)
+    }.test {
+      assertEquals(expected = 1L, actual = awaitItem())
+      assertEquals(expected = book.content.positionInChapter, actual = awaitItem())
+
+      liveFlow.value = LivePlaybackState(
+        bookId = book.id,
+        chapterId = book.chapters.first().id,
+        positionMs = 3.minutes.inWholeMilliseconds,
+        isPlaying = true,
+        playbackSpeed = 1F,
+      )
+      assertEquals(expected = 3.minutes.inWholeMilliseconds, actual = awaitItem())
+    }
+  }
+
+  @Test
+  fun `the open card dialog keeps the raw card so it can be composed at any position`() = scope.runTest {
+    val data = PlayerCardData(
+      id = "carl",
+      entries = listOf(
+        PlayerCardEntry(ms = 1.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "3"),
+        PlayerCardEntry(ms = 10.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9"),
+      ),
+    )
+    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = PlayerCardSet(mapOf("carl" to data), imageFolder = null))
+
+    viewModel.onXRayChipClick("carl")
+    yield()
+
+    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
+    assertEquals(expected = 2.5.minutes.inWholeMilliseconds, actual = dialog.openedAtMs)
+    assertEquals(expected = 3, actual = dialog.card.level)
+    assertEquals(expected = 9, actual = dialog.data.composeAt(11.minutes.inWholeMilliseconds).level)
+  }
+
+  private val carlManifest = XRayManifest(
+    entities = listOf(XRayEntityInfo(id = "carl", title = "Carl", description = "A crawler.")),
+    timeline = emptyList(),
+  )
+
   private fun viewModel(
     book: Book = this.book,
     experimentalPlaybackPersistence: Boolean = false,
     kioskMode: Boolean = false,
     livePlaybackFlow: MutableStateFlow<LivePlaybackState?> = MutableStateFlow(null),
     playStateFlow: MutableStateFlow<PlayStateManager.PlayState> = MutableStateFlow(PlayStateManager.PlayState.Paused),
+    xrayManifest: XRayManifest? = null,
+    playerCards: PlayerCardSet? = null,
   ): BookPlayViewModel {
     return BookPlayViewModel(
       bookRepository = mockk {
@@ -526,7 +662,10 @@ class BookPlayViewModelTest {
       copilotPipeline = mockk(),
       speechInputController = mockk(),
       xrayRepository = mockk {
-        coEvery { manifestFor(any()) } returns null
+        coEvery { manifestFor(any()) } returns xrayManifest
+      },
+      playerCardRepository = mockk<PlayerCardRepository> {
+        coEvery { cardsFor(any()) } returns playerCards
       },
     )
   }

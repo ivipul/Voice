@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.features.playbackScreen.view.BookPlayView
+import voice.features.playbackScreen.view.holocard.HoloCardDialog
 import voice.features.playbackScreen.view.CoPilotFeedOverlay
 import voice.features.sleepTimer.SleepTimerDialog
 import voice.navigation.Destination
@@ -140,6 +141,13 @@ fun BookPlayScreen(bookId: BookId) {
       }
       is BookPlayDialogViewState.XRayEntityDialog -> {
         XRayEntityBottomSheet(dialogState, viewModel)
+      }
+      is BookPlayDialogViewState.XRayCardDialog -> {
+        HoloCardDialog(
+          dialogState = dialogState,
+          positionMs = viewModel.cardPositionMs(dialogState.openedAtMs),
+          onDismiss = viewModel::dismissDialog,
+        )
       }
       is BookPlayDialogViewState.SleepTimer -> {
         SleepTimerDialog(

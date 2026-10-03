@@ -2,6 +2,10 @@ package voice.features.playbackScreen
 
 import androidx.compose.runtime.Immutable
 import voice.core.playback.misc.Decibel
+import voice.core.xray.card.ComposedPlayerCard
+import voice.core.xray.card.PlayerCardData
+import voice.core.xray.card.composeAt
+import voice.core.xray.card.hasGameStats
 import voice.features.sleepTimer.SleepTimerViewState
 import kotlin.time.Duration
 
@@ -71,4 +75,23 @@ internal sealed interface BookPlayDialogViewState {
     val description: String,
     val image: String?,
   ) : BookPlayDialogViewState
+
+  /**
+   * The raw [data] and every look's resolved [imageUris] are kept so the card can follow the playback position
+   * while it is open. [card] is how it looked when it was opened.
+   */
+  data class XRayCardDialog(
+    val name: String,
+    val description: String,
+    val data: PlayerCardData,
+    val imageUris: Map<String, String>,
+    val openedAtMs: Long,
+  ) : BookPlayDialogViewState {
+
+    val card: ComposedPlayerCard get() = data.composeAt(openedAtMs)
+
+    val plain: Boolean get() = !data.hasGameStats
+
+    val lookImage: String? get() = card.look?.image?.let(imageUris::get)
+  }
 }

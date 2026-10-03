@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.data.Book
@@ -53,9 +54,12 @@ import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.core.copilot.SnipEvent
+import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
+import voice.core.xray.card.PlayerCardRepository
+import voice.core.xray.card.composeAt
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -80,7 +84,7 @@ class BookPlayViewModel(
   private val bookmarkRepository: BookmarkRepo,
   private val volumeGainFormatter: VolumeGainFormatter,
   private val batteryOptimization: BatteryOptimization,
-  dispatcherProvider: DispatcherProvider,
+  private val dispatcherProvider: DispatcherProvider,
   @SleepTimerPreferenceStore
   private val sleepTimerPreferenceStore: DataStore<SleepTimerPreference>,
   @SeekTimeStore
@@ -95,6 +99,7 @@ class BookPlayViewModel(
   private val copilotPipeline: CoPilotPipeline,
   private val speechInputController: SpeechInputController,
   private val xrayRepository: XRayRepository,
+  private val playerCardRepository: PlayerCardRepository,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -370,12 +375,45 @@ class BookPlayViewModel(
     scope.launch {
       val book = currentBook() ?: return@launch
       val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
-      dialogState.value = BookPlayDialogViewState.XRayEntityDialog(
+      dialogState.value = playerCardDialog(book, entity) ?: BookPlayDialogViewState.XRayEntityDialog(
         title = entity.title,
         description = entity.description,
         image = entity.image,
       )
     }
+  }
+
+  private suspend fun playerCardDialog(
+    book: Book,
+    entity: XRayEntityInfo,
+  ): BookPlayDialogViewState.XRayCardDialog? = withContext(dispatcherProvider.io) {
+    val cards = playerCardRepository.cardsFor(book) ?: return@withContext null
+    val data = cards.card(entity.id) ?: return@withContext null
+    val positionMs = book.content.positionInChapter
+    if (!data.composeAt(positionMs).hasRevealedData) return@withContext null
+    BookPlayDialogViewState.XRayCardDialog(
+      name = entity.title,
+      description = entity.description,
+      data = data,
+      imageUris = data.entries
+        .mapNotNull { it.image }
+        .distinct()
+        .mapNotNull { path -> cards.imageUri(path)?.let { path to it.toString() } }
+        .toMap(),
+      openedAtMs = positionMs,
+    )
+  }
+
+  /** The playback position the open holo card follows, so stats and looks reveal as the book plays. */
+  @Composable
+  fun cardPositionMs(openedAtMs: Long): Long {
+    val persisted by remember(bookId) { bookRepository.flow(bookId).filterNotNull() }.collectAsState(initial = null)
+    val live = if (experimentalPlaybackPersistenceFeatureFlag.get()) {
+      remember(bookId) { player.livePlaybackStateFlow(bookId) }.collectAsState(null).value
+    } else {
+      null
+    }
+    return live?.positionMs ?: persisted?.content?.positionInChapter ?: openedAtMs
   }
 
   @Composable
