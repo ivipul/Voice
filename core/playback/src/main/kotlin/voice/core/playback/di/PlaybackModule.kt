@@ -115,7 +115,7 @@ interface PlaybackModule {
 // Android Auto's player row has two left slots, which Media3 fills from SLOT_BACK and SLOT_FORWARD
 // (the mini player card shows only these), and a right-aligned group, which it fills from
 // SLOT_OVERFLOW in list order; every other slot is dropped. So Ask and Snip take the left slots
-// and the 15 s rewind and 30 s forward buttons sit together on the right.
+// and Recap, the 15 s rewind and the 30 s forward buttons sit together on the right.
 internal fun mediaButtonPreferences(context: Context): List<CommandButton> = listOf(
   CommandButton.Builder(CommandButton.ICON_UNDEFINED)
     .setCustomIconResId(R.drawable.ic_copilot_ask)
@@ -128,6 +128,12 @@ internal fun mediaButtonPreferences(context: Context): List<CommandButton> = lis
     .setDisplayName(context.getString(StringsR.string.copilot_action_snip))
     .setSessionCommand(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
     .setSlots(CommandButton.SLOT_FORWARD)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_recap)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_recap))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_RECAP_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_OVERFLOW)
     .build(),
   CommandButton.Builder(CommandButton.ICON_SKIP_BACK_15)
     .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
