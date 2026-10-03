@@ -1,6 +1,7 @@
 package voice.core.copilot
 
 import voice.core.data.Book
+import voice.core.data.CoPilotVoiceSettings
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -9,11 +10,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * user hasn't reached yet. Empty by default; add entries as specific spoilers come up.
  */
 val spoilerBlocklist: List<String> = emptyList()
-
-private const val SPOKEN_ANSWER_STYLE = "Keep your answer under 15-20 seconds when spoken (roughly 40-60 words), " +
-  "and don't ramble or add extra detail beyond what was asked. Respond in plain, natural spoken language only: " +
-  "no markdown, no headings, no bullet points, no asterisks, no URLs or links, no code, and no text that " +
-  "wouldn't make sense read aloud by a text-to-speech engine."
 
 /**
  * The book title + current timestamp fact is injected as a hard system-prompt fact on every
@@ -34,26 +30,33 @@ private fun spoilerGuard(): String {
 
 /**
  * System prompt for a spoken answer (Open Mic, Auto-Identify, Catch-Me-Up): a short,
- * TTS-friendly response grounded in the current book and position.
+ * TTS-friendly response grounded in the current book and position, in the voice [style] sets.
  */
-fun spokenAnswerSystemPrompt(book: Book, task: String): String =
-  "You are a voice assistant for an audiobook app. ${bookContextFact(book)} $task $SPOKEN_ANSWER_STYLE${spoilerGuard()}"
+internal fun spokenAnswerSystemPrompt(book: Book, task: String, style: AnswerStyle): String =
+  "${style.persona} ${bookContextFact(book)} $task ${style.rules}${spoilerGuard()}"
 
 /**
- * System prompt for the Feed's typed Ask flow: same voice-assistant framing and length
- * constraint as the spoken answer, since Ask questions are themselves usually captured via
- * speech and displayed as short chat bubbles.
+ * System prompt for the Feed's typed Ask flow: same persona and length constraint as the spoken
+ * answer, since Ask questions are themselves usually captured via speech and displayed as short
+ * chat bubbles.
  */
-fun askSystemPrompt(book: Book): String =
-  "You are a voice assistant for an audiobook app, answering a listener's question about " +
-    "the book they're listening to. ${bookContextFact(book)} $SPOKEN_ANSWER_STYLE${spoilerGuard()}"
+internal fun askSystemPrompt(book: Book, style: AnswerStyle): String =
+  "${style.persona} You are answering a listener's question about the book they're listening to. " +
+    "${bookContextFact(book)} ${style.rules}${spoilerGuard()}"
 
 /**
  * System prompt for Snip & Synthesize's text capture: not a summary, an evocative freeze-frame
  * of the single most vivid beat in the excerpt - a striking line of dialogue, a sudden action,
  * an emotional gut-punch - written the way you'd caption a comic panel, not a bullet list.
  */
-fun snipHighlightSystemPrompt(book: Book): String =
+internal fun snipHighlightSystemPrompt(book: Book, settings: CoPilotVoiceSettings, flavor: SystemFlavor): String =
+  if (settings.useSystemAiVoice) {
+    "${bookContextFact(book)} ${systemAiSnipRules(settings, flavor)}${spoilerGuard()}"
+  } else {
+    plainSnipHighlightSystemPrompt(book)
+  }
+
+private fun plainSnipHighlightSystemPrompt(book: Book): String =
   "You are capturing the single most vivid, emotionally charged moment from a short excerpt of an " +
     "audiobook, for the listener's own notes. ${bookContextFact(book)} Write 1-2 sentences that capture " +
     "the feeling, urgency, or drama of that moment - it might be a line of dialogue, a sudden action, or " +

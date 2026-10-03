@@ -19,6 +19,9 @@ interface CoPilotPipeline {
   /** Catch-Me-Up: recaps the last 30 minutes, opening with "In the last 30 minutes,". */
   suspend fun catchMeUp(bookId: BookId): String
 
+  /** What to say when a co-pilot round trip fails outright, worded in the current voice. */
+  suspend fun failureMessage(): String
+
   /** Snip & Synthesize: silently extracts a 3-bullet summary of the last 3 minutes to the Feed. */
   suspend fun snip(bookId: BookId)
 }

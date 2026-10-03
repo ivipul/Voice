@@ -1,10 +1,14 @@
 package voice.core.copilot
 
+import androidx.datastore.core.DataStore
 import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.test.runTest
 import voice.core.copilot.frame.SnipFrameRunner
 import voice.core.data.Book
@@ -12,9 +16,11 @@ import voice.core.data.BookContent
 import voice.core.data.BookId
 import voice.core.data.Chapter
 import voice.core.data.ChapterId
+import voice.core.data.CoPilotVoiceSettings
 import voice.core.data.repo.BookRepository
 import voice.core.transcript.TranscriptRepository
 import java.time.Instant
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -37,12 +43,15 @@ class RealCoPilotPipelineTest {
     coEvery { isAvailable() } returns false
   }
 
+  private val voiceStore = MemoryDataStore(CoPilotVoiceSettings())
+
   private val pipeline = RealCoPilotPipeline(
     bookRepository = bookRepository,
     transcriptRepository = transcriptRepository,
     jevRouter = jevRouter,
     geminiClient = geminiClient,
     coPilotRepository = coPilotRepository,
+    voiceSettingsStore = voiceStore,
     snipFrameRunner = snipFrameRunner,
   )
 
@@ -120,6 +129,7 @@ class RealCoPilotPipelineTest {
 
   @Test
   fun `autoIdentify falls back when there's no transcript at all`() = runTest {
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
     coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
 
     val result = pipeline.autoIdentify(book.id)
@@ -143,6 +153,7 @@ class RealCoPilotPipelineTest {
 
   @Test
   fun `catchMeUp falls back when there's no transcript yet`() = runTest {
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
     coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
 
     val result = pipeline.catchMeUp(book.id)
@@ -242,6 +253,137 @@ class RealCoPilotPipelineTest {
 
     assertTrue(coPilotRepository.allMessagesByBook.value[book.id].orEmpty().isEmpty())
   }
+
+  @Test
+  fun `fallbacks speak in the System AI voice by default`() = runTest {
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns null
+
+    val result = pipeline.catchMeUp(book.id)
+
+    assertTrue(result.startsWith("Warning!"))
+  }
+
+  @Test
+  fun `ask uses the System AI persona with a 60-80 word budget by default`() = runTest {
+    val systemPrompt = slot<String>()
+    coEvery { jevRouter.needsTranscriptContext(any()) } returns false
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "the answer"
+
+    assertEquals("the answer", pipeline.ask(book.id, "who is Mordecai?"))
+
+    assertTrue(systemPrompt.captured.contains("System AI from Dungeon Crawler Carl"))
+    assertTrue(systemPrompt.captured.contains("60-80 words"))
+    assertTrue(systemPrompt.captured.contains("Occasional swearing"))
+    assertFalse(systemPrompt.captured.contains("Keep it clean"))
+  }
+
+  @Test
+  fun `keep it clean swaps the crude allowance for a no swearing no sexual lines rule`() = runTest {
+    voiceStore.updateData { it.copy(keepItClean = true) }
+    val systemPrompt = slot<String>()
+    coEvery { jevRouter.needsTranscriptContext(any()) } returns false
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "the answer"
+
+    assertEquals("the answer", pipeline.ask(book.id, "who is Mordecai?"))
+
+    assertTrue(systemPrompt.captured.contains("Keep it clean: no swearing or profanity, and no sexual"))
+    assertFalse(systemPrompt.captured.contains("Occasional swearing"))
+  }
+
+  @Test
+  fun `turning the System AI voice off restores the plain assistant and ignores keep it clean`() = runTest {
+    voiceStore.updateData { CoPilotVoiceSettings(useSystemAiVoice = false, keepItClean = true) }
+    val systemPrompt = slot<String>()
+    coEvery { jevRouter.needsTranscriptContext(any()) } returns false
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "the answer"
+
+    assertEquals("the answer", pipeline.ask(book.id, "who is Mordecai?"))
+
+    assertTrue(systemPrompt.captured.contains("You are a voice assistant for an audiobook app."))
+    assertFalse(systemPrompt.captured.contains("System AI"))
+    assertFalse(systemPrompt.captured.contains("Keep it clean"))
+    assertTrue(systemPrompt.captured.contains("40-60 words"))
+    assertFalse(systemPrompt.captured.contains("60-80 words"))
+  }
+
+  @Test
+  fun `snip writes the caption in the System AI voice by default`() = runTest {
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertTrue(systemPrompt.captured.contains("System AI from Dungeon Crawler Carl"))
+    assertTrue(systemPrompt.captured.contains("Occasional swearing"))
+  }
+
+  @Test
+  fun `snip keep it clean forbids swearing and sexual lines`() = runTest {
+    voiceStore.updateData { it.copy(keepItClean = true) }
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertTrue(systemPrompt.captured.contains("Keep it clean: no swearing or profanity, and no sexual"))
+  }
+
+  @Test
+  fun `snip keeps the plain caption prompt when the System AI voice is off`() = runTest {
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "the last three minutes"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "Nice."
+
+    pipeline.snip(book.id)
+
+    assertFalse(systemPrompt.captured.contains("System AI"))
+    assertTrue(systemPrompt.captured.contains("single most vivid, emotionally charged moment"))
+  }
+
+  @Test
+  fun `failure message is in the System AI voice by default and plain when it is off`() = runTest {
+    assertTrue(pipeline.failureMessage().startsWith("System message."))
+
+    voiceStore.updateData { it.copy(useSystemAiVoice = false) }
+
+    assertEquals("Sorry, something went wrong.", pipeline.failureMessage())
+  }
+
+  @Test
+  fun `catchMeUp gets the 80-100 word budget and never a banner flavor`() = runTest {
+    val systemPrompt = slot<String>()
+    coEvery { transcriptRepository.textForPrecedingWindow(book, any()) } returns "plot"
+    coEvery { geminiClient.ask(capture(systemPrompt), any()) } returns "In the last 30 minutes, things happened."
+
+    repeat(30) { assertTrue(pipeline.catchMeUp(book.id).isNotEmpty()) }
+
+    assertTrue(systemPrompt.captured.contains("80-100 words"))
+    assertTrue(systemPrompt.captured.contains(SystemFlavor.Plain.instruction))
+  }
+
+  @Test
+  fun `banner flavors are rare and plain answers dominate`() {
+    val random = Random(42)
+    val counts = (1..1000).map { pickSystemFlavor(random) }.groupingBy { it }.eachCount()
+
+    assertTrue(SystemFlavor.entries.all { (counts[it] ?: 0) > 0 })
+    assertTrue(counts.getValue(SystemFlavor.Plain) in 550..750)
+    assertTrue(counts.getValue(SystemFlavor.Achievement) in 60..180)
+  }
+
+  @Test
+  fun `defaults enable the System AI voice and leave keep it clean off`() {
+    assertEquals(CoPilotVoiceSettings(useSystemAiVoice = true, keepItClean = false), CoPilotVoiceSettings())
+  }
+}
+
+private class MemoryDataStore<T>(initial: T) : DataStore<T> {
+  private val value = MutableStateFlow(initial)
+  override val data: Flow<T> get() = value
+  override suspend fun updateData(transform: suspend (t: T) -> T): T = value.updateAndGet { transform(it) }
 }
 
 private fun fakeBook(): Book {

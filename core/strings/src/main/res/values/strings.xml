@@ -101,7 +101,7 @@
     <!-- Snackbar shown when microphone permission is required for Ask. -->
     <string name="copilot.permission.microphone_required">Microphone access is needed for Ask</string>
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
-    <string name="copilot.settings.title">Co-Pilot Button Mapping</string>
+    <string name="copilot.settings.title">Co-Pilot</string>
     <!-- Section header for the co-pilot settings screen. -->
     <string name="copilot.settings.description">Choose what each headset button press does.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
@@ -124,6 +124,14 @@
     <string name="copilot.settings.action.catch_me_up">Catch-Me-Up Recap</string>
     <!-- Trigger action option: silently capture an evocative moment to the Feed. -->
     <string name="copilot.settings.action.snip">Snip &amp; Synthesize</string>
+    <!-- Switch title: answer in the Dungeon Crawler Carl System AI's voice. -->
+    <string name="copilot.settings.voice.system_ai.title">Use System AI voice</string>
+    <!-- Switch summary for the System AI voice setting. -->
+    <string name="copilot.settings.voice.system_ai.summary">Answers in the snarky, deadpan voice of the dungeon\'s System AI.</string>
+    <!-- Switch title: forbid swearing and sexual lines in the System AI voice. -->
+    <string name="copilot.settings.voice.keep_clean.title">Keep it clean</string>
+    <!-- Switch summary for the keep-it-clean setting. -->
+    <string name="copilot.settings.voice.keep_clean.summary">No swearing or sexual lines. Handy for demos.</string>
     <!-- Content description for a cover preview that can be selected. -->
     <string name="cover.content_description.selectable">Shows cover to choose</string>
     <!-- Content description for an icon indicating the author in cover search results. -->

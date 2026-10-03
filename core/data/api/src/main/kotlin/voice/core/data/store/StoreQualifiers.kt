@@ -21,6 +21,9 @@ public annotation class SeekForwardTimeStore
 public annotation class CoPilotButtonMappingStore
 
 @Qualifier
+public annotation class CoPilotVoiceSettingsStore
+
+@Qualifier
 public annotation class SleepTimerPreferenceStore
 
 @Qualifier

@@ -15,6 +15,7 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import voice.core.data.BookId
 import voice.core.data.CoPilotButtonMapping
+import voice.core.data.CoPilotVoiceSettings
 import voice.core.data.GridMode
 import voice.core.data.ThemeColorScheme
 import voice.core.data.ThemeMode
@@ -122,6 +123,17 @@ public interface StoreModule {
       serializer = CoPilotButtonMapping.serializer(),
       defaultValue = CoPilotButtonMapping(),
       fileName = "copilotButtonMapping",
+    )
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @CoPilotVoiceSettingsStore
+  private fun copilotVoiceSettings(factory: VoiceDataStoreFactory): DataStore<CoPilotVoiceSettings> {
+    return factory.create(
+      serializer = CoPilotVoiceSettings.serializer(),
+      defaultValue = CoPilotVoiceSettings(),
+      fileName = "copilotVoiceSettings",
     )
   }
 
