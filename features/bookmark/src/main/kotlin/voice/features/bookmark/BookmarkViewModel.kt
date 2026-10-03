@@ -3,6 +3,7 @@ package voice.features.bookmark
 import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,10 @@ import voice.core.featureflag.KioskModeFeatureFlagQualifier
 import voice.core.playback.PlayerController
 import voice.core.playback.playstate.PlayStateManager
 import voice.core.strings.R
+import voice.core.strips.AvailableStrip
+import voice.core.strips.StripRepository
+import voice.core.strips.bookPositionOf
+import voice.core.strips.isUnlockedAt
 import voice.core.ui.formatTime
 import voice.navigation.Navigator
 import java.time.Instant
@@ -48,6 +53,7 @@ class BookmarkViewModel(
   private val playerController: PlayerController,
   private val navigator: Navigator,
   private val context: Context,
+  private val stripRepository: StripRepository,
   @KioskModeFeatureFlagQualifier
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
   @Assisted
@@ -57,6 +63,10 @@ class BookmarkViewModel(
   private val scope = MainScope()
   private var bookmarks by mutableStateOf<List<Bookmark>>(emptyList())
   private var chapters by mutableStateOf<List<Chapter>>(emptyList())
+  private var strips by mutableStateOf<List<AvailableStrip>>(emptyList())
+  private var savedBookPosition by mutableStateOf(0L)
+  private var unlockedStripChapters by mutableStateOf<Set<Int>>(emptySet())
+  private var activeStrip by mutableStateOf<AvailableStrip?>(null)
 
   private var shouldScrollTo by mutableStateOf<Bookmark.Id?>(null)
   private var dialogViewState: BookmarkDialogViewState by mutableStateOf(BookmarkDialogViewState.None)
@@ -72,7 +82,17 @@ class BookmarkViewModel(
         bookmarks = bookmarkRepo.bookmarks(book.content)
           .sortedByDescending { it.addedAt }
         chapters = book.chapters
+        savedBookPosition = book.position
+        strips = stripRepository.stripsFor(book.content.name)
       }
+    }
+    val livePlayback by remember(bookId) { playerController.livePlaybackStateFlow(bookId) }
+      .collectAsState(initial = null)
+    val currentBookPosition = livePlayback?.let { chapters.bookPositionOf(it.chapterId, it.positionMs) }
+      ?: savedBookPosition
+    LaunchedEffect(currentBookPosition, strips) {
+      val reached = strips.filter { it.isUnlockedAt(currentBookPosition) }.map { it.manifest.chapter }
+      unlockedStripChapters = unlockedStripChapters + reached
     }
     return BookmarkViewState(
       bookmarks = bookmarks.map { bookmark ->
@@ -107,7 +127,17 @@ class BookmarkViewModel(
       },
       shouldScrollTo = shouldScrollTo,
       dialogViewState = dialogViewState,
+      strips = strips.filter { it.manifest.chapter in unlockedStripChapters },
+      activeStrip = activeStrip,
     )
+  }
+
+  fun onStripClick(strip: AvailableStrip) {
+    activeStrip = strip
+  }
+
+  fun onStripClose() {
+    activeStrip = null
   }
 
   private fun kioskModeViewState(): BookmarkViewState {

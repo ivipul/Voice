@@ -38,6 +38,8 @@
     <string name="bookmark.tab.strips">Strips</string>
     <!-- Empty-state message on the Strips tab before any comic panels exist. -->
     <string name="bookmark.strips.empty">Generated comic panels will show up here once Snip &amp; Synthesize is wired up.</string>
+    <!-- Label under a strip card on the Strips tab. %1$d is the chapter number. -->
+    <string name="bookmark.strips.chapter">Chapter %1$d</string>
     <!-- Generic add action and content description. -->
     <string name="common.action.add">Add</string>
     <!-- Generic content description for closing the current screen or dialog. -->

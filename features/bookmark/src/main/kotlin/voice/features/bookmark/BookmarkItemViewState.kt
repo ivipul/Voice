@@ -1,6 +1,7 @@
 package voice.features.bookmark
 
 import voice.core.data.Bookmark
+import voice.core.strips.AvailableStrip
 
 data class BookmarkItemViewState(
   val title: String,
@@ -13,6 +14,8 @@ data class BookmarkViewState(
   val bookmarks: List<BookmarkItemViewState>,
   val shouldScrollTo: Bookmark.Id?,
   val dialogViewState: BookmarkDialogViewState,
+  val strips: List<AvailableStrip> = emptyList(),
+  val activeStrip: AvailableStrip? = null,
 )
 
 sealed interface BookmarkDialogViewState {
