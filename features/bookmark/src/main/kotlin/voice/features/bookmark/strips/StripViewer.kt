@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import voice.core.strips.AvailableStrip
 import voice.core.strips.heroFrame
+import voice.core.ui.rememberPlayIconPainter
 import voice.core.ui.icons.VoiceIcons
 import voice.core.strings.R as StringsR
 
@@ -120,10 +121,9 @@ fun StripViewer(
       .pointerInput(Unit) {
         detectTapGestures { offset ->
           if (offset.x < size.width / 3f) {
-            viewModel.seekTo(viewState.previousFrameStartMs)
-          } else {
-            val next = viewState.nextFrameStartMs
-            if (next == null) onClose() else viewModel.seekTo(next)
+            viewModel.onPrevious()
+          } else if (!viewModel.onNext()) {
+            onClose()
           }
         }
       }
@@ -167,6 +167,21 @@ fun StripViewer(
           }
         }
       }
+    }
+    IconButton(
+      onClick = viewModel::togglePlaying,
+      modifier = Modifier
+        .align(Alignment.BottomStart)
+        .systemBarsPadding()
+        .padding(8.dp),
+    ) {
+      Icon(
+        painter = rememberPlayIconPainter(playing = viewState.isPlaying),
+        contentDescription = stringResource(
+          id = if (viewState.isPlaying) StringsR.string.playback_action_pause else StringsR.string.playback_action_play,
+        ),
+        tint = Color.White,
+      )
     }
     IconButton(
       onClick = onClose,
