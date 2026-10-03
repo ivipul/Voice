@@ -127,6 +127,20 @@ public interface StoreModule {
 
   @Provides
   @SingleIn(AppScope::class)
+  @SystemAiVoiceStore
+  private fun systemAiVoice(factory: VoiceDataStoreFactory): DataStore<Boolean> {
+    return factory.boolean("systemAiVoice", defaultValue = true)
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
+  @SystemAiKeepCleanStore
+  private fun systemAiKeepClean(factory: VoiceDataStoreFactory): DataStore<Boolean> {
+    return factory.boolean("systemAiKeepClean", defaultValue = false)
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
   @SleepTimerPreferenceStore
   private fun sleepTimerPreference(factory: VoiceDataStoreFactory): DataStore<SleepTimerPreference> {
     return factory.create(

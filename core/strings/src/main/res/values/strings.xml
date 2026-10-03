@@ -89,9 +89,17 @@
     <!-- Snackbar shown when microphone permission is required for Ask. -->
     <string name="copilot.permission.microphone_required">Microphone access is needed for Ask</string>
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
-    <string name="copilot.settings.title">Co-Pilot Button Mapping</string>
+    <string name="copilot.settings.title">Co-Pilot</string>
     <!-- Section header for the co-pilot settings screen. -->
     <string name="copilot.settings.description">Choose what each headset button press does.</string>
+    <!-- Switch label: answers and Snip captions are written as the System AI from Dungeon Crawler Carl. -->
+    <string name="copilot.settings.system_ai_voice.title">Use System AI voice</string>
+    <!-- Supporting text under the System AI voice switch. -->
+    <string name="copilot.settings.system_ai_voice.description">Co-pilot answers and Snip captions in the sarcastic voice of the System AI.</string>
+    <!-- Switch label: forbids swearing and sexual lines in System AI voice answers. -->
+    <string name="copilot.settings.keep_clean.title">Keep it clean</string>
+    <!-- Supporting text under the Keep it clean switch. -->
+    <string name="copilot.settings.keep_clean.description">No swearing or sexual lines. Handy for demos.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
     <string name="copilot.settings.trigger.single_next">Single tap NEXT</string>
     <!-- Settings row label for the single-tap PREVIOUS trigger slot. -->

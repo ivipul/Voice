@@ -10,6 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -33,6 +34,8 @@ import kotlinx.coroutines.launch
 import voice.core.data.CoPilotButtonMapping
 import voice.core.data.CoPilotTriggerAction
 import voice.core.data.store.CoPilotButtonMappingStore
+import voice.core.data.store.SystemAiKeepCleanStore
+import voice.core.data.store.SystemAiVoiceStore
 import voice.core.ui.VoiceTheme
 import voice.core.ui.icons.VoiceIcons
 import voice.navigation.Destination
@@ -91,16 +94,28 @@ private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerA
 fun CoPilotSettingsScreen(
   navigator: Navigator,
   mappingStore: DataStore<CoPilotButtonMapping>,
+  systemAiVoiceStore: DataStore<Boolean>,
+  keepCleanStore: DataStore<Boolean>,
 ) {
   val mapping by remember { mappingStore.data }.collectAsState(initial = CoPilotButtonMapping())
+  val systemAiVoice by remember { systemAiVoiceStore.data }.collectAsState(initial = true)
+  val keepClean by remember { keepCleanStore.data }.collectAsState(initial = false)
   val coroutineScope = rememberCoroutineScope()
   CoPilotSettingsScreen(
     mapping = mapping,
+    systemAiVoice = systemAiVoice,
+    keepClean = keepClean,
     onClose = navigator::goBack,
     onSelect = { slot, action ->
       coroutineScope.launch {
         mappingStore.updateData { it.with(slot, action) }
       }
+    },
+    onSystemAiVoiceChange = { enabled ->
+      coroutineScope.launch { systemAiVoiceStore.updateData { enabled } }
+    },
+    onKeepCleanChange = { enabled ->
+      coroutineScope.launch { keepCleanStore.updateData { enabled } }
     },
   )
 }
@@ -108,8 +123,12 @@ fun CoPilotSettingsScreen(
 @Composable
 private fun CoPilotSettingsScreen(
   mapping: CoPilotButtonMapping,
+  systemAiVoice: Boolean,
+  keepClean: Boolean,
   onClose: () -> Unit,
   onSelect: (TriggerSlot, CoPilotTriggerAction) -> Unit,
+  onSystemAiVoiceChange: (Boolean) -> Unit,
+  onKeepCleanChange: (Boolean) -> Unit,
 ) {
   Scaffold(
     topBar = {
@@ -127,6 +146,20 @@ private fun CoPilotSettingsScreen(
     },
   ) { contentPadding ->
     Column(modifier = Modifier.padding(contentPadding)) {
+      SwitchRow(
+        title = StringsR.string.copilot_settings_system_ai_voice_title,
+        description = StringsR.string.copilot_settings_system_ai_voice_description,
+        checked = systemAiVoice,
+        onCheckedChange = onSystemAiVoiceChange,
+      )
+      if (systemAiVoice) {
+        SwitchRow(
+          title = StringsR.string.copilot_settings_keep_clean_title,
+          description = StringsR.string.copilot_settings_keep_clean_description,
+          checked = keepClean,
+          onCheckedChange = onKeepCleanChange,
+        )
+      }
       Text(
         text = stringResource(id = StringsR.string.copilot_settings_description),
         style = MaterialTheme.typography.bodyMedium,
@@ -140,6 +173,21 @@ private fun CoPilotSettingsScreen(
         )
       }
     }
+  }
+}
+
+@Composable
+private fun SwitchRow(
+  title: Int,
+  description: Int,
+  checked: Boolean,
+  onCheckedChange: (Boolean) -> Unit,
+) {
+  ListItem(
+    supportingContent = { Text(text = stringResource(id = description)) },
+    trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange) },
+  ) {
+    Text(text = stringResource(id = title))
   }
 }
 
@@ -181,8 +229,12 @@ private fun CoPilotSettingsPreview() {
   VoiceTheme {
     CoPilotSettingsScreen(
       mapping = CoPilotButtonMapping(),
+      systemAiVoice = true,
+      keepClean = false,
       onClose = {},
       onSelect = { _, _ -> },
+      onSystemAiVoiceChange = {},
+      onKeepCleanChange = {},
     )
   }
 }
@@ -195,10 +247,17 @@ interface CoPilotSettingsProvider {
   fun coPilotSettingsNavEntryProvider(
     navigator: Navigator,
     @CoPilotButtonMappingStore mappingStore: DataStore<CoPilotButtonMapping>,
+    @SystemAiVoiceStore systemAiVoiceStore: DataStore<Boolean>,
+    @SystemAiKeepCleanStore keepCleanStore: DataStore<Boolean>,
   ): NavEntryProvider<*> =
     NavEntryProvider<Destination.CoPilotSettings> { key ->
       NavEntry(key) {
-        CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore)
+        CoPilotSettingsScreen(
+          navigator = navigator,
+          mappingStore = mappingStore,
+          systemAiVoiceStore = systemAiVoiceStore,
+          keepCleanStore = keepCleanStore,
+        )
       }
     }
 }
