@@ -19,7 +19,7 @@ class MediaButtonPreferencesTest {
       expected = listOf(
         CommandButton.SLOT_BACK,
         CommandButton.SLOT_FORWARD,
-        CommandButton.SLOT_OVERFLOW,
+        CommandButton.SLOT_FORWARD_SECONDARY,
         CommandButton.SLOT_OVERFLOW,
       ),
       actual = buttons.map { it.slots[0] },
