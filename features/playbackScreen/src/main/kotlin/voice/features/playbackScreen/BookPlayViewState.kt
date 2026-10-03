@@ -70,21 +70,17 @@ internal sealed interface BookPlayDialogViewState {
   @JvmInline
   value class SleepTimer(val viewState: SleepTimerViewState) : BookPlayDialogViewState
 
-  data class XRayEntityDialog(
-    val title: String,
-    val description: String,
-    val image: String?,
-  ) : BookPlayDialogViewState
-
   /**
-   * The raw [data] and every look's resolved [imageUris] are kept so the card can follow the playback position
-   * while it is open. [card] is how it looked when it was opened.
+   * Every X-Ray chip opens one. An entity with card data keeps its raw [data] and every look's resolved
+   * [imageUris] so the card can follow the playback position while it is open; [card] is how it looked when it was
+   * opened. Anything else gets empty [data], shows the X-Ray [description] and, if it has one, the X-Ray [portrait].
    */
   data class XRayCardDialog(
     val name: String,
     val description: String,
     val data: PlayerCardData,
     val imageUris: Map<String, String>,
+    val portrait: String?,
     val openedAtMs: Long,
   ) : BookPlayDialogViewState {
 

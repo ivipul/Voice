@@ -12,9 +12,12 @@ import kotlin.math.sin
 internal const val TiltRangeX = 22f
 internal const val TiltRangeY = 28f
 
+/** Without a sensor reading for this long the card goes back to its idle sway. */
+private const val DeviceTimeoutSeconds = 1.5f
+
 /**
- * Where the card is tilted to and where the light sits. Follows the finger while it is down, sways gently
- * otherwise. With [reducedMotion] there is no idle sway and no smoothing, the card only moves with the finger.
+ * Where the card is tilted to and where the light sits. Follows the finger while it is down, then the phone's
+ * motion sensor, and sways gently when neither is available. With [reducedMotion] there is no idle sway and no smoothing, the card only moves with the finger.
  */
 @Stable
 internal class HoloTiltState(private val reducedMotion: Boolean) {
@@ -37,6 +40,10 @@ internal class HoloTiltState(private val reducedMotion: Boolean) {
   private var targetPointerX = 0.5f
   private var targetPointerY = 0.5f
   private var touching = false
+  private var deviceRotationX = 0f
+  private var deviceRotationY = 0f
+  private var lastDeviceEventSeconds = Float.NEGATIVE_INFINITY
+  private var nowSeconds = 0f
 
   /** Tilt around the vertical axis as -0.5..0.5, used to shift parallax layers. */
   val offsetX: Float get() = rotationY / TiltRangeY
@@ -60,6 +67,17 @@ internal class HoloTiltState(private val reducedMotion: Boolean) {
     targetPointerY = ny
   }
 
+  /** Tilt of the phone, in card degrees. Ignored with reduced motion; a finger on the card takes over. */
+  fun onDeviceTilt(
+    rotationX: Float,
+    rotationY: Float,
+  ) {
+    if (reducedMotion) return
+    deviceRotationX = rotationX
+    deviceRotationY = rotationY
+    lastDeviceEventSeconds = nowSeconds
+  }
+
   fun onRelease() {
     touching = false
     targetRotationX = 0f
@@ -72,11 +90,19 @@ internal class HoloTiltState(private val reducedMotion: Boolean) {
     timeSeconds: Float,
     deltaSeconds: Float,
   ) {
+    nowSeconds = timeSeconds
     if (!touching && !reducedMotion) {
-      targetRotationY = sin(timeSeconds * 0.9f) * 9f
-      targetRotationX = cos(timeSeconds * 0.7f) * 5f
-      targetPointerX = 0.5f + sin(timeSeconds * 0.9f) * 0.32f
-      targetPointerY = 0.5f + cos(timeSeconds * 0.7f) * 0.22f
+      if (timeSeconds - lastDeviceEventSeconds < DeviceTimeoutSeconds) {
+        targetRotationX = deviceRotationX
+        targetRotationY = deviceRotationY
+        targetPointerX = 0.5f + deviceRotationY / TiltRangeY
+        targetPointerY = 0.5f - deviceRotationX / TiltRangeX
+      } else {
+        targetRotationY = sin(timeSeconds * 0.9f) * 9f
+        targetRotationX = cos(timeSeconds * 0.7f) * 5f
+        targetPointerX = 0.5f + sin(timeSeconds * 0.9f) * 0.32f
+        targetPointerY = 0.5f + cos(timeSeconds * 0.7f) * 0.22f
+      }
     }
     val rotationBlend = if (reducedMotion) 1f else 1f - exp(-8f * deltaSeconds)
     val pointerBlend = if (reducedMotion) 1f else 1f - exp(-10f * deltaSeconds)

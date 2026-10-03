@@ -83,4 +83,62 @@ class HoloTiltStateTest {
 
     assertTrue(tilt.strength in 0f..1f)
   }
+
+  @Test
+  fun `phone motion drives the card and the light instead of the idle sway`() {
+    val tilt = HoloTiltState(reducedMotion = false)
+
+    tilt.stepWithPhone(startSeconds = 10f, frames = 120, rotationX = 6f, rotationY = -10f)
+
+    assertEquals(expected = -10f, actual = tilt.rotationY, absoluteTolerance = 0.05f)
+    assertEquals(expected = 6f, actual = tilt.rotationX, absoluteTolerance = 0.05f)
+    assertEquals(expected = 0.5f - 10f / TiltRangeY, actual = tilt.pointerX, absoluteTolerance = 0.01f)
+  }
+
+  @Test
+  fun `a finger overrides the phone and letting go hands control back`() {
+    val tilt = HoloTiltState(reducedMotion = false)
+    tilt.onPointer(x = 1f, y = 0.5f)
+    tilt.stepWithPhone(startSeconds = 10f, frames = 120, rotationX = 0f, rotationY = -10f)
+    assertEquals(expected = TiltRangeY / 2f, actual = tilt.rotationY, absoluteTolerance = 0.05f)
+
+    tilt.onRelease()
+    tilt.stepWithPhone(startSeconds = 12f, frames = 120, rotationX = 0f, rotationY = -10f)
+    assertEquals(expected = -10f, actual = tilt.rotationY, absoluteTolerance = 0.05f)
+  }
+
+  @Test
+  fun `the card goes back to swaying when the sensor goes quiet`() {
+    val tilt = HoloTiltState(reducedMotion = false)
+    tilt.stepWithPhone(startSeconds = 10f, frames = 60, rotationX = 0f, rotationY = 0f)
+    assertEquals(expected = 0f, actual = tilt.rotationY, absoluteTolerance = 0.05f)
+
+    repeat(120) { tilt.step(timeSeconds = 20f + it * 0.016f, deltaSeconds = 0.016f) }
+
+    assertNotEquals(illegal = 0f, actual = tilt.rotationY)
+  }
+
+  @Test
+  fun `reduced motion ignores the phone`() {
+    val tilt = HoloTiltState(reducedMotion = true)
+
+    tilt.onDeviceTilt(rotationX = 5f, rotationY = 9f)
+    repeat(10) { tilt.step(timeSeconds = 10f + it, deltaSeconds = 0.016f) }
+
+    assertEquals(expected = 0f, actual = tilt.rotationY)
+    assertEquals(expected = 0f, actual = tilt.rotationX)
+  }
+
+  /** A sensor delivers readings every frame, so each frame gets one before it is stepped. */
+  private fun HoloTiltState.stepWithPhone(
+    startSeconds: Float,
+    frames: Int,
+    rotationX: Float,
+    rotationY: Float,
+  ) {
+    repeat(frames) {
+      onDeviceTilt(rotationX = rotationX, rotationY = rotationY)
+      step(timeSeconds = startSeconds + it * 0.016f, deltaSeconds = 0.016f)
+    }
+  }
 }

@@ -44,7 +44,7 @@ private val FoilColors = listOf(
   Color(0xFFFF4FA8),
 )
 
-private const val MaxAbilities = 3
+private const val MaxAbilities = 4
 
 @Composable
 internal fun HoloCardBack(
@@ -55,7 +55,7 @@ internal fun HoloCardBack(
   u: CardUnit,
   modifier: Modifier = Modifier,
 ) {
-  val palette = remember(card.floor) { floorPalette(card.floor) }
+  val palette = remember(card.floor, card.id) { floorPalette(card.floor, card.id) }
   Box(
     modifier = modifier
       .fillMaxSize()
@@ -65,23 +65,22 @@ internal fun HoloCardBack(
   ) {
     Emblem(tilt = tilt, palette = palette, u = u)
     if (plain) {
-      Heading(text = stringResource(R.string.holo_card_about), top = 38f, palette = palette, u = u)
+      Heading(text = stringResource(R.string.holo_card_about), top = 34f, palette = palette, u = u)
       CardText(
         text = description,
-        size = u.sp(3.4f),
+        size = u.sp(4.2f),
         color = InkColor,
         weight = FontWeight.Normal,
         align = TextAlign.Start,
-        maxLines = 12,
-        modifier = Modifier.cardRect(u, 7f, 44.5f, 86f, 62f),
+        maxLines = 18,
+        modifier = Modifier.cardRect(u, 7f, 40.5f, 86f, 92f),
       )
     } else {
-      Heading(text = stringResource(R.string.holo_card_abilities), top = 38f, palette = palette, u = u)
+      Heading(text = stringResource(R.string.holo_card_abilities), top = 34f, palette = palette, u = u)
       Abilities(abilities = card.abilities.take(MaxAbilities), palette = palette, u = u)
-      Heading(text = stringResource(R.string.holo_card_loadout), top = 72f, palette = palette, u = u)
+      Heading(text = stringResource(R.string.holo_card_loadout), top = 80f, palette = palette, u = u)
       Loadout(loadout = card.loadout, palette = palette, u = u)
     }
-    Callout(description = card.look?.description, u = u, modifier = Modifier.align(Alignment.BottomCenter))
   }
 }
 
@@ -120,7 +119,7 @@ private fun Emblem(
   palette: FloorPalette,
   u: CardUnit,
 ) {
-  Canvas(modifier = Modifier.cardRect(u, 35f, 5.5f, 30f, 30f)) {
+  Canvas(modifier = Modifier.cardRect(u, 37f, 5f, 26f, 26f)) {
     val center = Offset(size.width / 2f, size.height / 2f)
     rotate(degrees = (1f - tilt.pointerX) * 360f, pivot = center) {
       drawCircle(brush = Brush.sweepGradient(FoilColors, center), radius = size.minDimension / 2f)
@@ -130,7 +129,7 @@ private fun Emblem(
       brush = Brush.radialGradient(listOf(palette.accent.copy(alpha = 0.18f), Color.Transparent), center = center),
       radius = size.minDimension / 2f - u.px(1.6f),
     )
-    val icon = u.px(17f)
+    val icon = u.px(15f)
     val iconTop = Offset(center.x - icon / 2f, center.y - icon / 2f)
     val gradient = Brush.linearGradient(
       listOf(Color(0xFF9FF3FF), Color(0xFFFFB3E6), Color(0xFFD6FFA8)),
@@ -177,7 +176,7 @@ private fun Abilities(
   u: CardUnit,
 ) {
   Column(
-    modifier = Modifier.cardRect(u, 7f, 44.5f, 86f, 26f),
+    modifier = Modifier.cardRect(u, 7f, 40.5f, 86f, 36f),
     verticalArrangement = Arrangement.spacedBy(u.dp(1.6f)),
   ) {
     if (abilities.isEmpty()) {
@@ -254,7 +253,7 @@ private fun Loadout(
 ) {
   val bySlot = remember(loadout) { loadout.associateBy { it.slot.trim().lowercase() } }
   Column(
-    modifier = Modifier.cardRect(u, 7f, 78.5f, 86f, 30f),
+    modifier = Modifier.cardRect(u, 7f, 86.5f, 86f, 45.5f),
     verticalArrangement = Arrangement.spacedBy(u.dp(2f)),
   ) {
     PlayerCardSlots.ordered.chunked(4).forEach { rowSlots ->
@@ -287,53 +286,15 @@ private fun Slot(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    CardText(text = label.uppercase(), size = u.sp(2f), minSize = u.sp(1.4f), color = InkDimColor, letterSpacingEm = 0.1f)
+    CardText(text = label.uppercase(), size = u.sp(2.3f), minSize = u.sp(1.5f), color = InkDimColor, letterSpacingEm = 0.1f)
     CardText(
       text = item ?: "–",
-      size = u.sp(2.4f),
-      minSize = u.sp(1.5f),
+      size = u.sp(3f),
+      minSize = u.sp(1.8f),
       color = if (equipped) InkColor else InkDimColor,
       weight = FontWeight.Medium,
-      maxLines = 3,
+      maxLines = 4,
       modifier = Modifier.fillMaxWidth(),
     )
-  }
-}
-
-@Composable
-private fun Callout(
-  description: String?,
-  u: CardUnit,
-  modifier: Modifier = Modifier,
-) {
-  val shape = RoundedCornerShape(u.dp(2f))
-  Column(
-    modifier = modifier
-      .padding(start = u.dp(6f), end = u.dp(6f), bottom = u.dp(5f))
-      .fillMaxWidth()
-      .clip(shape)
-      .background(Color(0xFF0E1317))
-      .border(u.dp(0.4f), Color(0xFF3A444D), shape)
-      .padding(horizontal = u.dp(3f), vertical = u.dp(2.2f)),
-  ) {
-    CardText(
-      text = stringResource(R.string.holo_card_current_look).uppercase(),
-      size = u.sp(3.1f),
-      color = InkColor,
-      letterSpacingEm = 0.1f,
-      align = TextAlign.Start,
-      modifier = Modifier.fillMaxWidth(),
-    )
-    if (description != null) {
-      CardText(
-        text = description,
-        size = u.sp(2.7f),
-        color = InkDimColor,
-        weight = FontWeight.Normal,
-        align = TextAlign.Start,
-        maxLines = 5,
-        modifier = Modifier.fillMaxWidth(),
-      )
-    }
   }
 }

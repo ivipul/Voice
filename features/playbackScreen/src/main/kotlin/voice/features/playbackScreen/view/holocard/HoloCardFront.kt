@@ -43,7 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import voice.core.strings.R
 import voice.core.xray.card.CardStat
@@ -79,12 +79,13 @@ internal fun HoloCardFront(
   plain: Boolean,
   card: ComposedPlayerCard,
   lookImage: String?,
+  portrait: String?,
   animate: Boolean,
   tilt: HoloTiltState,
   u: CardUnit,
   modifier: Modifier = Modifier,
 ) {
-  val palette = remember(card.floor) { floorPalette(card.floor) }
+  val palette = remember(card.floor, card.id) { floorPalette(card.floor, card.id) }
   Box(
     modifier = modifier
       .fillMaxSize()
@@ -92,8 +93,15 @@ internal fun HoloCardFront(
       .drawBehind { drawFrontBackground(palette, u) }
       .holoFoil(tilt),
   ) {
-    ArtWindow(palette = palette, tilt = tilt, u = u, modifier = Modifier.cardRect(u, WindowLeft, WindowTop, WindowWidth, WindowHeight))
-    Figure(name = name, lookImage = lookImage, animate = animate, palette = palette, tilt = tilt, u = u)
+    val portraitOnly = lookImage == null && portrait != null
+    ArtWindow(
+      palette = palette,
+      showHalo = !portraitOnly,
+      tilt = tilt,
+      u = u,
+      modifier = Modifier.cardRect(u, WindowLeft, WindowTop, WindowWidth, WindowHeight),
+    )
+    Art(name = name, image = lookImage ?: portrait, portraitOnly = portraitOnly, animate = animate, palette = palette, tilt = tilt, u = u)
     Banner(name = name, epithet = card.epithet, wide = plain, palette = palette, tilt = tilt, u = u)
     if (!plain) {
       Badge(
@@ -147,6 +155,7 @@ private fun DrawScope.drawFrontBackground(
 @Composable
 private fun ArtWindow(
   palette: FloorPalette,
+  showHalo: Boolean,
   tilt: HoloTiltState,
   u: CardUnit,
   modifier: Modifier = Modifier,
@@ -155,7 +164,7 @@ private fun ArtWindow(
     drawRect(brush = Brush.verticalGradient(listOf(palette.backdropTop, palette.backdropBottom)))
     drawPattern(palette.pattern, u, shiftX = -tilt.offsetX * u.px(7f), shiftY = tilt.offsetY * u.px(7f))
     drawGlow(palette, u, shiftX = -tilt.offsetX * u.px(4f), shiftY = tilt.offsetY * u.px(4f))
-    drawHalo(palette, tilt, u)
+    if (showHalo) drawHalo(palette, tilt, u)
     drawRect(
       brush = Brush.verticalGradient(
         colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.45f)),
@@ -265,48 +274,75 @@ private fun DrawScope.drawHalo(
   }
 }
 
+/**
+ * The art of the card: a transparent look cut-out standing over the halo, or an X-Ray picture filling the art
+ * window, or a monogram in the halo when there is no image (or it fails to load).
+ */
 @Composable
-private fun Figure(
+private fun Art(
   name: String,
-  lookImage: String?,
+  image: String?,
+  portraitOnly: Boolean,
   animate: Boolean,
   palette: FloorPalette,
   tilt: HoloTiltState,
   u: CardUnit,
 ) {
-  Box(
-    modifier = Modifier
+  val bounds = if (portraitOnly) {
+    Modifier
+      .cardRect(u, WindowLeft, WindowTop, WindowWidth, WindowHeight)
+      .clip(RoundedCornerShape(u.dp(3f)))
+  } else {
+    Modifier
       .cardRect(u, FigureLeft, FigureTop, FigureWidth, FigureHeight)
       .graphicsLayer {
         translationX = tilt.offsetX * u.px(3.2f)
         translationY = -tilt.offsetY * u.px(2f)
         scaleX = 1.02f
         scaleY = 1.02f
-      },
-    contentAlignment = Alignment.BottomCenter,
-  ) {
-    Crossfade(targetState = lookImage, animationSpec = if (animate) tween(400) else snap(), label = "look") { image ->
-      if (image != null) {
-        AsyncImage(
-          model = ImageRequest.Builder(LocalContext.current).data(image).crossfade(false).build(),
-          contentDescription = null,
-          contentScale = ContentScale.Fit,
-          alignment = Alignment.BottomCenter,
-          modifier = Modifier.fillMaxSize(),
-        )
+      }
+  }
+  Box(modifier = bounds, contentAlignment = Alignment.BottomCenter) {
+    Crossfade(targetState = image, animationSpec = if (animate) tween(400) else snap(), label = "art") { model ->
+      if (model == null) {
+        Monogram(name = name, palette = palette, u = u)
       } else {
-        Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
-          CardText(
-            text = name.take(1).uppercase(),
-            size = u.sp(40f),
-            color = palette.accent,
-            fontFamily = DisplayFont,
-            weight = FontWeight.Black,
-            modifier = Modifier.padding(bottom = u.dp(20f)),
-          )
-        }
+        SubcomposeAsyncImage(
+          model = ImageRequest.Builder(LocalContext.current).data(model).crossfade(false).build(),
+          contentDescription = null,
+          contentScale = if (portraitOnly) ContentScale.Crop else ContentScale.Fit,
+          alignment = if (portraitOnly) Alignment.TopCenter else Alignment.BottomCenter,
+          modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+              if (portraitOnly) {
+                translationX = tilt.offsetX * u.px(3f)
+                translationY = -tilt.offsetY * u.px(2f)
+                scaleX = 1.06f
+                scaleY = 1.06f
+              }
+            },
+          error = { Monogram(name = name, palette = palette, u = u) },
+        )
       }
     }
+  }
+}
+
+@Composable
+private fun Monogram(
+  name: String,
+  palette: FloorPalette,
+  u: CardUnit,
+) {
+  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(bottom = u.dp(7f))) {
+    CardText(
+      text = name.trim().take(1).uppercase(),
+      size = u.sp(40f),
+      color = palette.accent,
+      fontFamily = DisplayFont,
+      weight = FontWeight.Black,
+    )
   }
 }
 

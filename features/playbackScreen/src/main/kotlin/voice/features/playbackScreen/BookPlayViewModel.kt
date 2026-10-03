@@ -58,8 +58,8 @@ import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
+import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.PlayerCardRepository
-import voice.core.xray.card.composeAt
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -375,22 +375,16 @@ class BookPlayViewModel(
     scope.launch {
       val book = currentBook() ?: return@launch
       val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
-      dialogState.value = playerCardDialog(book, entity) ?: BookPlayDialogViewState.XRayEntityDialog(
-        title = entity.title,
-        description = entity.description,
-        image = entity.image,
-      )
+      dialogState.value = cardDialog(book, entity)
     }
   }
 
-  private suspend fun playerCardDialog(
+  private suspend fun cardDialog(
     book: Book,
     entity: XRayEntityInfo,
-  ): BookPlayDialogViewState.XRayCardDialog? = withContext(dispatcherProvider.io) {
-    val cards = playerCardRepository.cardsFor(book) ?: return@withContext null
-    val data = cards.card(entity.id) ?: return@withContext null
-    val positionMs = book.content.positionInChapter
-    if (!data.composeAt(positionMs).hasRevealedData) return@withContext null
+  ): BookPlayDialogViewState.XRayCardDialog = withContext(dispatcherProvider.io) {
+    val cards = playerCardRepository.cardsFor(book)
+    val data = cards?.card(entity.id) ?: PlayerCardData(id = entity.id, entries = emptyList())
     BookPlayDialogViewState.XRayCardDialog(
       name = entity.title,
       description = entity.description,
@@ -398,9 +392,10 @@ class BookPlayViewModel(
       imageUris = data.entries
         .mapNotNull { it.image }
         .distinct()
-        .mapNotNull { path -> cards.imageUri(path)?.let { path to it.toString() } }
+        .mapNotNull { path -> cards?.imageUri(path)?.let { path to it.toString() } }
         .toMap(),
-      openedAtMs = positionMs,
+      portrait = entity.image,
+      openedAtMs = book.content.positionInChapter,
     )
   }
 
