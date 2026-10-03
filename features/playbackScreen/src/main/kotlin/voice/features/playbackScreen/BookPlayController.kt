@@ -172,7 +172,11 @@ fun BookPlayScreen(bookId: BookId) {
     )
   }
   viewModel.snipSheet.value?.let { snipSheet ->
-    SnipBottomSheet(snipSheet, onDismiss = viewModel::onSnipSheetDismiss)
+    SnipBottomSheet(
+      state = snipSheet,
+      frame = snipSheet.frameState(viewModel.copilotMessages()),
+      onDismiss = viewModel::onSnipSheetDismiss,
+    )
   }
 }
 

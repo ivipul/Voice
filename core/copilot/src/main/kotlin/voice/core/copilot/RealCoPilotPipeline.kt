@@ -101,7 +101,8 @@ class RealCoPilotPipeline(
   }
 
   override suspend fun snip(bookId: BookId) {
-    coPilotRepository.emitSnipEvent(SnipEvent.Started)
+    val drawFrame = snipFrameRunner.isAvailable()
+    coPilotRepository.emitSnipEvent(SnipEvent.Started(drawFrame))
     val book = bookRepository.get(bookId) ?: return snipFailed()
     val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return snipFailed()
     val highlight = runCatching {
@@ -114,7 +115,6 @@ class RealCoPilotPipeline(
       return snipFailed()
     }
     val messageId = UUID.randomUUID().toString()
-    val drawFrame = snipFrameRunner.isAvailable()
     coPilotRepository.addMessage(
       bookId,
       CoPilotMessage(
@@ -128,7 +128,7 @@ class RealCoPilotPipeline(
         snipPositionInChapterMs = book.content.positionInChapter,
       ),
     )
-    coPilotRepository.emitSnipEvent(SnipEvent.Ready(highlight))
+    coPilotRepository.emitSnipEvent(SnipEvent.Ready(highlight, messageId))
     if (drawFrame) {
       snipFrameRunner.start(
         bookId,
