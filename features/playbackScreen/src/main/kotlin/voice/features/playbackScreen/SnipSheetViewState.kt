@@ -26,3 +26,16 @@ internal fun SnipSheetViewState.frameState(messages: List<CoPilotMessage>): Snip
     }
   }
 }
+
+/**
+ * The height of the frame in the snip sheet. The sheet holds up to two thirds of the screen; the frame leaves room
+ * for the title and about five lines of snip text, so the text is visible without scrolling, and never exceeds
+ * 40% of the screen.
+ */
+internal fun snipFrameHeightDp(screenHeightDp: Int): Int {
+  val roomLeft = screenHeightDp * 2 / 3 - SNIP_SHEET_CHROME_DP
+  return minOf(roomLeft, screenHeightDp * 2 / 5).coerceAtLeast(MIN_SNIP_FRAME_DP)
+}
+
+private const val SNIP_SHEET_CHROME_DP = 260
+private const val MIN_SNIP_FRAME_DP = 160

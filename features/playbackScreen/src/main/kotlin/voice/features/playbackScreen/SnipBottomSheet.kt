@@ -1,12 +1,15 @@
 package voice.features.playbackScreen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import voice.features.playbackScreen.view.FRAME_ASPECT
 import voice.features.playbackScreen.view.HoloImageLoader
 import voice.core.strings.R as StringsR
 
@@ -52,7 +56,14 @@ internal fun SnipBottomSheet(
         )
         Spacer(modifier = Modifier.size(16.dp))
         if (frame != SnipFrameViewState.None) {
-          HoloImageLoader(imagePath = (frame as? SnipFrameViewState.Image)?.path, contentDescription = null)
+          val imageWidth = (snipFrameHeightDp(LocalConfiguration.current.screenHeightDp) * FRAME_ASPECT).dp
+          Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            HoloImageLoader(
+              imagePath = (frame as? SnipFrameViewState.Image)?.path,
+              contentDescription = null,
+              modifier = Modifier.width(imageWidth),
+            )
+          }
           Spacer(modifier = Modifier.size(16.dp))
         }
         when (state) {

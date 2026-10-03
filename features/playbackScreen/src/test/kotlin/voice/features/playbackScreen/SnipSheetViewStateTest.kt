@@ -46,4 +46,14 @@ class SnipSheetViewStateTest {
 
     assertEquals(SnipFrameViewState.None, sheet.frameState(listOf(message("other", imagePath = "/frames/other.png"))))
   }
+
+  @Test
+  fun `the frame leaves room for the text above the fold`() {
+    // 900 dp screen: the sheet holds 600 dp, the title and text take about 260, so the frame gets 340.
+    assertEquals(340, snipFrameHeightDp(900))
+    // A tall screen is capped at 40%.
+    assertEquals(480, snipFrameHeightDp(1200))
+    // A short screen still gets a usable frame.
+    assertEquals(160, snipFrameHeightDp(500))
+  }
 }

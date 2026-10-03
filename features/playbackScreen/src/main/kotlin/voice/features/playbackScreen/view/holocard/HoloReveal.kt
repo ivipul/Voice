@@ -21,9 +21,10 @@ import androidx.compose.ui.unit.IntSize
 import voice.core.logging.api.Logger
 
 /**
- * The look-to-look morph of the Crawl explorer (web/crawl/js/gl.js), ported to AGSL: the loader's holo foil
- * dissolves into the image through a noise threshold, both layers are nudged by the noise, and a glowing,
- * rainbow-tinted front runs along the dissolve edge. `reveal` goes 0..1; [time] animates the foil.
+ * The look-to-look morph of the Crawl explorer (web/crawl/js/gl.js), ported to AGSL. While waiting, two holo foil
+ * looks bleed into each other along a slowly drifting noise front. When the image is ready the same foil
+ * dissolves into it through a noise threshold, both layers are nudged by the noise, and a glowing, rainbow-tinted
+ * front runs along the edge with a final flourish. `reveal` goes 0..1; [time] drives the foil and the drift.
  */
 private const val RevealShaderSource = """
 uniform shader image;
@@ -60,37 +61,54 @@ float fbm(float2 p) {
   return v;
 }
 
-float3 loader(float2 fragCoord) {
+float3 look(float2 fragCoord, float phase) {
   float2 uv = fragCoord / size;
-  float2 light = float2(0.5 + 0.5 * sin(time * 1.3), 0.5 + 0.5 * sin(time * 0.9 + 1.0));
-  float strength = 0.55 + 0.45 * sin(time * 5.2);
+  float2 light = float2(0.5 + 0.5 * sin(time * 0.9 + phase * 6.2831), 0.5 + 0.5 * sin(time * 0.6 + phase * 9.0 + 1.0));
+  float strength = 0.55 + 0.45 * sin(time * 3.1 + phase * 6.2831);
   float diagonal = uv.x * 0.9 + uv.y * 0.5;
-  float3 wash = 0.5 + 0.5 * cos(6.2831 * (diagonal * 1.1 - time * 0.2 + float3(0.0, 0.33, 0.67)));
+  float3 wash = 0.5 + 0.5 * cos(6.2831 * (diagonal * 1.1 - time * 0.1 + phase + float3(0.0, 0.33, 0.67)));
   return float3(0.06, 0.06, 0.09) + wash * (0.14 + 0.12 * strength) + foilColor(fragCoord, size, light, strength) * 1.6;
+}
+
+// The waiting state: two foil looks bleeding into each other along a noise front that drifts slowly at random.
+float3 idle(float2 fragCoord) {
+  float2 uv = fragCoord / size;
+  float drift = time * 0.07;
+  float th = fbm(uv * 3.5 + float2(drift, -drift * 0.8));
+  float2 n = float2(fbm(uv * 2.5 + float2(5.2, 1.3) + drift), fbm(uv * 2.5 + float2(9.1, 4.7) - drift)) - 0.5;
+  float front0 = 0.5 + 0.28 * sin(time * 0.5);
+  float w = 0.16;
+  float2 pos = fragCoord + n * 0.1 * size;
+  float k = 1.0 - smoothstep(front0 - w, front0 + w, th);
+  float3 c = mix(look(pos, 0.0), look(pos, 0.5), k);
+  float front = pow(clamp(1.0 - abs(th - front0) / w, 0.0, 1.0), 1.6);
+  float3 accent = 0.5 + 0.5 * cos(6.2831 * (th * 1.7 + time * 0.12 + float3(0.0, 0.33, 0.67)));
+  return mix(c, accent, front * 0.35) + accent * front * 0.15;
 }
 
 half4 main(float2 fragCoord) {
   if (hasImage < 0.5) {
-    return half4(half3(loader(fragCoord)), 1.0);
+    return half4(half3(idle(fragCoord)), 1.0);
   }
   float2 uv = fragCoord / size;
   float t = reveal;
   float env = sin(3.14159 * t);
-  float w = 0.2;
+  float w = 0.22;
   float tp = t * (1.0 + 2.0 * w) - w;
-  float str = 0.16 * env;
+  float str = 0.3 * env;
   float2 n = float2(fbm(uv * 3.0 + time * 0.2), fbm(uv * 3.0 + float2(17.3, 5.1) - time * 0.17)) - 0.5;
-  float2 lift = float2(0.0, 0.07 * env);
+  float2 lift = float2(0.0, 0.1 * env);
   float2 posA = (uv + n * str * t * 1.4 + lift * t) * size;
   float2 posB = clamp((uv - n * str * (1.0 - t) * 1.4) * size, float2(0.0), size - 1.0);
-  float3 a = loader(posA);
+  float3 a = idle(posA);
   half4 b = image.eval(posB);
   float th = fbm(uv * 5.0 + float2(3.1, 8.7));
   float k = 1.0 - smoothstep(tp - w, tp + w, th);
   float3 c = mix(a, float3(b.rgb), k);
-  float front = pow(clamp(1.0 - abs(th - tp) / w, 0.0, 1.0), 1.6) * env;
+  float front = pow(clamp(1.0 - abs(th - tp) / w, 0.0, 1.0), 1.4) * env;
   float3 accent = 0.5 + 0.5 * cos(6.2831 * (th * 1.7 + time * 0.25 + float3(0.0, 0.33, 0.67)));
-  c = mix(c, accent, front * 0.55) + accent * front * 0.25;
+  c = mix(c, accent, front * 0.7) + accent * front * 0.45;
+  c += accent * env * env * 0.1;
   return half4(half3(c), 1.0);
 }
 """

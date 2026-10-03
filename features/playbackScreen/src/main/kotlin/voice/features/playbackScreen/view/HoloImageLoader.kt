@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import voice.features.playbackScreen.view.holocard.holoReveal
 import voice.core.strings.R as StringsR
 
-private const val REVEAL_MS = 650
+private const val REVEAL_MS = 900
 
 /**
  * A snip's comic frame, in the snip sheet and in the Feed. While there is no image yet it shows a pulsing,
