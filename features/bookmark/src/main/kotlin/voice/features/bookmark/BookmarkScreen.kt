@@ -50,9 +50,13 @@ import dev.zacsweers.metro.Provides
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.core.data.Bookmark
+import voice.core.strips.AvailableStrip
 import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.dialogs.AddBookmarkDialog
 import voice.features.bookmark.dialogs.EditBookmarkDialog
+import voice.features.bookmark.strips.StripCardList
+import voice.features.bookmark.strips.StripViewer
+import voice.features.bookmark.strips.StripViewerViewModel
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
 import kotlin.uuid.Uuid
@@ -66,6 +70,7 @@ private enum class BookmarkTab(val labelRes: Int) {
 @ContributesTo(AppScope::class)
 interface Graph {
   val bookmarkViewModelFactory: BookmarkViewModel.Factory
+  val stripViewerViewModelFactory: StripViewerViewModel.Factory
 }
 
 @ContributesTo(AppScope::class)
@@ -86,18 +91,27 @@ fun BookmarkScreen(bookId: BookId) {
     rootGraphAs<Graph>().bookmarkViewModelFactory.create(bookId)
   }
   val viewState = viewModel.viewState()
-  BookmarkScreen(
-    viewState = viewState,
-    onClose = viewModel::closeScreen,
-    onAdd = viewModel::onAddClick,
-    onDelete = viewModel::deleteBookmark,
-    onEdit = viewModel::onEditClick,
-    onScrollConfirm = viewModel::onScrollConfirm,
-    onClick = viewModel::selectBookmark,
-    onNewBookmarkNameChoose = viewModel::addBookmark,
-    onCloseDialog = viewModel::closeDialog,
-    onEditBookmark = viewModel::editBookmark,
-  )
+  Box {
+    BookmarkScreen(
+      viewState = viewState,
+      onClose = viewModel::closeScreen,
+      onAdd = viewModel::onAddClick,
+      onDelete = viewModel::deleteBookmark,
+      onEdit = viewModel::onEditClick,
+      onScrollConfirm = viewModel::onScrollConfirm,
+      onClick = viewModel::selectBookmark,
+      onNewBookmarkNameChoose = viewModel::addBookmark,
+      onCloseDialog = viewModel::closeDialog,
+      onEditBookmark = viewModel::editBookmark,
+      onStripClick = viewModel::onStripClick,
+    )
+    viewState.activeStrip?.let { strip ->
+      val storyViewModel = remember(bookId, strip) {
+        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip)
+      }
+      StripViewer(viewModel = storyViewModel, onClose = viewModel::onStripClose)
+    }
+  }
 }
 
 @Composable
@@ -112,6 +126,7 @@ internal fun BookmarkScreen(
   onCloseDialog: () -> Unit,
   onNewBookmarkNameChoose: (String) -> Unit,
   onEditBookmark: (Bookmark.Id, String) -> Unit,
+  onStripClick: (AvailableStrip) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
@@ -185,16 +200,20 @@ internal fun BookmarkScreen(
           }
         }
         BookmarkTab.Strips -> {
-          Box(
-            modifier = Modifier
-              .fillMaxSize()
-              .padding(24.dp),
-            contentAlignment = Alignment.Center,
-          ) {
-            Text(
-              text = stringResource(id = StringsR.string.bookmark_strips_empty),
-              style = MaterialTheme.typography.bodyLarge,
-            )
+          if (viewState.strips.isEmpty()) {
+            Box(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+              contentAlignment = Alignment.Center,
+            ) {
+              Text(
+                text = stringResource(id = StringsR.string.bookmark_strips_empty),
+                style = MaterialTheme.typography.bodyLarge,
+              )
+            }
+          } else {
+            StripCardList(strips = viewState.strips, onClick = onStripClick)
           }
         }
       }

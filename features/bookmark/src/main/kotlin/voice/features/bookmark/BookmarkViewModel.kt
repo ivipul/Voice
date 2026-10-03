@@ -27,6 +27,8 @@ import voice.core.featureflag.KioskModeFeatureFlagQualifier
 import voice.core.playback.PlayerController
 import voice.core.playback.playstate.PlayStateManager
 import voice.core.strings.R
+import voice.core.strips.AvailableStrip
+import voice.core.strips.StripRepository
 import voice.core.ui.formatTime
 import voice.navigation.Navigator
 import java.time.Instant
@@ -46,6 +48,7 @@ class BookmarkViewModel(
   private val playerController: PlayerController,
   private val navigator: Navigator,
   private val context: Context,
+  private val stripRepository: StripRepository,
   @KioskModeFeatureFlagQualifier
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
   @Assisted
@@ -55,6 +58,8 @@ class BookmarkViewModel(
   private val scope = MainScope()
   private var bookmarks by mutableStateOf<List<Bookmark>>(emptyList())
   private var chapters by mutableStateOf<List<Chapter>>(emptyList())
+  private var strips by mutableStateOf<List<AvailableStrip>>(emptyList())
+  private var activeStrip by mutableStateOf<AvailableStrip?>(null)
 
   private var shouldScrollTo by mutableStateOf<Bookmark.Id?>(null)
   private var dialogViewState: BookmarkDialogViewState by mutableStateOf(BookmarkDialogViewState.None)
@@ -70,6 +75,7 @@ class BookmarkViewModel(
         bookmarks = bookmarkRepo.bookmarks(book.content)
           .sortedByDescending { it.addedAt }
         chapters = book.chapters
+        strips = stripRepository.stripsFor(book.content.name)
       }
     }
     return BookmarkViewState(
@@ -104,7 +110,17 @@ class BookmarkViewModel(
       },
       shouldScrollTo = shouldScrollTo,
       dialogViewState = dialogViewState,
+      strips = strips,
+      activeStrip = activeStrip,
     )
+  }
+
+  fun onStripClick(strip: AvailableStrip) {
+    activeStrip = strip
+  }
+
+  fun onStripClose() {
+    activeStrip = null
   }
 
   private fun kioskModeViewState(): BookmarkViewState {

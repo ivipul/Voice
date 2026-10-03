@@ -12,4 +12,9 @@ dependencies {
   implementation(projects.navigation)
   implementation(projects.core.data.api)
   implementation(projects.core.featureflag)
+  api(projects.core.strips)
+  implementation(libs.coil)
+
+  testImplementation(libs.molecule)
+  testImplementation(libs.turbine)
 }
