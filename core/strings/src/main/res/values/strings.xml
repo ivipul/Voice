@@ -110,6 +110,8 @@
     <string name="copilot.settings.trigger.single_previous">Single tap PREVIOUS</string>
     <!-- Settings row label for the double-tap NEXT trigger slot. -->
     <string name="copilot.settings.trigger.double_next">Double tap NEXT</string>
+    <!-- Settings row label for the triple-tap NEXT trigger slot. -->
+    <string name="copilot.settings.trigger.triple_next">Triple tap NEXT</string>
     <!-- Settings row label for the double-tap PREVIOUS trigger slot. -->
     <string name="copilot.settings.trigger.double_previous">Double tap PREVIOUS</string>
     <!-- Trigger action option: the default fixed rewind, same as the on-screen skip-back button's default. -->

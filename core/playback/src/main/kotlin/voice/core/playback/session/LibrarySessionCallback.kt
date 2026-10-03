@@ -33,6 +33,7 @@ import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.CoPilotButtonMapping
 import voice.core.data.CoPilotTriggerAction
+import voice.core.data.actionFor
 import voice.core.data.repo.BookRepository
 import voice.core.data.store.CoPilotButtonMappingStore
 import voice.core.data.store.CurrentBookStore
@@ -57,11 +58,10 @@ class LibrarySessionCallback(
 ) : MediaLibrarySession.Callback {
 
   private var pendingHeadsetPressJob: Job? = null
-  private var lastHeadsetPressKeyCode: Int? = null
-  private var lastHeadsetPressAtMs: Long = 0L
+  private val headsetPressCounter = HeadsetPressCounter(PRESS_SEQUENCE_WINDOW_MS)
   private var lastNextOrPreviousAtMs: Long = 0L
 
-  // Intercepts headset NEXT/PREVIOUS to disambiguate single vs. double presses (Phase 3) and
+  // Intercepts headset NEXT/PREVIOUS to disambiguate single, double and (NEXT only) triple presses and
   // dispatch whatever action the user has mapped to that slot (CoPilotButtonMappingStore, set
   // via CoPilotSettingsScreen). Consumes both so the default seek behavior doesn't also fire
   // underneath our own handling.
@@ -107,25 +107,22 @@ class LibrarySessionCallback(
     }
 
     val now = System.currentTimeMillis()
-    val isDoublePress = keyCode == lastHeadsetPressKeyCode && now - lastHeadsetPressAtMs <= DOUBLE_PRESS_THRESHOLD_MS
-    lastHeadsetPressKeyCode = keyCode
-    lastHeadsetPressAtMs = now
+    val presses = headsetPressCounter.onPress(keyCode, now)
     lastNextOrPreviousAtMs = now
     pendingHeadsetPressJob?.cancel()
 
-    if (isDoublePress) {
-      lastHeadsetPressKeyCode = null
-      scope.launch {
-        val mapping = copilotButtonMappingStore.data.first()
-        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.doubleNext else mapping.doublePrevious
-        performAction(action)
-      }
+    val isNext = keyCode == KeyEvent.KEYCODE_MEDIA_NEXT
+    val maxPresses = if (isNext) MAX_NEXT_PRESSES else MAX_PREVIOUS_PRESSES
+    if (presses >= maxPresses) {
+      // No further press can extend this sequence, so dispatch right away instead of waiting
+      // out the window.
+      headsetPressCounter.reset()
+      scope.launch { performAction(copilotButtonMappingStore.data.first().actionFor(isNext, presses)) }
     } else {
       pendingHeadsetPressJob = scope.launch {
-        delay(DOUBLE_PRESS_THRESHOLD_MS)
-        val mapping = copilotButtonMappingStore.data.first()
-        val action = if (keyCode == KeyEvent.KEYCODE_MEDIA_NEXT) mapping.singleNext else mapping.singlePrevious
-        performAction(action)
+        delay(PRESS_SEQUENCE_WINDOW_MS)
+        headsetPressCounter.reset()
+        performAction(copilotButtonMappingStore.data.first().actionFor(isNext, presses))
       }
     }
     return true
@@ -379,7 +376,9 @@ class LibrarySessionCallback(
   }
 
   private companion object {
-    const val DOUBLE_PRESS_THRESHOLD_MS = 1500L
+    const val PRESS_SEQUENCE_WINDOW_MS = 1500L
+    const val MAX_NEXT_PRESSES = 3
+    const val MAX_PREVIOUS_PRESSES = 2
     const val NEXT_PREVIOUS_ECHO_WINDOW_MS = 500L
     val PLAY_PAUSE_KEY_CODES = setOf(
       KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
