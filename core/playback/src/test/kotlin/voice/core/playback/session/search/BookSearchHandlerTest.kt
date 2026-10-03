@@ -88,6 +88,31 @@ class BookSearchHandlerTest {
   }
 
   @Test
+  fun searchAllReturnsEveryBookMatchingTitleAuthorOrChapter() = runTest {
+    val dune = book(listOf(chapter())).withName("Dune").withAuthor("Frank Herbert")
+    val dune2 = book(listOf(chapter())).withName("Dune Messiah").withAuthor("Frank Herbert")
+    val emma = book(listOf(chapter().copy(name = "A Dune in Chapter Two"))).withName("Emma").withAuthor("Jane Austen")
+    val other = book(listOf(chapter())).withName("Persuasion").withAuthor("Jane Austen")
+    coEvery { repo.all() } coAnswers { listOf(dune, dune2, emma, other) }
+
+    assertEquals(listOf(dune, dune2, emma), searchHandler.searchAll("dune"))
+    assertEquals(listOf(dune, dune2), searchHandler.searchAll("HERBERT"))
+    assertEquals(listOf(emma, other), searchHandler.searchAll("jane austen"))
+  }
+
+  @Test
+  fun searchAllBlankQueryReturnsNothing() = runTest {
+    assertEquals(emptyList(), searchHandler.searchAll(null))
+    assertEquals(emptyList(), searchHandler.searchAll(""))
+    assertEquals(emptyList(), searchHandler.searchAll("   "))
+  }
+
+  @Test
+  fun searchAllNoMatchReturnsNothing() = runTest {
+    assertEquals(emptyList(), searchHandler.searchAll("no such book anywhere"))
+  }
+
+  @Test
   fun mediaFocusAlbum() = runTest {
     val bookSearch = VoiceSearch(
       mediaFocus = MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE,
@@ -98,6 +123,10 @@ class BookSearchHandlerTest {
     assertEquals(expected = bookToFind, actual = searchHandler.handle(bookSearch))
   }
 }
+
+private fun Book.withName(name: String) = copy(content = content.copy(name = name))
+
+private fun Book.withAuthor(author: String) = copy(content = content.copy(author = author))
 
 fun book(
   chapters: List<Chapter>,
