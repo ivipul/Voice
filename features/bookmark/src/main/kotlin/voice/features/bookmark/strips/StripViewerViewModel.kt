@@ -13,6 +13,7 @@ import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import voice.core.data.BookId
 import voice.core.data.Chapter
@@ -53,7 +54,10 @@ class StripViewerViewModel(
   fun start() {
     scope.launch {
       currentBookStore.updateData { bookId }
-      seekTo(manifest.frames.first().startMs)
+      val chapters = bookRepository.get(bookId)?.chapters ?: return@launch
+      val (chapterId, positionInChapter) = chapters.chapterPositionOf(manifest.frames.first().startMs) ?: return@launch
+      playerController.setPosition(positionInChapter, chapterId)
+      playerController.play()
     }
   }
 
@@ -63,6 +67,10 @@ class StripViewerViewModel(
       val (chapterId, positionInChapter) = chapters.chapterPositionOf(bookMs) ?: return@launch
       playerController.setPosition(positionInChapter, chapterId)
     }
+  }
+
+  fun close() {
+    scope.cancel()
   }
 
   @Composable

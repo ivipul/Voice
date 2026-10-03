@@ -9,6 +9,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,6 +95,15 @@ class StripViewerViewModelTest {
   fun startSeeksToFirstFrameInItsChapter() = runTest {
     viewModel().start()
     verify { playerController.setPosition(1_000L, first.id) }
+  }
+
+  @Test
+  fun startSeeksToFirstFrameThenPlays() = runTest {
+    viewModel().start()
+    verifyOrder {
+      playerController.setPosition(1_000L, first.id)
+      playerController.play()
+    }
   }
 
   @Test
