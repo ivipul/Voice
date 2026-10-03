@@ -10,8 +10,18 @@
   ['roster', 'depth', 'eyebrow', 'name', 'desc', 'when', 'cardName', 'cardEp', 'bLv', 'bFl', 'bFlName', 'line1Look', 'line1Time', 'hexes',
     'figure', 'hero', 'empty', 'skills', 'skillCount', 'loadout', 'calloutT', 'calloutB', 'log', 'sampleChip', 'lookSeq', 'lookText', 'lookFile',
     'track', 'segs', 'ticks', 'head', 'headLbl', 'bookLbl', 'total', 'party', 'partyWhen', 'members', 'scene3d', 'tilt', 'flip', 'hint',
+<<<<<<< Updated upstream
     'btnParty', 'btnClose', 'btnPrev', 'btnNext', 'btnPlay', 'playIcon', 'loading', 'scene', 'title', 'more', 'descFull', 'descFullEyebrow', 'descFullText', 'descFullWhen'].forEach(function (k) { els[k] = $(k); });
+=======
+    'more', 'btnParty', 'btnClose', 'btnPrev', 'btnNext', 'btnPlay', 'playIcon', 'loading', 'scene'].forEach(function (k) { els[k] = $(k); });
+>>>>>>> Stashed changes
 
+  function setDescOpen(open) {
+    els.desc.classList.toggle('open', open);
+    els.scene.classList.toggle('desc-open', open);
+    els.more.setAttribute('aria-expanded', open);
+    els.more.textContent = open ? 'Show less' : 'Read more';
+  }
   function cur() { return chars[state.idx]; }
   function doc() { return docs[cur().slug]; }
   function imgFor(look, pref) {
@@ -44,7 +54,12 @@
     // warm the textures of every first look so switching never shows a blank
     chars.forEach(function (c) { var l = docs[c.slug].looks; if (morph && l.length) morph.preload(imgFor(l[0], 'action')); });
     select(i, null, true);
+<<<<<<< Updated upstream
     wireCard(); wireTimeline(); wireKeys(); wireDesc();
+=======
+    wireCard(); wireTimeline(); wireKeys();
+    els.more.addEventListener('click', function () { setDescOpen(!els.desc.classList.contains('open')); });
+>>>>>>> Stashed changes
     els.btnParty.addEventListener('click', function () { setParty(!state.party); });
     els.btnClose.addEventListener('click', function () { setParty(false); });
     els.btnPrev.addEventListener('click', function () { stepLook(-1); });
@@ -212,9 +227,14 @@
       var url = imgFor(look, 'action');
       if (morph) morph.show(url, charChanged && state.lastSel === null);
       els.empty.hidden = !!url;
+      setDescOpen(false);
       els.desc.textContent = look ? look.description : (looks.length ? 'Before the first recorded look.' : 'No looks bundled for this crawler yet.');
+<<<<<<< Updated upstream
       els.descFull.hidden = true;
       checkClamp();
+=======
+      requestAnimationFrame(function () { els.more.hidden = els.desc.scrollHeight <= els.desc.clientHeight + 1; });
+>>>>>>> Stashed changes
       els.eyebrow.textContent = look ? 'Crawler · look ' + pad2(li + 1) + ' / ' + pad2(looks.length) : 'Crawler · ' + looks.length + ' looks';
       els.line1Look.textContent = look ? 'Look ' + pad2(li + 1) + ' / ' + pad2(looks.length) : 'Look – / ' + pad2(looks.length);
       els.calloutT.textContent = look ? 'Look ' + pad2(li + 1) + ' · B' + look.book + ' ' + look.t : 'No look yet';
