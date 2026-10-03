@@ -112,8 +112,9 @@ interface PlaybackModule {
   }
 }
 
-// Android Auto lays these out left to right: Rewind, then Ask and Snip, with Forward at the far
-// right. Ask takes the forward slot and Snip/Forward share the overflow slot, in this order.
+// Android Auto only supports the back, forward and overflow slots (Media3 drops buttons in the
+// other slots). Rewind keeps the back slot; Ask, Snip and Forward share the overflow slot, which is
+// laid out in list order.
 internal fun mediaButtonPreferences(context: Context): List<CommandButton> = listOf(
   CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
     .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
@@ -124,7 +125,7 @@ internal fun mediaButtonPreferences(context: Context): List<CommandButton> = lis
     .setCustomIconResId(R.drawable.ic_copilot_ask)
     .setDisplayName(context.getString(StringsR.string.copilot_action_ask))
     .setSessionCommand(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
-    .setSlots(CommandButton.SLOT_FORWARD)
+    .setSlots(CommandButton.SLOT_OVERFLOW)
     .build(),
   CommandButton.Builder(CommandButton.ICON_UNDEFINED)
     .setCustomIconResId(R.drawable.ic_copilot_snip)
