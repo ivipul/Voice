@@ -26,6 +26,7 @@ internal sealed interface CustomCommand {
 
     const val CUSTOM_COMMAND_ACTION = "voiceCommandAction"
     const val COPILOT_ASK_ACTION = "voiceCopilotAsk"
+    const val COPILOT_SNIP_ACTION = "voiceCopilotSnip"
     internal const val CUSTOM_COMMAND_EXTRA = "voiceCommandExtra"
     internal fun parse(
       command: SessionCommand,
