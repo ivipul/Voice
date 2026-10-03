@@ -295,6 +295,8 @@ class LibrarySessionCallback(
     val sessionCommands = connectionResult.availableSessionCommands
       .buildUpon()
       .add(SessionCommand(CustomCommand.CUSTOM_COMMAND_ACTION, Bundle.EMPTY))
+      .add(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
+      .add(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
       .build()
     return ConnectionResult.accept(
       sessionCommands,
@@ -316,6 +318,14 @@ class LibrarySessionCallback(
     customCommand: SessionCommand,
     args: Bundle,
   ): ListenableFuture<SessionResult> {
+    if (customCommand.customAction == CustomCommand.COPILOT_ASK_ACTION) {
+      performAction(CoPilotTriggerAction.OpenMic)
+      return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+    }
+    if (customCommand.customAction == CustomCommand.COPILOT_SNIP_ACTION) {
+      performAction(CoPilotTriggerAction.Snip)
+      return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+    }
     val command = CustomCommand.parse(customCommand, args)
       ?: return super.onCustomCommand(session, controller, customCommand, args)
     when (command) {
