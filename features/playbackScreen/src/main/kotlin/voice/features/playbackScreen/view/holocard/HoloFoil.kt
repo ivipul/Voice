@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import voice.core.logging.api.Logger
 
-private val RainbowColors = listOf(
+internal val RainbowColors = listOf(
   Color(0xFFFF4FA8),
   Color(0xFFFFD24A),
   Color(0xFF4DFFB0),

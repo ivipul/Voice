@@ -185,8 +185,10 @@ class RealCoPilotPipelineTest {
     coPilotRepository.snipEvents.test {
       pipeline.snip(book.id)
 
-      assertEquals(SnipEvent.Started, awaitItem())
-      assertEquals(SnipEvent.Ready("Carl's blade froze mid-swing."), awaitItem())
+      assertEquals(SnipEvent.Started(drawsFrame = false), awaitItem())
+      val ready = awaitItem() as SnipEvent.Ready
+      assertEquals("Carl's blade froze mid-swing.", ready.text)
+      assertEquals(coPilotRepository.allMessagesByBook.value.getValue(book.id).single().id, ready.messageId)
     }
   }
 
@@ -198,7 +200,7 @@ class RealCoPilotPipelineTest {
     coPilotRepository.snipEvents.test {
       pipeline.snip(book.id)
 
-      assertEquals(SnipEvent.Started, awaitItem())
+      assertEquals(SnipEvent.Started(drawsFrame = false), awaitItem())
       assertEquals(SnipEvent.Failed, awaitItem())
     }
   }
