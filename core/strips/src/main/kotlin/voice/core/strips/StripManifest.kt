@@ -13,6 +13,8 @@ data class StripManifest(
   val summary: String,
   @SerialName("hero_frames") val heroFrames: List<Int> = emptyList(),
   @SerialName("last_frame_hold_ms") val lastFrameHoldMs: Long,
+  /** The composed full strip, shown as a final frame after the last comic frame; null when there is none. */
+  @SerialName("strip_image") val stripImage: String? = null,
   val frames: List<StripFrame>,
 )
 

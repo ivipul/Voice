@@ -19,6 +19,7 @@ import voice.core.playback.PlayerController
 import voice.core.playback.playstate.PlayStateManager
 import voice.core.playback.story.StoryPlayer
 import voice.core.strips.AvailableStrip
+import voice.core.strips.frameCount
 import voice.core.strips.frameIndexAt
 import voice.core.strips.nextSeekMs
 import voice.core.strips.previousSeekMs
@@ -109,7 +110,7 @@ class StripViewerViewModel(
     val displayIndex = frameIndex ?: 0
     return StripViewerViewState(
       frameIndex = displayIndex,
-      progress = manifest.frames.indices.map { index ->
+      progress = (0 until manifest.frameCount).map { index ->
         progressOf(index, displayIndex, bookMs.takeIf { frameIndex != null })
       },
       isPlaying = story?.isPlaying ?: true,
@@ -127,7 +128,7 @@ class StripViewerViewModel(
       index > displayIndex -> 0f
       bookMs == null -> 0f
       else -> {
-        val start = manifest.frames[index].startMs
+        val start = if (index < manifest.frames.size) manifest.frames[index].startMs else manifest.segmentEndMs(index - 1)
         val end = manifest.segmentEndMs(index)
         ((bookMs - start).toFloat() / (end - start).toFloat()).coerceIn(0f, 1f)
       }

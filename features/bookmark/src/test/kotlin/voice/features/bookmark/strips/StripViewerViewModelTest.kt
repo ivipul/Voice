@@ -64,6 +64,7 @@ class StripViewerViewModelTest {
     directory = File("strip"),
   )
 
+  private val stripWithImage = strip.copy(manifest = strip.manifest.copy(stripImage = "ch01-strip.png"))
   private val story = MutableStateFlow<StoryPlayer.State?>(null)
   private val storyPlayer = mockk<StoryPlayer>(relaxed = true) {
     every { state } returns story
@@ -88,7 +89,7 @@ class StripViewerViewModelTest {
     Dispatchers.resetMain()
   }
 
-  private fun viewModel() = StripViewerViewModel(
+  private fun viewModel(strip: AvailableStrip = this.strip) = StripViewerViewModel(
     storyPlayer = storyPlayer,
     playerController = playerController,
     playStateManager = playStateManager,
@@ -286,6 +287,87 @@ class StripViewerViewModelTest {
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       story.value = StoryPlayer.State(bookMs = 6_000L, isPlaying = true)
       awaitFrame(2)
+      assertFalse(viewModel.onNext())
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun theFullStripIsAnExtraFinalFrameWithItsOwnProgressSegment() = runTest {
+    val viewModel = viewModel(stripWithImage)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 16_000L + 3_500L, isPlaying = true)
+      val state = awaitUntil { it.frameIndex == 3 }
+      assertEquals(4, state.progress.size)
+      assertEquals(listOf(1f, 1f, 1f), state.progress.take(3))
+      assertEquals(3_500f / 7_000f, state.progress[3], 0.0001f)
+      assertFalse(state.closed)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun theStoryClosesSevenSecondsAfterTheFullStripAppears() = runTest {
+    val viewModel = viewModel(stripWithImage)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 16_000L, isPlaying = true)
+      assertFalse(awaitUntil { it.frameIndex == 3 }.closed)
+      story.value = StoryPlayer.State(bookMs = 22_900L, isPlaying = true)
+      assertFalse(awaitUntil { it.progress[3] > 0.9f }.closed)
+      story.value = StoryPlayer.State(bookMs = 23_000L, isPlaying = true)
+      assertTrue(awaitUntil { it.closed }.closed)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun aPausedStoryStaysOnTheFullStripWithoutClosing() = runTest {
+    val viewModel = viewModel(stripWithImage)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 20_000L, isPlaying = false)
+      val paused = awaitUntil { it.frameIndex == 3 }
+      assertFalse(paused.isPlaying)
+      assertFalse(paused.closed)
+      story.value = StoryPlayer.State(bookMs = 20_000L, isPlaying = false)
+      expectNoEvents()
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun nextFromTheLastComicFrameShowsTheFullStripAndNextOnItClosesTheStory() = runTest {
+    val viewModel = viewModel(stripWithImage)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 6_500L, isPlaying = true)
+      awaitFrame(2)
+      assertTrue(viewModel.onNext())
+      verify { storyPlayer.seekTo(16_000L) }
+      awaitFrame(3)
+      assertFalse(viewModel.onNext())
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun backFromTheFullStripGoesToTheLastComicFrame() = runTest {
+    val viewModel = viewModel(stripWithImage)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 17_000L, isPlaying = true)
+      awaitFrame(3)
+      viewModel.onPrevious()
+      verify { storyPlayer.seekTo(6_000L) }
+      awaitFrame(2)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun withoutAStripImageTheLastFrameStillHasNoNext() = runTest {
+    val viewModel = viewModel()
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      story.value = StoryPlayer.State(bookMs = 6_500L, isPlaying = true)
+      val state = awaitUntil { it.frameIndex == 2 }
+      assertEquals(3, state.progress.size)
       assertFalse(viewModel.onNext())
       cancelAndIgnoreRemainingEvents()
     }
