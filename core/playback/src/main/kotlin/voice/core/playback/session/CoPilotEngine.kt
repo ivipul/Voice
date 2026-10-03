@@ -81,7 +81,7 @@ class CoPilotEngine(
     .setMaxStreams(2)
     .setAudioAttributes(
       AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setUsage(AudioAttributes.USAGE_ASSISTANT)
         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build(),
     )
@@ -321,6 +321,14 @@ class CoPilotEngine(
     textToSpeech = TextToSpeech(context) { status ->
       val tts = textToSpeech
       if (status == TextToSpeech.SUCCESS && tts != null) {
+        // On Android Auto the spoken answer played on the phone speaker only while the book was paused,
+        // so tag it (and the cues) as assistant audio, which Android Auto can route to the car.
+        tts.setAudioAttributes(
+          AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ASSISTANT)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build(),
+        )
         tts.setOnUtteranceProgressListener(
           object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
