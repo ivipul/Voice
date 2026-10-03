@@ -471,20 +471,20 @@ class BookPlayViewModel(
     try {
       copilotRepository.snipEvents.collect(::onSnipEvent)
     } finally {
-      if (snipSheet.value == SnipSheetViewState.Loading) snipSheet.value = null
+      if (snipSheet.value is SnipSheetViewState.Loading) snipSheet.value = null
     }
   }
 
   private fun onSnipEvent(event: SnipEvent) {
     when (event) {
-      SnipEvent.Started -> {
-        snipSheet.value = SnipSheetViewState.Loading
+      is SnipEvent.Started -> {
+        snipSheet.value = SnipSheetViewState.Loading(drawsFrame = event.drawsFrame)
         viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
       }
-      is SnipEvent.Ready -> if (snipSheet.value == SnipSheetViewState.Loading) {
-        snipSheet.value = SnipSheetViewState.Ready(event.text)
+      is SnipEvent.Ready -> if (snipSheet.value is SnipSheetViewState.Loading) {
+        snipSheet.value = SnipSheetViewState.Ready(event.text, event.messageId)
       }
-      SnipEvent.Failed -> if (snipSheet.value == SnipSheetViewState.Loading) {
+      SnipEvent.Failed -> if (snipSheet.value is SnipSheetViewState.Loading) {
         snipSheet.value = null
       }
     }

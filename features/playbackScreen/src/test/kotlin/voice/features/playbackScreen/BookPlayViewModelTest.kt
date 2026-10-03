@@ -395,14 +395,14 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
     runCurrent()
     assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.SnipSaved), effects)
-    assertEquals(SnipSheetViewState.Loading, viewModel.snipSheet.value)
+    assertEquals(SnipSheetViewState.Loading(drawsFrame = true), viewModel.snipSheet.value)
 
-    copilotRepository.emitSnipEvent(SnipEvent.Ready("Carl's blade froze mid-swing."))
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("Carl's blade froze mid-swing.", "m1"))
     runCurrent()
-    assertEquals(SnipSheetViewState.Ready("Carl's blade froze mid-swing."), viewModel.snipSheet.value)
+    assertEquals(SnipSheetViewState.Ready("Carl's blade froze mid-swing.", "m1"), viewModel.snipSheet.value)
     assertEquals(1, effects.size)
   }
 
@@ -423,8 +423,8 @@ class BookPlayViewModelTest {
   @Test
   fun `snips captured while nothing is collecting are dropped`() = scope.runTest {
     val effects = mutableListOf<BookPlayViewEffect>()
-    copilotRepository.emitSnipEvent(SnipEvent.Started)
-    copilotRepository.emitSnipEvent(SnipEvent.Ready("missed"))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("missed", "m0"))
 
     backgroundScope.launch { viewModel.collectSnipEvents() }
     backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
@@ -439,9 +439,9 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
     runCurrent()
-    assertEquals(SnipSheetViewState.Loading, viewModel.snipSheet.value)
+    assertEquals(SnipSheetViewState.Loading(drawsFrame = true), viewModel.snipSheet.value)
 
     copilotRepository.emitSnipEvent(SnipEvent.Failed)
     runCurrent()
@@ -453,10 +453,10 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
     runCurrent()
     viewModel.onSnipSheetDismiss()
-    copilotRepository.emitSnipEvent(SnipEvent.Ready("late"))
+    copilotRepository.emitSnipEvent(SnipEvent.Ready("late", "m2"))
     runCurrent()
 
     assertEquals(null, viewModel.snipSheet.value)
@@ -466,7 +466,7 @@ class BookPlayViewModelTest {
   fun `leaving the screen while capturing clears the loading sheet`() = scope.runTest {
     val collector = backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
-    copilotRepository.emitSnipEvent(SnipEvent.Started)
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
     runCurrent()
 
     collector.cancelAndJoin()
