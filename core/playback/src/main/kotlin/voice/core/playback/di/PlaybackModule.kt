@@ -112,28 +112,35 @@ interface PlaybackModule {
   }
 }
 
-// Android Auto only supports the back, forward and overflow slots (Media3 drops buttons in the
-// other slots). Rewind keeps the back slot; Ask, Snip and Forward share the overflow slot, which is
-// laid out in list order.
+// Android Auto's player row has two left slots, which Media3 fills from SLOT_BACK and SLOT_FORWARD
+// (the mini player card shows only these), and a right-aligned group, which it fills from
+// SLOT_OVERFLOW in list order; every other slot is dropped. So Ask and Snip take the left slots
+// and Recap, the 15 s rewind and the 30 s forward buttons sit together on the right.
 internal fun mediaButtonPreferences(context: Context): List<CommandButton> = listOf(
-  CommandButton.Builder(CommandButton.ICON_SKIP_BACK)
-    .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
-    .setPlayerCommand(Player.COMMAND_SEEK_BACK)
-    .setSlots(CommandButton.SLOT_BACK)
-    .build(),
   CommandButton.Builder(CommandButton.ICON_UNDEFINED)
     .setCustomIconResId(R.drawable.ic_copilot_ask)
     .setDisplayName(context.getString(StringsR.string.copilot_action_ask))
     .setSessionCommand(SessionCommand(CustomCommand.COPILOT_ASK_ACTION, Bundle.EMPTY))
-    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .setSlots(CommandButton.SLOT_BACK)
     .build(),
   CommandButton.Builder(CommandButton.ICON_UNDEFINED)
     .setCustomIconResId(R.drawable.ic_copilot_snip)
     .setDisplayName(context.getString(StringsR.string.copilot_action_snip))
     .setSessionCommand(SessionCommand(CustomCommand.COPILOT_SNIP_ACTION, Bundle.EMPTY))
+    .setSlots(CommandButton.SLOT_FORWARD)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    .setCustomIconResId(R.drawable.ic_copilot_recap)
+    .setDisplayName(context.getString(StringsR.string.copilot_action_recap))
+    .setSessionCommand(SessionCommand(CustomCommand.COPILOT_RECAP_ACTION, Bundle.EMPTY))
     .setSlots(CommandButton.SLOT_OVERFLOW)
     .build(),
-  CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD)
+  CommandButton.Builder(CommandButton.ICON_SKIP_BACK_15)
+    .setDisplayName(context.getString(StringsR.string.playback_action_rewind))
+    .setPlayerCommand(Player.COMMAND_SEEK_BACK)
+    .setSlots(CommandButton.SLOT_OVERFLOW)
+    .build(),
+  CommandButton.Builder(CommandButton.ICON_SKIP_FORWARD_30)
     .setDisplayName(context.getString(StringsR.string.playback_action_fast_forward))
     .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
     .setSlots(CommandButton.SLOT_OVERFLOW)
