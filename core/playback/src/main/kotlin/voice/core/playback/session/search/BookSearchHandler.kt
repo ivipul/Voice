@@ -45,21 +45,29 @@ class BookSearchHandler(
   // Look for anything that might match the query
   private suspend fun searchUnstructured(query: String?): Book? {
     if (!query.isNullOrBlank()) {
-      val foundMatch = findBook {
-        val bookNameMatches = it.content.name.contains(query, ignoreCase = true)
-        val authorMatches = it.content.author?.contains(query, ignoreCase = true) == true
-        val chapterNameMatches = it.chapters.any { chapter ->
-          val chapterName = chapter.name
-          chapterName != null && chapterName.contains(query, ignoreCase = true)
-        }
-        bookNameMatches || authorMatches || chapterNameMatches
-      }
+      val foundMatch = findBook { it.matches(query) }
       if (foundMatch != null) return foundMatch
     }
 
     Logger.i("continuing from search without query")
     val currentId = currentBookStore.data.first()
     return findBook { it.content.id == currentId }
+  }
+
+  /** Every book whose name, author or a chapter name contains [query]; empty for a blank query. */
+  suspend fun searchAll(query: String?): List<Book> {
+    if (query.isNullOrBlank()) return emptyList()
+    return repo.all().filter { it.matches(query) }
+  }
+
+  private fun Book.matches(query: String): Boolean {
+    val bookNameMatches = content.name.contains(query, ignoreCase = true)
+    val authorMatches = content.author?.contains(query, ignoreCase = true) == true
+    val chapterNameMatches = chapters.any { chapter ->
+      val chapterName = chapter.name
+      chapterName != null && chapterName.contains(query, ignoreCase = true)
+    }
+    return bookNameMatches || authorMatches || chapterNameMatches
   }
 
   private suspend fun searchByArtist(search: VoiceSearch): Book? {
