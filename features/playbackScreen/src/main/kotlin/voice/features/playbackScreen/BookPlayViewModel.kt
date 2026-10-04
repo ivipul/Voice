@@ -55,6 +55,12 @@ import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.core.copilot.SnipEvent
 import voice.core.xray.XRayEntityInfo
+import voice.core.strips.ActiveStripFrame
+import voice.core.strips.AvailableStrip
+import voice.core.strips.StripRepository
+import voice.core.strips.activeFrameAt
+import voice.core.strips.chapterPositionOf
+import voice.core.strips.zonesWithin
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
@@ -100,6 +106,7 @@ class BookPlayViewModel(
   private val speechInputController: SpeechInputController,
   private val xrayRepository: XRayRepository,
   private val playerCardRepository: PlayerCardRepository,
+  private val stripRepository: StripRepository,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -170,6 +177,13 @@ class BookPlayViewModel(
     val xrayManifest by produceState<XRayManifest?>(initialValue = null, book.currentChapter.id) {
       value = xrayRepository.manifestFor(book)
     }
+    val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
+      value = stripRepository.stripsFor(book.content.name)
+    }
+    val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
+    val stripZones = remember(strips, markStartBookMs, currentMark.durationMs) {
+      strips.zonesWithin(markStartBookMs, markStartBookMs + currentMark.durationMs)
+    }
     val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
     }.orEmpty()
@@ -186,6 +200,8 @@ class BookPlayViewModel(
       skipBackSeconds = skipBackSeconds,
       skipForwardSeconds = skipForwardSeconds,
       xrayChips = xrayChips,
+      stripZones = stripZones,
+      stripFrame = strips.activeFrameAt(book.position),
     )
   }
 
@@ -369,6 +385,20 @@ class BookPlayViewModel(
 
   fun onBookmarkClick() {
     navigator.goTo(Destination.Bookmarks(bookId))
+  }
+
+  /** A tap inside a strip's zone on the seek bar: jump to where that strip starts. */
+  fun onStripZoneTap(startBookMs: Long) {
+    scope.launch {
+      val book = currentBook() ?: return@launch
+      val (chapterId, positionInChapter) = book.chapters.chapterPositionOf(startBookMs) ?: return@launch
+      player.setPosition(positionInChapter, chapterId)
+    }
+  }
+
+  /** A tap on the strip frame that replaces the cover: open the story on that frame. */
+  fun onStripFrameClick(frame: ActiveStripFrame) {
+    navigator.goTo(Destination.StripStory(bookId, frame.strip.manifest.chapter, frame.frameIndex, linkedToBook = true))
   }
 
   fun onXRayChipClick(id: String) {

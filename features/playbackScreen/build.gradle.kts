@@ -10,6 +10,7 @@ dependencies {
   implementation(projects.core.strings)
   implementation(projects.core.playback)
   implementation(projects.core.copilot)
+  implementation(projects.core.strips)
   implementation(projects.core.data.api)
   implementation(projects.core.featureflag)
   implementation(projects.core.ui)

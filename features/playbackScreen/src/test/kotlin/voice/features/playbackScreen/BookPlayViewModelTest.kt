@@ -42,6 +42,13 @@ import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
 import voice.core.copilot.CoPilotMessage
+import voice.core.strips.ActiveStripFrame
+import voice.core.strips.AvailableStrip
+import voice.core.strips.StripFrame
+import voice.core.strips.StripManifest
+import voice.navigation.Destination
+import voice.navigation.Navigator
+import java.io.File
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.core.copilot.SnipEvent
@@ -110,6 +117,7 @@ class BookPlayViewModelTest {
       title = null,
     )
   }
+  private val navigator = mockk<Navigator>(relaxed = true)
   private val viewModel = BookPlayViewModel(
     bookRepository = mockk {
       coEvery { get(book.id) } returns book
@@ -122,7 +130,7 @@ class BookPlayViewModelTest {
     sleepTimer = sleepTimer,
     playStateManager = playStateManager,
     currentBookStoreId = currentBookStoreId,
-    navigator = mockk(),
+    navigator = navigator,
     bookmarkRepository = bookmarkRepository,
     volumeGainFormatter = mockk(),
     batteryOptimization = mockk(),
@@ -141,6 +149,9 @@ class BookPlayViewModelTest {
     },
     playerCardRepository = mockk {
       coEvery { cardsFor(any()) } returns null
+    },
+    stripRepository = mockk {
+      coEvery { stripsFor(any()) } returns emptyList()
     },
   )
 
@@ -336,6 +347,94 @@ class BookPlayViewModelTest {
       assertEquals(expected = true, actual = state.playing)
       assertEquals(expected = 30.seconds, actual = state.playedTime)
     }
+  }
+
+  // The book is two 5 minute files; the current mark is "Middle Section" of the second (7:00 to 9:00 of the book).
+  private fun strip(
+    startsMs: List<Long>,
+    holdMs: Long,
+    chapter: Int = 1,
+  ) = AvailableStrip(
+    manifest = StripManifest(
+      schemaVersion = 1,
+      book = 1,
+      bookTitlePrefix = "Dungeon Crawler Carl",
+      chapter = chapter,
+      title = "A strip",
+      summary = "s",
+      lastFrameHoldMs = holdMs,
+      frames = startsMs.mapIndexed { index, start -> StripFrame(index + 1, "f${index + 1}-final.png", start) },
+    ),
+    directory = File("strip$chapter"),
+  )
+
+  private fun bookAt(positionInChapterMs: Long): Book = book().let {
+    it.copy(content = it.content.copy(positionInChapter = positionInChapterMs))
+  }
+
+  @Test
+  fun `viewState puts a strip on the seek bar as a fraction of the current chapter and shows its frame`() = scope.runTest {
+    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L)
+    val bookAtSevenThirty = bookAt(2.5.minutes.inWholeMilliseconds)
+    val viewModel = viewModel(book = bookAtSevenThirty, strips = listOf(strip))
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      val span = 119_999f
+      val zone = state.stripZones.single()
+      assertEquals((430_000f - 420_000f) / span, zone.startFraction, 0.0001f)
+      assertEquals((490_000f - 420_000f) / span, zone.endFraction, 0.0001f)
+      assertEquals(430_000L, zone.startBookMs)
+      assertEquals(0, state.stripFrame?.frameIndex)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `the strip frame follows the position and the cover returns once the strip is done`() = scope.runTest {
+    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L)
+    for ((positionInChapter, expectedFrame) in listOf(3.minutes to 1, 3.8.minutes to null)) {
+      val viewModel = viewModel(book = bookAt(positionInChapter.inWholeMilliseconds), strips = listOf(strip))
+      backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+        var state = awaitItem()
+        while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+        assertEquals(expectedFrame, state.stripFrame?.frameIndex)
+        cancelAndIgnoreRemainingEvents()
+      }
+    }
+  }
+
+  @Test
+  fun `without strips there are no zones and the cover stays`() = scope.runTest {
+    val viewModel = viewModel()
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null) state = awaitItem()
+      assertEquals(emptyList(), state.stripZones)
+      assertEquals(null, state.stripFrame)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `tapping a strip zone seeks to the strip start in the right file`() = scope.runTest {
+    every { player.setPosition(any(), any()) } just Runs
+
+    viewModel.onStripZoneTap(430_000L)
+    yield()
+
+    // 430 s into the book is 130 s into the second 5 minute file.
+    verify { player.setPosition(130_000L, book.chapters[1].id) }
+  }
+
+  @Test
+  fun `tapping the strip frame opens the story on that frame`() = scope.runTest {
+    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L, chapter = 3)
+
+    viewModel.onStripFrameClick(ActiveStripFrame(strip, frameIndex = 1))
+
+    verify { navigator.goTo(Destination.StripStory(book.id, chapter = 3, startFrameIndex = 1, linkedToBook = true)) }
   }
 
   @Test
@@ -640,6 +739,7 @@ class BookPlayViewModelTest {
     playStateFlow: MutableStateFlow<PlayStateManager.PlayState> = MutableStateFlow(PlayStateManager.PlayState.Paused),
     xrayManifest: XRayManifest? = null,
     playerCards: PlayerCardSet? = null,
+    strips: List<AvailableStrip> = emptyList(),
   ): BookPlayViewModel {
     return BookPlayViewModel(
       bookRepository = mockk {
@@ -676,6 +776,9 @@ class BookPlayViewModelTest {
       },
       playerCardRepository = mockk<PlayerCardRepository> {
         coEvery { cardsFor(any()) } returns playerCards
+      },
+      stripRepository = mockk {
+        coEvery { stripsFor(any()) } returns strips
       },
     )
   }
