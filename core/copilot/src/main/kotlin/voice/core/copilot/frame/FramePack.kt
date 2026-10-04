@@ -5,6 +5,7 @@ import dev.zacsweers.metro.Inject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import voice.core.data.withoutBookNumber
 import voice.core.logging.api.Logger
 import java.io.File
 
@@ -78,7 +79,7 @@ class FramePack(private val context: Context) {
     val looks = readLooks()
     // Prefix, so both the embedded title ("Dungeon Crawler Carl") and a file-name title
     // ("Dungeon Crawler Carl - Dungeon Crawler Carl, Book 1") match book 1 but not book 2.
-    val matchesBook = looks?.bookTitle == null || bookTitle.startsWith(looks.bookTitle, ignoreCase = true)
+    val matchesBook = looks?.bookTitle == null || withoutBookNumber(bookTitle).startsWith(looks.bookTitle, ignoreCase = true)
     val characters = if (matchesBook) looks?.characters.orEmpty().map(::toCharacter) else emptyList()
     return FramePackData(looks?.bookTitle, styleImages(), characters)
   }

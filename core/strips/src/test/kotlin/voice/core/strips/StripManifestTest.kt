@@ -56,4 +56,12 @@ class StripManifestTest {
     assertFalse(strip.matchesBook("Dungeon Crawler Carl - Dungeon Crawler Carl, Book 2"))
     assertFalse(strip.matchesBook("Carl's Doomsday Scenario - Dungeon Crawler Carl, Book 2"))
   }
+
+  @Test
+  fun matchesNumberedAlbumNames() {
+    val book2 = manifest(starts = listOf(0L), holdMs = 1L, book = 2).copy(bookTitlePrefix = "Carl's Doomsday Scenario")
+    assertTrue(book2.matchesBook("2. Carl's Doomsday Scenario"))
+    assertFalse(book2.matchesBook("1. Carl's Doomsday Scenario"))
+    assertTrue(book2.matchesBook("Carl's Doomsday Scenario"))
+  }
 }

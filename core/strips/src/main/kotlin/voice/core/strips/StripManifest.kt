@@ -2,6 +2,8 @@ package voice.core.strips
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import voice.core.data.leadingBookNumber
+import voice.core.data.withoutBookNumber
 
 @Serializable
 data class StripManifest(
@@ -31,8 +33,10 @@ fun StripManifest.heroFrame(): StripFrame {
 }
 
 fun StripManifest.matchesBook(bookTitle: String): Boolean {
-  if (!bookTitle.startsWith(bookTitlePrefix, ignoreCase = true)) return false
-  val bookNumber = BOOK_NUMBER.find(bookTitle)?.groupValues?.get(1)?.toIntOrNull() ?: return true
+  if (!withoutBookNumber(bookTitle).startsWith(bookTitlePrefix, ignoreCase = true)) return false
+  val bookNumber = leadingBookNumber(bookTitle)
+    ?: BOOK_NUMBER.find(bookTitle)?.groupValues?.get(1)?.toIntOrNull()
+    ?: return true
   return bookNumber == book
 }
 

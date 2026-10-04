@@ -5,8 +5,10 @@ import voice.core.data.Book
 import voice.core.data.BookContent
 import voice.core.data.BookId
 import voice.core.data.Chapter
+import voice.core.data.numberedBookName
 import voice.core.data.repo.BookContentRepo
 import voice.core.data.repo.getOrPut
+import voice.core.data.resolveBookNumber
 import voice.core.data.toUri
 import voice.core.documentfile.CachedDocumentFile
 import voice.core.documentfile.CachedDocumentFileFactory
@@ -45,9 +47,12 @@ internal class BookParser(
       addedAt = Instant.now(),
       author = analyzed?.artist,
       lastPlayedAt = Instant.EPOCH,
-      name = analyzed?.album
-        ?: analyzed?.title?.takeIf { file.isFile }
-        ?: file.bookName(),
+      name = numberedBookName(
+        name = analyzed?.album
+          ?: analyzed?.title?.takeIf { file.isFile }
+          ?: file.bookName(),
+        number = resolveBookNumber(partTag = analyzed?.part, fileName = file.name),
+      ),
       playbackSpeed = 1F,
       skipSilence = false,
       chapters = chapters.map { it.id },
