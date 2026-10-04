@@ -89,13 +89,17 @@ class StripViewerViewModelTest {
     Dispatchers.resetMain()
   }
 
-  private fun viewModel(strip: AvailableStrip = this.strip) = StripViewerViewModel(
+  private fun viewModel(
+    strip: AvailableStrip = this.strip,
+    startFrameIndex: Int = 0,
+  ) = StripViewerViewModel(
     storyPlayer = storyPlayer,
     playerController = playerController,
     playStateManager = playStateManager,
     bookRepository = bookRepository,
     bookId = bookId,
     strip = strip,
+    startFrameIndex = startFrameIndex,
   )
 
   private fun bookIsPlaying() {
@@ -109,6 +113,26 @@ class StripViewerViewModelTest {
       playerController.pause()
       storyPlayer.start(chapters, 1_000L)
     }
+  }
+
+  @Test
+  fun startCanOpenOnALaterFrame() = runTest {
+    viewModel(startFrameIndex = 1).start()
+    verify { storyPlayer.start(chapters, 3_000L) }
+  }
+
+  @Test
+  fun aStartFrameBeyondTheLastIsClamped() = runTest {
+    viewModel(startFrameIndex = 99).start()
+    verify { storyPlayer.start(chapters, 6_000L) }
+  }
+
+  @Test
+  fun nextAfterOpeningOnALaterFrameAdvancesFromThatFrame() = runTest {
+    val viewModel = viewModel(startFrameIndex = 1)
+    viewModel.start()
+    assertTrue(viewModel.onNext())
+    verify { storyPlayer.seekTo(6_000L) }
   }
 
   @Test

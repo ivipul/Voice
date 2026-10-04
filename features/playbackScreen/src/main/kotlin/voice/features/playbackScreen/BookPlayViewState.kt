@@ -2,6 +2,8 @@ package voice.features.playbackScreen
 
 import androidx.compose.runtime.Immutable
 import voice.core.playback.misc.Decibel
+import voice.core.strips.ActiveStripFrame
+import voice.core.strips.StripZone
 import voice.core.xray.card.ComposedPlayerCard
 import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.composeAt
@@ -23,6 +25,10 @@ data class BookPlayViewState(
   val skipBackSeconds: Int,
   val skipForwardSeconds: Int,
   val xrayChips: List<XRayChipViewState>,
+  /** The strips that play within the current chapter, as ranges of the seek bar. */
+  val stripZones: List<StripZone> = emptyList(),
+  /** The strip frame to show in place of the cover while a strip is playing. */
+  val stripFrame: ActiveStripFrame? = null,
 ) {
 
   data class XRayChipViewState(val id: String, val label: String)

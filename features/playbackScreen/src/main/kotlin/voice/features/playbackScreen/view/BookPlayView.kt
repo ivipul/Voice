@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import voice.core.data.BookId
+import voice.core.strips.ActiveStripFrame
 import voice.core.ui.VoiceTheme
 import voice.features.playbackScreen.BookPlayViewState
 import kotlin.time.Duration
@@ -23,6 +24,8 @@ internal fun BookPlayView(
   onRewindClick: () -> Unit,
   onFastForwardClick: () -> Unit,
   onSeek: (Duration) -> Unit,
+  onStripZoneTap: (Long) -> Unit,
+  onStripFrameClick: (ActiveStripFrame) -> Unit,
   onSleepTimerClick: () -> Unit,
   onBookmarkClick: () -> Unit,
   onBookmarkLongClick: () -> Unit,
@@ -66,6 +69,8 @@ internal fun BookPlayView(
         onRewindClick = onRewindClick,
         onFastForwardClick = onFastForwardClick,
         onSeek = onSeek,
+        onStripZoneTap = onStripZoneTap,
+        onStripFrameClick = onStripFrameClick,
         onSkipToNext = onSkipToNext,
         onSkipToPrevious = onSkipToPrevious,
         onCurrentChapterClick = onCurrentChapterClick,
@@ -94,6 +99,8 @@ private fun BookPlayPreview(
       onRewindClick = {},
       onFastForwardClick = {},
       onSeek = {},
+      onStripZoneTap = {},
+      onStripFrameClick = {},
       onSleepTimerClick = {},
       onBookmarkClick = {},
       onBookmarkLongClick = {},

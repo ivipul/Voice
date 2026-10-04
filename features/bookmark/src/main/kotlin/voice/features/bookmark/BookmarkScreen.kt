@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
@@ -50,7 +51,9 @@ import dev.zacsweers.metro.Provides
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.core.data.Bookmark
+import voice.core.data.repo.BookRepository
 import voice.core.strips.AvailableStrip
+import voice.core.strips.StripRepository
 import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.dialogs.AddBookmarkDialog
 import voice.features.bookmark.dialogs.EditBookmarkDialog
@@ -59,6 +62,7 @@ import voice.features.bookmark.strips.StripViewer
 import voice.features.bookmark.strips.StripViewerViewModel
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
+import voice.navigation.Navigator
 import kotlin.uuid.Uuid
 import voice.core.strings.R as StringsR
 
@@ -71,6 +75,9 @@ private enum class BookmarkTab(val labelRes: Int) {
 interface Graph {
   val bookmarkViewModelFactory: BookmarkViewModel.Factory
   val stripViewerViewModelFactory: StripViewerViewModel.Factory
+  val stripRepository: StripRepository
+  val bookRepository: BookRepository
+  val navigator: Navigator
 }
 
 @ContributesTo(AppScope::class)
@@ -82,6 +89,29 @@ interface BookmarkProvider {
     NavEntry(key) {
       BookmarkScreen(bookId = key.bookId)
     }
+  }
+
+  @Provides
+  @IntoSet
+  fun stripStoryNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.StripStory> { key ->
+    NavEntry(key) {
+      StripStoryScreen(key)
+    }
+  }
+}
+
+@Composable
+fun StripStoryScreen(destination: Destination.StripStory) {
+  val graph = rootGraphAs<Graph>()
+  val strip by produceState<AvailableStrip?>(null, destination) {
+    val book = graph.bookRepository.get(destination.bookId) ?: return@produceState
+    value = graph.stripRepository.stripsFor(book.content.name).firstOrNull { it.manifest.chapter == destination.chapter }
+  }
+  strip?.let { loaded ->
+    val storyViewModel = remember(destination, loaded) {
+      graph.stripViewerViewModelFactory.create(destination.bookId, loaded, destination.startFrameIndex)
+    }
+    StripViewer(viewModel = storyViewModel, onClose = graph.navigator::goBack)
   }
 }
 
@@ -107,7 +137,7 @@ fun BookmarkScreen(bookId: BookId) {
     )
     viewState.activeStrip?.let { strip ->
       val storyViewModel = remember(bookId, strip) {
-        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip)
+        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip, 0)
       }
       StripViewer(viewModel = storyViewModel, onClose = viewModel::onStripClose)
     }

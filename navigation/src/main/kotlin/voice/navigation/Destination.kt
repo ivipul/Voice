@@ -19,6 +19,16 @@ sealed interface Destination {
     override val trackingName: String get() = "Bookmarks"
   }
 
+  /** The full-screen story of a chapter's strip, starting at one of its frames. */
+  @Serializable
+  data class StripStory(
+    val bookId: BookId,
+    val chapter: Int,
+    val startFrameIndex: Int,
+  ) : Compose {
+    override val trackingName: String get() = "StripStory"
+  }
+
   @Serializable
   data object CoPilotSettings : Compose {
     override val trackingName: String get() = "CoPilotSettings"

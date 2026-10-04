@@ -47,6 +47,9 @@ class StripViewerViewModel(
   private val bookId: BookId,
   @Assisted
   val strip: AvailableStrip,
+  /** The comic frame the story opens on; the first frame when it is not given. */
+  @Assisted
+  private val startFrameIndex: Int,
 ) {
 
   private val scope = MainScope()
@@ -62,7 +65,9 @@ class StripViewerViewModel(
       val chapters = bookRepository.get(bookId)?.chapters ?: return@launch
       resumeBookOnClose = playStateManager.playState == PlayStateManager.PlayState.Playing
       playerController.pause()
-      storyPlayer.start(chapters, manifest.frames.first().startMs)
+      val first = startFrameIndex.coerceIn(0, manifest.frames.lastIndex)
+      shownFrameIndex = first
+      storyPlayer.start(chapters, manifest.frames[first].startMs)
     }
   }
 
@@ -140,6 +145,7 @@ class StripViewerViewModel(
     fun create(
       bookId: BookId,
       strip: AvailableStrip,
+      startFrameIndex: Int,
     ): StripViewerViewModel
   }
 }
