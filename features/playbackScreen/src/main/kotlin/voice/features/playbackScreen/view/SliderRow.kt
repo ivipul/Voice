@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -148,7 +149,7 @@ private fun StripTrack(
           val width = right - left
           // Mirrored tiles repeat every two zone widths, so a drift of exactly that loops without a seam.
           val drift = if (zone == flowingZone) flow.value * 2f * width else 0f
-          drawRect(
+          drawRoundRect(
             brush = Brush.horizontalGradient(
               colors = listOf(colors.light, colors.deep),
               startX = left + drift,
@@ -157,6 +158,7 @@ private fun StripTrack(
             ),
             topLeft = Offset(left, 0f),
             size = Size(width, size.height),
+            cornerRadius = CornerRadius(minOf(size.height, width) / 2f),
           )
         }
       }
