@@ -48,6 +48,7 @@ private enum class TriggerSlot(val labelRes: Int) {
   SingleNext(StringsR.string.copilot_settings_trigger_single_next),
   SinglePrevious(StringsR.string.copilot_settings_trigger_single_previous),
   DoubleNext(StringsR.string.copilot_settings_trigger_double_next),
+  TripleNext(StringsR.string.copilot_settings_trigger_triple_next),
   DoublePrevious(StringsR.string.copilot_settings_trigger_double_previous),
 }
 
@@ -64,13 +65,14 @@ private val CoPilotTriggerAction.labelRes: Int
 /**
  * Single NEXT/PREVIOUS only offer the fixed-seek direction that matches their physical
  * gesture (rewind for PREVIOUS, forward for NEXT) - the other direction wouldn't make sense
- * mapped to that button. Double-tap slots don't offer either: a fixed skip is a single-press
- * action, not something worth reserving a double-tap for.
+ * mapped to that button. Double- and triple-tap slots don't offer either: a fixed skip is a
+ * single-press action, not something worth reserving a multi-tap for.
  */
 private fun TriggerSlot.availableActions(): List<CoPilotTriggerAction> = when (this) {
   TriggerSlot.SingleNext -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultRewind
   TriggerSlot.SinglePrevious -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultForward
   TriggerSlot.DoubleNext,
+  TriggerSlot.TripleNext,
   TriggerSlot.DoublePrevious,
   -> CoPilotTriggerAction.entries - CoPilotTriggerAction.DefaultRewind - CoPilotTriggerAction.DefaultForward
 }
@@ -79,6 +81,7 @@ private fun CoPilotButtonMapping.get(slot: TriggerSlot): CoPilotTriggerAction = 
   TriggerSlot.SingleNext -> singleNext
   TriggerSlot.SinglePrevious -> singlePrevious
   TriggerSlot.DoubleNext -> doubleNext
+  TriggerSlot.TripleNext -> tripleNext
   TriggerSlot.DoublePrevious -> doublePrevious
 }
 
@@ -87,6 +90,7 @@ private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerA
     TriggerSlot.SingleNext -> copy(singleNext = action)
     TriggerSlot.SinglePrevious -> copy(singlePrevious = action)
     TriggerSlot.DoubleNext -> copy(doubleNext = action)
+    TriggerSlot.TripleNext -> copy(tripleNext = action)
     TriggerSlot.DoublePrevious -> copy(doublePrevious = action)
   }
 
