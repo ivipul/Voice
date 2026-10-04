@@ -1,6 +1,7 @@
 package voice.features.playbackScreen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -176,6 +177,12 @@ class BookPlayViewModel(
     val skipForwardSeconds by remember { seekForwardTimeStore.data }.collectAsState(initial = 30)
     val xrayManifest by produceState<XRayManifest?>(initialValue = null, book.currentChapter.id) {
       value = xrayRepository.manifestFor(book)
+    }
+    // Finding a card's files in the audiobook folder is slow, so it is done now rather than when a chip is tapped.
+    LaunchedEffect(book.currentChapter.id) {
+      withContext(dispatcherProvider.io) {
+        playerCardRepository.cardsFor(book)?.resolveAllImages()
+      }
     }
     val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
       value = stripRepository.stripsFor(book.content.name)
