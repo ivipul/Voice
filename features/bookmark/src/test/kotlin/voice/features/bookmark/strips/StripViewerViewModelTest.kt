@@ -72,11 +72,15 @@ class StripViewerViewModelTest {
     every { seekTo(any()) } answers { story.value = StoryPlayer.State(firstArg(), isPlaying = true) }
   }
   private val playerController = mockk<PlayerController>(relaxed = true)
+  private val playState = MutableStateFlow(PlayStateManager.PlayState.Playing)
   private val playStateManager = mockk<PlayStateManager> {
     every { playState } returns PlayStateManager.PlayState.Paused
+    every { playStateFlow } returns this@StripViewerViewModelTest.playState
   }
+  private val persistedBook = MutableStateFlow<Book?>(null)
   private val bookRepository = mockk<BookRepository> {
     coEvery { get(bookId) } returns book
+    every { flow(bookId) } returns persistedBook
   }
 
   @BeforeTest
@@ -92,6 +96,7 @@ class StripViewerViewModelTest {
   private fun viewModel(
     strip: AvailableStrip = this.strip,
     startFrameIndex: Int = 0,
+    linkedToBook: Boolean = false,
   ) = StripViewerViewModel(
     storyPlayer = storyPlayer,
     playerController = playerController,
@@ -100,6 +105,7 @@ class StripViewerViewModelTest {
     bookId = bookId,
     strip = strip,
     startFrameIndex = startFrameIndex,
+    linkedToBook = linkedToBook,
   )
 
   private fun bookIsPlaying() {
@@ -393,6 +399,127 @@ class StripViewerViewModelTest {
       val state = awaitUntil { it.frameIndex == 2 }
       assertEquals(3, state.progress.size)
       assertFalse(viewModel.onNext())
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  private fun bookAt(bookMs: Long) = mockk<Book> {
+    every { position } returns bookMs
+    every { chapters } returns this@StripViewerViewModelTest.chapters
+  }
+
+  private fun linkedViewModel(
+    strip: AvailableStrip = this.strip,
+    startFrameIndex: Int = 1,
+  ) = viewModel(strip, startFrameIndex, linkedToBook = true)
+
+  @Test
+  fun aLinkedStoryOpensWithoutTouchingTheBook() = runTest {
+    bookIsPlaying()
+    persistedBook.value = bookAt(3_500L)
+    linkedViewModel().start()
+    verify(exactly = 0) { playerController.pause() }
+    verify(exactly = 0) { playerController.play() }
+    verify(exactly = 0) { playerController.setPosition(any(), any()) }
+    verify(exactly = 0) { storyPlayer.start(any(), any()) }
+  }
+
+  @Test
+  fun aLinkedStoryFollowsTheBooksPosition() = runTest {
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      val state = awaitUntil { it.frameIndex == 1 && it.progress[1] > 0f }
+      assertEquals(500f / 3_000f, state.progress[1], 0.0001f)
+      persistedBook.value = bookAt(6_500L)
+      assertEquals(2, awaitUntil { it.frameIndex == 2 }.frameIndex)
+      verify(exactly = 0) { storyPlayer.seekTo(any()) }
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun aLinkedStoryReportsTheBooksPlayState() = runTest {
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      assertTrue(awaitUntil { it.frameIndex == 1 }.isPlaying)
+      playState.value = PlayStateManager.PlayState.Paused
+      assertFalse(awaitUntil { !it.isPlaying }.isPlaying)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun tappingNextInALinkedStorySeeksTheBookToTheNextFrame() = runTest {
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    viewModel.start()
+    assertTrue(viewModel.onNext())
+    // 6 s into the book is 4 s into the 20 s second file, which starts 2 s in.
+    verify { playerController.setPosition(4_000L, second.id) }
+    verify(exactly = 0) { storyPlayer.seekTo(any()) }
+  }
+
+  @Test
+  fun tappingBackInALinkedStorySeeksTheBookToThePreviousFrame() = runTest {
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    viewModel.start()
+    viewModel.onPrevious()
+    verify { playerController.setPosition(any(), any()) }
+    verify(exactly = 0) { storyPlayer.seekTo(any()) }
+  }
+
+  @Test
+  fun theLastFrameOfALinkedStoryHasNoNext() = runTest {
+    persistedBook.value = bookAt(6_500L)
+    val viewModel = linkedViewModel(startFrameIndex = 2)
+    viewModel.start()
+    assertFalse(viewModel.onNext())
+    verify(exactly = 0) { playerController.setPosition(any(), any()) }
+  }
+
+  @Test
+  fun thePlayButtonOfALinkedStoryPlaysAndPausesTheBook() = runTest {
+    linkedViewModel().togglePlaying()
+    verify { playerController.playPause() }
+    verify(exactly = 0) { storyPlayer.togglePlaying() }
+  }
+
+  @Test
+  fun closingALinkedStoryLeavesTheBookWhereItIsAndInItsPlayState() = runTest {
+    bookIsPlaying()
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    viewModel.start()
+    viewModel.close()
+    verify(exactly = 0) { storyPlayer.stop() }
+    verify(exactly = 0) { playerController.play() }
+    verify(exactly = 0) { playerController.pause() }
+    verify(exactly = 0) { playerController.setPosition(any(), any()) }
+  }
+
+  @Test
+  fun aLinkedStoryClosesWhenTheBookLeavesTheStripRange() = runTest {
+    persistedBook.value = bookAt(3_500L)
+    val viewModel = linkedViewModel()
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      assertFalse(awaitUntil { it.frameIndex == 1 }.closed)
+      persistedBook.value = bookAt(18_000L)
+      assertTrue(awaitUntil { it.closed }.closed)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun aLinkedStoryClosesAfterTheFullStripHold() = runTest {
+    persistedBook.value = bookAt(16_000L)
+    val viewModel = linkedViewModel(stripWithImage, startFrameIndex = 3)
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      assertFalse(awaitUntil { it.frameIndex == 3 }.closed)
+      persistedBook.value = bookAt(23_000L)
+      assertTrue(awaitUntil { it.closed }.closed)
       cancelAndIgnoreRemainingEvents()
     }
   }

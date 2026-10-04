@@ -434,7 +434,7 @@ class BookPlayViewModelTest {
 
     viewModel.onStripFrameClick(ActiveStripFrame(strip, frameIndex = 1))
 
-    verify { navigator.goTo(Destination.StripStory(book.id, chapter = 3, startFrameIndex = 1)) }
+    verify { navigator.goTo(Destination.StripStory(book.id, chapter = 3, startFrameIndex = 1, linkedToBook = true)) }
   }
 
   @Test

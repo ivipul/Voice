@@ -109,7 +109,7 @@ fun StripStoryScreen(destination: Destination.StripStory) {
   }
   strip?.let { loaded ->
     val storyViewModel = remember(destination, loaded) {
-      graph.stripViewerViewModelFactory.create(destination.bookId, loaded, destination.startFrameIndex)
+      graph.stripViewerViewModelFactory.create(destination.bookId, loaded, destination.startFrameIndex, destination.linkedToBook)
     }
     StripViewer(viewModel = storyViewModel, onClose = graph.navigator::goBack)
   }
@@ -137,7 +137,7 @@ fun BookmarkScreen(bookId: BookId) {
     )
     viewState.activeStrip?.let { strip ->
       val storyViewModel = remember(bookId, strip) {
-        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip, 0)
+        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip, 0, linkedToBook = false)
       }
       StripViewer(viewModel = storyViewModel, onClose = viewModel::onStripClose)
     }

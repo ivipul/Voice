@@ -19,12 +19,16 @@ sealed interface Destination {
     override val trackingName: String get() = "Bookmarks"
   }
 
-  /** The full-screen story of a chapter's strip, starting at one of its frames. */
+  /**
+   * The full-screen story of a chapter's strip, starting at one of its frames. [linkedToBook] makes the story the
+   * book's own playback (opened from the player) instead of a separate player that leaves the book untouched.
+   */
   @Serializable
   data class StripStory(
     val bookId: BookId,
     val chapter: Int,
     val startFrameIndex: Int,
+    val linkedToBook: Boolean = false,
   ) : Compose {
     override val trackingName: String get() = "StripStory"
   }

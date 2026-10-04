@@ -398,7 +398,7 @@ class BookPlayViewModel(
 
   /** A tap on the strip frame that replaces the cover: open the story on that frame. */
   fun onStripFrameClick(frame: ActiveStripFrame) {
-    navigator.goTo(Destination.StripStory(bookId, frame.strip.manifest.chapter, frame.frameIndex))
+    navigator.goTo(Destination.StripStory(bookId, frame.strip.manifest.chapter, frame.frameIndex, linkedToBook = true))
   }
 
   fun onXRayChipClick(id: String) {
