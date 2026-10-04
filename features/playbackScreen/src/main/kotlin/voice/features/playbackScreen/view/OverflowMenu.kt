@@ -19,6 +19,7 @@ import voice.core.ui.icons.VoiceIcons
 @Composable
 internal fun OverflowMenu(
   skipSilence: Boolean,
+  onFeedClick: () -> Unit,
   onSleepTimerClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
@@ -39,6 +40,15 @@ internal fun OverflowMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
     ) {
+      DropdownMenuItem(
+        onClick = {
+          expanded = false
+          onFeedClick()
+        },
+        text = {
+          Text(text = stringResource(id = R.string.copilot_action_feed))
+        },
+      )
       DropdownMenuItem(
         onClick = {
           expanded = false

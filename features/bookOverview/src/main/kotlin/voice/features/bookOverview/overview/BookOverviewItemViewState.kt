@@ -1,9 +1,11 @@
 package voice.features.bookOverview.overview
 
+import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Immutable
 import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.logging.api.Logger
+import voice.core.ui.crawl.crawlEditionOf
 import voice.core.ui.formatTime
 
 @Immutable
@@ -14,6 +16,8 @@ data class BookOverviewItemViewState(
   val progress: Float,
   val id: BookId,
   val remainingTime: String,
+  /** The Crawl's own cover art for a series book, shown instead of [cover]. */
+  @DrawableRes val artwork: Int? = null,
 )
 
 internal fun Book.toItemViewState() = BookOverviewItemViewState(
@@ -23,6 +27,7 @@ internal fun Book.toItemViewState() = BookOverviewItemViewState(
   id = id,
   progress = progress(),
   remainingTime = formatTime(duration - position),
+  artwork = crawlEditionOf(content.name)?.cover,
 )
 
 private fun Book.progress(): Float {

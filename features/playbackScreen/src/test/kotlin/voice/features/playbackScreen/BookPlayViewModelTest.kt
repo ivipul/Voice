@@ -46,6 +46,7 @@ import voice.core.strips.ActiveStripFrame
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripFrame
 import voice.core.strips.StripManifest
+import voice.core.ui.crawl.CrawlEdition
 import voice.navigation.Destination
 import voice.navigation.Navigator
 import java.io.File
@@ -435,6 +436,54 @@ class BookPlayViewModelTest {
     viewModel.onStripFrameClick(ActiveStripFrame(strip, frameIndex = 1))
 
     verify { navigator.goTo(Destination.StripStory(book.id, chapter = 3, startFrameIndex = 1, linkedToBook = true)) }
+  }
+
+  @Test
+  fun `viewState carries the series book and the playback speed`() = scope.runTest {
+    val doomsday = book(name = "2. Carl's Doomsday Scenario").let {
+      it.copy(content = it.content.copy(playbackSpeed = 1.3F))
+    }
+    val viewModel = viewModel(book = doomsday)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null) state = awaitItem()
+      assertEquals(CrawlEdition.CarlsDoomsdayScenario, state.edition)
+      assertEquals(1.3F, state.playbackSpeed)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `a book outside the series has no edition`() = scope.runTest {
+    val viewModel = viewModel()
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null) state = awaitItem()
+      assertEquals(null, state.edition)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `the speed sheet opens on the book's speed and follows changes`() = scope.runTest {
+    every { player.setSpeed(any()) } just Runs
+
+    viewModel.onPlaybackSpeedIconClick()
+    yield()
+    assertEquals(BookPlayDialogViewState.SpeedDialog(1F), viewModel.dialogState.value)
+
+    viewModel.onPlaybackSpeedChanged(1.5F)
+    assertEquals(BookPlayDialogViewState.SpeedDialog(1.5F), viewModel.dialogState.value)
+    verify { player.setSpeed(1.5F) }
+  }
+
+  @Test
+  fun `the Inventory button opens the Inventory screen`() = scope.runTest {
+    viewModel.onBookmarkClick()
+
+    verify { navigator.goTo(Destination.Bookmarks(book.id)) }
   }
 
   @Test

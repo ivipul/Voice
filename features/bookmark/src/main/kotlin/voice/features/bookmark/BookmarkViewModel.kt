@@ -34,6 +34,8 @@ import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
 import voice.core.strips.bookPositionOf
 import voice.core.strips.isUnlockedAt
+import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.crawlEditionOf
 import voice.core.ui.formatTime
 import voice.navigation.Navigator
 import java.time.Instant
@@ -67,6 +69,7 @@ class BookmarkViewModel(
   private var savedBookPosition by mutableStateOf(0L)
   private var unlockedStripChapters by mutableStateOf<Set<Int>>(emptySet())
   private var activeStrip by mutableStateOf<AvailableStrip?>(null)
+  private var edition by mutableStateOf<CrawlEdition?>(null)
 
   private var shouldScrollTo by mutableStateOf<Bookmark.Id?>(null)
   private var dialogViewState: BookmarkDialogViewState by mutableStateOf(BookmarkDialogViewState.None)
@@ -84,6 +87,7 @@ class BookmarkViewModel(
         chapters = book.chapters
         savedBookPosition = book.position
         strips = stripRepository.stripsFor(book.content.name)
+        edition = crawlEditionOf(book.content.name)
       }
     }
     val livePlayback by remember(bookId) { playerController.livePlaybackStateFlow(bookId) }
@@ -129,6 +133,7 @@ class BookmarkViewModel(
       dialogViewState = dialogViewState,
       strips = strips.filter { it.manifest.chapter in unlockedStripChapters },
       activeStrip = activeStrip,
+      edition = edition,
     )
   }
 

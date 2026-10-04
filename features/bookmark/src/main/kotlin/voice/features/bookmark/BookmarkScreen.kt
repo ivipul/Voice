@@ -54,6 +54,7 @@ import voice.core.data.Bookmark
 import voice.core.data.repo.BookRepository
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
+import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.dialogs.AddBookmarkDialog
 import voice.features.bookmark.dialogs.EditBookmarkDialog
@@ -122,19 +123,22 @@ fun BookmarkScreen(bookId: BookId) {
   }
   val viewState = viewModel.viewState()
   Box {
-    BookmarkScreen(
-      viewState = viewState,
-      onClose = viewModel::closeScreen,
-      onAdd = viewModel::onAddClick,
-      onDelete = viewModel::deleteBookmark,
-      onEdit = viewModel::onEditClick,
-      onScrollConfirm = viewModel::onScrollConfirm,
-      onClick = viewModel::selectBookmark,
-      onNewBookmarkNameChoose = viewModel::addBookmark,
-      onCloseDialog = viewModel::closeDialog,
-      onEditBookmark = viewModel::editBookmark,
-      onStripClick = viewModel::onStripClick,
-    )
+    // The open strip viewer is black, so the book's colors (and its dark status bar icons) give way while it shows.
+    CrawlTheme(edition = viewState.edition.takeIf { viewState.activeStrip == null }) {
+      BookmarkScreen(
+        viewState = viewState,
+        onClose = viewModel::closeScreen,
+        onAdd = viewModel::onAddClick,
+        onDelete = viewModel::deleteBookmark,
+        onEdit = viewModel::onEditClick,
+        onScrollConfirm = viewModel::onScrollConfirm,
+        onClick = viewModel::selectBookmark,
+        onNewBookmarkNameChoose = viewModel::addBookmark,
+        onCloseDialog = viewModel::closeDialog,
+        onEditBookmark = viewModel::editBookmark,
+        onStripClick = viewModel::onStripClick,
+      )
+    }
     viewState.activeStrip?.let { strip ->
       val storyViewModel = remember(bookId, strip) {
         rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip, 0, linkedToBook = false)
@@ -169,7 +173,7 @@ internal fun BookmarkScreen(
     },
     topBar = {
       TopAppBar(
-        title = { Text(text = stringResource(id = StringsR.string.bookmark_title)) },
+        title = { Text(text = stringResource(id = StringsR.string.inventory_title)) },
         navigationIcon = {
           IconButton(onClick = onClose) {
             Icon(

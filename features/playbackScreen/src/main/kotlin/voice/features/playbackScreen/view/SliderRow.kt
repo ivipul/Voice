@@ -1,185 +1,134 @@
 package voice.features.playbackScreen.view
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SliderState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import voice.core.strips.StripZone
 import voice.core.strips.stripStartAt
-import voice.core.ui.formatTime
+import voice.core.ui.crawl.CrawlPalette
 import kotlin.time.Duration
 
-private val SliderTrackHeight = 16.dp
-private val SliderThumbWidth = 4.dp
-private const val FlowLoopMs = 5_000
+private val TrackHeight = 4.dp
+private val StripHeight = 10.dp
+private val ThumbSize = DpSize(4.dp, 18.dp)
+private const val TRACK_ALPHA = 0.2F
 
+/**
+ * The chapter's seek bar: a thin track filled in the title color, with each comic strip as one stretch in the Ask AI
+ * color. A tap inside a stretch starts its strip, anything else seeks. [onScrub] reports where a drag is, then null.
+ */
 @Composable
 internal fun SliderRow(
   duration: Duration,
   playedTime: Duration,
-  playing: Boolean,
   stripZones: List<StripZone>,
+  palette: CrawlPalette,
+  onScrub: (Float?) -> Unit,
   onStripZoneTap: (Long) -> Unit,
   onSeek: (Duration) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-  Row(
-    modifier = Modifier
+  var localValue by remember { mutableFloatStateOf(0F) }
+  val interactionSource = remember { MutableInteractionSource() }
+  val dragging by interactionSource.collectIsDraggedAsState()
+  val gesture = remember { GestureTracker() }
+  Slider(
+    modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 16.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    var localValue by remember { mutableFloatStateOf(0F) }
-    val interactionSource = remember { MutableInteractionSource() }
-    val dragging by interactionSource.collectIsDraggedAsState()
-    val gesture = remember { GestureTracker() }
-    Text(
-      text = formatTime(
-        timeMs = if (dragging) {
-          (duration * localValue.toDouble()).inWholeMilliseconds
-        } else {
-          playedTime.inWholeMilliseconds
-        },
-        durationMs = duration.inWholeMilliseconds,
-      ),
-    )
-    Slider(
-      modifier = Modifier
-        .weight(1F)
-        .padding(horizontal = 8.dp)
-        .trackTapVersusDrag(gesture),
-      interactionSource = interactionSource,
-      value = if (dragging) {
-        localValue
+      .padding(horizontal = 20.dp)
+      .trackTapVersusDrag(gesture),
+    interactionSource = interactionSource,
+    value = if (dragging) {
+      localValue
+    } else {
+      (playedTime / duration).toFloat()
+        .coerceIn(0F, 1F)
+    },
+    onValueChange = {
+      localValue = it
+      onScrub(it)
+    },
+    onValueChangeFinished = {
+      onScrub(null)
+      val stripStart = if (gesture.moved) null else stripZones.stripStartAt(localValue)
+      if (stripStart != null) {
+        onStripZoneTap(stripStart)
       } else {
-        (playedTime / duration).toFloat()
-          .coerceIn(0F, 1F)
-      },
-      onValueChange = {
-        localValue = it
-      },
-      onValueChangeFinished = {
-        val stripStart = if (gesture.moved) null else stripZones.stripStartAt(localValue)
-        if (stripStart != null) {
-          onStripZoneTap(stripStart)
-        } else {
-          onSeek(duration * localValue.toDouble())
-        }
-      },
-      thumb = {
-        // As tall as the track, instead of the default 44 dp bar.
-        SliderDefaults.Thumb(
-          interactionSource = interactionSource,
-          thumbSize = DpSize(SliderThumbWidth, SliderTrackHeight),
-        )
-      },
-      track = { sliderState ->
-        StripTrack(
-          sliderState = sliderState,
-          stripZones = stripZones,
-          flowingZone = if (playing && !dragging) stripZones.zoneAt(sliderState.value) else null,
-        )
-      },
-    )
-    Text(
-      text = formatTime(
-        timeMs = duration.inWholeMilliseconds,
-        durationMs = duration.inWholeMilliseconds,
-      ),
-    )
-  }
-}
-
-/** The slider's track with each strip's range overlaid as a soft gradient of its own colour. */
-@Composable
-private fun StripTrack(
-  sliderState: SliderState,
-  stripZones: List<StripZone>,
-  flowingZone: StripZone?,
-) {
-  Box(contentAlignment = Alignment.Center) {
-    SliderDefaults.Track(sliderState = sliderState)
-    if (stripZones.isNotEmpty()) {
-      // Read only while drawing, so the flow redraws this canvas and recomposes nothing.
-      val flow = rememberFlowPhase(flowing = flowingZone != null)
-      Canvas(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(SliderTrackHeight)
-          .clip(RoundedCornerShape(percent = 50)),
-      ) {
-        stripZones.forEach { zone ->
-          val left = size.width * zone.startFraction
-          val right = size.width * zone.endFraction
-          val colors = stripZoneColors(zone.chapter)
-          val width = right - left
-          // Mirrored tiles repeat every two zone widths, so a drift of exactly that loops without a seam.
-          val drift = if (zone == flowingZone) flow.value * 2f * width else 0f
-          drawRoundRect(
-            brush = Brush.horizontalGradient(
-              colors = listOf(colors.light, colors.deep),
-              startX = left + drift,
-              endX = right + drift,
-              tileMode = TileMode.Mirror,
-            ),
-            topLeft = Offset(left, 0f),
-            size = Size(width, size.height),
-            cornerRadius = CornerRadius(minOf(size.height, width) / 2f),
-          )
-        }
+        onSeek(duration * localValue.toDouble())
       }
-    }
-  }
-}
-
-/** 0..1, looping slowly while [flowing]; a still 0 otherwise, without keeping an animation running. */
-@Composable
-private fun rememberFlowPhase(flowing: Boolean): State<Float> {
-  if (!flowing) return remember { mutableFloatStateOf(0f) }
-  return rememberInfiniteTransition(label = "strip zone flow").animateFloat(
-    initialValue = 0f,
-    targetValue = 1f,
-    animationSpec = infiniteRepeatable(tween(durationMillis = FlowLoopMs, easing = LinearEasing), RepeatMode.Restart),
-    label = "strip zone flow phase",
+    },
+    thumb = {
+      SliderDefaults.Thumb(
+        interactionSource = interactionSource,
+        colors = SliderDefaults.colors(thumbColor = palette.highlight),
+        thumbSize = ThumbSize,
+      )
+    },
+    track = { sliderState ->
+      PosterTrack(sliderState = sliderState, stripZones = stripZones, palette = palette)
+    },
   )
 }
 
-private fun List<StripZone>.zoneAt(fraction: Float): StripZone? =
-  lastOrNull { fraction >= it.startFraction && fraction < it.endFraction }
+@Composable
+private fun PosterTrack(
+  sliderState: SliderState,
+  stripZones: List<StripZone>,
+  palette: CrawlPalette,
+) {
+  Canvas(
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(StripHeight),
+  ) {
+    val trackHeight = TrackHeight.toPx()
+    val trackTop = (size.height - trackHeight) / 2F
+    val trackCorner = CornerRadius(trackHeight / 2F)
+    drawRoundRect(
+      color = palette.content.copy(alpha = TRACK_ALPHA),
+      topLeft = Offset(0F, trackTop),
+      size = Size(size.width, trackHeight),
+      cornerRadius = trackCorner,
+    )
+    drawRoundRect(
+      color = palette.highlight,
+      topLeft = Offset(0F, trackTop),
+      size = Size(size.width * sliderState.value.coerceIn(0F, 1F), trackHeight),
+      cornerRadius = trackCorner,
+    )
+    stripZones.forEach { zone ->
+      val left = size.width * zone.startFraction
+      val width = size.width * (zone.endFraction - zone.startFraction)
+      drawRoundRect(
+        color = palette.accent,
+        topLeft = Offset(left, 0F),
+        size = Size(width, size.height),
+        cornerRadius = CornerRadius(minOf(size.height, width) / 2F),
+      )
+    }
+  }
+}
 
 /** Whether the gesture that just ended moved far enough to be a drag rather than a tap. */
 internal class GestureTracker {

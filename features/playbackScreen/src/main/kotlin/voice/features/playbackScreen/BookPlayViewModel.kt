@@ -50,6 +50,7 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
+import voice.core.ui.crawl.crawlEditionOf
 import voice.core.ui.formatTime
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
@@ -194,6 +195,7 @@ class BookPlayViewModel(
     val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
     }.orEmpty()
+    val edition = remember(book.content.name) { crawlEditionOf(book.content.name) }
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -209,6 +211,8 @@ class BookPlayViewModel(
       xrayChips = xrayChips,
       stripZones = stripZones,
       stripFrame = strips.activeFrameAt(book.position),
+      edition = edition,
+      playbackSpeed = book.content.playbackSpeed,
     )
   }
 

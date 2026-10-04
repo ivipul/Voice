@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import voice.core.playback.misc.Decibel
 import voice.core.strips.ActiveStripFrame
 import voice.core.strips.StripZone
+import voice.core.ui.crawl.CrawlEdition
 import voice.core.xray.card.ComposedPlayerCard
 import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.composeAt
@@ -29,6 +30,9 @@ data class BookPlayViewState(
   val stripZones: List<StripZone> = emptyList(),
   /** The strip frame to show in place of the cover while a strip is playing. */
   val stripFrame: ActiveStripFrame? = null,
+  /** The series book this is, for its cover art, colors and display type; null for any other book. */
+  val edition: CrawlEdition? = null,
+  val playbackSpeed: Float = 1F,
 ) {
 
   data class XRayChipViewState(val id: String, val label: String)
@@ -52,10 +56,7 @@ data class BookPlayViewState(
 }
 
 internal sealed interface BookPlayDialogViewState {
-  data class SpeedDialog(val speed: Float) : BookPlayDialogViewState {
-
-    val maxSpeed: Float get() = if (speed < 2F) 2F else 3.5F
-  }
+  data class SpeedDialog(val speed: Float) : BookPlayDialogViewState
 
   data class VolumeGainDialog(
     val gain: Decibel,

@@ -103,7 +103,7 @@ internal fun ListBookRow(
   ) {
     Column(Modifier.padding()) {
       Row(verticalAlignment = Alignment.CenterVertically) {
-        CoverImage(book.id, book.cover)
+        CoverImage(book.id, book.artwork ?: book.cover)
 
         Column(
           Modifier
@@ -156,7 +156,7 @@ internal fun ListBookRow(
 @Composable
 private fun CoverImage(
   bookId: BookId,
-  cover: String?,
+  cover: Any?,
 ) {
   val startPadding = 16.dp
   val endPadding = 16.dp

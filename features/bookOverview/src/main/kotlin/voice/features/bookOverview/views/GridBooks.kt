@@ -114,7 +114,7 @@ internal fun GridBook(
       Box(
         modifier = Modifier
           .fillMaxWidth()
-          .aspectRatio(4f / 3f)
+          .aspectRatio(1f)
           .sharedCoverElementModifier(book.id)
           .clip(MaterialTheme.shapes.large)
           .background(MaterialTheme.colorScheme.surfaceVariant),
@@ -123,7 +123,7 @@ internal fun GridBook(
         AsyncImage(
           modifier = Modifier.fillMaxSize(),
           contentScale = ContentScale.Crop,
-          model = book.cover,
+          model = book.artwork ?: book.cover,
           placeholder = painterResource(id = UiR.drawable.album_art),
           error = painterResource(id = UiR.drawable.album_art),
           contentDescription = null,

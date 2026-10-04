@@ -1,86 +1,53 @@
 package voice.features.playbackScreen.view
 
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ripple
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import voice.core.strings.R
 import voice.core.ui.icons.VoiceIcons
-import voice.features.playbackScreen.BookPlayViewState
 
+/** Only a way back and the overflow menu: the cover art carries the title. */
 @Composable
 internal fun BookPlayAppBar(
-  viewState: BookPlayViewState,
+  skipSilence: Boolean,
+  onCloseClick: () -> Unit,
+  onFeedClick: () -> Unit,
   onSleepTimerClick: () -> Unit,
-  onBookmarkClick: () -> Unit,
-  onBookmarkLongClick: () -> Unit,
-  onSpeedChangeClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
-  onCloseClick: () -> Unit,
-  useLandscapeLayout: Boolean,
 ) {
-  val appBarActions: @Composable RowScope.() -> Unit = {
-    Box(
-      modifier = Modifier
-        .size(40.dp)
-        .combinedClickable(
-          onClick = onBookmarkClick,
-          onLongClick = onBookmarkLongClick,
-          indication = ripple(bounded = false, radius = 20.dp),
-          interactionSource = remember { MutableInteractionSource() },
-        ),
-      contentAlignment = Alignment.Center,
-    ) {
-      Icon(
-        imageVector = VoiceIcons.CollectionsBookmark,
-        contentDescription = stringResource(id = R.string.bookmark_title),
+  val iconColor = LocalContentColor.current
+  TopAppBar(
+    title = {},
+    navigationIcon = {
+      IconButton(onClick = onCloseClick) {
+        Icon(
+          imageVector = VoiceIcons.ArrowBack,
+          contentDescription = stringResource(id = R.string.common_action_close),
+        )
+      }
+    },
+    actions = {
+      OverflowMenu(
+        skipSilence = skipSilence,
+        onFeedClick = onFeedClick,
+        onSleepTimerClick = onSleepTimerClick,
+        onSkipSilenceClick = onSkipSilenceClick,
+        onVolumeBoostClick = onVolumeBoostClick,
       )
-    }
-    IconButton(onClick = onSpeedChangeClick) {
-      Icon(
-        imageVector = VoiceIcons.Speed,
-        contentDescription = stringResource(id = R.string.playback_speed_title),
-      )
-    }
-    OverflowMenu(
-      skipSilence = viewState.skipSilence,
-      onSleepTimerClick = onSleepTimerClick,
-      onSkipSilenceClick = onSkipSilenceClick,
-      onVolumeBoostClick = onVolumeBoostClick,
-    )
-  }
-  if (useLandscapeLayout) {
-    TopAppBar(
-      navigationIcon = {
-        CloseIcon(onCloseClick)
-      },
-      actions = appBarActions,
-      title = {
-        AppBarTitle(viewState.title)
-      },
-    )
-  } else {
-    LargeTopAppBar(
-      navigationIcon = {
-        CloseIcon(onCloseClick)
-      },
-      actions = appBarActions,
-      title = {
-        AppBarTitle(viewState.title)
-      },
-    )
-  }
+    },
+    expandedHeight = 48.dp,
+    colors = TopAppBarDefaults.topAppBarColors(
+      containerColor = Color.Transparent,
+      scrolledContainerColor = Color.Transparent,
+      navigationIconContentColor = iconColor,
+      actionIconContentColor = iconColor,
+    ),
+  )
 }

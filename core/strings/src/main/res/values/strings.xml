@@ -64,8 +64,10 @@
     <string name="common.error.generic.retry">Retry</string>
     <!-- Content description for the Ask co-pilot toolbar button. -->
     <string name="copilot.action.ask">Ask</string>
-    <!-- Content description for the Catch Me Up co-pilot toolbar button. -->
-    <string name="copilot.action.catch_me_up">Catch me up</string>
+    <!-- Label of the player button that asks the AI a spoken question. -->
+    <string name="copilot.action.ask_ai">Ask AI</string>
+    <!-- Content description for the player button that has the AI recap what happened recently. -->
+    <string name="copilot.action.smart_recap">Smart Recap</string>
     <!-- Name of the Smart Recap button on the Android Auto player. -->
     <string name="copilot.action.recap">Recap</string>
     <!-- Content description for the entry point into the co-pilot Feed. -->
@@ -183,6 +185,8 @@
     </plurals>
     <!-- Title for choosing how audiobook files are structured. -->
     <string name="folder.type.title">How are your files structured?</string>
+    <!-- Title of the screen with a book's snips and comic strips, and of the player button that opens it. -->
+    <string name="inventory.title">Inventory</string>
     <!-- Library category header for completed books. -->
     <string name="library.category.completed.title">Completed</string>
     <!-- Library category header for books currently being listened to. -->
@@ -261,6 +265,8 @@
     <string name="playback.option.volume_boost">Volume boost</string>
     <!-- Title and content description for playback-speed controls. -->
     <string name="playback.speed.title">Playback speed</string>
+    <!-- The current playback speed on the player, e.g. "1.2×". -->
+    <string name="playback.speed.value">%1$s×</string>
     <!-- Negative button for cancelling feedback. -->
     <string name="review.feedback.action.cancel" tools:ignore="UnusedResources">Cancel</string>
     <!-- Positive button for sending feedback. -->
