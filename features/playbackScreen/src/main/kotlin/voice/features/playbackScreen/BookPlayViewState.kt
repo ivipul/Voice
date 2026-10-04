@@ -35,7 +35,10 @@ data class BookPlayViewState(
   val playbackSpeed: Float = 1F,
 ) {
 
-  data class XRayChipViewState(val id: String, val label: String)
+  data class XRayChipViewState(
+    val id: String,
+    val label: String,
+  )
 
   sealed interface SleepTimerViewState {
     data object Disabled : SleepTimerViewState
