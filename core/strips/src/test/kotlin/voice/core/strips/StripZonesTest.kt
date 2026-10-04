@@ -23,7 +23,7 @@ class StripZonesTest {
   fun `a bar covering the whole book gets each strip as a fraction of it`() {
     val zones = listOf(first, second).zonesWithin(spanStartMs = 0L, spanEndMs = 100_000L)
     assertEquals(
-      listOf(StripZone(0.01f, 0.16f, 1_000L), StripZone(0.4f, 0.55f, 40_000L)),
+      listOf(StripZone(0.01f, 0.16f, 1_000L, chapter = 1), StripZone(0.4f, 0.55f, 40_000L, chapter = 2)),
       zones,
     )
   }
@@ -32,7 +32,7 @@ class StripZonesTest {
   fun `a per-chapter bar clips a zone that starts before it and keeps the strip start as the target`() {
     // The chapter bar covers 10000..20000, so the first strip's tail (10000..16000) fills 60% of it.
     val zones = listOf(first).zonesWithin(spanStartMs = 10_000L, spanEndMs = 20_000L)
-    assertEquals(listOf(StripZone(0f, 0.6f, 1_000L)), zones)
+    assertEquals(listOf(StripZone(0f, 0.6f, 1_000L, chapter = 1)), zones)
   }
 
   @Test

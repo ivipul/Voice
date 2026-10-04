@@ -75,6 +75,7 @@ internal fun BookPlayContent(
         SliderRow(
           duration = viewState.duration,
           playedTime = viewState.playedTime,
+          playing = viewState.playing,
           stripZones = viewState.stripZones,
           onStripZoneTap = onStripZoneTap,
           onSeek = onSeek,
@@ -130,6 +131,7 @@ internal fun BookPlayContent(
       SliderRow(
         duration = viewState.duration,
         playedTime = viewState.playedTime,
+        playing = viewState.playing,
         stripZones = viewState.stripZones,
         onStripZoneTap = onStripZoneTap,
         onSeek = onSeek,

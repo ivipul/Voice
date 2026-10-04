@@ -3,11 +3,13 @@ package voice.core.strips
 /**
  * A strip's range on a seek bar that covers [spanStartMs]..[spanEndMs] of the book, as fractions of that bar.
  * [startBookMs] is where tapping the zone should seek to: the strip's first frame, even if the zone is clipped.
+ * [chapter] is the strip's chapter, which decides the zone's colour.
  */
 data class StripZone(
   val startFraction: Float,
   val endFraction: Float,
   val startBookMs: Long,
+  val chapter: Int,
 )
 
 /** The book-time range a strip plays over: its first frame until the last frame's hold ends. */
@@ -32,6 +34,7 @@ fun List<AvailableStrip>.zonesWithin(
         startFraction = (clippedStart - spanStartMs).toFloat() / span,
         endFraction = (clippedEnd - spanStartMs).toFloat() / span,
         startBookMs = start,
+        chapter = strip.manifest.chapter,
       )
     }
   }
