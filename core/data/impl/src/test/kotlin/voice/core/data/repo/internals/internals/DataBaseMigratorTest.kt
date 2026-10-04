@@ -116,6 +116,31 @@ class DataBaseMigratorTest {
   }
 
   @Test
+  fun migrate59to60KeepsDataAndAddsTheCoPilotHistoryTable() {
+    val dbName = "testDb"
+    val db = helper.createDatabase(dbName, 59)
+    db.execSQL("INSERT INTO `recentBookSearch`(`searchTerm`) VALUES ('cats')")
+    db.close()
+
+    val migrated = helper.runMigrationsAndValidate(dbName, 60, true, *allMigrations())
+
+    assertEquals(
+      expected = listOf("cats"),
+      actual = migrated.query("SELECT * FROM recentBookSearch").mapRows { getString("searchTerm") },
+    )
+    assertEquals(0, migrated.query("SELECT * FROM coPilotMessage").mapRows { getString("id") }.size)
+    migrated.execSQL(
+      "INSERT INTO `coPilotMessage`(`id`,`bookId`,`role`,`text`,`timestampMs`,`isVisualPriority`,`imagePath`," +
+        "`snipChapterId`,`snipPositionInChapterMs`,`orderIndex`) VALUES ('m1','book','User','hi',1,0,NULL,NULL,NULL,0)",
+    )
+    assertEquals(
+      listOf("m1"),
+      migrated.query("SELECT * FROM coPilotMessage").mapRows { getString("id") },
+    )
+    migrated.close()
+  }
+
+  @Test
   fun migrate43() {
     val dbName = "testDb"
     val db = helper.createDatabase(dbName, 43)
