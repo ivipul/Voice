@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Usage: push_strips.sh [BOOK_DIR]   (default book1; e.g. book2 pushes audiobook-copilot/storyboards/book2)
+BOOK="${1:-book1}"
 PKG="${PKG:-de.ph1b.audiobook}"
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
-SRC="$ROOT/audiobook-copilot/storyboards/book1"
-DEST="/sdcard/Android/data/$PKG/files/strips/book1"
+SRC="$ROOT/audiobook-copilot/storyboards/$BOOK"
+DEST="/sdcard/Android/data/$PKG/files/strips/$BOOK"
 
 pushed=0
 for dir in "$SRC"/ch*-comic; do
