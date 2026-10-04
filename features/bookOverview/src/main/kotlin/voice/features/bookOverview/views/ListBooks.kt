@@ -53,19 +53,22 @@ internal fun ListBooks(
         PermissionBugCard(onPermissionBugCardClick)
       }
     }
+    val showHeaders = books.count { it.value.isNotEmpty() } > 1
     books.forEach { (category, books) ->
       if (books.isEmpty()) return@forEach
-      stickyHeader(
-        key = category,
-        contentType = "header",
-      ) {
-        Header(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 8.dp, horizontal = 8.dp),
-          category = category,
-        )
+      if (showHeaders) {
+        stickyHeader(
+          key = category,
+          contentType = "header",
+        ) {
+          Header(
+            modifier = Modifier
+              .fillMaxWidth()
+              .background(MaterialTheme.colorScheme.surface)
+              .padding(vertical = 8.dp, horizontal = 8.dp),
+            category = category,
+          )
+        }
       }
       items(
         items = books.toList(),

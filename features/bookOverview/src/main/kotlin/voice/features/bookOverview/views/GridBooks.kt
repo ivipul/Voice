@@ -62,17 +62,20 @@ internal fun GridBooks(
         PermissionBugCard(onPermissionBugCardClick)
       }
     }
+    val showHeaders = books.count { it.value.isNotEmpty() } > 1
     books.forEach { (category, books) ->
       if (books.isEmpty()) return@forEach
-      item(
-        span = { GridItemSpan(maxLineSpan) },
-        key = category,
-        contentType = "header",
-      ) {
-        Header(
-          modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
-          category = category,
-        )
+      if (showHeaders) {
+        item(
+          span = { GridItemSpan(maxLineSpan) },
+          key = category,
+          contentType = "header",
+        ) {
+          Header(
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 8.dp),
+            category = category,
+          )
+        }
       }
       items(
         items = books.toList(),

@@ -24,6 +24,7 @@ import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.common.comparator.sortedNaturally
 import voice.core.data.Book
+import voice.core.data.BookComparator
 import voice.core.data.BookId
 import voice.core.data.GridMode
 import voice.core.data.KioskModeDemoData
@@ -134,21 +135,16 @@ class BookOverviewViewModel(
 
     return BookOverviewViewState(
       layoutMode = layoutMode,
-      books = books
-        .groupBy {
-          it.category
-        }
-        .mapValues { (category, books) ->
-          books
-            .sortedWith(category.comparator)
-            .associate { book ->
-              book.id to book.itemViewState(
-                currentBookId = currentBookId,
-                livePlaybackState = { livePlaybackState.value },
-              )
-            }
-        }
-        .toSortedMap(),
+      books = mapOf(
+        BookOverviewCategory.CURRENT to books
+          .sortedWith(BookComparator.ByName)
+          .associate { book ->
+            book.id to book.itemViewState(
+              currentBookId = currentBookId,
+              livePlaybackState = { livePlaybackState.value },
+            )
+          },
+      ),
       playButtonState = if (playState == PlayStateManager.PlayState.Playing) {
         BookOverviewViewState.PlayButtonState.Playing
       } else {
