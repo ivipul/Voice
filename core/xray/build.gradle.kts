@@ -9,7 +9,10 @@ dependencies {
   implementation(projects.core.data.api)
   implementation(projects.core.logging.api)
   implementation(libs.serialization.json)
+  implementation(libs.coroutines.core)
 
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.testJunit)
+  testImplementation(libs.coroutines.test)
+  testImplementation(libs.mockk)
 }

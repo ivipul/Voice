@@ -600,6 +600,23 @@ class BookPlayViewModelTest {
   }
 
   @Test
+  fun `the card files are looked up and their images resolved when the player opens, not on a chip tap`() = scope.runTest {
+    val cards = mockk<PlayerCardSet>(relaxed = true)
+    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = cards)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.viewState()
+    }.test {
+      assertEquals(expected = null, actual = awaitItem())
+      awaitItem()
+      yield()
+      cancelAndIgnoreRemainingEvents()
+    }
+
+    verify(exactly = 1) { cards.resolveAllImages() }
+  }
+
+  @Test
   fun `tapping a chip with card data opens the holo card composed at the playback position`() = scope.runTest {
     val viewModel = viewModel(
       xrayManifest = carlManifest,
