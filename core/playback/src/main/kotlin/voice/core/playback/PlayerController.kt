@@ -114,6 +114,11 @@ class PlayerController(
     controller.sendCustomCommand(CustomCommand.ForceSeekToNext)
   }
 
+  /** Pauses whatever is playing without preparing anything, unlike [playPause]. */
+  fun pause() {
+    scope.launch { awaitConnect()?.pause() }
+  }
+
   fun play() = executeAfterPrepare { controller ->
     controller.play()
   }

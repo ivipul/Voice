@@ -123,6 +123,7 @@ private fun HoloCard(
   val card = remember(dialogState.data, positionMs) { dialogState.data.composeAt(positionMs) }
   val lookImage = card.look?.image?.let(dialogState.imageUris::get)
 
+  DeviceTiltEffect(tilt = tilt, enabled = !reducedMotion)
   LaunchedEffect(tilt) {
     var lastNanos = 0L
     while (true) {
@@ -184,6 +185,7 @@ private fun HoloCard(
             plain = dialogState.plain,
             card = card,
             lookImage = lookImage,
+            portrait = dialogState.portrait?.toImageModel(),
             animate = !reducedMotion,
             tilt = tilt,
             u = u,

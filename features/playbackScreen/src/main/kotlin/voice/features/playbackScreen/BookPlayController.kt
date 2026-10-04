@@ -110,6 +110,8 @@ fun BookPlayScreen(bookId: BookId) {
     onFastForwardClick = viewModel::fastForward,
     onRewindClick = viewModel::rewind,
     onSeek = viewModel::seekTo,
+    onStripZoneTap = viewModel::onStripZoneTap,
+    onStripFrameClick = viewModel::onStripFrameClick,
     onBookmarkClick = viewModel::onBookmarkClick,
     onBookmarkLongClick = viewModel::onBookmarkLongClick,
     onSkipSilenceClick = viewModel::toggleSkipSilence,
@@ -138,9 +140,6 @@ fun BookPlayScreen(bookId: BookId) {
       }
       is BookPlayDialogViewState.SelectChapterDialog -> {
         SelectChapterDialog(dialogState, viewModel)
-      }
-      is BookPlayDialogViewState.XRayEntityDialog -> {
-        XRayEntityBottomSheet(dialogState, viewModel)
       }
       is BookPlayDialogViewState.XRayCardDialog -> {
         HoloCardDialog(
@@ -172,7 +171,11 @@ fun BookPlayScreen(bookId: BookId) {
     )
   }
   viewModel.snipSheet.value?.let { snipSheet ->
-    SnipBottomSheet(snipSheet, onDismiss = viewModel::onSnipSheetDismiss)
+    SnipBottomSheet(
+      state = snipSheet,
+      frame = snipSheet.frameState(viewModel.copilotMessages()),
+      onDismiss = viewModel::onSnipSheetDismiss,
+    )
   }
 }
 

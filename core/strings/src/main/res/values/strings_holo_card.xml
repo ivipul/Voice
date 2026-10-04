@@ -8,7 +8,6 @@
   <string name="holo_card_rank">Rank %1$d</string>
   <string name="holo_card_about">About</string>
   <string name="holo_card_loadout">Equipped loadout</string>
-  <string name="holo_card_current_look">Current look</string>
   <string name="holo_card_hint_front">Tap the card to flip it</string>
   <string name="holo_card_hint_back">Tap the card to flip it back</string>
   <string name="holo_card_flip">Flip card</string>

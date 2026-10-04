@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import voice.core.data.BookId
+import voice.core.strips.ActiveStripFrame
 import voice.features.playbackScreen.BookPlayViewState
 import kotlin.time.Duration
 
@@ -25,6 +26,8 @@ internal fun BookPlayContent(
   onRewindClick: () -> Unit,
   onFastForwardClick: () -> Unit,
   onSeek: (Duration) -> Unit,
+  onStripZoneTap: (Long) -> Unit,
+  onStripFrameClick: (ActiveStripFrame) -> Unit,
   onSkipToNext: () -> Unit,
   onSkipToPrevious: () -> Unit,
   onCurrentChapterClick: () -> Unit,
@@ -41,6 +44,8 @@ internal fun BookPlayContent(
         bookId = bookId,
         cover = viewState.cover,
         onPlayClick = onPlayClick,
+        stripFrame = viewState.stripFrame,
+        onStripFrameClick = onStripFrameClick,
         sleepTimerState = viewState.sleepTimerState,
         modifier = Modifier
           .fillMaxHeight()
@@ -70,6 +75,9 @@ internal fun BookPlayContent(
         SliderRow(
           duration = viewState.duration,
           playedTime = viewState.playedTime,
+          playing = viewState.playing,
+          stripZones = viewState.stripZones,
+          onStripZoneTap = onStripZoneTap,
           onSeek = onSeek,
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -97,6 +105,8 @@ internal fun BookPlayContent(
         bookId = bookId,
         onPlayClick = onPlayClick,
         cover = viewState.cover,
+        stripFrame = viewState.stripFrame,
+        onStripFrameClick = onStripFrameClick,
         sleepTimerState = viewState.sleepTimerState,
         modifier = Modifier
           .fillMaxWidth()
@@ -121,6 +131,9 @@ internal fun BookPlayContent(
       SliderRow(
         duration = viewState.duration,
         playedTime = viewState.playedTime,
+        playing = viewState.playing,
+        stripZones = viewState.stripZones,
+        onStripZoneTap = onStripZoneTap,
         onSeek = onSeek,
       )
       Spacer(modifier = Modifier.size(16.dp))

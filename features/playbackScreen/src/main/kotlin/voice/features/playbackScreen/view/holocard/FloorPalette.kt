@@ -33,8 +33,14 @@ private val palettes = listOf(
   palette(0xFF4A4A2A, 0xFF1A1A0E, 0xFFE8D77A, 0xFF8A8A3A, BackdropPattern.Dots),
 )
 
-/** Floors cycle through the palettes; an unknown floor gets the first one. */
-internal fun floorPalette(floor: Int?): FloorPalette {
-  if (floor == null || floor < 1) return palettes.first()
+/**
+ * Floors cycle through the palettes. A card with no floor (a monster, a place) gets a palette from [seed] so
+ * different entities do not all look alike.
+ */
+internal fun floorPalette(
+  floor: Int?,
+  seed: String,
+): FloorPalette {
+  if (floor == null || floor < 1) return palettes[Math.floorMod(seed.hashCode(), palettes.size)]
   return palettes[(floor - 1) % palettes.size]
 }

@@ -1,7 +1,11 @@
 package voice.features.playbackScreen.view
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -9,23 +13,49 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import voice.core.data.BookId
 import voice.core.strings.R
+import voice.core.strips.ActiveStripFrame
 import voice.core.ui.formatTime
 import voice.features.playbackScreen.BookPlayViewState
+import java.io.File
+
+private const val STRIP_FRAME_CROSSFADE_MS = 300
 
 @Composable
 internal fun CoverRow(
   bookId: BookId,
   cover: String?,
+  stripFrame: ActiveStripFrame?,
+  onStripFrameClick: (ActiveStripFrame) -> Unit,
   sleepTimerState: BookPlayViewState.SleepTimerViewState,
   onPlayClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Box(modifier) {
-    Cover(bookId = bookId, onDoubleClick = onPlayClick, cover = cover)
+    // The cover gives way to the strip's current frame while a strip plays, and comes back when it is done.
+    Crossfade(
+      targetState = stripFrame,
+      animationSpec = tween(STRIP_FRAME_CROSSFADE_MS),
+      label = "cover-strip-frame",
+    ) { frame ->
+      if (frame == null) {
+        Cover(bookId = bookId, onDoubleClick = onPlayClick, cover = cover)
+      } else {
+        AsyncImage(
+          model = File(frame.strip.directory, frame.strip.manifest.frames[frame.frameIndex].image),
+          contentDescription = frame.strip.manifest.title,
+          contentScale = ContentScale.Fit,
+          modifier = Modifier
+            .fillMaxSize()
+            .clickable { onStripFrameClick(frame) },
+        )
+      }
+    }
     when (sleepTimerState) {
       BookPlayViewState.SleepTimerViewState.Disabled -> {
       }

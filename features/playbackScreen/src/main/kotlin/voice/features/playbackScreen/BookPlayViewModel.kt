@@ -55,11 +55,17 @@ import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
 import voice.core.copilot.SnipEvent
 import voice.core.xray.XRayEntityInfo
+import voice.core.strips.ActiveStripFrame
+import voice.core.strips.AvailableStrip
+import voice.core.strips.StripRepository
+import voice.core.strips.activeFrameAt
+import voice.core.strips.chapterPositionOf
+import voice.core.strips.zonesWithin
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
+import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.PlayerCardRepository
-import voice.core.xray.card.composeAt
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -100,6 +106,7 @@ class BookPlayViewModel(
   private val speechInputController: SpeechInputController,
   private val xrayRepository: XRayRepository,
   private val playerCardRepository: PlayerCardRepository,
+  private val stripRepository: StripRepository,
   @Assisted
   private val bookId: BookId,
 ) {
@@ -170,6 +177,13 @@ class BookPlayViewModel(
     val xrayManifest by produceState<XRayManifest?>(initialValue = null, book.currentChapter.id) {
       value = xrayRepository.manifestFor(book)
     }
+    val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
+      value = stripRepository.stripsFor(book.content.name)
+    }
+    val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
+    val stripZones = remember(strips, markStartBookMs, currentMark.durationMs) {
+      strips.zonesWithin(markStartBookMs, markStartBookMs + currentMark.durationMs)
+    }
     val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
     }.orEmpty()
@@ -186,6 +200,8 @@ class BookPlayViewModel(
       skipBackSeconds = skipBackSeconds,
       skipForwardSeconds = skipForwardSeconds,
       xrayChips = xrayChips,
+      stripZones = stripZones,
+      stripFrame = strips.activeFrameAt(book.position),
     )
   }
 
@@ -371,26 +387,34 @@ class BookPlayViewModel(
     navigator.goTo(Destination.Bookmarks(bookId))
   }
 
+  /** A tap inside a strip's zone on the seek bar: jump to where that strip starts. */
+  fun onStripZoneTap(startBookMs: Long) {
+    scope.launch {
+      val book = currentBook() ?: return@launch
+      val (chapterId, positionInChapter) = book.chapters.chapterPositionOf(startBookMs) ?: return@launch
+      player.setPosition(positionInChapter, chapterId)
+    }
+  }
+
+  /** A tap on the strip frame that replaces the cover: open the story on that frame. */
+  fun onStripFrameClick(frame: ActiveStripFrame) {
+    navigator.goTo(Destination.StripStory(bookId, frame.strip.manifest.chapter, frame.frameIndex, linkedToBook = true))
+  }
+
   fun onXRayChipClick(id: String) {
     scope.launch {
       val book = currentBook() ?: return@launch
       val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
-      dialogState.value = playerCardDialog(book, entity) ?: BookPlayDialogViewState.XRayEntityDialog(
-        title = entity.title,
-        description = entity.description,
-        image = entity.image,
-      )
+      dialogState.value = cardDialog(book, entity)
     }
   }
 
-  private suspend fun playerCardDialog(
+  private suspend fun cardDialog(
     book: Book,
     entity: XRayEntityInfo,
-  ): BookPlayDialogViewState.XRayCardDialog? = withContext(dispatcherProvider.io) {
-    val cards = playerCardRepository.cardsFor(book) ?: return@withContext null
-    val data = cards.card(entity.id) ?: return@withContext null
-    val positionMs = book.content.positionInChapter
-    if (!data.composeAt(positionMs).hasRevealedData) return@withContext null
+  ): BookPlayDialogViewState.XRayCardDialog = withContext(dispatcherProvider.io) {
+    val cards = playerCardRepository.cardsFor(book)
+    val data = cards?.card(entity.id) ?: PlayerCardData(id = entity.id, entries = emptyList())
     BookPlayDialogViewState.XRayCardDialog(
       name = entity.title,
       description = entity.description,
@@ -398,9 +422,10 @@ class BookPlayViewModel(
       imageUris = data.entries
         .mapNotNull { it.image }
         .distinct()
-        .mapNotNull { path -> cards.imageUri(path)?.let { path to it.toString() } }
+        .mapNotNull { path -> cards?.imageUri(path)?.let { path to it.toString() } }
         .toMap(),
-      openedAtMs = positionMs,
+      portrait = entity.image,
+      openedAtMs = book.content.positionInChapter,
     )
   }
 
@@ -476,20 +501,20 @@ class BookPlayViewModel(
     try {
       copilotRepository.snipEvents.collect(::onSnipEvent)
     } finally {
-      if (snipSheet.value == SnipSheetViewState.Loading) snipSheet.value = null
+      if (snipSheet.value is SnipSheetViewState.Loading) snipSheet.value = null
     }
   }
 
   private fun onSnipEvent(event: SnipEvent) {
     when (event) {
-      SnipEvent.Started -> {
-        snipSheet.value = SnipSheetViewState.Loading
+      is SnipEvent.Started -> {
+        snipSheet.value = SnipSheetViewState.Loading(drawsFrame = event.drawsFrame)
         viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
       }
-      is SnipEvent.Ready -> if (snipSheet.value == SnipSheetViewState.Loading) {
-        snipSheet.value = SnipSheetViewState.Ready(event.text)
+      is SnipEvent.Ready -> if (snipSheet.value is SnipSheetViewState.Loading) {
+        snipSheet.value = SnipSheetViewState.Ready(event.text, event.messageId)
       }
-      SnipEvent.Failed -> if (snipSheet.value == SnipSheetViewState.Loading) {
+      SnipEvent.Failed -> if (snipSheet.value is SnipSheetViewState.Loading) {
         snipSheet.value = null
       }
     }

@@ -28,7 +28,6 @@ class PlayerCardComposerTest {
     assertTrue(composed.stats.all { it.locked })
     assertTrue(composed.abilities.isEmpty())
     assertTrue(composed.loadout.isEmpty())
-    assertFalse(composed.hasRevealedData)
   }
 
   @Test

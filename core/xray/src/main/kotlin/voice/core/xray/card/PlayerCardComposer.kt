@@ -35,9 +35,6 @@ data class ComposedPlayerCard(
   data class GearItem(val slot: String, val name: String)
 
   data class Look(val image: String?, val description: String?)
-
-  val hasRevealedData: Boolean
-    get() = look?.image != null || level != null || floor != null || epithet != null || stats.any { !it.locked } || abilities.isNotEmpty() || loadout.isNotEmpty()
 }
 
 /**
