@@ -9,9 +9,10 @@ android {
     buildConfig = true
   }
 
-  // Set gemini.apiKey / openrouter.apiKey / ideogram.apiKey in ~/.gradle/gradle.properties
-  // (outside the repo, never committed) to enable the co-pilot's Gemini and Jev router calls
-  // and the Snip comic-frame image generation.
+  // Set gemini.apiKey / openrouter.apiKey / ideogram.apiKey / fish.apiKey in
+  // ~/.gradle/gradle.properties (outside the repo, never committed) to enable the co-pilot's
+  // Gemini and Jev router calls, the Snip comic-frame image generation and the spoken answers'
+  // Fish Audio voice.
   defaultConfig {
     buildConfigField(
       type = "String",
@@ -27,6 +28,11 @@ android {
       type = "String",
       name = "IDEOGRAM_API_KEY",
       value = "\"${providers.gradleProperty("ideogram.apiKey").getOrElse("")}\"",
+    )
+    buildConfigField(
+      type = "String",
+      name = "FISH_API_KEY",
+      value = "\"${providers.gradleProperty("fish.apiKey").getOrElse("")}\"",
     )
   }
 }
