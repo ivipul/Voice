@@ -120,11 +120,14 @@ class CoPilotEngine(
   private val audioManager = context.getSystemService(AudioManager::class.java)
   private var audioFocusRequest: AudioFocusRequest? = null
 
+  // Every co-pilot sound is guidance audio: it follows the media volume, and Android Auto routes it to
+  // the car. USAGE_ASSISTANT plays on the assistant stream, which the phone can mute on its own and
+  // which an app cannot unmute, so the whole answer was silent.
   private val soundPool = SoundPool.Builder()
     .setMaxStreams(2)
     .setAudioAttributes(
       AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_ASSISTANT)
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build(),
     )
@@ -351,7 +354,7 @@ class CoPilotEngine(
     val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
       .setAudioAttributes(
         AudioAttributes.Builder()
-          .setUsage(AudioAttributes.USAGE_ASSISTANT)
+          .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
           .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
           .build(),
       )
@@ -662,7 +665,7 @@ class CoPilotEngine(
     val player = ExoPlayer.Builder(context)
       .setAudioAttributes(
         MediaAudioAttributes.Builder()
-          .setUsage(C.USAGE_ASSISTANT)
+          .setUsage(C.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
           .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
           .build(),
         // The engine already holds audio focus for the whole round trip.
@@ -719,10 +722,10 @@ class CoPilotEngine(
       val tts = textToSpeech
       if (status == TextToSpeech.SUCCESS && tts != null) {
         // On Android Auto the spoken answer played on the phone speaker only while the book was paused,
-        // so tag it (and the cues) as assistant audio, which Android Auto can route to the car.
+        // so tag it (and the cues) as guidance audio, which Android Auto can route to the car.
         tts.setAudioAttributes(
           AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_ASSISTANT)
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
             .build(),
         )

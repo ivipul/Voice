@@ -62,7 +62,7 @@ internal class ExoWaitingLoopPlayback(
     val exo = ExoPlayer.Builder(context)
       .setAudioAttributes(
         AudioAttributes.Builder()
-          .setUsage(C.USAGE_ASSISTANT)
+          .setUsage(C.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
           .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
           .build(),
         // The engine already holds audio focus for the whole round trip.
