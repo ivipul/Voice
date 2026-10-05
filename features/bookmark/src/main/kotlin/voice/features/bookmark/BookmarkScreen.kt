@@ -1,8 +1,13 @@
 package voice.features.bookmark
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -17,8 +22,12 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
@@ -36,6 +45,7 @@ import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.strips.StripGallery
 import voice.features.bookmark.strips.StripViewer
 import voice.features.bookmark.strips.StripViewerViewModel
+import voice.navigation.BottomSheetNav
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
 import voice.navigation.Navigator
@@ -61,7 +71,7 @@ interface BookmarkProvider {
   @Provides
   @IntoSet
   fun bookmarkNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.Bookmarks> { key ->
-    NavEntry(key) {
+    NavEntry(key, metadata = BottomSheetNav.bottomSheet(bare = true)) {
       BookmarkScreen(bookId = key.bookId)
     }
   }
@@ -128,8 +138,10 @@ internal fun BookmarkScreen(
   val palette = crawlPaletteOf(viewState.edition)
 
   Scaffold(
-    modifier = modifier,
+    modifier = modifier.clip(SheetShape),
     topBar = {
+      Column {
+      InventoryHandle(color = palette.content)
       TopAppBar(
         title = { Text(text = stringResource(id = StringsR.string.inventory_title)) },
         navigationIcon = {
@@ -141,6 +153,7 @@ internal fun BookmarkScreen(
           }
         },
       )
+      }
     },
   ) { paddingValues ->
     Column(modifier = Modifier.padding(paddingValues)) {
@@ -177,5 +190,25 @@ internal fun BookmarkScreen(
         onDismiss = { viewedFrame = null },
       )
     }
+  }
+}
+
+private val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+
+/** The sheet's drag handle, drawn in the book's colors because the sheet itself is bare. */
+@Composable
+private fun InventoryHandle(color: Color) {
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 10.dp),
+    contentAlignment = Alignment.Center,
+  ) {
+    Box(
+      modifier = Modifier
+        .size(width = 36.dp, height = 4.dp)
+        .clip(CircleShape)
+        .background(color.copy(alpha = 0.4F)),
+    )
   }
 }
