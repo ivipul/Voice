@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Copertă de pe internet</string>
     <string name="book.edit.name.label">Nume</string>
     <string name="book.edit.title">Modificare carte</string>
-    <string name="bookmark.added.snackbar">Semn de carte adăugat</string>
-    <string name="bookmark.created.just_now">Acum</string>
-    <string name="bookmark.edit.name.label">Nume semn de carte</string>
-    <string name="bookmark.edit.title">Modificare semn de carte</string>
-    <string name="bookmark.title">Semn de carte</string>
     <string name="common.action.add">Adaugă</string>
     <string name="common.action.close">Închide</string>
     <string name="common.action.delete">Șterge</string>
-    <string name="common.action.edit">Modificare</string>
     <string name="common.action.more">Mai multe</string>
-    <string name="common.action.remove">Eliminare</string>
     <string name="common.dialog.cancel">Anulare</string>
     <string name="common.dialog.confirm">Setare</string>
     <string name="common.error.generic.message">S-a produs o eroare 😢</string>

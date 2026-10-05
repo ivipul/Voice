@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Корица од Интернет</string>
     <string name="book.edit.name.label">Име</string>
     <string name="book.edit.title">Ажурирај книга</string>
-    <string name="bookmark.added.snackbar">Обележано</string>
-    <string name="bookmark.created.just_now">Сега</string>
-    <string name="bookmark.edit.name.label">Име на обележувач</string>
-    <string name="bookmark.edit.title">Уреди обележувач</string>
-    <string name="bookmark.title">Обележи</string>
     <string name="common.action.add">Додај</string>
     <string name="common.action.close">Затвори</string>
     <string name="common.action.delete">Избриши</string>
-    <string name="common.action.edit">Уреди</string>
     <string name="common.action.more">Повеќе</string>
-    <string name="common.action.remove">Отстрани</string>
     <string name="common.dialog.cancel">Откажи</string>
     <string name="common.dialog.confirm">Намести</string>
     <string name="common.dialog.ok">ОК</string>

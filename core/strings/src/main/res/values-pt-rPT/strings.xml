@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Capa da internet</string>
     <string name="book.edit.name.label">Título</string>
     <string name="book.edit.title">Editar livro</string>
-    <string name="bookmark.added.snackbar">Marcador adicionado</string>
-    <string name="bookmark.created.just_now">Nesse exato momento</string>
-    <string name="bookmark.edit.name.label">Título do marcador</string>
-    <string name="bookmark.edit.title">Editar marcador</string>
-    <string name="bookmark.title">Marcador</string>
     <string name="common.action.add">Adicionar</string>
     <string name="common.action.close">Fechar</string>
     <string name="common.action.delete">Apagar</string>
-    <string name="common.action.edit">Editar</string>
     <string name="common.action.more">Mais</string>
-    <string name="common.action.remove">Remover</string>
     <string name="common.dialog.cancel">Cancelar</string>
     <string name="common.dialog.confirm">Definir</string>
     <string name="common.dialog.ok">OK</string>

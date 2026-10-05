@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Portada d\'Internet</string>
     <string name="book.edit.name.label">Nom</string>
     <string name="book.edit.title">Edita el llibre</string>
-    <string name="bookmark.added.snackbar">S\'ha afegit el punt de llibre</string>
-    <string name="bookmark.created.just_now">Ara mateix</string>
-    <string name="bookmark.edit.name.label">Nom del punt de llibre</string>
-    <string name="bookmark.edit.title">Canvia el punt de llibre</string>
-    <string name="bookmark.title">Punt de llibre</string>
     <string name="common.action.add">Afegeix</string>
     <string name="common.action.close">Tanca</string>
     <string name="common.action.delete">Suprimeix</string>
-    <string name="common.action.edit">Edita</string>
     <string name="common.action.more">Més</string>
-    <string name="common.action.remove">Suprimeix</string>
     <string name="common.dialog.cancel">Cancel·la</string>
     <string name="common.dialog.confirm">Estableix</string>
     <string name="common.error.generic.message">Alguna cosa ha anat malament 😢</string>

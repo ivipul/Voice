@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">इन्टरनेटबाट कभर लिनुहोस्</string>
     <string name="book.edit.name.label">नाम</string>
     <string name="book.edit.title">पुस्तक सम्पादन गर्नुहोस्</string>
-    <string name="bookmark.added.snackbar">पुस्तकचिनो राखियो</string>
-    <string name="bookmark.created.just_now">भर्खरै</string>
-    <string name="bookmark.edit.name.label">पुस्तकचिनो को नाम</string>
-    <string name="bookmark.edit.title">पुस्तकचिनो सम्पादन गर्नुहोस्</string>
-    <string name="bookmark.title">पुस्तकचिनो</string>
     <string name="common.action.add">थप्नुहोस्</string>
     <string name="common.action.close">बन्द गर्नुहोस्</string>
     <string name="common.action.delete">मेटाउनुहोस्</string>
-    <string name="common.action.edit">सम्पादन गर्नुहोस्</string>
     <string name="common.action.more">थप</string>
-    <string name="common.action.remove">हटाउनुहोस्</string>
     <string name="common.dialog.cancel">रद्द गर्नुहोस्</string>
     <string name="common.dialog.confirm">सेट</string>
     <string name="common.error.generic.message">केही गडबड भयो 😢</string>

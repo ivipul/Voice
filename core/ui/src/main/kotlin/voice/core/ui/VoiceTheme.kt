@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:compose:compositionlocal-allowlist")
+
 package voice.core.ui
 
 import android.os.Build
@@ -9,8 +11,10 @@ import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.materialkolor.DynamicMaterialExpressiveTheme
@@ -20,6 +24,9 @@ import voice.core.data.ThemeColorScheme
 import voice.core.data.ThemeMode
 
 val VoiceBlue = Color(0xFF003b7f)
+
+/** The color scheme the app's theme is built from, so a screen can build it again in light. */
+internal val LocalThemeColorScheme = staticCompositionLocalOf { ThemeColorScheme.VoiceBlue }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -38,21 +45,23 @@ fun VoiceTheme(
       content()
     }
   }
-  if (themeColorScheme == ThemeColorScheme.Dynamic && Build.VERSION.SDK_INT >= 31) {
-    MaterialExpressiveTheme(
-      colorScheme = systemDynamicColorScheme(darkTheme),
-    ) {
-      themedContent()
-    }
-  } else {
-    DynamicMaterialExpressiveTheme(
-      primary = VoiceBlue,
-      secondary = Color(0xFF5E6F95),
-      isDark = darkTheme,
-      style = PaletteStyle.Expressive,
-      specVersion = ColorSpec.SpecVersion.SPEC_2025,
-    ) {
-      themedContent()
+  CompositionLocalProvider(LocalThemeColorScheme provides themeColorScheme) {
+    if (themeColorScheme == ThemeColorScheme.Dynamic && Build.VERSION.SDK_INT >= 31) {
+      MaterialExpressiveTheme(
+        colorScheme = systemDynamicColorScheme(darkTheme),
+      ) {
+        themedContent()
+      }
+    } else {
+      DynamicMaterialExpressiveTheme(
+        primary = VoiceBlue,
+        secondary = Color(0xFF5E6F95),
+        isDark = darkTheme,
+        style = PaletteStyle.Expressive,
+        specVersion = ColorSpec.SpecVersion.SPEC_2025,
+      ) {
+        themedContent()
+      }
     }
   }
 }

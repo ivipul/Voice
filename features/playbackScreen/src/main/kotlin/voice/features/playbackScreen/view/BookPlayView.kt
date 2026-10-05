@@ -1,16 +1,22 @@
 package voice.features.playbackScreen.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import voice.core.data.BookId
 import voice.core.strips.ActiveStripFrame
 import voice.core.ui.VoiceTheme
+import voice.core.ui.bookCardBackdropModifier
+import voice.core.ui.bookCardContentModifier
 import voice.core.ui.crawl.CrawlEdition
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
@@ -42,52 +48,60 @@ internal fun BookPlayView(
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
   onInventoryClick: () -> Unit,
-  onInventoryLongClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
   val palette = crawlPaletteOf(viewState.edition)
-  Scaffold(
-    containerColor = palette.background,
-    contentColor = palette.content,
-    snackbarHost = {
-      SnackbarHost(hostState = snackbarHostState)
-    },
-    topBar = {
-      BookPlayAppBar(
-        skipSilence = viewState.skipSilence,
-        onCloseClick = onCloseClick,
-        onFeedClick = onFeedClick,
-        onSleepTimerClick = onSleepTimerClick,
-        onSkipSilenceClick = onSkipSilenceClick,
-        onVolumeBoostClick = onVolumeBoostClick,
-      )
-    },
-    content = {
-      BookPlayContent(
-        contentPadding = it,
-        viewState = viewState,
-        bookId = bookId,
-        useLandscapeLayout = useLandscapeLayout,
-        onPlayClick = onPlayClick,
-        onRewindClick = onRewindClick,
-        onFastForwardClick = onFastForwardClick,
-        onSkipToNext = onSkipToNext,
-        onSkipToPrevious = onSkipToPrevious,
-        onSeek = onSeek,
-        onStripZoneTap = onStripZoneTap,
-        onStripFrameClick = onStripFrameClick,
-        onCurrentChapterClick = onCurrentChapterClick,
-        onSmartRecapClick = onSmartRecapClick,
-        onSpeedClick = onSpeedClick,
-        onAskClick = onAskClick,
-        onSnipClick = onSnipClick,
-        onInventoryClick = onInventoryClick,
-        onInventoryLongClick = onInventoryLongClick,
-        onXRayChipClick = onXRayChipClick,
-      )
-    },
-  )
+  // The player is what the book's library card grows into: its color first, then the screen on top of it.
+  Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+      modifier = Modifier
+        .matchParentSize()
+        .bookCardBackdropModifier(bookId, onCard = false)
+        .background(palette.background),
+    )
+    Scaffold(
+      modifier = Modifier.bookCardContentModifier(bookId, onCard = false),
+      containerColor = palette.background,
+      contentColor = palette.content,
+      snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+      },
+      topBar = {
+        BookPlayAppBar(
+          skipSilence = viewState.skipSilence,
+          onCloseClick = onCloseClick,
+          onFeedClick = onFeedClick,
+          onSleepTimerClick = onSleepTimerClick,
+          onSkipSilenceClick = onSkipSilenceClick,
+          onVolumeBoostClick = onVolumeBoostClick,
+        )
+      },
+      content = {
+        BookPlayContent(
+          contentPadding = it,
+          viewState = viewState,
+          bookId = bookId,
+          useLandscapeLayout = useLandscapeLayout,
+          onPlayClick = onPlayClick,
+          onRewindClick = onRewindClick,
+          onFastForwardClick = onFastForwardClick,
+          onSkipToNext = onSkipToNext,
+          onSkipToPrevious = onSkipToPrevious,
+          onSeek = onSeek,
+          onStripZoneTap = onStripZoneTap,
+          onStripFrameClick = onStripFrameClick,
+          onCurrentChapterClick = onCurrentChapterClick,
+          onSmartRecapClick = onSmartRecapClick,
+          onSpeedClick = onSpeedClick,
+          onAskClick = onAskClick,
+          onSnipClick = onSnipClick,
+          onInventoryClick = onInventoryClick,
+          onXRayChipClick = onXRayChipClick,
+        )
+      },
+    )
+  }
 }
 
 @Composable
@@ -121,7 +135,6 @@ private fun BookPlayPreview(
         onAskClick = {},
         onSnipClick = {},
         onInventoryClick = {},
-        onInventoryLongClick = {},
         onXRayChipClick = {},
       )
     }
@@ -150,6 +163,7 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
       ),
       edition = CrawlEdition.DungeonCrawlerCarl,
       playbackSpeed = 1.1F,
+      inventoryCount = 7,
     )
     yield(initial)
     yield(

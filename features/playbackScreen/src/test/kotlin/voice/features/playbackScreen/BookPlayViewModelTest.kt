@@ -480,11 +480,43 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `the Inventory button opens the Inventory screen`() = scope.runTest {
+  fun `the Inventory card opens the Inventory screen`() = scope.runTest {
     viewModel.onBookmarkClick()
 
     verify { navigator.goTo(Destination.Bookmarks(book.id)) }
   }
+
+  @Test
+  fun `the Inventory card counts the book's snips and the strips reached so far`() = scope.runTest {
+    val copilotRepository = CoPilotRepository()
+    copilotRepository.addMessage(book.id, snipMessage("first"))
+    copilotRepository.addMessage(book.id, snipMessage("second"))
+    copilotRepository.addMessage(
+      book.id,
+      CoPilotMessage(id = "answer", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 0L),
+    )
+    copilotRepository.addMessage(BookId("another-book"), snipMessage("elsewhere"))
+    // The book is at 7:30; the first strip started at 1:00 and the second one starts at 8:20.
+    val reached = strip(startsMs = listOf(60_000L), holdMs = 10_000L, chapter = 1)
+    val ahead = strip(startsMs = listOf(500_000L), holdMs = 10_000L, chapter = 2)
+    val viewModel = viewModel(strips = listOf(reached, ahead), copilotRepository = copilotRepository)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      assertEquals(3, state.inventoryCount)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  private fun snipMessage(id: String) = CoPilotMessage(
+    id = id,
+    role = CoPilotMessage.Role.CoPilot,
+    text = "A title\nThe moment.",
+    timestampMs = 0L,
+    snipChapterId = book.currentChapter.id,
+    snipPositionInChapterMs = 1_000L,
+  )
 
   @Test
   fun `viewState uses currently playing demo book in kiosk mode`() = scope.runTest {
@@ -514,15 +546,6 @@ class BookPlayViewModelTest {
     assertEquals("who is Carl?", messages[0].text)
     assertEquals(CoPilotMessage.Role.CoPilot, messages[1].role)
     assertEquals("Carl is the protagonist.", messages[1].text)
-  }
-
-  @Test
-  fun `bookmark long-click adds a plain bookmark, not Snip and Synthesize`() = scope.runTest {
-    viewModel.onBookmarkLongClick()
-    yield()
-
-    coVerify { bookmarkRepository.addBookmarkAtBookPosition(book, any(), any()) }
-    coVerify(exactly = 0) { copilotPipeline.snip(any()) }
   }
 
   @Test
@@ -806,6 +829,7 @@ class BookPlayViewModelTest {
     xrayManifest: XRayManifest? = null,
     playerCards: PlayerCardSet? = null,
     strips: List<AvailableStrip> = emptyList(),
+    copilotRepository: CoPilotRepository = CoPilotRepository(),
   ): BookPlayViewModel {
     return BookPlayViewModel(
       bookRepository = mockk {
@@ -834,7 +858,7 @@ class BookPlayViewModelTest {
       dispatcherProvider = DispatcherProvider(scope.coroutineContext, scope.coroutineContext, scope.coroutineContext),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(experimentalPlaybackPersistence),
       kioskModeFeatureFlag = MemoryFeatureFlag(kioskMode),
-      copilotRepository = CoPilotRepository(),
+      copilotRepository = copilotRepository,
       copilotPipeline = mockk(),
       speechInputController = mockk(),
       xrayRepository = mockk {

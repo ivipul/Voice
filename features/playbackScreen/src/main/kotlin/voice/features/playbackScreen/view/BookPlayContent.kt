@@ -1,10 +1,13 @@
 package voice.features.playbackScreen.view
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import voice.core.data.BookId
 import voice.core.strips.ActiveStripFrame
@@ -48,7 +53,6 @@ internal fun BookPlayContent(
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
   onInventoryClick: () -> Unit,
-  onInventoryLongClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
 ) {
   val palette = crawlPaletteOf(viewState.edition)
@@ -66,7 +70,9 @@ internal fun BookPlayContent(
       type = viewState.edition?.chapterType ?: CrawlDisplayType.Default,
       onChapterClick = onCurrentChapterClick,
     )
-    Spacer(modifier = Modifier.size(4.dp))
+    Spacer(modifier = Modifier.size(12.dp))
+    XRayChipRow(chips = viewState.xrayChips, palette = palette, onChipClick = onXRayChipClick)
+    Spacer(modifier = Modifier.size(12.dp))
     SliderRow(
       duration = viewState.duration,
       playedTime = viewState.playedTime,
@@ -92,22 +98,28 @@ internal fun BookPlayContent(
       onSpeedClick = onSpeedClick,
     )
     Spacer(modifier = Modifier.size(24.dp))
-    XRayChipRow(chips = viewState.xrayChips, palette = palette, onChipClick = onXRayChipClick)
-    Spacer(modifier = Modifier.size(16.dp))
     CoPilotActions(
       palette = palette,
       onAskClick = onAskClick,
       onSnipClick = onSnipClick,
-      onInventoryClick = onInventoryClick,
-      onInventoryLongClick = onInventoryLongClick,
     )
   }
+  // The Inventory card runs under the navigation bar, so only the card keeps clear of it.
+  val bottomInset = contentPadding.calculateBottomPadding()
+  val inventoryPeek: @Composable () -> Unit = {
+    InventoryPeek(
+      count = viewState.inventoryCount,
+      palette = palette,
+      bottomInset = bottomInset,
+      onClick = onInventoryClick,
+    )
+  }
+  val layoutDirection = LocalLayoutDirection.current
   if (useLandscapeLayout) {
     Row(
       modifier = Modifier
-        .padding(contentPadding)
+        .padding(contentPadding.withoutBottom(layoutDirection))
         .fillMaxSize(),
-      verticalAlignment = Alignment.CenterVertically,
     ) {
       CoverStage(
         bookId = bookId,
@@ -120,20 +132,36 @@ internal fun BookPlayContent(
         alwaysFadeSides = true,
         modifier = Modifier
           .weight(1F)
-          .fillMaxHeight(),
+          .fillMaxHeight()
+          .padding(bottom = bottomInset),
       )
       Column(
         modifier = Modifier
           .weight(1F)
-          .verticalScroll(rememberScrollState()),
+          .fillMaxHeight(),
       ) {
-        controls()
+        Box(
+          modifier = Modifier
+            .weight(1F)
+            .fillMaxWidth(),
+          contentAlignment = Alignment.Center,
+        ) {
+          Column(
+            modifier = Modifier
+              .fillMaxWidth()
+              .verticalScroll(rememberScrollState()),
+          ) {
+            controls()
+          }
+        }
+        Spacer(modifier = Modifier.size(12.dp))
+        inventoryPeek()
       }
     }
   } else {
     Column(
       modifier = Modifier
-        .padding(contentPadding)
+        .padding(contentPadding.withoutBottom(layoutDirection))
         .fillMaxSize(),
     ) {
       CoverStage(
@@ -150,6 +178,13 @@ internal fun BookPlayContent(
       )
       controls()
       Spacer(modifier = Modifier.size(24.dp))
+      inventoryPeek()
     }
   }
 }
+
+private fun PaddingValues.withoutBottom(layoutDirection: LayoutDirection): PaddingValues = PaddingValues(
+  start = calculateStartPadding(layoutDirection),
+  top = calculateTopPadding(),
+  end = calculateEndPadding(layoutDirection),
+)

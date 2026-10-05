@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Обкладинка з Інтернету</string>
     <string name="book.edit.name.label">Назва</string>
     <string name="book.edit.title">Редагувати книгу</string>
-    <string name="bookmark.added.snackbar">Закладку додано</string>
-    <string name="bookmark.created.just_now">Щойно</string>
-    <string name="bookmark.edit.name.label">Назва закладки</string>
-    <string name="bookmark.edit.title">Редагувати закладку</string>
-    <string name="bookmark.title">Закладка</string>
     <string name="common.action.add">Додати</string>
     <string name="common.action.close">Закрити</string>
     <string name="common.action.delete">Видалити</string>
-    <string name="common.action.edit">Редагувати</string>
     <string name="common.action.more">Більше</string>
-    <string name="common.action.remove">Вилучити</string>
     <string name="common.dialog.cancel">Скасувати</string>
     <string name="common.dialog.confirm">Установити</string>
     <string name="common.dialog.ok">ОК</string>

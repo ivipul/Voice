@@ -17,6 +17,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import voice.core.data.ThemeMode
+import voice.core.ui.LocalThemeColorScheme
+import voice.core.ui.VoiceTheme
 
 /**
  * Colors everything inside in [edition]'s palette and turns the system bar icons to match it.
@@ -36,6 +39,17 @@ fun CrawlTheme(
     SystemBarIcons(dark = edition.palette.darkSystemBarIcons)
   }
   MaterialTheme(colorScheme = colorScheme, content = content)
+}
+
+/** The library on white: the app's light colors whatever the phone's dark mode, with dark system bar icons to match. */
+@Composable
+fun CrawlLibraryTheme(content: @Composable () -> Unit) {
+  SystemBarIcons(dark = true)
+  VoiceTheme(themeMode = ThemeMode.Light, themeColorScheme = LocalThemeColorScheme.current) {
+    val colorScheme = MaterialTheme.colorScheme
+    val onWhite = remember(colorScheme) { colorScheme.copy(background = Color.White, surface = Color.White) }
+    MaterialTheme(colorScheme = onWhite, content = content)
+  }
 }
 
 /** [edition]'s palette, or one taken from the app theme for a book outside the series. */

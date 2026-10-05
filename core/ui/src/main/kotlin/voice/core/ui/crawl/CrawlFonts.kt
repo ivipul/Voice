@@ -40,6 +40,14 @@ object CrawlType {
     fontSize = 12.sp,
     letterSpacing = 0.08.em,
   )
+
+  /** Ask AI and Snip, and the Inventory card under them. */
+  val button = TextStyle(
+    fontFamily = CrawlFonts.ChakraPetch,
+    fontWeight = FontWeight.Bold,
+    fontSize = 15.sp,
+    letterSpacing = 0.06.em,
+  )
   val label = TextStyle(
     fontFamily = CrawlFonts.ChakraPetch,
     fontWeight = FontWeight.Bold,

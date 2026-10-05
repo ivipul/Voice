@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Dekblad van internet af</string>
     <string name="book.edit.name.label">Naam</string>
     <string name="book.edit.title">Wysig boek</string>
-    <string name="bookmark.added.snackbar">Boekmerk bygevoeg</string>
-    <string name="bookmark.created.just_now">Nou net</string>
-    <string name="bookmark.edit.name.label">Boekmerk naam</string>
-    <string name="bookmark.edit.title">Wysig boekmerk</string>
-    <string name="bookmark.title">Boekmerk</string>
     <string name="common.action.add">Voeg toe</string>
     <string name="common.action.close">Sluit</string>
     <string name="common.action.delete">Skrap</string>
-    <string name="common.action.edit">Wysig</string>
     <string name="common.action.more">Meer</string>
-    <string name="common.action.remove">Verwyder</string>
     <string name="common.dialog.cancel">Kanselleer</string>
     <string name="common.dialog.confirm">Stel</string>
     <string name="common.dialog.ok">OK</string>
