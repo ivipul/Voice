@@ -18,6 +18,7 @@ import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
@@ -46,6 +47,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
+import voice.core.ui.crawl.crawlEditionOf
 import voice.features.bookOverview.di.BookOverviewScope
 import voice.features.bookOverview.search.BookSearchViewState
 import voice.navigation.Destination
@@ -164,6 +166,7 @@ class BookOverviewViewModel(
         !folderPickerMovedDialogShown &&
         appInfoProvider.installTime < FolderPickerMigrationInstallTimeCutoff,
       dialog = dialog,
+      activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
     )
   }
 
@@ -288,8 +291,15 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Playback(id))
   }
 
-  fun playPause() {
-    playerController.playPause()
+  /** Starts the current book if it isn't playing and opens its player. */
+  fun onPlayButtonClick() {
+    scope.launch {
+      val bookId = currentBookStoreDataStore.data.first() ?: return@launch
+      if (playStateManager.playState != PlayStateManager.PlayState.Playing) {
+        playerController.play()
+      }
+      navigator.goTo(Destination.Playback(bookId))
+    }
   }
 
   fun onPermissionBugCardClick() {

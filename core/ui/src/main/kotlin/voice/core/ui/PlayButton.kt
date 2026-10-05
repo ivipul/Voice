@@ -7,7 +7,9 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,6 +17,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import voice.core.ui.crawl.CrawlPalette
+import voice.core.ui.crawl.hardShadow
 import voice.core.strings.R as StringsR
 
 @Composable
@@ -25,17 +29,24 @@ fun PlayButton(
   onPlayClick: () -> Unit,
   modifier: Modifier = Modifier,
   sharedElementModifier: Modifier = Modifier,
+  palette: CrawlPalette? = null,
 ) {
   val cornerSize by animateDpAsState(
     targetValue = if (playing) 16.dp else fabSize / 2,
     label = "cornerSize",
   )
+  val shape = RoundedCornerShape(cornerSize)
+  val containerColor = palette?.highlight ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
+      .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
       .size(fabSize)
       .then(sharedElementModifier),
     onClick = onPlayClick,
-    shape = RoundedCornerShape(cornerSize),
+    shape = shape,
+    containerColor = containerColor,
+    contentColor = palette?.onHighlight ?: contentColorFor(containerColor),
+    elevation = if (palette != null) flatElevation() else FloatingActionButtonDefaults.elevation(),
   ) {
     Icon(
       modifier = Modifier.size(iconSize),
@@ -60,3 +71,12 @@ fun rememberPlayIconPainter(playing: Boolean): Painter {
     atEnd = !playing,
   )
 }
+
+/** With a palette the button casts the comic-style hard shadow instead of a soft one. */
+@Composable
+private fun flatElevation() = FloatingActionButtonDefaults.elevation(
+  defaultElevation = 0.dp,
+  pressedElevation = 0.dp,
+  focusedElevation = 0.dp,
+  hoveredElevation = 0.dp,
+)

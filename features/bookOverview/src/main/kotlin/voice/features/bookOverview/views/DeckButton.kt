@@ -3,7 +3,9 @@ package voice.features.bookOverview.views
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,21 +14,30 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import voice.core.ui.crawl.CrawlPalette
+import voice.core.ui.crawl.hardShadow
 import voice.core.strings.R as StringsR
 
 private val FabSize = 56.dp
 private val IconSize = 24.dp
 
-/** Opens The Deck. The same size and colors as the play button on the other side of the library. */
+/** Opens The Deck. The same size and colors as the play button on the other side of the library, in the active book's [palette]. */
 @Composable
 internal fun DeckButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  palette: CrawlPalette? = null,
 ) {
+  val containerColor = palette?.highlight ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
-    modifier = modifier.size(FabSize),
+    modifier = modifier
+      .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = CircleShape, x = 3.dp, y = 3.dp) else Modifier)
+      .size(FabSize),
     onClick = onClick,
     shape = CircleShape,
+    containerColor = containerColor,
+    contentColor = palette?.onHighlight ?: contentColorFor(containerColor),
+    elevation = if (palette != null) flatElevation() else FloatingActionButtonDefaults.elevation(),
   ) {
     Icon(
       modifier = Modifier.size(IconSize),
@@ -35,6 +46,14 @@ internal fun DeckButton(
     )
   }
 }
+
+@Composable
+private fun flatElevation() = FloatingActionButtonDefaults.elevation(
+  defaultElevation = 0.dp,
+  pressedElevation = 0.dp,
+  focusedElevation = 0.dp,
+  hoveredElevation = 0.dp,
+)
 
 /** Two cards, the second peeking out behind the first. */
 private val DeckIcon: ImageVector = ImageVector.Builder(

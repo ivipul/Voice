@@ -116,7 +116,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     },
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
-    onPlayButtonClick = bookOverviewViewModel::playPause,
+    onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
     onDeckClick = bookOverviewViewModel::onDeckClick,
     onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
     onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
@@ -210,6 +210,7 @@ internal fun BookOverview(
           iconSize = 24.dp,
           onPlayClick = onPlayButtonClick,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
+          palette = viewState.activeEdition?.palette,
         )
       }
     },
@@ -242,6 +243,7 @@ internal fun BookOverview(
       }
       DeckButton(
         onClick = onDeckClick,
+        palette = viewState.activeEdition?.palette,
         modifier = Modifier
           .align(Alignment.BottomStart)
           .navigationBarsPadding()
