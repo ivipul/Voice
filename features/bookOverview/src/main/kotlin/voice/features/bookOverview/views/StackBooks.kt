@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -81,10 +82,15 @@ private const val TITLE_SCALE = 0.5F
 private const val TITLE_LINE_HEIGHT = 1.1F
 private const val FULL_PERCENT = 100
 
-// How far the cards lean while the list moves: a degree for every 4 px it scrolls in a frame, at most 10 degrees.
-private const val TILT_DEGREES_PER_PX = 0.25F
-private const val MAX_TILT_DEGREES = 10F
-private const val TILT_CAMERA_DISTANCE = 12F
+// How far the cards lean while the list moves: a degree for every px it scrolls in a frame, at most 24 degrees.
+private const val TILT_DEGREES_PER_PX = 1F
+private const val MAX_TILT_DEGREES = 24F
+
+// A near camera, so the edge that tips away visibly narrows.
+private const val TILT_CAMERA_DISTANCE = 7F
+
+// Cards tip about the middle of the part that shows, not of the whole card with its tucked part.
+private val TiltPivot = TransformOrigin(pivotFractionX = 0.5F, pivotFractionY = 0.36F)
 
 /**
  * How far the cards lean for a scroll of [scrolledPx] in one frame: forward (top edge away) while the list scrolls down,
@@ -122,7 +128,7 @@ internal fun StackBooks(
   LaunchedEffect(tilt) {
     // The cards follow the lean on a soft spring, so they sway into it and settle back once the list stops.
     snapshotFlow { targetTilt.floatValue }.collectLatest { target ->
-      tilt.animateTo(target, spring(dampingRatio = 0.55F, stiffness = Spring.StiffnessLow))
+      tilt.animateTo(target, spring(dampingRatio = 0.5F, stiffness = Spring.StiffnessMediumLow))
     }
   }
   LazyColumn(
@@ -151,6 +157,7 @@ internal fun StackBooks(
           modifier = Modifier.graphicsLayer {
             rotationX = tilt.value
             cameraDistance = TILT_CAMERA_DISTANCE * density
+            transformOrigin = TiltPivot
           },
         )
       }
