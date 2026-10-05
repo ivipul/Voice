@@ -60,8 +60,19 @@ class TranscriptRepository(
     }
   }
 
+  private val uriCache by lazy { context.getSharedPreferences("transcript_uris", Context.MODE_PRIVATE) }
+
   private suspend fun loadCues(chapterUri: Uri): List<TranscriptCue>? {
     val startedAt = System.currentTimeMillis()
+    // Finding the transcript is a SAF folder walk that took 1-7+ s; remember where it was found.
+    uriCache.getString(chapterUri.toString(), null)?.let { saved ->
+      val json = readJson(Uri.parse(saved))
+      val cues = json?.let { parseCues(it, saved) }
+      if (cues != null) {
+        Logger.d("Transcript loaded from remembered location in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
+        return cues
+      }
+    }
     val audioFile = documentFileFactory.create(chapterUri)
     val targetBaseName = audioFile.nameWithoutExtension()
 
@@ -74,21 +85,24 @@ class TranscriptRepository(
         val foundAt = System.currentTimeMillis()
         return readJson(match.uri)?.let { json ->
           val readAt = System.currentTimeMillis()
-          try {
-            TranscriptParser.parse(json).also {
-              Logger.d(
-                "Transcript loaded: find ${foundAt - startedAt} ms, read ${readAt - foundAt} ms, " +
-                  "parse ${System.currentTimeMillis() - readAt} ms (${it.size} cues)",
-              )
-            }
-          } catch (e: Exception) {
-            Logger.w(e, "Could not parse transcript at ${match.uri}")
-            null
+          parseCues(json, match.uri.toString())?.also {
+            uriCache.edit().putString(chapterUri.toString(), match.uri.toString()).apply()
+            Logger.d(
+              "Transcript loaded: find ${foundAt - startedAt} ms, read ${readAt - foundAt} ms, " +
+                "parse ${System.currentTimeMillis() - readAt} ms (${it.size} cues)",
+            )
           }
         }
       }
     }
     return null
+  }
+
+  private fun parseCues(json: String, source: String): List<TranscriptCue>? = try {
+    TranscriptParser.parse(json)
+  } catch (e: Exception) {
+    Logger.w(e, "Could not parse transcript at $source")
+    null
   }
 
   private fun readJson(uri: Uri): String? = try {

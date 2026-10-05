@@ -4,7 +4,11 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import voice.core.copilot.frame.FrameRequest
 import voice.core.copilot.frame.SnipFrameRunner
 import voice.core.data.BookId
@@ -45,66 +49,96 @@ class RealCoPilotPipeline(
   override suspend fun failureMessage(): String =
     if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_ANSWER else GENERIC_FAILURE
 
-  override suspend fun ask(bookId: BookId, question: String): String {
-    val book = bookRepository.get(bookId) ?: return fallbackAnswer()
+  /** What a spoken/typed action needs: either an answer already known, or the prompts to send to Gemini. */
+  private sealed interface Plan {
+    data class Direct(val answer: String) : Plan
+    data class Gemini(val systemPrompt: String, val userPrompt: String) : Plan
+  }
+
+  private suspend fun askPlan(bookId: BookId, question: String): Plan {
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
     val transcript = if (jevRouter.needsTranscriptContext(question)) {
       transcriptRepository.textForPrecedingWindow(book, ASK_TRANSCRIPT_WINDOW_MS)
     } else {
       null
     }
-    return runCatching {
-      geminiClient.ask(
-        systemPrompt = askSystemPrompt(book, currentStyle(WordBudget.Answer)),
-        userPrompt = userQuestionPrompt(question, transcript),
-      )
-    }.getOrElse { e ->
-      Logger.w(e, "CoPilot ask() failed")
-      fallbackAnswer()
-    }
+    return Plan.Gemini(
+      askSystemPrompt(book, currentStyle(WordBudget.Answer)),
+      userQuestionPrompt(question, transcript),
+    )
   }
 
-  override suspend fun warmUp(bookId: BookId) {
-    val book = bookRepository.get(bookId) ?: return
-    val ignored = transcriptRepository.textForPrecedingWindow(book, 1)
-    Logger.d("CoPilot warm-up done, transcript ${if (ignored == null) "missing" else "loaded"}")
-  }
-
-  override suspend fun autoIdentify(bookId: BookId): String {
-    val book = bookRepository.get(bookId) ?: return fallbackAnswer()
+  private suspend fun autoIdentifyPlan(bookId: BookId): Plan {
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
     val last60Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_RECENT_WINDOW_MS)
-      ?: return fallbackNoTranscript()
+      ?: return Plan.Direct(fallbackNoTranscript())
     val last30Minutes = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_CONTEXT_WINDOW_MS)
     val task = "Explain what is happening right now in the book, based specifically on the last 60 seconds " +
       "provided below. Use the last 30 minutes of context only to understand who or what is involved - don't " +
       "summarize that older context itself, focus your explanation on the current moment."
-    return runCatching {
-      geminiClient.ask(
-        systemPrompt = spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Answer)),
-        userPrompt = autoIdentifyPrompt(last30Minutes, last60Seconds),
-      )
-    }.getOrElse { e ->
-      Logger.w(e, "CoPilot autoIdentify() failed")
+    return Plan.Gemini(
+      spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Answer)),
+      autoIdentifyPrompt(last30Minutes, last60Seconds),
+    )
+  }
+
+  private suspend fun catchMeUpPlan(bookId: BookId): Plan {
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
+    val transcript = transcriptRepository.textForPrecedingWindow(book, CATCH_UP_WINDOW_MS)
+      ?: return Plan.Direct(fallbackNoTranscript())
+    val task = "Give a spoken summary of what happened in the last 30 minutes of the book, shown below. " +
+      "Start your answer with the exact words \"In the last 30 minutes,\" and continue directly from there."
+    return Plan.Gemini(
+      // The recap must open with an exact phrase, so it never takes a banner flavor.
+      spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Recap, SystemFlavor.Plain)),
+      transcriptOnlyPrompt(transcript),
+    )
+  }
+
+  private suspend fun answer(plan: Plan, label: String): String = when (plan) {
+    is Plan.Direct -> plan.answer
+    is Plan.Gemini -> runCatching { geminiClient.ask(plan.systemPrompt, plan.userPrompt) }.getOrElse { e ->
+      Logger.w(e, "CoPilot $label() failed")
       fallbackAnswer()
     }
   }
 
-  override suspend fun catchMeUp(bookId: BookId): String {
-    val book = bookRepository.get(bookId) ?: return fallbackAnswer()
-    val transcript = transcriptRepository.textForPrecedingWindow(book, CATCH_UP_WINDOW_MS)
-      ?: return fallbackNoTranscript()
-    val task = "Give a spoken summary of what happened in the last 30 minutes of the book, shown below. " +
-      "Start your answer with the exact words \"In the last 30 minutes,\" and continue directly from there."
-    return runCatching {
-      geminiClient.ask(
-        // The recap must open with an exact phrase, so it never takes a banner flavor.
-        spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Recap, SystemFlavor.Plain)),
-        transcriptOnlyPrompt(transcript),
-      )
-    }.getOrElse { e ->
-      Logger.w(e, "CoPilot catchMeUp() failed")
-      fallbackAnswer()
+  private fun stream(label: String, plan: suspend () -> Plan): Flow<String> = flow {
+    Logger.d("CoPilot $label stream: pipeline start")
+    when (val resolved = plan()) {
+      is Plan.Direct -> emit(resolved.answer)
+      is Plan.Gemini -> emitAll(geminiClient.askStream(resolved.systemPrompt, resolved.userPrompt))
     }
   }
+
+  override suspend fun warmUp(bookId: BookId) {
+    // At app start the library may not have the book yet, so give it a few tries.
+    var book = bookRepository.get(bookId)
+    var attempts = 1
+    while (book == null && attempts < WARM_UP_ATTEMPTS) {
+      delay(WARM_UP_RETRY_MS)
+      book = bookRepository.get(bookId)
+      attempts++
+    }
+    if (book == null) {
+      Logger.d("CoPilot warm-up: book not available")
+      return
+    }
+    val loaded = transcriptRepository.textForPrecedingWindow(book, 1)
+    Logger.d("CoPilot warm-up done (attempt $attempts), transcript ${if (loaded == null) "missing" else "loaded"}")
+  }
+
+  override suspend fun ask(bookId: BookId, question: String): String = answer(askPlan(bookId, question), "ask")
+
+  override suspend fun autoIdentify(bookId: BookId): String = answer(autoIdentifyPlan(bookId), "autoIdentify")
+
+  override suspend fun catchMeUp(bookId: BookId): String = answer(catchMeUpPlan(bookId), "catchMeUp")
+
+  override fun askStream(bookId: BookId, question: String): Flow<String> = stream("ask") { askPlan(bookId, question) }
+
+  override fun autoIdentifyStream(bookId: BookId): Flow<String> = stream("autoIdentify") { autoIdentifyPlan(bookId) }
+
+  override fun catchMeUpStream(bookId: BookId): Flow<String> = stream("catchMeUp") { catchMeUpPlan(bookId) }
 
   override suspend fun snip(bookId: BookId) {
     val drawFrame = snipFrameRunner.isAvailable()
@@ -147,6 +181,8 @@ class RealCoPilotPipeline(
   private fun snipFailed() = coPilotRepository.emitSnipEvent(SnipEvent.Failed)
 
   private companion object {
+    const val WARM_UP_ATTEMPTS = 8
+    const val WARM_UP_RETRY_MS = 2_000L
     const val FALLBACK_ANSWER = "Sorry, I couldn't get an answer just now."
     const val FALLBACK_NO_TRANSCRIPT = "I don't have a transcript for this book yet, so I can't answer that."
     const val GENERIC_FAILURE = "Sorry, something went wrong."
