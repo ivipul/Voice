@@ -66,6 +66,7 @@ import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -505,6 +506,54 @@ class BookPlayViewModelTest {
       var state = awaitItem()
       while (state == null || state.stripZones.isEmpty()) state = awaitItem()
       assertEquals(3, state.inventoryCount)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `reaching a new strip toasts once, and strips already reached when the screen opens do not`() = scope.runTest {
+    // The book opens at 7:30; the first strip started at 1:00 and the second one starts at 8:20.
+    val reached = strip(startsMs = listOf(60_000L), holdMs = 10_000L, chapter = 1)
+    val ahead = strip(startsMs = listOf(500_000L), holdMs = 10_000L, chapter = 2)
+    val livePlaybackFlow = MutableStateFlow<LivePlaybackState?>(null)
+    val viewModel = viewModel(
+      experimentalPlaybackPersistence = true,
+      livePlaybackFlow = livePlaybackFlow,
+      strips = listOf(reached, ahead),
+    )
+    val effects = mutableListOf<BookPlayViewEffect>()
+    backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      runCurrent()
+      assertEquals(emptyList<BookPlayViewEffect>(), effects)
+
+      fun playAt(positionInChapter: Duration) {
+        livePlaybackFlow.value = LivePlaybackState(
+          bookId = book.id,
+          chapterId = book.chapters[1].id,
+          positionMs = positionInChapter.inWholeMilliseconds,
+          isPlaying = true,
+          playbackSpeed = 1F,
+        )
+      }
+      playAt(3.minutes)
+      awaitItem()
+      runCurrent()
+      assertEquals(emptyList<BookPlayViewEffect>(), effects)
+
+      playAt(201.seconds)
+      awaitItem()
+      runCurrent()
+      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.StripUnlocked), effects)
+
+      playAt(3.minutes)
+      awaitItem()
+      playAt(205.seconds)
+      awaitItem()
+      runCurrent()
+      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.StripUnlocked), effects)
       cancelAndIgnoreRemainingEvents()
     }
   }

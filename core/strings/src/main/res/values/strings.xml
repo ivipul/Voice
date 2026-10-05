@@ -62,6 +62,8 @@
     <string name="copilot.action.snip">Snip</string>
     <!-- Toast shown when Snip &amp; Synthesize starts capturing a moment. -->
     <string name="copilot.snip.saved.snackbar">Snipped</string>
+    <!-- Toast shown when playback reaches a comic strip for the first time and it unlocks in the Inventory. -->
+    <string name="strip.unlocked.snackbar">New strip unlocked!</string>
     <!-- Title of the bottom sheet that shows the text of a just-snipped moment. -->
     <string name="copilot.snip.sheet.title">Snipped moment</string>
     <!-- Shown in the snip bottom sheet while the snipped text is still being written. -->

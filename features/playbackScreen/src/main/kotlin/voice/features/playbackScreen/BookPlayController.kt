@@ -50,6 +50,7 @@ fun BookPlayScreen(bookId: BookId) {
   val viewState = viewModel.viewState()
     ?: return
   val snipSavedMessage = stringResource(StringsR.string.copilot_snip_saved_snackbar)
+  val stripUnlockedMessage = stringResource(StringsR.string.strip_unlocked_snackbar)
   val batteryOptimizationMessage = stringResource(StringsR.string.playback_battery_optimization_rationale)
   val batteryOptimizationAction = stringResource(StringsR.string.playback_battery_optimization_action)
   val microphonePermissionMessage = stringResource(StringsR.string.copilot_permission_microphone_required)
@@ -86,6 +87,9 @@ fun BookPlayScreen(bookId: BookId) {
       when (viewEffect) {
         BookPlayViewEffect.SnipSaved -> {
           Toast.makeText(context, snipSavedMessage, Toast.LENGTH_SHORT).show()
+        }
+        BookPlayViewEffect.StripUnlocked -> {
+          Toast.makeText(context, stripUnlockedMessage, Toast.LENGTH_SHORT).show()
         }
         BookPlayViewEffect.RequestIgnoreBatteryOptimization -> {
           val result = snackbarHostState.showSnackbar(
