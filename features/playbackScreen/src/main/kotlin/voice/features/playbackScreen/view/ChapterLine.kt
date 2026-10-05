@@ -44,7 +44,7 @@ internal fun ChapterLine(
       modifier = Modifier
         .weight(1F)
         .clickable(enabled = chapterName != null, onClick = onChapterClick),
-      verticalAlignment = Alignment.Bottom,
+      verticalAlignment = Alignment.CenterVertically,
     ) {
       BasicText(
         text = chapterName?.let { if (type.uppercase) it.uppercase() else it }.orEmpty(),
