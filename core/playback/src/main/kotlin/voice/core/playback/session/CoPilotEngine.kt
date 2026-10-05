@@ -28,14 +28,21 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.GeminiClient
 import voice.core.copilot.tts.FishAudioClient
 import voice.core.copilot.tts.SpeechChunker
 import voice.core.data.BookId
@@ -75,6 +82,7 @@ class CoPilotEngine(
   private val scope: CoroutineScope,
   private val copilotPipeline: CoPilotPipeline,
   private val copilotRepository: CoPilotRepository,
+  private val geminiClient: GeminiClient,
   private val fishAudioClient: FishAudioClient,
   @CurrentBookStore
   private val currentBookStoreId: DataStore<BookId?>,
@@ -82,11 +90,17 @@ class CoPilotEngine(
 
   private val mainHandler = Handler(Looper.getMainLooper())
   private var textToSpeech: TextToSpeech? = null
-  private var speakJob: Job? = null
-
   // Bumped on every speak() and interrupt so work finishing on another thread can tell it was
   // superseded (the job itself has already completed by the time its audio is played).
   private var speakGeneration = 0
+
+  private var clockStart = 0L
+
+  /** Logs `TIMING +ms event`, with ms counted from the button press (logcat also stamps every line). */
+  private fun mark(event: String) {
+    if (event.startsWith("trigger")) clockStart = System.currentTimeMillis()
+    Logger.d("CoPilotEngine TIMING +${System.currentTimeMillis() - clockStart} ms $event")
+  }
   private var fishPlayer: ExoPlayer? = null
   private val fishFiles = mutableListOf<File>()
   private var noSpeechTimeout: Runnable? = null
@@ -123,7 +137,12 @@ class CoPilotEngine(
     // The transcript takes seconds to find and parse; do it now so the first button press doesn't wait.
     scope.launch {
       try {
-        currentBookStoreId.data.first()?.let { copilotPipeline.warmUp(it) }
+        val bookId = currentBookStoreId.data.first()
+        Logger.d("CoPilotEngine: warm-up for book $bookId")
+        // Open the Gemini and Fish connections too, so the first spoken answer skips the TLS handshakes.
+        launch { geminiClient.warmUp() }
+        launch { fishAudioClient.warmUp() }
+        if (bookId != null) copilotPipeline.warmUp(bookId)
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
@@ -153,6 +172,12 @@ class CoPilotEngine(
     if (mode == CoPilotMode.AutoIdentify) {
       playCue(autoIdentifyStartSoundId)
     }
+    mark("trigger($mode)")
+    // Open the connections now so the first real request skips the TLS handshake.
+    scope.launch {
+      geminiClient.warmUp()
+      fishAudioClient.warmUp()
+    }
     activeJob = scope.launch {
       try {
         val bookId = currentBookStoreId.data.first()
@@ -160,23 +185,43 @@ class CoPilotEngine(
           finish(onFinished)
           return@launch
         }
-        val answer = when (mode) {
-          CoPilotMode.OpenMic -> runOpenMic(bookId)
-          CoPilotMode.AutoIdentify -> copilotPipeline.autoIdentify(bookId)
-          CoPilotMode.CatchMeUp -> copilotPipeline.catchMeUp(bookId)
+        when (mode) {
+          CoPilotMode.OpenMic -> {
+            val heard = listenForQuestion(bookId)
+            if (heard == null) {
+              finish(onFinished)
+              return@launch
+            }
+            speakAnswer(
+              deltas = copilotPipeline.askStream(bookId, heard),
+              nonStreaming = { copilotPipeline.ask(bookId, heard) },
+              onAnswer = { recordAnswer(bookId, it) },
+            )
+          }
+          CoPilotMode.AutoIdentify -> speakAnswer(
+            deltas = copilotPipeline.autoIdentifyStream(bookId),
+            nonStreaming = { copilotPipeline.autoIdentify(bookId) },
+          )
+          CoPilotMode.CatchMeUp -> speakAnswer(
+            deltas = copilotPipeline.catchMeUpStream(bookId),
+            nonStreaming = { copilotPipeline.catchMeUp(bookId) },
+          )
         }
-        if (answer == null) {
-          finish(onFinished)
-          return@launch
-        }
-        speak(answer) { finish(onFinished) }
+        finish(onFinished)
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
         Logger.w(e, "CoPilotEngine: $mode failed")
         val message = runCatching { copilotPipeline.failureMessage() }
           .getOrDefault("Sorry, something went wrong.")
-        speak(message) { finish(onFinished) }
+        try {
+          speakAnswer(flowOf(message), { message })
+        } catch (e: CancellationException) {
+          throw e
+        } catch (e: Exception) {
+          Logger.w(e, "CoPilotEngine: could not speak the failure message")
+        }
+        finish(onFinished)
       }
     }
   }
@@ -194,7 +239,7 @@ class CoPilotEngine(
   }
 
   /** Returns null when the listener said nothing, so there is nothing to answer or speak. */
-  private suspend fun runOpenMic(bookId: BookId): String? {
+  private suspend fun listenForQuestion(bookId: BookId): String? {
     val heard = when (val result = listen()) {
       is ListenResult.Heard -> result.text
       ListenResult.Silence -> {
@@ -202,6 +247,7 @@ class CoPilotEngine(
         return null
       }
     }
+    mark("recognizer result")
     Logger.d("CoPilotEngine: heard \"$heard\"")
     copilotRepository.addMessage(
       bookId,
@@ -212,7 +258,10 @@ class CoPilotEngine(
         timestampMs = System.currentTimeMillis(),
       ),
     )
-    val answer = copilotPipeline.ask(bookId, heard)
+    return heard
+  }
+
+  private suspend fun recordAnswer(bookId: BookId, answer: String) {
     copilotRepository.addMessage(
       bookId,
       CoPilotMessage(
@@ -222,7 +271,6 @@ class CoPilotEngine(
         timestampMs = System.currentTimeMillis(),
       ),
     )
-    return answer
   }
 
   private fun finish(onFinished: () -> Unit) {
@@ -272,8 +320,6 @@ class CoPilotEngine(
     textToSpeech?.shutdown()
     textToSpeech = null
     speakGeneration++
-    speakJob?.cancel()
-    speakJob = null
     releaseFishPlayer()
     abandonAudioFocus()
   }
@@ -354,66 +400,151 @@ class CoPilotEngine(
   }
 
   /**
-   * Speaks in the Fish Audio System AI voice when it's configured and reachable, otherwise (no
-   * key, offline, out of credit, playback error) falls back to the phone's TextToSpeech. The
-   * answer is split into sentence chunks that are all requested at once; chunk 1 starts playing
-   * as soon as it arrives and the rest are queued behind it in order (waiting if one isn't ready),
-   * so audio starts after one short request instead of after the whole answer. If a chunk fails,
-   * the rest of the answer is spoken by the phone TTS from that point.
+   * Speaks an answer that arrives as streamed text. If the stream fails before anything was
+   * spoken, [nonStreaming] fetches the whole answer and that is spoken instead.
    */
-  private fun speak(text: String, onDone: () -> Unit) {
-    val chunks = SpeechChunker.split(text)
-    if (!fishAudioClient.isConfigured || chunks.isEmpty()) {
-      speakWithPhoneTts(text, onDone)
-      return
-    }
-    speakJob?.cancel()
+  private suspend fun speakAnswer(
+    deltas: Flow<String>,
+    nonStreaming: suspend () -> String,
+    onAnswer: suspend (String) -> Unit = {},
+  ) {
+    if (speakStream(deltas, onAnswer)) return
+    Logger.w("CoPilotEngine: stream failed before any speech, using the non-streaming answer")
+    val answer = nonStreaming()
+    mark("non-streaming answer complete")
+    onAnswer(answer)
+    if (!speakStream(flowOf(answer), {})) Logger.w("CoPilotEngine: nothing to speak")
+  }
+
+  /**
+   * Speaks in the Fish Audio System AI voice when it's configured and reachable, otherwise (no
+   * key, offline, out of credit, playback error) falls back to the phone's TextToSpeech. Text
+   * deltas go through [SpeechChunker]; each sentence chunk is requested the moment it is complete
+   * (all concurrently), chunk 1 plays as soon as it arrives and the rest are queued behind it in
+   * order, waiting if one isn't ready. If a chunk fails, the rest of the answer is spoken by the
+   * phone TTS from that point. Returns false only when the stream failed before any chunk was
+   * produced, so the caller can fall back to the non-streaming path.
+   */
+  private suspend fun speakStream(deltas: Flow<String>, onAnswer: suspend (String) -> Unit): Boolean {
+    if (!fishAudioClient.isConfigured) return speakStreamWithPhoneTts(deltas, onAnswer)
     val generation = ++speakGeneration
-    speakJob = scope.launch {
-      val answerReadyAt = System.currentTimeMillis()
-      val fetches = chunks.map { chunk ->
-        async(Dispatchers.IO) {
-          val started = System.currentTimeMillis()
-          try {
-            File.createTempFile("fish-tts", ".wav", context.cacheDir)
-              .also { it.writeBytes(fishAudioClient.synthesize(chunk)) }
-              .also { Logger.d("CoPilotEngine: Fish chunk (${chunk.length} chars) fetched in ${System.currentTimeMillis() - started} ms") }
-          } catch (e: CancellationException) {
-            throw e
-          } catch (e: Exception) {
-            Logger.w(e, "CoPilotEngine: Fish chunk failed")
-            null
+    val full = StringBuilder()
+    val chunker = SpeechChunker()
+    val chunkTexts = mutableListOf<String>()
+    val queue = Channel<Deferred<File?>>(Channel.UNLIMITED)
+    val fetches = mutableListOf<Deferred<File?>>()
+    var streamError: Exception? = null
+    var failedAt: Int? = null
+    try {
+      coroutineScope {
+        fun submit(chunk: String) {
+          chunkTexts += chunk
+          val number = chunkTexts.size
+          mark("chunk $number sent to Fish (${chunk.length} chars)")
+          val fetch = async(Dispatchers.IO) { fetchChunk(chunk, number) }
+          fetches += fetch
+          queue.trySend(fetch)
+        }
+        val playback = async { playQueue(queue, generation) }
+        try {
+          deltas.collect { delta ->
+            if (full.isEmpty()) mark("first token")
+            full.append(delta)
+            chunker.feed(delta).forEach(::submit)
           }
+          chunker.finish().forEach(::submit)
+          mark("answer complete")
+        } catch (e: CancellationException) {
+          throw e
+        } catch (e: Exception) {
+          Logger.w(e, "CoPilotEngine: answer stream failed")
+          streamError = e
+          if (chunkTexts.isNotEmpty()) chunker.finish().forEach(::submit)
         }
+        queue.close()
+        if (streamError == null || chunkTexts.isNotEmpty()) onAnswer(full.toString())
+        failedAt = playback.await()
       }
-      // Build the player while the first chunk is still being fetched; creating it is not free.
-      withMain { if (generation == speakGeneration && fishPlayer == null) fishPlayer = createFishPlayer() }
-      var queued = 0
-      try {
-        for (fetch in fetches) {
-          val file = fetch.await() ?: break
-          if (!enqueueFishChunk(file, answerReadyAt.takeIf { queued == 0 })) break
-          queued++
-        }
-        // Let whatever was queued finish before deciding what, if anything, is left to say.
-        val completed = if (queued > 0) awaitFishPlaybackEnd() else true
-        val spokenChunks = if (queued == 0) 0 else if (completed) queued else fishPlayedIndex
-        val remaining = chunks.drop(spokenChunks).joinToString(" ")
-        withMain {
-          if (generation != speakGeneration) return@withMain
-          if (remaining.isBlank()) {
-            releaseFishPlayer()
-            finishSpeaking(onDone)
-          } else {
-            releaseFishPlayer()
-            Logger.w("CoPilotEngine: speaking the rest with phone TTS (${chunks.size - spokenChunks} of ${chunks.size} chunks)")
-            speakWithPhoneTts(remaining, onDone)
-          }
-        }
-      } finally {
-        fetches.forEach { it.cancel() }
-      }
+    } finally {
+      fetches.forEach { it.cancel() }
+      queue.cancel()
     }
+    if (streamError != null && chunkTexts.isEmpty()) {
+      withMain { if (generation == speakGeneration) releaseFishPlayer() }
+      return false
+    }
+    withMain { if (generation == speakGeneration) releaseFishPlayer() }
+    val remaining = failedAt?.let { chunkTexts.drop(it).joinToString(" ") }.orEmpty()
+    if (remaining.isNotBlank()) {
+      Logger.w("CoPilotEngine: speaking the rest with phone TTS (${chunkTexts.size - failedAt!!} of ${chunkTexts.size} chunks)")
+      awaitPhoneTts(remaining)
+    } else {
+      endOfSpeechPause()
+    }
+    return true
+  }
+
+  /** No Fish key: collect the whole answer, then speak it with the phone TTS as before. */
+  private suspend fun speakStreamWithPhoneTts(deltas: Flow<String>, onAnswer: suspend (String) -> Unit): Boolean {
+    val full = StringBuilder()
+    try {
+      deltas.collect { full.append(it) }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Logger.w(e, "CoPilotEngine: answer stream failed")
+      if (full.isEmpty()) return false
+    }
+    mark("answer complete")
+    onAnswer(full.toString())
+    awaitPhoneTts(full.toString())
+    return true
+  }
+
+  private suspend fun fetchChunk(chunk: String, number: Int): File? {
+    val started = System.currentTimeMillis()
+    return try {
+      File.createTempFile("fish-tts", ".wav", context.cacheDir)
+        .also { it.writeBytes(fishAudioClient.synthesize(chunk)) }
+        .also { Logger.d("CoPilotEngine: Fish chunk $number (${chunk.length} chars) fetched in ${System.currentTimeMillis() - started} ms") }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Logger.w(e, "CoPilotEngine: Fish chunk $number failed")
+      null
+    }
+  }
+
+  /**
+   * Plays the fetched chunks in order as they arrive. Returns the index of the first chunk that
+   * was not played (so the rest can be spoken another way), or null if every chunk played.
+   */
+  private suspend fun playQueue(queue: Channel<Deferred<File?>>, generation: Int): Int? {
+    // Build the player while the first chunk is still being fetched; creating it is not free.
+    withMain { if (generation == speakGeneration && fishPlayer == null) fishPlayer = createFishPlayer() }
+    var index = 0
+    for (fetch in queue) {
+      val file = fetch.await()
+      if (file == null || !enqueueFishChunk(file)) {
+        if (index == 0) return 0
+        // Let what is already queued finish before the rest is spoken another way.
+        return if (awaitFishPlaybackEnd()) index else fishPlayedIndex
+      }
+      index++
+    }
+    if (index == 0) return null
+    return if (awaitFishPlaybackEnd()) null else fishPlayedIndex
+  }
+
+  private suspend fun awaitPhoneTts(text: String) = suspendCancellableCoroutine { cont ->
+    mainHandler.post { speakWithPhoneTts(text) { if (cont.isActive) cont.resume(Unit) } }
+  }
+
+  private suspend fun endOfSpeechPause() {
+    // Signal that the spoken response is over, then give it a beat before resuming
+    // the book so the cue doesn't get talked over by playback starting immediately.
+    playCue(endListeningSoundId)
+    delay(RESPONSE_END_PAUSE_MS)
   }
 
   private suspend fun <T> withMain(block: () -> T): T = suspendCancellableCoroutine { cont ->
@@ -431,7 +562,7 @@ class CoPilotEngine(
   private var fishPlayedIndex = 0
 
   /** Adds one clip to the speech playlist (creating the player on the first one); false if playback can't start. */
-  private suspend fun enqueueFishChunk(file: File, firstAnswerReadyAt: Long?): Boolean = withMain {
+  private suspend fun enqueueFishChunk(file: File): Boolean = withMain {
     try {
       val player = fishPlayer ?: createFishPlayer().also { fishPlayer = it }
       fishFiles += file
@@ -439,15 +570,12 @@ class CoPilotEngine(
       if (player.playbackState == Player.STATE_ENDED) player.seekTo(player.mediaItemCount - 1, 0)
       if (player.playbackState == Player.STATE_IDLE) player.prepare()
       player.playWhenReady = true
-      if (firstAnswerReadyAt != null) fishFirstAnswerReadyAt = firstAnswerReadyAt
       true
     } catch (e: Exception) {
       Logger.w(e, "CoPilotEngine: Fish playback setup failed")
       false
     }
   }
-
-  private var fishFirstAnswerReadyAt = 0L
 
   private fun createFishPlayer(): ExoPlayer {
     val finished = CompletableDeferred<Boolean>()
@@ -470,7 +598,7 @@ class CoPilotEngine(
         override fun onPlaybackStateChanged(state: Int) {
           if (state == Player.STATE_READY && !logged) {
             logged = true
-            Logger.d("CoPilotEngine: time to first Fish audio ${System.currentTimeMillis() - fishFirstAnswerReadyAt} ms after the answer text was ready")
+            mark("first audio playing")
           }
           if (state == Player.STATE_ENDED && fishAllQueued) finished.complete(true)
         }

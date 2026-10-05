@@ -66,8 +66,22 @@ class FishAudioClient {
     throw lastError ?: IllegalStateException("Fish Audio TTS failed")
   }
 
+  /** Opens (or reuses) the connection to Fish Audio so the first real request skips the TLS handshake. */
+  suspend fun warmUp() {
+    try {
+      val startedAt = System.currentTimeMillis()
+      httpClient.newCall(Request.Builder().url(HOST).head().build()).executeAsync().close()
+      Logger.d("FishAudioClient: connection warmed in ${System.currentTimeMillis() - startedAt} ms")
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Logger.d("FishAudioClient: warm-up failed (${e.javaClass.simpleName})")
+    }
+  }
+
   internal companion object {
-    const val URL = "https://api.fish.audio/v1/tts"
+    const val HOST = "https://api.fish.audio"
+    const val URL = "$HOST/v1/tts"
     const val PAID_MODEL = "s2.1-pro"
     const val FREE_MODEL = "s2.1-pro-free"
     const val VOICE_ID = "ad2dc11f1eaf4f6eb1ca4dd9d01ec6eb"
