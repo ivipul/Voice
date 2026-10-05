@@ -7,18 +7,18 @@ class CardTiltTest {
 
   @Test
   fun evenASlowScrollDownLeansTheCardsForward() {
-    assertEquals(10.5F, cardTilt(speedPx = -1F))
+    assertEquals(7.5F, cardTilt(speedPx = -1F))
   }
 
   @Test
   fun scrollingUpLeansTheCardsBack() {
-    assertEquals(-15F, cardTilt(speedPx = 10F))
+    assertEquals(-12F, cardTilt(speedPx = 10F))
   }
 
   @Test
-  fun aFastFlingLeansThemNoFurtherThan20Degrees() {
-    assertEquals(20F, cardTilt(speedPx = -400F))
-    assertEquals(-20F, cardTilt(speedPx = 400F))
+  fun aFastFlingLeansThemNoFurtherThan14Degrees() {
+    assertEquals(14F, cardTilt(speedPx = -400F))
+    assertEquals(-14F, cardTilt(speedPx = 400F))
   }
 
   @Test

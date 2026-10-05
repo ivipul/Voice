@@ -83,10 +83,10 @@ private const val TITLE_SCALE = 0.5F
 private const val TITLE_LINE_HEIGHT = 1.1F
 private const val FULL_PERCENT = 100
 
-// Any scroll leans the cards 10 degrees; a faster one adds half a degree per px a frame, up to 20 degrees.
-private const val BASE_TILT_DEGREES = 10F
+// Any scroll leans the cards 7 degrees; a faster one adds half a degree per px a frame, up to 14 degrees.
+private const val BASE_TILT_DEGREES = 7F
 private const val TILT_DEGREES_PER_PX = 0.5F
-private const val MAX_TILT_DEGREES = 20F
+private const val MAX_TILT_DEGREES = 14F
 
 // Below this speed (px a frame) the list counts as still, so a resting finger doesn't make the cards flicker.
 private const val STILL_SPEED_PX = 0.3F
@@ -138,7 +138,8 @@ internal fun StackBooks(
         available: Offset,
         source: NestedScrollSource,
       ): Offset {
-        scrollSpeed.floatValue = smoothedScrollSpeed(scrollSpeed.floatValue, consumed.y)
+        // What the list couldn't take is the pull past its end, which leans the cards too.
+        scrollSpeed.floatValue = smoothedScrollSpeed(scrollSpeed.floatValue, consumed.y + available.y)
         return Offset.Zero
       }
     }
