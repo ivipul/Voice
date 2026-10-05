@@ -37,6 +37,7 @@ import voice.core.data.CoPilotVoiceSettings
 import voice.core.data.store.CoPilotButtonMappingStore
 import voice.core.data.store.CoPilotVoiceSettingsStore
 import voice.core.ui.VoiceTheme
+import voice.core.ui.crawl.CrawlLibraryTheme
 import voice.core.ui.icons.VoiceIcons
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
@@ -254,7 +255,9 @@ interface CoPilotSettingsProvider {
   ): NavEntryProvider<*> =
     NavEntryProvider<Destination.CoPilotSettings> { key ->
       NavEntry(key) {
-        CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore, voiceStore = voiceStore)
+        CrawlLibraryTheme {
+          CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore, voiceStore = voiceStore)
+        }
       }
     }
 }
