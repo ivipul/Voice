@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Crawl Poster</title>
+<meta name="description" content="Scrub one clock across the eight books and watch each crawler's look and player card change, in the book's own poster colours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bagel+Fat+One&family=Big+Shoulders+Display:wght@700;900&family=Chakra+Petch:wght@400;500;600;700&family=Instrument+Serif&family=Playfair+Display:wght@700;800&display=swap">
+<link rel="stylesheet" href="poster.css">
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="cover" aria-hidden="true"><img id="coverA" alt=""><img id="coverB" alt="" class="out"></div>
+    <div class="brand">The Crawl</div>
+    <ul class="roster" id="roster" aria-label="Crawlers"></ul>
+    <div class="rail-foot"><kbd>↑↓</kbd> crawler · <kbd>←→</kbd> look · <kbd>space</kbd> flip · <kbd>P</kbd> party</div>
+  </aside>
+
+  <main class="scene" id="scene">
+    <div class="eyebrow" id="eyebrow">Look – / –</div>
+    <h1 class="name" id="name">Carl</h1>
+
+    <div class="card-col">
+      <div class="scene3d" id="scene3d" tabindex="0" role="button" aria-label="Crawler card. Press to flip, drag to tilt.">
+        <div class="tilt" id="tilt">
+          <div class="flip" id="flip">
+
+            <div class="face front">
+              <div class="window">
+                <span class="ghost" id="ghost">Carl</span>
+                <div class="halo"></div>
+                <div class="figure" id="figure"><canvas id="hero" aria-hidden="true"></canvas><div class="empty" id="empty" hidden>No look image yet</div></div>
+              </div>
+              <div class="badge lv locked" id="bLv"><small>LV</small><b>–</b></div>
+              <div class="badge fl locked" id="bFl"><small>FL</small><b>–</b></div>
+              <div class="plate"><b id="cardName">Carl</b><small id="cardEp">Crawler</small></div>
+              <div class="epi"><span id="line1Time">Book 1 · 00:00:00</span><span id="line1Look">Look – / –</span></div>
+              <div class="stats" id="hexes"></div>
+              <div class="holo foil"></div><div class="holo glare"></div>
+            </div>
+
+            <div class="face rear">
+              <div class="rhead"><b id="rearName">Carl</b><small id="rearWhen"></small></div>
+              <h3>Skills <span id="skillCount"></span></h3>
+              <div class="skills" id="skills"></div>
+              <h3>Gear</h3>
+              <div class="loadout" id="loadout"></div>
+              <div class="callout"><b id="calloutT">Current look</b><span id="calloutB"></span></div>
+              <div class="holo foil"></div><div class="holo glare"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="card-hint" id="hint">Tap the card to flip · drag to tilt</div>
+    </div>
+  </main>
+
+  <footer class="timeline">
+    <div class="tgroup">
+      <button class="tbtn" id="btnPrev" type="button" aria-label="Previous look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="tbtn play" id="btnPlay" type="button" aria-label="Play through the books" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="M7 4l12 8-12 8z"/></svg></button>
+      <button class="tbtn" id="btnNext" type="button" aria-label="Next look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="trackwrap">
+      <div class="track" id="track" role="slider" tabindex="0" aria-label="Position across the eight books" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="">
+        <div class="fill" id="fill"></div>
+        <div id="ticks"></div>
+        <div class="head" id="head"><div class="lbl" id="headLbl">00:00:00</div></div>
+      </div>
+      <div class="segs" id="segs"></div>
+    </div>
+    <div class="booklbl"><img id="coverT" alt="" aria-hidden="true"><div><b id="bookLbl">Book 1</b><small id="bookTitle"></small></div></div>
+  </footer>
+</div>
+
+<div class="party" id="party" aria-hidden="true">
+  <header>
+    <div><span class="eyebrow">Party view</span><h2>All six at one moment</h2><span class="when" id="partyWhen"></span></div>
+    <button class="tbtn" id="btnClose" type="button" aria-label="Close party view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </header>
+  <div class="row" id="members"></div>
+</div>
+
+<div class="loading" id="loading">Loading the crawl</div>
+
+<script src="js/data.js"></script>
+<script src="js/gl.js"></script>
+<script src="js/poster.js"></script>
+</body>
+</html>
