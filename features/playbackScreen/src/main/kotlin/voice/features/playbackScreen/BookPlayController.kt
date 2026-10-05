@@ -9,11 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -31,8 +34,9 @@ import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
+import voice.core.ui.crawl.crawlPaletteOf
 import voice.features.playbackScreen.view.BookPlayView
-import voice.features.playbackScreen.view.CoPilotFeedOverlay
+import voice.features.playbackScreen.view.SystemAiChatSheet
 import voice.features.playbackScreen.view.holocard.HoloCardDialog
 import voice.features.sleepTimer.SleepTimerDialog
 import voice.navigation.Destination
@@ -110,32 +114,50 @@ fun BookPlayScreen(bookId: BookId) {
     }
   }
   CrawlTheme(edition = viewState.edition) {
-    BookPlayView(
-      viewState,
-      bookId = bookId,
-      onPlayClick = viewModel::playPause,
-      onFastForwardClick = viewModel::fastForward,
-      onRewindClick = viewModel::rewind,
-      onSkipToNext = viewModel::next,
-      onSkipToPrevious = viewModel::previous,
-      onSeek = viewModel::seekTo,
-      onStripZoneTap = viewModel::onStripZoneTap,
-      onStripFrameClick = viewModel::onStripFrameClick,
-      onCloseClick = viewModel::onCloseClick,
-      onFeedClick = viewModel::onFeedClick,
-      onSleepTimerClick = viewModel::toggleSleepTimer,
-      onSkipSilenceClick = viewModel::toggleSkipSilence,
-      onVolumeBoostClick = viewModel::onVolumeGainIconClick,
-      onCurrentChapterClick = viewModel::onCurrentChapterClick,
-      onSmartRecapClick = viewModel::onCatchMeUpClick,
-      onSpeedClick = viewModel::onPlaybackSpeedIconClick,
-      onAskClick = onAskClick,
-      onSnipClick = viewModel::onSnipClick,
-      onXRayChipClick = viewModel::onXRayChipClick,
-      inventoryContent = rootGraphAs<BookPlayGraph>().inventoryContent,
-      useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
-      snackbarHostState = snackbarHostState,
-    )
+    // The chat sheet slides over the whole player, Inventory card included.
+    Box(modifier = Modifier.fillMaxSize()) {
+      BookPlayView(
+        viewState,
+        bookId = bookId,
+        onPlayClick = viewModel::playPause,
+        onFastForwardClick = viewModel::fastForward,
+        onRewindClick = viewModel::rewind,
+        onSkipToNext = viewModel::next,
+        onSkipToPrevious = viewModel::previous,
+        onSeek = viewModel::seekTo,
+        onStripZoneTap = viewModel::onStripZoneTap,
+        onStripFrameClick = viewModel::onStripFrameClick,
+        onCloseClick = viewModel::onCloseClick,
+        onFeedClick = viewModel::onFeedClick,
+        onSleepTimerClick = viewModel::toggleSleepTimer,
+        onSkipSilenceClick = viewModel::toggleSkipSilence,
+        onVolumeBoostClick = viewModel::onVolumeGainIconClick,
+        onCurrentChapterClick = viewModel::onCurrentChapterClick,
+        onSmartRecapClick = viewModel::onCatchMeUpClick,
+        onSpeedClick = viewModel::onPlaybackSpeedIconClick,
+        onAskClick = onAskClick,
+        onSnipClick = viewModel::onSnipClick,
+        onXRayChipClick = viewModel::onXRayChipClick,
+        inventoryContent = rootGraphAs<BookPlayGraph>().inventoryContent,
+        useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
+        snackbarHostState = snackbarHostState,
+      )
+      SystemAiChatSheet(
+        visible = viewModel.feedVisible.value,
+        palette = crawlPaletteOf(viewState.edition),
+        messages = viewModel.copilotMessages(),
+        isThinking = viewModel.isThinking.value,
+        input = viewModel.chatInput.value,
+        onInputChange = viewModel::onChatInputChange,
+        onInputTap = viewModel::onChatInputTap,
+        onSend = viewModel::onChatSend,
+        onCancelAutoSend = viewModel::onChatAutoSendCancel,
+        onMicClick = onChatMicClick,
+        onDismiss = viewModel::onFeedDismiss,
+        onSeekToSnip = viewModel::onSnipTimestampClick,
+        snipLocationLabel = viewModel.snipLocationLabel(),
+      )
+    }
     if (dialogState != null) {
       when (dialogState) {
         is BookPlayDialogViewState.SpeedDialog -> {
@@ -170,21 +192,6 @@ fun BookPlayScreen(bookId: BookId) {
           )
         }
       }
-    }
-    if (viewModel.feedVisible.value) {
-      CoPilotFeedOverlay(
-        messages = viewModel.copilotMessages(),
-        isThinking = viewModel.isThinking.value,
-        input = viewModel.chatInput.value,
-        onInputChange = viewModel::onChatInputChange,
-        onInputTap = viewModel::onChatInputTap,
-        onSend = viewModel::onChatSend,
-        onCancelAutoSend = viewModel::onChatAutoSendCancel,
-        onMicClick = onChatMicClick,
-        onDismiss = viewModel::onFeedDismiss,
-        onSeekToSnip = viewModel::onSnipTimestampClick,
-        snipLocationLabel = viewModel.snipLocationLabel(),
-      )
     }
     viewModel.snipSheet.value?.let { snipSheet ->
       SnipBottomSheet(

@@ -84,10 +84,8 @@
     <string name="copilot.feed.mic.stop">Stop listening</string>
     <!-- Empty-state message shown before any co-pilot questions have been asked. -->
     <string name="copilot.feed.empty">Ask about the story with the mic button on the player, or type a question below.</string>
-    <!-- Title shown at the top of the co-pilot Feed overlay. -->
+    <!-- Title shown in the header of the System AI chat sheet. -->
     <string name="copilot.feed.title">System AI chat</string>
-    <!-- Content description for closing the co-pilot Feed overlay. -->
-    <string name="copilot.feed.close">Close</string>
     <!-- Shown over the empty comic-frame placeholder while a Snip's image is being drawn. -->
     <string name="copilot.feed.frame.drawing">Crawler footage incoming…</string>
     <!-- Click label for a Snip's comic frame in the Feed; opens it as a large card. -->

@@ -20,6 +20,26 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import voice.features.playbackScreen.ChatInputViewState
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import voice.core.ui.crawl.CrawlPalette
+import kotlin.math.abs
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +48,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
@@ -47,10 +66,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,8 +79,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import voice.core.copilot.CoPilotMessage
 import voice.core.data.ChapterId
 import voice.core.strings.R
@@ -73,8 +88,14 @@ import voice.core.ui.icons.VoiceIcons
 
 private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
 
+/**
+ * The System AI chat as a sheet over the player, built like the Inventory's: it slides up from the bottom edge
+ * under a header with a handle bar. Dragging the header down, tapping it, tapping outside or going back closes it.
+ */
 @Composable
-internal fun CoPilotFeedOverlay(
+internal fun SystemAiChatSheet(
+  visible: Boolean,
+  palette: CrawlPalette,
   messages: List<CoPilotMessage>,
   isThinking: Boolean,
   input: ChatInputViewState,
@@ -86,95 +107,153 @@ internal fun CoPilotFeedOverlay(
   onDismiss: () -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
+  modifier: Modifier = Modifier,
 ) {
+  val density = LocalDensity.current
+  val statusBar = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+  var progress by remember { mutableFloatStateOf(0F) }
+  var settling by remember { mutableStateOf<Job?>(null) }
+  val scope = rememberCoroutineScope()
+
+  fun settle(target: Float) {
+    settling?.cancel()
+    settling = scope.launch {
+      animate(initialValue = progress, targetValue = target) { value, _ -> progress = value }
+    }
+  }
+  LaunchedEffect(visible) { settle(if (visible) 1F else 0F) }
+  val showSheet by remember { derivedStateOf { progress > 0F } }
+  if (!visible && !showSheet) return
+  BackHandler(enabled = visible, onBack = onDismiss)
+
   var viewedFrame by remember { mutableStateOf<CoPilotMessage?>(null) }
-  Dialog(
-    onDismissRequest = onDismiss,
-    // decorFitsSystemWindows = false hands IME sizing entirely to this content's own
-    // imePadding() below, instead of the dialog's window also resizing itself and double-
-    // counting the keyboard height. Setting it here (applied before the window is shown)
-    // rather than reaching into the window after first composition avoids a race where
-    // focusing the field before that later fix-up ran would briefly let the window resize
-    // itself too, snapping the input bar to the top before settling into place.
-    properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
-  ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-      viewedFrame?.imagePath?.let { path ->
-        FrameCardViewer(
-          imagePath = path,
-          contentDescription = viewedFrame?.text.orEmpty(),
-          onDismiss = { viewedFrame = null },
+  viewedFrame?.imagePath?.let { path ->
+    FrameCardViewer(
+      imagePath = path,
+      contentDescription = viewedFrame?.text.orEmpty(),
+      onDismiss = { viewedFrame = null },
+    )
+  }
+
+  BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    val sheetHeight = maxHeight - statusBar - SheetTopGap
+    val rangePx = with(density) { sheetHeight.toPx() }.coerceAtLeast(1F)
+    var dragStartProgress by remember { mutableFloatStateOf(1F) }
+    val dragState = rememberDraggableState { delta ->
+      progress = (progress - delta / rangePx).coerceIn(0F, 1F)
+    }
+
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .graphicsLayer { alpha = progress }
+        .background(Color.Black.copy(alpha = SCRIM_ALPHA))
+        .clickable(interactionSource = null, indication = null, onClick = onDismiss),
+    )
+    Surface(
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .fillMaxWidth()
+        .height(sheetHeight)
+        .graphicsLayer { translationY = (1F - progress) * rangePx },
+      shape = SheetShape,
+      color = palette.background,
+      contentColor = palette.content,
+    ) {
+      Column {
+        SheetHeader(
+          icon = VoiceIcons.Mic,
+          title = stringResource(id = R.string.copilot_feed_title),
+          count = null,
+          palette = palette,
+          progress = { progress },
+          modifier = Modifier
+            .clickable(role = Role.Button, onClick = onDismiss)
+            .draggable(
+              state = dragState,
+              orientation = Orientation.Vertical,
+              onDragStarted = {
+                settling?.cancel()
+                dragStartProgress = progress
+              },
+              onDragStopped = { velocity ->
+                val movedPx = (progress - dragStartProgress) * rangePx
+                val downward = when {
+                  abs(movedPx) > with(density) { SettleThreshold.toPx() } -> movedPx < 0F
+                  else -> velocity > SETTLE_VELOCITY_PX
+                }
+                if (downward) onDismiss() else settle(1F)
+              },
+            ),
+        )
+        ChatMessages(
+          messages = messages,
+          isThinking = isThinking,
+          onSeekToSnip = onSeekToSnip,
+          snipLocationLabel = snipLocationLabel,
+          onOpenFrame = { viewedFrame = it },
+          modifier = Modifier
+            .weight(1F)
+            .fillMaxWidth(),
+        )
+        ChatInputBar(
+          state = input,
+          isThinking = isThinking,
+          onTextChange = onInputChange,
+          onInputTap = onInputTap,
+          onSend = onSend,
+          onCancelAutoSend = onCancelAutoSend,
+          onMicClick = onMicClick,
         )
       }
-      Scaffold(
-        topBar = {
-          TopAppBar(
-            title = { Text(text = stringResource(id = R.string.copilot_feed_title)) },
-            navigationIcon = {
-              IconButton(onClick = onDismiss) {
-                Icon(
-                  imageVector = VoiceIcons.Close,
-                  contentDescription = stringResource(id = R.string.copilot_feed_close),
-                )
-              }
-            },
-          )
-        },
-        bottomBar = {
-          ChatInputBar(
-            state = input,
-            isThinking = isThinking,
-            onTextChange = onInputChange,
-            onInputTap = onInputTap,
-            onSend = onSend,
-            onCancelAutoSend = onCancelAutoSend,
-            onMicClick = onMicClick,
-          )
-        },
-      ) { contentPadding ->
-        if (messages.isEmpty()) {
-          Box(
-            modifier = Modifier
-              .fillMaxSize()
-              .padding(contentPadding)
-              .padding(24.dp),
-            contentAlignment = Alignment.Center,
-          ) {
-            Text(
-              text = stringResource(id = R.string.copilot_feed_empty),
-              style = MaterialTheme.typography.bodyLarge,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-          }
-        } else {
-          val listState = rememberLazyListState()
-          LaunchedEffect(messages.size) {
-            if (messages.isNotEmpty()) {
-              listState.animateScrollToItem(messages.lastIndex)
-            }
-          }
-          LazyColumn(
-            state = listState,
-            contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-              .fillMaxSize()
-              .padding(contentPadding),
-          ) {
-            items(messages, key = { it.id }) { message ->
-              ChatBubble(
-                message,
-                onSeekToSnip = onSeekToSnip,
-                snipLocationLabel = snipLocationLabel,
-                onOpenFrame = { viewedFrame = message },
-              )
-            }
-            if (isThinking) {
-              item {
-                ThinkingBubble()
-              }
-            }
-          }
+    }
+  }
+}
+
+@Composable
+private fun ChatMessages(
+  messages: List<CoPilotMessage>,
+  isThinking: Boolean,
+  onSeekToSnip: (ChapterId, Long) -> Unit,
+  snipLocationLabel: (ChapterId, Long) -> String?,
+  onOpenFrame: (CoPilotMessage) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  if (messages.isEmpty()) {
+    Box(
+      modifier = modifier.padding(24.dp),
+      contentAlignment = Alignment.Center,
+    ) {
+      Text(
+        text = stringResource(id = R.string.copilot_feed_empty),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    }
+  } else {
+    val listState = rememberLazyListState()
+    LaunchedEffect(messages.size) {
+      if (messages.isNotEmpty()) {
+        listState.animateScrollToItem(messages.lastIndex)
+      }
+    }
+    LazyColumn(
+      state = listState,
+      contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
+      modifier = modifier,
+    ) {
+      items(messages, key = { it.id }) { message ->
+        ChatBubble(
+          message,
+          onSeekToSnip = onSeekToSnip,
+          snipLocationLabel = snipLocationLabel,
+          onOpenFrame = { onOpenFrame(message) },
+        )
+      }
+      if (isThinking) {
+        item {
+          ThinkingBubble()
         }
       }
     }

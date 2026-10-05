@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -64,12 +65,12 @@ private val InventoryBottomTrim = 16.dp
 
 /** How much of the bottom edge the collapsed card takes: its row, plus the navigation bar less a little trimmed padding. */
 internal fun inventoryPeekHeight(navigationBar: Dp): Dp = InventoryCardHeight + (navigationBar - InventoryBottomTrim).coerceAtLeast(0.dp)
-private val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-private val SheetTopGap = 12.dp
+internal val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+internal val SheetTopGap = 12.dp
 private val CollapsedMargin = 8.dp
-private val SettleThreshold = 6.dp
-private const val SETTLE_VELOCITY_PX = 400F
-private const val SCRIM_ALPHA = 0.32F
+internal val SettleThreshold = 6.dp
+internal const val SETTLE_VELOCITY_PX = 400F
+internal const val SCRIM_ALPHA = 0.32F
 
 /**
  * The Inventory as a sheet over the player. Collapsed it is a card at the bottom edge, under the navigation bar,
@@ -135,7 +136,9 @@ internal fun InventorySheet(
         .clip(SheetShape)
         .drawBehind { drawRect(color = lerp(collapsedFill, palette.background, progress)) },
     ) {
-      InventoryHeader(
+      SheetHeader(
+        icon = PosterIcons.Inventory,
+        title = stringResource(id = R.string.inventory_title),
         count = count,
         palette = palette,
         progress = { progress },
@@ -173,9 +176,15 @@ internal fun InventorySheet(
   }
 }
 
+/**
+ * The top of a sheet over the player: a handle bar, an icon and a title, then a chevron that points down once
+ * the sheet is open. [count] is shown before the chevron when there is one.
+ */
 @Composable
-private fun InventoryHeader(
-  count: Int,
+internal fun SheetHeader(
+  icon: ImageVector,
+  title: String,
+  count: Int?,
   palette: CrawlPalette,
   progress: () -> Float,
   modifier: Modifier = Modifier,
@@ -201,24 +210,26 @@ private fun InventoryHeader(
       verticalAlignment = Alignment.CenterVertically,
     ) {
       Icon(
-        imageVector = PosterIcons.Inventory,
+        imageVector = icon,
         contentDescription = null,
         tint = palette.content,
         modifier = Modifier.size(22.dp),
       )
       Spacer(modifier = Modifier.size(12.dp))
       Text(
-        text = stringResource(id = R.string.inventory_title).uppercase(),
+        text = title.uppercase(),
         style = CrawlType.button,
         color = palette.content,
         maxLines = 1,
         modifier = Modifier.weight(1F),
       )
-      Text(
-        text = count.toString(),
-        style = CrawlType.speed,
-        color = palette.content,
-      )
+      if (count != null) {
+        Text(
+          text = count.toString(),
+          style = CrawlType.speed,
+          color = palette.content,
+        )
+      }
       Icon(
         imageVector = VoiceIcons.ChevronRight,
         contentDescription = null,
