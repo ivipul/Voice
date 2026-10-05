@@ -33,6 +33,8 @@ data class BookPlayViewState(
   /** The series book this is, for its cover art, colors and display type; null for any other book. */
   val edition: CrawlEdition? = null,
   val playbackSpeed: Float = 1F,
+  /** The book's snips plus the strips reached so far: what the Inventory card counts. */
+  val inventoryCount: Int = 0,
 ) {
 
   data class XRayChipViewState(

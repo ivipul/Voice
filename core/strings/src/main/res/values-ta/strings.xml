@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">இணையத்திலிருந்து மூடி</string>
     <string name="book.edit.name.label">பெயர்</string>
     <string name="book.edit.title">புத்தகத்தைத் திருத்து</string>
-    <string name="bookmark.added.snackbar">புக்மார்க்கு சேர்க்கப்பட்டது</string>
-    <string name="bookmark.created.just_now">இப்போது</string>
-    <string name="bookmark.edit.name.label">புக்மார்க்கு பெயர்</string>
-    <string name="bookmark.edit.title">புக்மார்க்கைத் திருத்து</string>
-    <string name="bookmark.title">புத்தககுறி</string>
     <string name="common.action.add">கூட்டு</string>
     <string name="common.action.close">மூடு</string>
     <string name="common.action.delete">நீக்கு</string>
-    <string name="common.action.edit">தொகு</string>
     <string name="common.action.more">மேலும்</string>
-    <string name="common.action.remove">அகற்று</string>
     <string name="common.dialog.cancel">ரத்துசெய்</string>
     <string name="common.dialog.confirm">கணம்</string>
     <string name="common.dialog.ok">சரி</string>

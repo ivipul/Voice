@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Kaanepilt internetist</string>
     <string name="book.edit.name.label">Nimi</string>
     <string name="book.edit.title">Muuda raamatut</string>
-    <string name="bookmark.added.snackbar">Järjehoidja on lisatud</string>
-    <string name="bookmark.created.just_now">Just nüüd</string>
-    <string name="bookmark.edit.name.label">Järjehoidja nimi</string>
-    <string name="bookmark.edit.title">Muuda järjehoidjat</string>
-    <string name="bookmark.title">Järjehoidja</string>
     <string name="common.action.add">Lisa</string>
     <string name="common.action.close">Sulge</string>
     <string name="common.action.delete">Kustuta</string>
-    <string name="common.action.edit">Muuda</string>
     <string name="common.action.more">Veel</string>
-    <string name="common.action.remove">Eemalda</string>
     <string name="common.dialog.cancel">Katkesta</string>
     <string name="common.dialog.confirm">Salvesta</string>
     <string name="common.dialog.ok">OK</string>

@@ -1,4 +1,4 @@
-package voice.features.playbackScreen.view
+package voice.core.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
@@ -35,8 +35,8 @@ import java.io.File
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
-// Frames are drawn 736x1312 (9:16).
-internal const val FRAME_ASPECT = 736f / 1312f
+/** Snip frames are drawn 736x1312 (9:16). */
+const val FRAME_ASPECT = 736f / 1312f
 private const val CARD_SCREEN_FRACTION = 0.9f
 private const val SCRIM_ALPHA = 0.85f
 private const val FLING_OUT_SCREENS = 1.2f
@@ -47,7 +47,7 @@ private const val FLING_OUT_SCREENS = 1.2f
  * Back press or a tap on the scrim also dismisses it.
  */
 @Composable
-internal fun FrameCardViewer(
+fun FrameCardViewer(
   imagePath: String,
   contentDescription: String,
   onDismiss: () -> Unit,

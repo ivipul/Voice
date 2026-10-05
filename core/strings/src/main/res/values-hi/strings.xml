@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">इंटरनेट से कवर</string>
     <string name="book.edit.name.label">नाम</string>
     <string name="book.edit.title">पुस्तक संपादन</string>
-    <string name="bookmark.added.snackbar">बुकमार्क जोड़ा गया</string>
-    <string name="bookmark.created.just_now">बस अभी</string>
-    <string name="bookmark.edit.name.label">बुकमार्क का नाम</string>
-    <string name="bookmark.edit.title">बुकमार्क संपादन</string>
-    <string name="bookmark.title">बुकमार्क</string>
     <string name="common.action.add">जोड़ें</string>
     <string name="common.action.close">बंद</string>
     <string name="common.action.delete">हटाएँ</string>
-    <string name="common.action.edit">संपादन</string>
     <string name="common.action.more">अधिक</string>
-    <string name="common.action.remove">हटाएं</string>
     <string name="common.dialog.cancel">रद्द</string>
     <string name="common.dialog.confirm">निर्धारित</string>
     <string name="common.error.generic.message">कुछ गलत हो गया 😢</string>

@@ -1,7 +1,7 @@
 package voice.features.playbackScreen
 
 import voice.core.copilot.CoPilotMessage
-import voice.features.playbackScreen.view.FRAME_ASPECT
+import voice.core.ui.FRAME_ASPECT
 
 internal sealed interface SnipSheetViewState {
   data class Loading(val drawsFrame: Boolean) : SnipSheetViewState

@@ -59,6 +59,7 @@ import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
 import voice.core.strips.activeFrameAt
 import voice.core.strips.chapterPositionOf
+import voice.core.strips.isUnlockedAt
 import voice.core.strips.zonesWithin
 import voice.core.ui.crawl.crawlEditionOf
 import voice.core.ui.formatTime
@@ -188,6 +189,8 @@ class BookPlayViewModel(
     val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
       value = stripRepository.stripsFor(book.content.name)
     }
+    val messagesByBook by remember { copilotRepository.allMessagesByBook }.collectAsState()
+    val snipCount = messagesByBook[bookId].orEmpty().count { it.isSnip }
     val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
     val stripZones = remember(strips, markStartBookMs, currentMark.durationMs) {
       strips.zonesWithin(markStartBookMs, markStartBookMs + currentMark.durationMs)
@@ -213,6 +216,7 @@ class BookPlayViewModel(
       stripFrame = strips.activeFrameAt(book.position),
       edition = edition,
       playbackSpeed = book.content.playbackSpeed,
+      inventoryCount = snipCount + strips.count { it.isUnlockedAt(book.position) },
     )
   }
 
@@ -569,18 +573,6 @@ class BookPlayViewModel(
           timestampMs = System.currentTimeMillis(),
         ),
       )
-    }
-  }
-
-  fun onBookmarkLongClick() {
-    scope.launch {
-      val book = currentBook() ?: return@launch
-      bookmarkRepository.addBookmarkAtBookPosition(
-        book = book,
-        title = null,
-        setBySleepTimer = false,
-      )
-      viewEffects.tryEmit(BookPlayViewEffect.BookmarkAdded)
     }
   }
 

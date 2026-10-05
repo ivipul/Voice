@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,14 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -37,62 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import voice.core.strips.AvailableStrip
-import voice.core.ui.rememberPlayIconPainter
 import voice.core.ui.icons.VoiceIcons
+import voice.core.ui.rememberPlayIconPainter
 import voice.core.strings.R as StringsR
-
-@Composable
-fun StripCard(
-  strip: AvailableStrip,
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  Column(
-    modifier = modifier
-      .fillMaxWidth()
-      .clickable(onClick = onClick),
-  ) {
-    AsyncImage(
-      model = strip.coverFile(),
-      contentDescription = strip.manifest.title,
-      contentScale = ContentScale.Crop,
-      modifier = Modifier
-        .fillMaxWidth()
-        .aspectRatio(strip.coverAspect ?: DEFAULT_COVER_ASPECT),
-    )
-    Text(
-      text = strip.manifest.title,
-      style = MaterialTheme.typography.labelLarge,
-      maxLines = 2,
-      overflow = TextOverflow.Ellipsis,
-      modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
-    )
-  }
-}
-
-/** A two-column staggered gallery of the strips, each card at its own image's aspect ratio. */
-@Composable
-fun StripCardList(
-  strips: List<AvailableStrip>,
-  onClick: (AvailableStrip) -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  LazyVerticalStaggeredGrid(
-    columns = StaggeredGridCells.Fixed(GALLERY_COLUMNS),
-    modifier = modifier.fillMaxSize(),
-    contentPadding = PaddingValues(8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    verticalItemSpacing = 8.dp,
-  ) {
-    items(strips, key = { it.manifest.chapter }) { strip ->
-      StripCard(strip = strip, onClick = { onClick(strip) })
-    }
-  }
-}
 
 @Composable
 fun StripViewer(
@@ -202,5 +143,3 @@ fun StripViewer(
 }
 
 private const val SWIPE_DOWN_CLOSE_PX = 160f
-private const val GALLERY_COLUMNS = 2
-private const val DEFAULT_COVER_ASPECT = 9f / 16f

@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Cover fra internettet</string>
     <string name="book.edit.name.label">Navn</string>
     <string name="book.edit.title">Rediger bog</string>
-    <string name="bookmark.added.snackbar">Bogmærke tilføjet</string>
-    <string name="bookmark.created.just_now">Lige nu</string>
-    <string name="bookmark.edit.name.label">Bogmærke navn</string>
-    <string name="bookmark.edit.title">Rediger bogmærke</string>
-    <string name="bookmark.title">Bogmærke</string>
     <string name="common.action.add">Tilføj</string>
     <string name="common.action.close">Luk</string>
     <string name="common.action.delete">Slet</string>
-    <string name="common.action.edit">Rediger</string>
     <string name="common.action.more">Mere</string>
-    <string name="common.action.remove">Fjern</string>
     <string name="common.dialog.cancel">Annuller</string>
     <string name="common.dialog.confirm">Angiv</string>
     <string name="common.error.generic.message">Noget gik galt😢</string>

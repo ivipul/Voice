@@ -1,48 +1,24 @@
 package voice.features.bookmark
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
@@ -50,26 +26,28 @@ import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
-import voice.core.data.Bookmark
 import voice.core.data.repo.BookRepository
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
+import voice.core.ui.FrameCardViewer
 import voice.core.ui.crawl.CrawlTheme
+import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.icons.VoiceIcons
-import voice.features.bookmark.dialogs.AddBookmarkDialog
-import voice.features.bookmark.dialogs.EditBookmarkDialog
-import voice.features.bookmark.strips.StripCardList
+import voice.features.bookmark.strips.StripGallery
+import voice.features.bookmark.strips.StripGalleryLayout
 import voice.features.bookmark.strips.StripViewer
 import voice.features.bookmark.strips.StripViewerViewModel
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
 import voice.navigation.Navigator
-import kotlin.uuid.Uuid
 import voice.core.strings.R as StringsR
 
-private enum class BookmarkTab(val labelRes: Int) {
+private enum class InventoryTab(val labelRes: Int) {
   Snips(StringsR.string.bookmark_tab_snips),
   Strips(StringsR.string.bookmark_tab_strips),
+
+  // The strips again, one per row, while the two gallery layouts are compared.
+  Issues(StringsR.string.inventory_tab_issues),
 }
 
 @ContributesTo(AppScope::class)
@@ -128,14 +106,7 @@ fun BookmarkScreen(bookId: BookId) {
       BookmarkScreen(
         viewState = viewState,
         onClose = viewModel::closeScreen,
-        onAdd = viewModel::onAddClick,
-        onDelete = viewModel::deleteBookmark,
-        onEdit = viewModel::onEditClick,
-        onScrollConfirm = viewModel::onScrollConfirm,
-        onClick = viewModel::selectBookmark,
-        onNewBookmarkNameChoose = viewModel::addBookmark,
-        onCloseDialog = viewModel::closeDialog,
-        onEditBookmark = viewModel::editBookmark,
+        onSnipClick = viewModel::onSnipClick,
         onStripClick = viewModel::onStripClick,
       )
     }
@@ -152,25 +123,16 @@ fun BookmarkScreen(bookId: BookId) {
 internal fun BookmarkScreen(
   viewState: BookmarkViewState,
   onClose: () -> Unit,
-  onAdd: () -> Unit,
-  onDelete: (Bookmark.Id) -> Unit,
-  onEdit: (Bookmark.Id) -> Unit,
-  onScrollConfirm: () -> Unit,
-  onClick: (Bookmark.Id) -> Unit,
-  onCloseDialog: () -> Unit,
-  onNewBookmarkNameChoose: (String) -> Unit,
-  onEditBookmark: (Bookmark.Id, String) -> Unit,
+  onSnipClick: (SnipCardViewState) -> Unit,
   onStripClick: (AvailableStrip) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val snackbarHostState = remember { SnackbarHostState() }
-  var selectedTab by remember { mutableStateOf(BookmarkTab.Snips) }
+  var selectedTab by remember { mutableStateOf(InventoryTab.Snips) }
+  var viewedFrame by remember { mutableStateOf<SnipCardViewState?>(null) }
+  val palette = crawlPaletteOf(viewState.edition)
 
   Scaffold(
     modifier = modifier,
-    snackbarHost = {
-      SnackbarHost(hostState = snackbarHostState)
-    },
     topBar = {
       TopAppBar(
         title = { Text(text = stringResource(id = StringsR.string.inventory_title)) },
@@ -184,20 +146,10 @@ internal fun BookmarkScreen(
         },
       )
     },
-    floatingActionButton = {
-      if (selectedTab == BookmarkTab.Snips) {
-        FloatingActionButton(
-          onClick = onAdd,
-          content = {
-            Icon(imageVector = VoiceIcons.Add, contentDescription = stringResource(id = StringsR.string.common_action_add))
-          },
-        )
-      }
-    },
   ) { paddingValues ->
     Column(modifier = Modifier.padding(paddingValues)) {
       SecondaryTabRow(selectedTabIndex = selectedTab.ordinal) {
-        BookmarkTab.entries.forEach { tab ->
+        InventoryTab.entries.forEach { tab ->
           Tab(
             selected = selectedTab == tab,
             onClick = { selectedTab = tab },
@@ -206,181 +158,36 @@ internal fun BookmarkScreen(
         }
       }
       when (selectedTab) {
-        BookmarkTab.Snips -> {
-          val lazyListState = rememberLazyListState()
-          LaunchedEffect(viewState.shouldScrollTo, onScrollConfirm) {
-            val index = viewState.bookmarks.indexOfFirst { it.id == viewState.shouldScrollTo }
-            if (index != -1) {
-              lazyListState.animateScrollToItem(index)
-              onScrollConfirm()
-            }
-          }
-          LazyColumn(state = lazyListState) {
-            items(
-              items = viewState.bookmarks,
-              key = { it.id.value.toString() },
-            ) { bookmark ->
-              BookmarkItem(
-                modifier = Modifier.animateItem(),
-                bookmark = bookmark,
-                onDelete = onDelete,
-                onEdit = onEdit,
-                onClick = onClick,
-              )
-            }
-            item {
-              Spacer(Modifier.size(88.dp))
-            }
-          }
-        }
-        BookmarkTab.Strips -> {
-          if (viewState.strips.isEmpty()) {
-            Box(
-              modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-              contentAlignment = Alignment.Center,
-            ) {
-              Text(
-                text = stringResource(id = StringsR.string.bookmark_strips_empty),
-                style = MaterialTheme.typography.bodyLarge,
-              )
-            }
-          } else {
-            StripCardList(strips = viewState.strips, onClick = onStripClick)
-          }
-        }
-      }
-    }
-  }
-
-  when (viewState.dialogViewState) {
-    BookmarkDialogViewState.AddBookmark -> {
-      AddBookmarkDialog(
-        onDismissRequest = onCloseDialog,
-        onBookmarkNameChoose = onNewBookmarkNameChoose,
-      )
-    }
-    BookmarkDialogViewState.None -> {
-    }
-    is BookmarkDialogViewState.EditBookmark -> {
-      EditBookmarkDialog(
-        onDismissRequest = onCloseDialog,
-        onEditBookmark = onEditBookmark,
-        bookmarkId = viewState.dialogViewState.id,
-        initialTitle = viewState.dialogViewState.title ?: "",
-      )
-    }
-  }
-}
-
-@Composable
-internal fun BookmarkItem(
-  bookmark: BookmarkItemViewState,
-  onDelete: (Bookmark.Id) -> Unit,
-  onEdit: (Bookmark.Id) -> Unit,
-  onClick: (Bookmark.Id) -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  var expanded by remember { mutableStateOf(false) }
-  SwipeToDismissBox(
-    modifier = modifier,
-    onDismiss = {
-      if (it == SwipeToDismissBoxValue.StartToEnd) {
-        onDelete(bookmark.id)
-      }
-    },
-    enableDismissFromEndToStart = false,
-    backgroundContent = {
-      Box(
-        Modifier
-          .fillMaxSize()
-          .background(Color.Red),
-      ) {
-        Icon(
-          modifier = Modifier
-            .padding(start = 16.dp)
-            .align(Alignment.CenterStart),
-          imageVector = VoiceIcons.Delete,
-          contentDescription = stringResource(id = StringsR.string.common_action_delete),
-          tint = Color.White,
+        InventoryTab.Snips -> SnipCardList(
+          snips = viewState.snips,
+          onClick = onSnipClick,
+          onImageClick = { viewedFrame = it },
+        )
+        InventoryTab.Strips -> StripGallery(
+          strips = viewState.strips,
+          lockedStrips = viewState.lockedStrips,
+          layout = StripGalleryLayout.Grid,
+          palette = palette,
+          onClick = onStripClick,
+        )
+        InventoryTab.Issues -> StripGallery(
+          strips = viewState.strips,
+          lockedStrips = viewState.lockedStrips,
+          layout = StripGalleryLayout.Issues,
+          palette = palette,
+          onClick = onStripClick,
         )
       }
-    },
-    state = rememberSwipeToDismissBoxState(),
-    content = {
-      ListItem(
-        modifier = Modifier
-          .clickable {
-            onClick(bookmark.id)
-          },
-        trailingContent = {
-          Box {
-            IconButton(
-              onClick = {
-                expanded = !expanded
-              },
-              content = {
-                Icon(
-                  imageVector = VoiceIcons.MoreVert,
-                  contentDescription = stringResource(id = StringsR.string.common_action_edit),
-                )
-              },
-            )
-            DropdownMenu(
-              expanded = expanded,
-              onDismissRequest = { expanded = false },
-            ) {
-              DropdownMenuItem(
-                text = { Text(stringResource(id = StringsR.string.common_action_edit)) },
-                onClick = {
-                  expanded = false
-                  onEdit(bookmark.id)
-                },
-              )
-              DropdownMenuItem(
-                text = { Text(stringResource(id = StringsR.string.common_action_remove)) },
-                onClick = {
-                  expanded = false
-                  onDelete(bookmark.id)
-                },
-              )
-            }
-          }
-        },
-        supportingContent = {
-          Text(text = bookmark.subtitle)
-        },
-      ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = bookmark.title)
-          if (bookmark.showSleepIcon) {
-            Icon(
-              modifier = Modifier
-                .padding(start = 4.dp)
-                .size(16.dp),
-              imageVector = VoiceIcons.Timer,
-              contentDescription = stringResource(StringsR.string.sleep_timer_action_open),
-            )
-          }
-        }
-      }
-    },
-  )
-}
+    }
+  }
 
-@Composable
-@Preview
-private fun BookmarkItemPreview() {
-  BookmarkItem(
-    bookmark = BookmarkItemViewState(
-      title = "Bookmark 1",
-      subtitle = "10:10:10 / 12:12:12",
-      id = Bookmark.Id(Uuid.random()),
-      showSleepIcon = true,
-    ),
-    onDelete = {},
-    onEdit = { },
-    onClick = {},
-  )
+  viewedFrame?.let { snip ->
+    snip.imagePath?.let { path ->
+      FrameCardViewer(
+        imagePath = path,
+        contentDescription = snip.title ?: snip.text,
+        onDismiss = { viewedFrame = null },
+      )
+    }
+  }
 }

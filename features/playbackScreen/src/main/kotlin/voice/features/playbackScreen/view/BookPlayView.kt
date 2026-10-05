@@ -42,7 +42,6 @@ internal fun BookPlayView(
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
   onInventoryClick: () -> Unit,
-  onInventoryLongClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
@@ -83,7 +82,6 @@ internal fun BookPlayView(
         onAskClick = onAskClick,
         onSnipClick = onSnipClick,
         onInventoryClick = onInventoryClick,
-        onInventoryLongClick = onInventoryLongClick,
         onXRayChipClick = onXRayChipClick,
       )
     },
@@ -121,7 +119,6 @@ private fun BookPlayPreview(
         onAskClick = {},
         onSnipClick = {},
         onInventoryClick = {},
-        onInventoryLongClick = {},
         onXRayChipClick = {},
       )
     }
@@ -150,6 +147,7 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
       ),
       edition = CrawlEdition.DungeonCrawlerCarl,
       playbackSpeed = 1.1F,
+      inventoryCount = 7,
     )
     yield(initial)
     yield(

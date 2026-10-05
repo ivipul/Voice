@@ -26,12 +26,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import voice.core.ui.FRAME_ASPECT
+import voice.features.playbackScreen.view.holocard.holoReveal
 import kotlin.math.PI
 import kotlin.math.sin
-import androidx.compose.ui.unit.dp
-import voice.features.playbackScreen.view.holocard.holoReveal
 import voice.core.strings.R as StringsR
 
 private const val REVEAL_MS = 900

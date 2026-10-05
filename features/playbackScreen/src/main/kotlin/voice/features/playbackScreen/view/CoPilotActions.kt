@@ -2,7 +2,7 @@ package voice.features.playbackScreen.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,21 +25,19 @@ import voice.core.strings.R
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 
-/** Ask AI, filled in the accent color, then Snip and Inventory as outlines. A long press on Inventory adds a bookmark. */
+/** Ask AI, filled in the accent color, and Snip as an outline, side by side at the same width. */
 @Composable
 internal fun CoPilotActions(
   palette: CrawlPalette,
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
-  onInventoryClick: () -> Unit,
-  onInventoryLongClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Row(
     modifier = modifier
       .fillMaxWidth()
       .padding(horizontal = 20.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    horizontalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     ActionPill(
       icon = PosterIcons.Ask,
@@ -55,14 +53,7 @@ internal fun CoPilotActions(
       container = null,
       content = palette.content,
       onClick = onSnipClick,
-    )
-    ActionPill(
-      icon = PosterIcons.Inventory,
-      label = stringResource(id = R.string.inventory_title),
-      container = null,
-      content = palette.content,
-      onClick = onInventoryClick,
-      onLongClick = onInventoryLongClick,
+      modifier = Modifier.weight(1F),
     )
   }
 }
@@ -76,7 +67,6 @@ private fun ActionPill(
   content: Color,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
-  onLongClick: (() -> Unit)? = null,
 ) {
   Row(
     modifier = modifier
@@ -89,20 +79,20 @@ private fun ActionPill(
           Modifier.border(width = 1.5.dp, color = content, shape = CircleShape)
         },
       )
-      .combinedClickable(role = Role.Button, onLongClick = onLongClick, onClick = onClick)
+      .clickable(role = Role.Button, onClick = onClick)
       .padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
+    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Icon(
       imageVector = icon,
       contentDescription = null,
       tint = content,
-      modifier = Modifier.size(18.dp),
+      modifier = Modifier.size(22.dp),
     )
     Text(
       text = label.uppercase(),
-      style = CrawlType.pill,
+      style = CrawlType.button,
       color = content,
       maxLines = 1,
     )
