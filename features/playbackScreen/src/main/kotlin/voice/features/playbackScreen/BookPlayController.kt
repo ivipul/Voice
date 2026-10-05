@@ -77,6 +77,10 @@ fun BookPlayScreen(bookId: BookId) {
       microphonePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
   }
+  val onChatMicClick: () -> Unit = {
+    // Turning the mic off never needs the permission; turning it on goes through the same check as Ask.
+    if (viewModel.chatInput.value.isListening) viewModel.onChatMicClick() else onAskClick()
+  }
   val lifecycleOwner = LocalLifecycleOwner.current
   LaunchedEffect(viewModel, lifecycleOwner) {
     lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -171,7 +175,12 @@ fun BookPlayScreen(bookId: BookId) {
       CoPilotFeedOverlay(
         messages = viewModel.copilotMessages(),
         isThinking = viewModel.isThinking.value,
-        onSend = viewModel::onSendFeedMessage,
+        input = viewModel.chatInput.value,
+        onInputChange = viewModel::onChatInputChange,
+        onInputTap = viewModel::onChatInputTap,
+        onSend = viewModel::onChatSend,
+        onCancelAutoSend = viewModel::onChatAutoSendCancel,
+        onMicClick = onChatMicClick,
         onDismiss = viewModel::onFeedDismiss,
         onSeekToSnip = viewModel::onSnipTimestampClick,
         snipLocationLabel = viewModel.snipLocationLabel(),

@@ -1,5 +1,25 @@
 package voice.features.playbackScreen.view
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
+import voice.features.playbackScreen.ChatInputViewState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,7 +77,12 @@ private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
 internal fun CoPilotFeedOverlay(
   messages: List<CoPilotMessage>,
   isThinking: Boolean,
-  onSend: (String) -> Unit,
+  input: ChatInputViewState,
+  onInputChange: (String) -> Unit,
+  onInputTap: () -> Unit,
+  onSend: () -> Unit,
+  onCancelAutoSend: () -> Unit,
+  onMicClick: () -> Unit,
   onDismiss: () -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
@@ -96,7 +121,15 @@ internal fun CoPilotFeedOverlay(
           )
         },
         bottomBar = {
-          FeedInputBar(isThinking = isThinking, onSend = onSend)
+          ChatInputBar(
+            state = input,
+            isThinking = isThinking,
+            onTextChange = onInputChange,
+            onInputTap = onInputTap,
+            onSend = onSend,
+            onCancelAutoSend = onCancelAutoSend,
+            onMicClick = onMicClick,
+          )
         },
       ) { contentPadding ->
         if (messages.isEmpty()) {
@@ -240,13 +273,19 @@ private fun ThinkingBubble() {
 }
 
 @Composable
-private fun FeedInputBar(isThinking: Boolean, onSend: (String) -> Unit) {
-  var text by remember { mutableStateOf("") }
-  fun send() {
-    val trimmed = text.trim()
-    if (trimmed.isNotEmpty() && !isThinking) {
-      onSend(trimmed)
-      text = ""
+private fun ChatInputBar(
+  state: ChatInputViewState,
+  isThinking: Boolean,
+  onTextChange: (String) -> Unit,
+  onInputTap: () -> Unit,
+  onSend: () -> Unit,
+  onCancelAutoSend: () -> Unit,
+  onMicClick: () -> Unit,
+) {
+  val interactionSource = remember { MutableInteractionSource() }
+  LaunchedEffect(interactionSource) {
+    interactionSource.interactions.collect { interaction ->
+      if (interaction is PressInteraction.Press) onInputTap()
     }
   }
   Row(
@@ -258,25 +297,161 @@ private fun FeedInputBar(isThinking: Boolean, onSend: (String) -> Unit) {
     verticalAlignment = Alignment.CenterVertically,
   ) {
     OutlinedTextField(
-      value = text,
-      onValueChange = { text = it },
+      value = state.text,
+      onValueChange = onTextChange,
       modifier = Modifier
         .weight(1f),
-      placeholder = { Text(text = stringResource(id = R.string.copilot_feed_input_placeholder)) },
+      placeholder = {
+        Text(
+          text = stringResource(
+            id = if (state.isListening) R.string.copilot_feed_listening else R.string.copilot_feed_input_placeholder,
+          ),
+        )
+      },
+      trailingIcon = {
+        SendButton(
+          autoSendPending = state.autoSendPending,
+          enabled = !isThinking && state.text.isNotBlank(),
+          onSend = onSend,
+          onCancelAutoSend = onCancelAutoSend,
+        )
+      },
       maxLines = 4,
       enabled = !isThinking,
+      shape = RoundedCornerShape(28.dp),
+      interactionSource = interactionSource,
       keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-      keyboardActions = KeyboardActions(onSend = { send() }),
+      keyboardActions = KeyboardActions(onSend = { onSend() }),
     )
     Spacer(modifier = Modifier.size(8.dp))
-    IconButton(
+    MicButton(
+      isListening = state.isListening,
       enabled = !isThinking,
-      onClick = ::send,
-    ) {
-      Icon(
-        imageVector = VoiceIcons.Send,
-        contentDescription = stringResource(id = R.string.copilot_feed_input_send),
+      onClick = onMicClick,
+    )
+  }
+}
+
+/**
+ * The up-arrow send button inside the text box. While a dictated question is about to send itself it
+ * turns into an X with a ring that fills over the wait; tapping the X keeps the text and sends nothing.
+ */
+@Composable
+private fun SendButton(
+  autoSendPending: Boolean,
+  enabled: Boolean,
+  onSend: () -> Unit,
+  onCancelAutoSend: () -> Unit,
+) {
+  Box(
+    modifier = Modifier
+      .padding(end = 4.dp)
+      .size(40.dp),
+    contentAlignment = Alignment.Center,
+  ) {
+    if (autoSendPending) {
+      val progress = remember { Animatable(0f) }
+      LaunchedEffect(Unit) {
+        progress.animateTo(
+          targetValue = 1f,
+          animationSpec = tween(durationMillis = ChatInputViewState.AUTO_SEND_DELAY_MS.toInt(), easing = LinearEasing),
+        )
+      }
+      CircularProgressIndicator(
+        progress = { progress.value },
+        modifier = Modifier.size(36.dp),
+        strokeWidth = 3.dp,
+        trackColor = MaterialTheme.colorScheme.outlineVariant,
       )
+      IconButton(onClick = onCancelAutoSend) {
+        Icon(
+          imageVector = VoiceIcons.Close,
+          contentDescription = stringResource(id = R.string.copilot_feed_input_cancel_send),
+          modifier = Modifier.size(18.dp),
+        )
+      }
+    } else {
+      FilledIconButton(
+        enabled = enabled,
+        onClick = onSend,
+        modifier = Modifier.size(36.dp),
+      ) {
+        Icon(
+          imageVector = VoiceIcons.Send,
+          contentDescription = stringResource(id = R.string.copilot_feed_input_send),
+          modifier = Modifier.size(20.dp),
+        )
+      }
+    }
+  }
+}
+
+/** Filled and pulsing while the microphone is on; a muted, struck-through mic once it has stopped. */
+@Composable
+private fun MicButton(
+  isListening: Boolean,
+  enabled: Boolean,
+  onClick: () -> Unit,
+) {
+  val accent = MaterialTheme.colorScheme.primary
+  Box(
+    modifier = Modifier.size(48.dp),
+    contentAlignment = Alignment.Center,
+  ) {
+    if (isListening) {
+      val pulse by rememberInfiniteTransition(label = "listening").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(animation = tween(durationMillis = 1_100), repeatMode = RepeatMode.Restart),
+        label = "listeningPulse",
+      )
+      Box(
+        modifier = Modifier
+          .matchParentSize()
+          .graphicsLayer {
+            scaleX = 0.8f + 0.5f * pulse
+            scaleY = 0.8f + 0.5f * pulse
+            alpha = 0.45f * (1f - pulse)
+          }
+          .background(color = accent, shape = CircleShape),
+      )
+      FilledIconButton(
+        onClick = onClick,
+        modifier = Modifier.size(44.dp),
+      ) {
+        Icon(
+          imageVector = VoiceIcons.Mic,
+          contentDescription = stringResource(id = R.string.copilot_feed_mic_stop),
+        )
+      }
+    } else {
+      val strike = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (enabled) 0.8f else 0.3f)
+      FilledTonalIconButton(
+        enabled = enabled,
+        onClick = onClick,
+        modifier = Modifier.size(44.dp),
+        colors = IconButtonDefaults.filledTonalIconButtonColors(
+          containerColor = MaterialTheme.colorScheme.surfaceVariant,
+          contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+      ) {
+        Icon(
+          imageVector = VoiceIcons.Mic,
+          contentDescription = stringResource(id = R.string.copilot_feed_mic_start),
+          modifier = Modifier
+            .alpha(0.6f)
+            .drawWithContent {
+              drawContent()
+              drawLine(
+                color = strike,
+                start = Offset(size.width * 0.12f, size.height * 0.12f),
+                end = Offset(size.width * 0.88f, size.height * 0.88f),
+                strokeWidth = 2.dp.toPx(),
+                cap = StrokeCap.Round,
+              )
+            },
+        )
+      }
     }
   }
 }

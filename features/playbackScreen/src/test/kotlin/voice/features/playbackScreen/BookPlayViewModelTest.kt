@@ -12,11 +12,15 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
@@ -58,6 +62,8 @@ import voice.core.xray.card.PlayerCardFields
 import voice.core.xray.card.PlayerCardRepository
 import voice.core.xray.card.PlayerCardSet
 import voice.core.xray.card.composeAt
+import voice.features.playbackScreen.copilot.DictationEvent
+import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
 import voice.navigation.Destination
 import voice.navigation.Navigator
@@ -108,6 +114,7 @@ class BookPlayViewModelTest {
   }
   private val copilotRepository = CoPilotRepository()
   private val copilotPipeline = mockk<CoPilotPipeline>()
+  private val speechInputController = mockk<SpeechInputController>()
   private val bookmarkRepository = mockk<BookmarkRepo> {
     coEvery { addBookmarkAtBookPosition(book, any(), any()) } returns Bookmark(
       bookId = book.id,
@@ -145,7 +152,7 @@ class BookPlayViewModelTest {
     kioskModeFeatureFlag = MemoryFeatureFlag(false),
     copilotRepository = copilotRepository,
     copilotPipeline = copilotPipeline,
-    speechInputController = mockk(),
+    speechInputController = speechInputController,
     xrayRepository = mockk {
       coEvery { manifestFor(any()) } returns null
     },
@@ -578,7 +585,8 @@ class BookPlayViewModelTest {
   fun `sending a Feed message routes through the same CoPilotPipeline ask as Open Mic`() = scope.runTest {
     coEvery { copilotPipeline.ask(book.id, "who is Carl?") } returns "Carl is the protagonist."
 
-    viewModel.onSendFeedMessage("who is Carl?")
+    viewModel.onChatInputChange("who is Carl?")
+    viewModel.onChatSend()
     yield()
     yield()
 
@@ -588,6 +596,132 @@ class BookPlayViewModelTest {
     assertEquals("who is Carl?", messages[0].text)
     assertEquals(CoPilotMessage.Role.CoPilot, messages[1].role)
     assertEquals("Carl is the protagonist.", messages[1].text)
+  }
+
+  @Test
+  fun `Ask opens the chat listening and writes the words into the text box as they are heard`() = scope.runTest {
+    val heard = MutableSharedFlow<DictationEvent>()
+    every { speechInputController.dictate() } returns heard
+
+    viewModel.onAskClick()
+    runCurrent()
+
+    assertEquals(true, viewModel.feedVisible.value)
+    assertEquals(ChatInputViewState(text = "", isListening = true), viewModel.chatInput.value)
+
+    heard.emit(DictationEvent.Partial("who is"))
+    runCurrent()
+    assertEquals(ChatInputViewState(text = "who is", isListening = true), viewModel.chatInput.value)
+
+    heard.emit(DictationEvent.Partial("who is Carl"))
+    runCurrent()
+    assertEquals(ChatInputViewState(text = "who is Carl", isListening = true), viewModel.chatInput.value)
+
+    viewModel.onFeedDismiss()
+  }
+
+  @Test
+  fun `a dictated question sends itself five seconds after the mic stops`() = scope.runTest {
+    every { speechInputController.dictate() } returns flowOf(
+      DictationEvent.Partial("who is"),
+      DictationEvent.Final("who is Carl"),
+    )
+    coEvery { copilotPipeline.ask(book.id, "who is Carl") } returns "Carl is the protagonist."
+
+    viewModel.onAskClick()
+    runCurrent()
+    assertEquals(
+      ChatInputViewState(text = "who is Carl", isListening = false, autoSendPending = true),
+      viewModel.chatInput.value,
+    )
+
+    advanceTimeBy(ChatInputViewState.AUTO_SEND_DELAY_MS - 1)
+    runCurrent()
+    assertEquals(true, viewModel.chatInput.value.autoSendPending)
+    assertEquals(null, copilotRepository.allMessagesByBook.value[book.id])
+
+    advanceTimeBy(1)
+    runCurrent()
+    assertEquals(ChatInputViewState(), viewModel.chatInput.value)
+    val messages = copilotRepository.allMessagesByBook.value.getValue(book.id)
+    assertEquals(listOf("who is Carl", "Carl is the protagonist."), messages.map { it.text })
+  }
+
+  @Test
+  fun `tapping the X or the text box during the countdown keeps the text and sends nothing`() = scope.runTest {
+    every { speechInputController.dictate() } returns flowOf(DictationEvent.Final("who is Carl"))
+
+    viewModel.onAskClick()
+    runCurrent()
+    viewModel.onChatAutoSendCancel()
+    advanceTimeBy(ChatInputViewState.AUTO_SEND_DELAY_MS * 2)
+    runCurrent()
+    assertEquals(ChatInputViewState(text = "who is Carl"), viewModel.chatInput.value)
+
+    viewModel.onChatMicClick()
+    runCurrent()
+    assertEquals(true, viewModel.chatInput.value.autoSendPending)
+    viewModel.onChatInputTap()
+    advanceTimeBy(ChatInputViewState.AUTO_SEND_DELAY_MS * 2)
+    runCurrent()
+    assertEquals(false, viewModel.chatInput.value.autoSendPending)
+
+    assertEquals(null, copilotRepository.allMessagesByBook.value[book.id])
+  }
+
+  @Test
+  fun `tapping the mic or the text box while listening stops the mic without a countdown`() = scope.runTest {
+    val heard = MutableSharedFlow<DictationEvent>()
+    every { speechInputController.dictate() } returns heard
+
+    viewModel.onAskClick()
+    runCurrent()
+    heard.emit(DictationEvent.Partial("who is"))
+    runCurrent()
+    viewModel.onChatMicClick()
+    runCurrent()
+    assertEquals(ChatInputViewState(text = "who is"), viewModel.chatInput.value)
+    assertEquals(0, heard.subscriptionCount.value)
+
+    viewModel.onChatMicClick()
+    runCurrent()
+    assertEquals(true, viewModel.chatInput.value.isListening)
+    heard.emit(DictationEvent.Partial("Carl"))
+    runCurrent()
+    assertEquals("who is Carl", viewModel.chatInput.value.text)
+
+    viewModel.onChatInputTap()
+    runCurrent()
+    advanceTimeBy(ChatInputViewState.AUTO_SEND_DELAY_MS * 2)
+    assertEquals(ChatInputViewState(text = "who is Carl"), viewModel.chatInput.value)
+    assertEquals(0, heard.subscriptionCount.value)
+    assertEquals(null, copilotRepository.allMessagesByBook.value[book.id])
+  }
+
+  @Test
+  fun `hearing nothing turns the mic off and starts no countdown`() = scope.runTest {
+    every { speechInputController.dictate() } returns emptyFlow()
+
+    viewModel.onAskClick()
+    runCurrent()
+
+    assertEquals(true, viewModel.feedVisible.value)
+    assertEquals(ChatInputViewState(), viewModel.chatInput.value)
+  }
+
+  @Test
+  fun `closing the chat stops the mic and a pending send`() = scope.runTest {
+    every { speechInputController.dictate() } returns flowOf(DictationEvent.Final("who is Carl"))
+
+    viewModel.onAskClick()
+    runCurrent()
+    viewModel.onFeedDismiss()
+    advanceTimeBy(ChatInputViewState.AUTO_SEND_DELAY_MS * 2)
+    runCurrent()
+
+    assertEquals(false, viewModel.feedVisible.value)
+    assertEquals(false, viewModel.chatInput.value.autoSendPending)
+    assertEquals(null, copilotRepository.allMessagesByBook.value[book.id])
   }
 
   @Test
@@ -695,7 +829,7 @@ class BookPlayViewModelTest {
       assertEquals(expected = emptyList(), actual = awaitItem())
 
       // Simulates Open Mic / Snip & Synthesize, which write to CoPilotRepository
-      // directly rather than through onSendFeedMessage.
+      // directly rather than through onChatSend.
       copilotRepository.addMessage(
         book.id,
         CoPilotMessage(
