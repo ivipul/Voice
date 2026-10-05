@@ -118,9 +118,6 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
     onDeckClick = bookOverviewViewModel::onDeckClick,
-    onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
-    onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
-    onSearchBookClick = bookOverviewViewModel::onSearchBookClick,
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
@@ -182,9 +179,6 @@ internal fun BookOverview(
   onFolderPickerMovedDialogDismiss: () -> Unit,
   onPlayButtonClick: () -> Unit,
   onDeckClick: () -> Unit,
-  onSearchActiveChange: (Boolean) -> Unit,
-  onSearchQueryChange: (String) -> Unit,
-  onSearchBookClick: (BookId) -> Unit,
   onPermissionBugCardClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -196,9 +190,6 @@ internal fun BookOverview(
         viewState = viewState,
         onBookFolderClick = onBookFolderClick,
         onSettingsClick = onSettingsClick,
-        onActiveChange = onSearchActiveChange,
-        onQueryChange = onSearchQueryChange,
-        onSearchBookClick = onSearchBookClick,
       )
     },
     floatingActionButton = {
@@ -307,9 +298,6 @@ fun BookOverviewPreview(
       onFolderPickerMovedDialogDismiss = {},
       onPlayButtonClick = {},
       onDeckClick = {},
-      onSearchActiveChange = {},
-      onSearchQueryChange = {},
-      onSearchBookClick = {},
       onPermissionBugCardClick = {},
     )
   }
