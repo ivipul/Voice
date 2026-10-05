@@ -13,4 +13,7 @@ public abstract class CoPilotMessageDao {
 
   @Upsert
   public abstract suspend fun upsert(message: StoredCoPilotMessage)
+
+  @Query("DELETE FROM coPilotMessage WHERE id = :id")
+  public abstract suspend fun delete(id: String)
 }

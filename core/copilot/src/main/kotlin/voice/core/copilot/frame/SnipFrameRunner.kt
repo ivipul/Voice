@@ -52,6 +52,11 @@ class SnipFrameRunner(
       null
     }
     coPilotRepository.updateMessage(bookId, messageId) { it.copy(imagePath = path, isGeneratingImage = false) }
+    // The snip may have been deleted while its frame was being drawn; then nothing points at the file.
+    val snipExists = coPilotRepository.allMessagesByBook.value[bookId].orEmpty().any { it.id == messageId }
+    if (path != null && !snipExists) {
+      withContext(Dispatchers.IO) { File(path).delete() }
+    }
   }
 
   private fun save(messageId: String, bytes: ByteArray): String {

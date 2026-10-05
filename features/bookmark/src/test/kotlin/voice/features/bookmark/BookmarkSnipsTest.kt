@@ -110,6 +110,31 @@ class BookmarkSnipsTest {
     verify(exactly = 0) { navigator.goBack() }
   }
 
+  @Test
+  fun deletingASnipRemovesOnlyThatSnipFromTheBook() = runTest {
+    val bookId = BookId("book")
+    val copilotRepository = CoPilotRepository()
+    val kept = snip(id = "kept", text = "Kept", takenAtMs = 1L, positionMs = 30_000L)
+    val deleted = snip(id = "deleted", text = "Deleted", takenAtMs = 2L, positionMs = 341_000L)
+    copilotRepository.addMessage(bookId, kept)
+    copilotRepository.addMessage(bookId, deleted)
+    val viewModel = BookmarkViewModel(
+      currentBookStore = MemoryDataStore<BookId?>(null),
+      repo = mockk(relaxed = true),
+      playStateManager = mockk(relaxed = true),
+      playerController = mockk(relaxed = true),
+      navigator = mockk(relaxed = true),
+      stripRepository = mockk(relaxed = true),
+      copilotRepository = copilotRepository,
+      bookId = bookId,
+    )
+    val card = listOf(kept, deleted).snipCards(listOf(chapter)).first { it.id == "deleted" }
+
+    viewModel.onSnipDelete(card)
+
+    assertEquals(listOf(kept), copilotRepository.allMessagesByBook.value[bookId])
+  }
+
   private fun snip(
     id: String,
     text: String,
