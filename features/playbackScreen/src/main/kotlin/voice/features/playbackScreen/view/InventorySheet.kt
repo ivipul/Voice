@@ -3,16 +3,15 @@ package voice.features.playbackScreen.view
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animate
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -38,8 +38,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -53,10 +56,12 @@ import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.icons.VoiceIcons
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 internal val InventoryPeekHeight = 60.dp
 private val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
 private val SheetTopGap = 12.dp
+private val CollapsedMargin = 8.dp
 private val SettleThreshold = 6.dp
 private const val SETTLE_VELOCITY_PX = 400F
 private const val SCRIM_ALPHA = 0.32F
@@ -110,15 +115,20 @@ internal fun InventorySheet(
           .clickable(interactionSource = null, indication = null) { settle(0F) },
       )
     }
+    val collapsedFill = MaterialTheme.colorScheme.surfaceContainerHigh
     Column(
       modifier = Modifier
         .align(Alignment.BottomCenter)
+        .layout { measurable, constraints ->
+          val margin = (CollapsedMargin.toPx() * (1F - progress)).roundToInt()
+          val placeable = measurable.measure(constraints.copy(minWidth = 0, maxWidth = constraints.maxWidth - 2 * margin))
+          layout(constraints.maxWidth, placeable.height) { placeable.place(margin, 0) }
+        }
         .fillMaxWidth()
         .height(sheetHeight)
         .graphicsLayer { translationY = (1F - progress) * rangePx }
         .clip(SheetShape)
-        .background(palette.background)
-        .border(width = 1.5.dp, color = palette.content, shape = SheetShape),
+        .drawBehind { drawRect(color = lerp(collapsedFill, palette.background, progress)) },
     ) {
       InventoryHeader(
         count = count,
@@ -175,15 +185,15 @@ private fun InventoryHeader(
         .align(Alignment.TopCenter)
         .padding(top = 8.dp)
         .size(width = 36.dp, height = 4.dp)
+        .graphicsLayer { alpha = progress() }
         .clip(CircleShape)
         .background(palette.content.copy(alpha = 0.4F)),
     )
     Row(
       modifier = Modifier
         .fillMaxSize()
-        .padding(start = 20.dp, end = 12.dp, top = 6.dp),
+        .padding(start = 20.dp, end = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       Icon(
         imageVector = PosterIcons.Inventory,
@@ -191,6 +201,7 @@ private fun InventoryHeader(
         tint = palette.content,
         modifier = Modifier.size(22.dp),
       )
+      Spacer(modifier = Modifier.size(12.dp))
       Text(
         text = stringResource(id = R.string.inventory_title).uppercase(),
         style = CrawlType.button,
@@ -204,12 +215,12 @@ private fun InventoryHeader(
         color = palette.content,
       )
       Icon(
-        imageVector = VoiceIcons.ExpandMore,
+        imageVector = VoiceIcons.ChevronRight,
         contentDescription = null,
         tint = palette.content,
         modifier = Modifier
           .size(24.dp)
-          .graphicsLayer { rotationZ = 180F * (1F - progress()) },
+          .graphicsLayer { rotationZ = 90F * progress() },
       )
     }
   }
