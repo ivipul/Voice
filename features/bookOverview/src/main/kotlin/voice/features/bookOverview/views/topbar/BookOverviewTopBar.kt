@@ -32,7 +32,7 @@ import voice.features.bookOverview.search.BookSearchViewState
 import kotlin.time.Duration.Companion.seconds
 import voice.core.strings.R as StringsR
 
-/** The library's title in bold with the folder and settings buttons to its right. */
+/** The library's title in the author-name face of the cards, with the folder and settings buttons to its right. */
 @Composable
 internal fun BookOverviewTopBar(
   viewState: BookOverviewViewState,
@@ -49,8 +49,8 @@ internal fun BookOverviewTopBar(
       horizontalArrangement = Arrangement.End,
     ) {
       Text(
-        text = stringResource(StringsR.string.library_title),
-        style = CrawlType.button.copy(fontSize = 30.sp),
+        text = stringResource(StringsR.string.library_title).uppercase(),
+        style = CrawlType.label.copy(fontSize = 28.sp),
         color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.weight(1F),
       )

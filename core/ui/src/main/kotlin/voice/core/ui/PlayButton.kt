@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
@@ -14,6 +13,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -40,9 +40,8 @@ fun PlayButton(
   val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
-      .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
+      .then(if (palette != null) Modifier.hardShadow(color = Color.White, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
       .size(fabSize)
-      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.highlight, shape = shape) else Modifier)
       .then(sharedElementModifier),
     onClick = onPlayClick,
     shape = shape,
@@ -74,7 +73,7 @@ fun rememberPlayIconPainter(playing: Boolean): Painter {
   )
 }
 
-/** With a palette the button casts the comic-style hard shadow instead of a soft one. */
+/** With a palette the button casts a white hard shadow instead of a soft one, so it stands off a card of its own color. */
 @Composable
 private fun flatElevation() = FloatingActionButtonDefaults.elevation(
   defaultElevation = 0.dp,

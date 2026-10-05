@@ -1,6 +1,5 @@
 package voice.features.bookOverview.views
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -32,9 +31,8 @@ internal fun DeckButton(
   val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
-      .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = CircleShape, x = 3.dp, y = 3.dp) else Modifier)
-      .size(FabSize)
-      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.highlight, shape = CircleShape) else Modifier),
+      .then(if (palette != null) Modifier.hardShadow(color = Color.White, shape = CircleShape, x = 3.dp, y = 3.dp) else Modifier)
+      .size(FabSize),
     onClick = onClick,
     shape = CircleShape,
     containerColor = containerColor,
