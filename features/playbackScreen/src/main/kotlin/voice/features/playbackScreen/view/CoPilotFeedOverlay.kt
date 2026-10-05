@@ -81,10 +81,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import voice.core.copilot.CoPilotMessage
 import voice.core.data.ChapterId
+import voice.core.playback.speech.SpokenMessage
 import voice.core.strings.R
 import voice.core.ui.FrameCardViewer
 import voice.core.ui.formatTime
 import voice.core.ui.icons.VoiceIcons
+import voice.core.ui.rememberPlayIconPainter
 
 private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
 
@@ -104,6 +106,8 @@ internal fun SystemAiChatSheet(
   onSend: () -> Unit,
   onCancelAutoSend: () -> Unit,
   onMicClick: () -> Unit,
+  spokenMessage: SpokenMessage?,
+  onMessagePlayClick: (CoPilotMessage) -> Unit,
   onDismiss: () -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
@@ -189,6 +193,8 @@ internal fun SystemAiChatSheet(
         ChatMessages(
           messages = messages,
           isThinking = isThinking,
+          spokenMessage = spokenMessage,
+          onMessagePlayClick = onMessagePlayClick,
           onSeekToSnip = onSeekToSnip,
           snipLocationLabel = snipLocationLabel,
           onOpenFrame = { viewedFrame = it },
@@ -214,6 +220,8 @@ internal fun SystemAiChatSheet(
 private fun ChatMessages(
   messages: List<CoPilotMessage>,
   isThinking: Boolean,
+  spokenMessage: SpokenMessage?,
+  onMessagePlayClick: (CoPilotMessage) -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
   onOpenFrame: (CoPilotMessage) -> Unit,
@@ -246,6 +254,8 @@ private fun ChatMessages(
       items(messages, key = { it.id }) { message ->
         ChatBubble(
           message,
+          spoken = spokenMessage?.takeIf { it.id == message.id },
+          onPlayClick = { onMessagePlayClick(message) },
           onSeekToSnip = onSeekToSnip,
           snipLocationLabel = snipLocationLabel,
           onOpenFrame = { onOpenFrame(message) },
@@ -263,6 +273,8 @@ private fun ChatMessages(
 @Composable
 private fun ChatBubble(
   message: CoPilotMessage,
+  spoken: SpokenMessage?,
+  onPlayClick: () -> Unit,
   onSeekToSnip: (ChapterId, Long) -> Unit,
   snipLocationLabel: (ChapterId, Long) -> String?,
   onOpenFrame: () -> Unit,
@@ -274,6 +286,7 @@ private fun ChatBubble(
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     Surface(
       shape = RoundedCornerShape(16.dp),
@@ -282,7 +295,10 @@ private fun ChatBubble(
       } else {
         MaterialTheme.colorScheme.surfaceVariant
       },
-      modifier = Modifier.widthIn(max = if (hasFrame) FRAME_BUBBLE_MAX_WIDTH else 320.dp),
+      modifier = Modifier
+        // Never so wide that it pushes the play button off the row.
+        .weight(1F, fill = false)
+        .widthIn(max = if (hasFrame) FRAME_BUBBLE_MAX_WIDTH else 320.dp),
     ) {
       Column {
         if (hasFrame) {
@@ -328,6 +344,49 @@ private fun ChatBubble(
           style = MaterialTheme.typography.bodyLarge,
         )
       }
+    }
+    if (!isUser) {
+      Spacer(modifier = Modifier.size(8.dp))
+      MessagePlayButton(spoken = spoken, onClick = onPlayClick)
+    }
+  }
+}
+
+/**
+ * Reads the reply beside it aloud. It shows pause from the tap until the reading ends or is stopped, with a
+ * ring around it while the voice is still being prepared.
+ */
+@Composable
+private fun MessagePlayButton(
+  spoken: SpokenMessage?,
+  onClick: () -> Unit,
+) {
+  val playing = spoken != null
+  Box(
+    modifier = Modifier.size(40.dp),
+    contentAlignment = Alignment.Center,
+  ) {
+    if (spoken != null && !spoken.audible) {
+      CircularProgressIndicator(
+        modifier = Modifier.size(40.dp),
+        strokeWidth = 2.dp,
+      )
+    }
+    FilledTonalIconButton(
+      onClick = onClick,
+      modifier = Modifier.size(36.dp),
+      colors = IconButtonDefaults.filledTonalIconButtonColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+      ),
+    ) {
+      Icon(
+        painter = rememberPlayIconPainter(playing = playing),
+        contentDescription = stringResource(
+          id = if (playing) R.string.copilot_feed_message_stop else R.string.copilot_feed_message_play,
+        ),
+        modifier = Modifier.size(20.dp),
+      )
     }
   }
 }

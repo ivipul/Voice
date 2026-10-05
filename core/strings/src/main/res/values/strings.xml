@@ -78,6 +78,10 @@
     <string name="copilot.feed.input.send">Send</string>
     <!-- Content description for the X that stops a dictated co-pilot question from sending itself. -->
     <string name="copilot.feed.input.cancel_send">Cancel sending</string>
+    <!-- Content description for the play button beside a System AI reply, which reads it aloud. -->
+    <string name="copilot.feed.message.play">Read aloud</string>
+    <!-- Content description for that button while its reply is being read aloud. -->
+    <string name="copilot.feed.message.stop">Stop reading</string>
     <!-- Content description for the chat's microphone button while it is off. -->
     <string name="copilot.feed.mic.start">Start listening</string>
     <!-- Content description for the chat's microphone button while it is listening. -->
