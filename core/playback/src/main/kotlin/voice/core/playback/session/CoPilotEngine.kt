@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.Handler
@@ -19,18 +20,22 @@ import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.tts.FishAudioClient
 import voice.core.data.BookId
 import voice.core.data.store.CurrentBookStore
 import voice.core.logging.api.Logger
 import voice.core.playback.R
 import voice.core.playback.di.PlaybackScope
+import java.io.File
 import java.util.Locale
 import java.util.UUID
 import kotlin.coroutines.resume
@@ -62,12 +67,20 @@ class CoPilotEngine(
   private val scope: CoroutineScope,
   private val copilotPipeline: CoPilotPipeline,
   private val copilotRepository: CoPilotRepository,
+  private val fishAudioClient: FishAudioClient,
   @CurrentBookStore
   private val currentBookStoreId: DataStore<BookId?>,
 ) {
 
   private val mainHandler = Handler(Looper.getMainLooper())
   private var textToSpeech: TextToSpeech? = null
+  private var speakJob: Job? = null
+
+  // Bumped on every speak() and interrupt so work finishing on another thread can tell it was
+  // superseded (the job itself has already completed by the time its audio is played).
+  private var speakGeneration = 0
+  private var fishPlayer: MediaPlayer? = null
+  private var fishFile: File? = null
   private var noSpeechTimeout: Runnable? = null
 
   @Volatile
@@ -240,6 +253,10 @@ class CoPilotEngine(
     textToSpeech?.stop()
     textToSpeech?.shutdown()
     textToSpeech = null
+    speakGeneration++
+    speakJob?.cancel()
+    speakJob = null
+    releaseFishPlayer()
     abandonAudioFocus()
   }
 
@@ -318,7 +335,101 @@ class CoPilotEngine(
     noSpeechTimeout = null
   }
 
+  /**
+   * Speaks in the Fish Audio System AI voice when it's configured and reachable, otherwise (no
+   * key, offline, out of credit, playback error) falls back to the phone's TextToSpeech.
+   */
   private fun speak(text: String, onDone: () -> Unit) {
+    if (!fishAudioClient.isConfigured) {
+      speakWithPhoneTts(text, onDone)
+      return
+    }
+    speakJob?.cancel()
+    val generation = ++speakGeneration
+    speakJob = scope.launch {
+      val requestedAt = System.currentTimeMillis()
+      val file = try {
+        withContext(Dispatchers.IO) {
+          val bytes = fishAudioClient.synthesize(text)
+          File.createTempFile("fish-tts", ".mp3", context.cacheDir).also { it.writeBytes(bytes) }
+        }
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Logger.w(e, "CoPilotEngine: Fish voice failed, falling back to phone TTS")
+        null
+      }
+      if (file == null) {
+        mainHandler.post { if (generation == speakGeneration) speakWithPhoneTts(text, onDone) }
+        return@launch
+      }
+      Logger.d("CoPilotEngine: Fish audio ready in ${System.currentTimeMillis() - requestedAt} ms")
+      mainHandler.post {
+        if (generation == speakGeneration) playFishAudio(file, text, requestedAt, onDone) else file.delete()
+      }
+    }
+  }
+
+  private fun playFishAudio(file: File, text: String, requestedAt: Long, onDone: () -> Unit) {
+    releaseFishPlayer()
+    var started = false
+    var settled = false
+    fun fallBack() {
+      if (settled) return
+      settled = true
+      releaseFishPlayer()
+      if (started) finishSpeaking(onDone) else speakWithPhoneTts(text, onDone)
+    }
+    try {
+      val player = MediaPlayer()
+      fishPlayer = player
+      fishFile = file
+      player.setAudioAttributes(
+        AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_ASSISTANT)
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build(),
+      )
+      player.setDataSource(file.path)
+      player.setOnPreparedListener {
+        started = true
+        it.start()
+        Logger.d("CoPilotEngine: Fish playback started ${System.currentTimeMillis() - requestedAt} ms after the request")
+      }
+      player.setOnCompletionListener {
+        Logger.d("CoPilotEngine: Fish playback done")
+        if (settled) return@setOnCompletionListener
+        settled = true
+        releaseFishPlayer()
+        finishSpeaking(onDone)
+      }
+      player.setOnErrorListener { _, what, extra ->
+        Logger.w("CoPilotEngine: Fish playback error $what/$extra")
+        fallBack()
+        true
+      }
+      player.prepareAsync()
+    } catch (e: Exception) {
+      Logger.w(e, "CoPilotEngine: Fish playback setup failed")
+      fallBack()
+    }
+  }
+
+  private fun releaseFishPlayer() {
+    fishPlayer?.let {
+      try {
+        it.stop()
+      } catch (_: IllegalStateException) {
+        // Never prepared; nothing to stop.
+      }
+      it.release()
+    }
+    fishPlayer = null
+    fishFile?.delete()
+    fishFile = null
+  }
+
+  private fun speakWithPhoneTts(text: String, onDone: () -> Unit) {
     textToSpeech?.shutdown()
     textToSpeech = TextToSpeech(context) { status ->
       val tts = textToSpeech

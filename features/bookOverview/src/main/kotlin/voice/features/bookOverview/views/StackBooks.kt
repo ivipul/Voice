@@ -1,5 +1,8 @@
 package voice.features.bookOverview.views
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -19,16 +22,27 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
@@ -38,6 +52,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kotlin.math.abs
+import kotlinx.coroutines.flow.collectLatest
 import voice.core.data.BookId
 import voice.core.ui.BookCardCorner
 import voice.core.ui.bookCardBackdropModifier
@@ -67,6 +83,43 @@ private const val TITLE_SCALE = 0.5F
 private const val TITLE_LINE_HEIGHT = 1.1F
 private const val FULL_PERCENT = 100
 
+// Any scroll leans the cards 7 degrees; a faster one adds half a degree per px a frame, up to 14 degrees.
+private const val BASE_TILT_DEGREES = 7F
+private const val TILT_DEGREES_PER_PX = 0.5F
+private const val MAX_TILT_DEGREES = 14F
+
+// Below this speed (px a frame) the list counts as still, so a resting finger doesn't make the cards flicker.
+private const val STILL_SPEED_PX = 0.3F
+
+// Each frame's scroll moves the speed only a fifth of the way, so a jumpy finger gives a steady lean.
+private const val SPEED_SMOOTHING = 0.2F
+
+// The lean eases in and out slowly, with no bounce.
+private val TiltSpring = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 60F)
+
+// A near camera, so the edge that tips away visibly narrows.
+private const val TILT_CAMERA_DISTANCE = 7F
+
+// Cards tip about the middle of the part that shows, not of the whole card with its tucked part.
+private val TiltPivot = TransformOrigin(pivotFractionX = 0.5F, pivotFractionY = 0.36F)
+
+/**
+ * How far the cards lean at a scroll speed of [speedPx] a frame: forward (top edge away) while the list scrolls down,
+ * back while it scrolls up. [speedPx] is the content's move, negative when it moves up as the list scrolls down.
+ */
+internal fun cardTilt(speedPx: Float): Float {
+  val speed = abs(speedPx)
+  if (speed < STILL_SPEED_PX) return 0F
+  val lean = (BASE_TILT_DEGREES + speed * TILT_DEGREES_PER_PX).coerceAtMost(MAX_TILT_DEGREES)
+  return if (speedPx < 0F) lean else -lean
+}
+
+/** The scroll speed after a frame that moved [scrolledPx], from the [previous] speed. */
+internal fun smoothedScrollSpeed(
+  previous: Float,
+  scrolledPx: Float,
+): Float = previous + (scrolledPx - previous) * SPEED_SMOOTHING
+
 /** The library as a stack of cards in each book's own colors, each tucked under the next like cards in a wallet. */
 @Composable
 internal fun StackBooks(
@@ -76,7 +129,33 @@ internal fun StackBooks(
   showPermissionBugCard: Boolean,
   onPermissionBugCardClick: () -> Unit,
 ) {
+  val listState = rememberLazyListState()
+  val scrollSpeed = remember { mutableFloatStateOf(0F) }
+  val scrollTilt = remember {
+    object : NestedScrollConnection {
+      override fun onPostScroll(
+        consumed: Offset,
+        available: Offset,
+        source: NestedScrollSource,
+      ): Offset {
+        // What the list couldn't take is the pull past its end, which leans the cards too.
+        scrollSpeed.floatValue = smoothedScrollSpeed(scrollSpeed.floatValue, consumed.y + available.y)
+        return Offset.Zero
+      }
+    }
+  }
+  LaunchedEffect(listState.isScrollInProgress) {
+    if (!listState.isScrollInProgress) scrollSpeed.floatValue = 0F
+  }
+  val tilt = remember { Animatable(0F) }
+  LaunchedEffect(tilt) {
+    snapshotFlow { cardTilt(scrollSpeed.floatValue) }.collectLatest { target ->
+      tilt.animateTo(target, TiltSpring)
+    }
+  }
   LazyColumn(
+    state = listState,
+    modifier = Modifier.nestedScroll(scrollTilt),
     contentPadding = PaddingValues(top = 16.dp, start = 12.dp, end = 12.dp),
   ) {
     if (showPermissionBugCard) {
@@ -97,6 +176,11 @@ internal fun StackBooks(
           book = bookState.value,
           onBookClick = onBookClick,
           onBookLongClick = onBookLongClick,
+          modifier = Modifier.graphicsLayer {
+            rotationX = tilt.value
+            cameraDistance = TILT_CAMERA_DISTANCE * density
+            transformOrigin = TiltPivot
+          },
         )
       }
     }
