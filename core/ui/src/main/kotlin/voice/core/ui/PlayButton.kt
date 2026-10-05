@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
@@ -36,16 +37,17 @@ fun PlayButton(
     label = "cornerSize",
   )
   val shape = RoundedCornerShape(cornerSize)
-  val containerColor = palette?.highlight ?: FloatingActionButtonDefaults.containerColor
+  val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
       .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
       .size(fabSize)
+      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.content, shape = shape) else Modifier)
       .then(sharedElementModifier),
     onClick = onPlayClick,
     shape = shape,
     containerColor = containerColor,
-    contentColor = palette?.onHighlight ?: contentColorFor(containerColor),
+    contentColor = palette?.highlight ?: contentColorFor(containerColor),
     elevation = if (palette != null) flatElevation() else FloatingActionButtonDefaults.elevation(),
   ) {
     Icon(

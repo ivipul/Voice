@@ -1,5 +1,6 @@
 package voice.features.bookOverview.views
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -21,22 +22,23 @@ import voice.core.strings.R as StringsR
 private val FabSize = 56.dp
 private val IconSize = 24.dp
 
-/** Opens The Deck. The same size and colors as the play button on the other side of the library, in the active book's [palette]. */
+/** Opens The Deck. The same size and colors as the play button on the other side of the library, in the active book's [palette]: its background with the icon in its highlight color. */
 @Composable
 internal fun DeckButton(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   palette: CrawlPalette? = null,
 ) {
-  val containerColor = palette?.highlight ?: FloatingActionButtonDefaults.containerColor
+  val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
       .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = CircleShape, x = 3.dp, y = 3.dp) else Modifier)
-      .size(FabSize),
+      .size(FabSize)
+      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.content, shape = CircleShape) else Modifier),
     onClick = onClick,
     shape = CircleShape,
     containerColor = containerColor,
-    contentColor = palette?.onHighlight ?: contentColorFor(containerColor),
+    contentColor = palette?.highlight ?: contentColorFor(containerColor),
     elevation = if (palette != null) flatElevation() else FloatingActionButtonDefaults.elevation(),
   ) {
     Icon(
