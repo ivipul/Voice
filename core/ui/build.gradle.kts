@@ -11,6 +11,7 @@ android {
 dependencies {
   api(libs.datastore)
   implementation(libs.appCompat)
+  implementation(libs.androidxCore)
   api(projects.core.data.api)
   implementation(projects.core.initializer)
   implementation(projects.core.strings)

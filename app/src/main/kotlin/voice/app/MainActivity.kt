@@ -100,17 +100,19 @@ class MainActivity : AppCompatActivity() {
               sceneStrategies = listOf(bottomSheetStrategy, dialogStrategy),
               sharedTransitionScope = this,
               transitionSpec = {
-                if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
-                  SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
+                if (targetState.destination() is Destination.Bookmarks) {
+                  inventoryOpenTransition()
+                } else if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
+                  bookCardOpenTransition()
                 } else {
                   SharedXAxisEnterTransition(density) togetherWith SharedXAxisExitTransition(density)
                 }
               },
               popTransitionSpec = {
-                SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
+                popTransition()
               },
               predictivePopTransitionSpec = {
-                SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
+                popTransition()
               },
               onBack = {
                 if (backStack.size > 1) {

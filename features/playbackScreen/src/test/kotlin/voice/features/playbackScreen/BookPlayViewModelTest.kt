@@ -21,6 +21,10 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import voice.core.common.DispatcherProvider
+import voice.core.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotPipeline
+import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.SnipEvent
 import voice.core.data.Book
 import voice.core.data.BookContent
 import voice.core.data.BookId
@@ -41,17 +45,11 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
-import voice.core.copilot.CoPilotMessage
 import voice.core.strips.ActiveStripFrame
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripFrame
 import voice.core.strips.StripManifest
-import voice.navigation.Destination
-import voice.navigation.Navigator
-import java.io.File
-import voice.core.copilot.CoPilotPipeline
-import voice.core.copilot.CoPilotRepository
-import voice.core.copilot.SnipEvent
+import voice.core.ui.crawl.CrawlEdition
 import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.card.PlayerCardData
@@ -61,6 +59,9 @@ import voice.core.xray.card.PlayerCardRepository
 import voice.core.xray.card.PlayerCardSet
 import voice.core.xray.card.composeAt
 import voice.features.sleepTimer.SleepTimerViewState
+import voice.navigation.Destination
+import voice.navigation.Navigator
+import java.io.File
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -438,6 +439,86 @@ class BookPlayViewModelTest {
   }
 
   @Test
+  fun `viewState carries the series book and the playback speed`() = scope.runTest {
+    val doomsday = book(name = "2. Carl's Doomsday Scenario").let {
+      it.copy(content = it.content.copy(playbackSpeed = 1.3F))
+    }
+    val viewModel = viewModel(book = doomsday)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null) state = awaitItem()
+      assertEquals(CrawlEdition.CarlsDoomsdayScenario, state.edition)
+      assertEquals(1.3F, state.playbackSpeed)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `a book outside the series has no edition`() = scope.runTest {
+    val viewModel = viewModel()
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null) state = awaitItem()
+      assertEquals(null, state.edition)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `the speed sheet opens on the book's speed and follows changes`() = scope.runTest {
+    every { player.setSpeed(any()) } just Runs
+
+    viewModel.onPlaybackSpeedIconClick()
+    yield()
+    assertEquals(BookPlayDialogViewState.SpeedDialog(1F), viewModel.dialogState.value)
+
+    viewModel.onPlaybackSpeedChanged(1.5F)
+    assertEquals(BookPlayDialogViewState.SpeedDialog(1.5F), viewModel.dialogState.value)
+    verify { player.setSpeed(1.5F) }
+  }
+
+  @Test
+  fun `the Inventory card opens the Inventory screen`() = scope.runTest {
+    viewModel.onBookmarkClick()
+
+    verify { navigator.goTo(Destination.Bookmarks(book.id)) }
+  }
+
+  @Test
+  fun `the Inventory card counts the book's snips and the strips reached so far`() = scope.runTest {
+    val copilotRepository = CoPilotRepository()
+    copilotRepository.addMessage(book.id, snipMessage("first"))
+    copilotRepository.addMessage(book.id, snipMessage("second"))
+    copilotRepository.addMessage(
+      book.id,
+      CoPilotMessage(id = "answer", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 0L),
+    )
+    copilotRepository.addMessage(BookId("another-book"), snipMessage("elsewhere"))
+    // The book is at 7:30; the first strip started at 1:00 and the second one starts at 8:20.
+    val reached = strip(startsMs = listOf(60_000L), holdMs = 10_000L, chapter = 1)
+    val ahead = strip(startsMs = listOf(500_000L), holdMs = 10_000L, chapter = 2)
+    val viewModel = viewModel(strips = listOf(reached, ahead), copilotRepository = copilotRepository)
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      assertEquals(3, state.inventoryCount)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  private fun snipMessage(id: String) = CoPilotMessage(
+    id = id,
+    role = CoPilotMessage.Role.CoPilot,
+    text = "A title\nThe moment.",
+    timestampMs = 0L,
+    snipChapterId = book.currentChapter.id,
+    snipPositionInChapterMs = 1_000L,
+  )
+
+  @Test
   fun `viewState uses currently playing demo book in kiosk mode`() = scope.runTest {
     val viewModel = viewModel(kioskMode = true)
 
@@ -465,15 +546,6 @@ class BookPlayViewModelTest {
     assertEquals("who is Carl?", messages[0].text)
     assertEquals(CoPilotMessage.Role.CoPilot, messages[1].role)
     assertEquals("Carl is the protagonist.", messages[1].text)
-  }
-
-  @Test
-  fun `bookmark long-click adds a plain bookmark, not Snip and Synthesize`() = scope.runTest {
-    viewModel.onBookmarkLongClick()
-    yield()
-
-    coVerify { bookmarkRepository.addBookmarkAtBookPosition(book, any(), any()) }
-    coVerify(exactly = 0) { copilotPipeline.snip(any()) }
   }
 
   @Test
@@ -757,6 +829,7 @@ class BookPlayViewModelTest {
     xrayManifest: XRayManifest? = null,
     playerCards: PlayerCardSet? = null,
     strips: List<AvailableStrip> = emptyList(),
+    copilotRepository: CoPilotRepository = CoPilotRepository(),
   ): BookPlayViewModel {
     return BookPlayViewModel(
       bookRepository = mockk {
@@ -785,7 +858,7 @@ class BookPlayViewModelTest {
       dispatcherProvider = DispatcherProvider(scope.coroutineContext, scope.coroutineContext, scope.coroutineContext),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(experimentalPlaybackPersistence),
       kioskModeFeatureFlag = MemoryFeatureFlag(kioskMode),
-      copilotRepository = CoPilotRepository(),
+      copilotRepository = copilotRepository,
       copilotPipeline = mockk(),
       speechInputController = mockk(),
       xrayRepository = mockk {

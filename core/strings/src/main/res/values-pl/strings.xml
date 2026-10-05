@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Okładka z internetu</string>
     <string name="book.edit.name.label">Nazwa</string>
     <string name="book.edit.title">Edytuj książkę</string>
-    <string name="bookmark.added.snackbar">Zakładka dodana</string>
-    <string name="bookmark.created.just_now">Przed chwilą</string>
-    <string name="bookmark.edit.name.label">Nazwa zakładki</string>
-    <string name="bookmark.edit.title">Edytuj zakładkę</string>
-    <string name="bookmark.title">Zakładka</string>
     <string name="common.action.add">Dodaj</string>
     <string name="common.action.close">Zamknij</string>
     <string name="common.action.delete">Skasuj</string>
-    <string name="common.action.edit">Edytuj</string>
     <string name="common.action.more">Więcej</string>
-    <string name="common.action.remove">Usuń</string>
     <string name="common.dialog.cancel">Anuluj</string>
     <string name="common.dialog.confirm">Wybierz</string>
     <string name="common.dialog.ok">OK</string>

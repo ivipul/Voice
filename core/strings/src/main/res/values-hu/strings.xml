@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Borító az internetről</string>
     <string name="book.edit.name.label">Cím</string>
     <string name="book.edit.title">Könyv szerkesztése</string>
-    <string name="bookmark.added.snackbar">Könyvjelző hozzáadva</string>
-    <string name="bookmark.created.just_now">Éppen most</string>
-    <string name="bookmark.edit.name.label">Könyvjelző neve</string>
-    <string name="bookmark.edit.title">Könyvjelző szerkesztése</string>
-    <string name="bookmark.title">Könyvjelző</string>
     <string name="common.action.add">Hozzáadás</string>
     <string name="common.action.close">Bezárás</string>
     <string name="common.action.delete">Törlés</string>
-    <string name="common.action.edit">Szerkesztés</string>
     <string name="common.action.more">Tovább</string>
-    <string name="common.action.remove">Eltávolítás</string>
     <string name="common.dialog.cancel">Mégse</string>
     <string name="common.dialog.confirm">Beállítás</string>
     <string name="common.error.generic.message">Valami balul sült el 😢</string>

@@ -21,6 +21,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
+import voice.core.copilot.CoPilotMessage
+import voice.core.copilot.CoPilotPipeline
+import voice.core.copilot.CoPilotRepository
+import voice.core.copilot.SnipEvent
 import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.ChapterId
@@ -28,10 +32,10 @@ import voice.core.data.KioskModeDemoData
 import voice.core.data.durationMs
 import voice.core.data.formatted
 import voice.core.data.markForPosition
-import voice.core.data.snipLocation
 import voice.core.data.repo.BookRepository
 import voice.core.data.repo.BookmarkRepo
 import voice.core.data.sleeptimer.SleepTimerPreference
+import voice.core.data.snipLocation
 import voice.core.data.store.CurrentBookStore
 import voice.core.data.store.SeekForwardTimeStore
 import voice.core.data.store.SeekTimeStore
@@ -50,18 +54,16 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
-import voice.core.ui.formatTime
-import voice.core.copilot.CoPilotMessage
-import voice.core.copilot.CoPilotPipeline
-import voice.core.copilot.CoPilotRepository
-import voice.core.copilot.SnipEvent
-import voice.core.xray.XRayEntityInfo
 import voice.core.strips.ActiveStripFrame
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
 import voice.core.strips.activeFrameAt
 import voice.core.strips.chapterPositionOf
+import voice.core.strips.isUnlockedAt
 import voice.core.strips.zonesWithin
+import voice.core.ui.crawl.crawlEditionOf
+import voice.core.ui.formatTime
+import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.XRayRepository
 import voice.core.xray.activeEntities
@@ -187,6 +189,8 @@ class BookPlayViewModel(
     val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
       value = stripRepository.stripsFor(book.content.name)
     }
+    val messagesByBook by remember { copilotRepository.allMessagesByBook }.collectAsState()
+    val snipCount = messagesByBook[bookId].orEmpty().count { it.isSnip }
     val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
     val stripZones = remember(strips, markStartBookMs, currentMark.durationMs) {
       strips.zonesWithin(markStartBookMs, markStartBookMs + currentMark.durationMs)
@@ -194,6 +198,7 @@ class BookPlayViewModel(
     val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
     }.orEmpty()
+    val edition = remember(book.content.name) { crawlEditionOf(book.content.name) }
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -209,6 +214,9 @@ class BookPlayViewModel(
       xrayChips = xrayChips,
       stripZones = stripZones,
       stripFrame = strips.activeFrameAt(book.position),
+      edition = edition,
+      playbackSpeed = book.content.playbackSpeed,
+      inventoryCount = snipCount + strips.count { it.isUnlockedAt(book.position) },
     )
   }
 
@@ -531,12 +539,18 @@ class BookPlayViewModel(
     snipSheet.value = null
   }
 
-  fun onSnipTimestampClick(chapterId: ChapterId, positionInChapterMs: Long) {
+  fun onSnipTimestampClick(
+    chapterId: ChapterId,
+    positionInChapterMs: Long,
+  ) {
     player.setPosition(positionInChapterMs, chapterId)
     feedVisible.value = false
   }
 
-  private fun runCoPilotExchange(userText: String, answer: suspend () -> String) {
+  private fun runCoPilotExchange(
+    userText: String,
+    answer: suspend () -> String,
+  ) {
     scope.launch {
       copilotRepository.addMessage(
         bookId,
@@ -559,18 +573,6 @@ class BookPlayViewModel(
           timestampMs = System.currentTimeMillis(),
         ),
       )
-    }
-  }
-
-  fun onBookmarkLongClick() {
-    scope.launch {
-      val book = currentBook() ?: return@launch
-      bookmarkRepository.addBookmarkAtBookPosition(
-        book = book,
-        title = null,
-        setBySleepTimer = false,
-      )
-      viewEffects.tryEmit(BookPlayViewEffect.BookmarkAdded)
     }
   }
 

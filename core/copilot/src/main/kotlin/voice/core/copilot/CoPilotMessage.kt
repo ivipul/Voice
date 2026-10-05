@@ -16,6 +16,10 @@ data class CoPilotMessage(
   val snipChapterId: ChapterId? = null,
   val snipPositionInChapterMs: Long? = null,
 ) {
+
+  /** A moment captured with Snip & Synthesize, which the Inventory keeps as a card. */
+  val isSnip: Boolean get() = snipChapterId != null && snipPositionInChapterMs != null
+
   enum class Role {
     User,
     CoPilot,

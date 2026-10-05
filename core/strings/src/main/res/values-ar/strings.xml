@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">الغلاف من الإنترنت</string>
     <string name="book.edit.name.label">الاسم</string>
     <string name="book.edit.title">حرر كتاب</string>
-    <string name="bookmark.added.snackbar">أضيفت علامة مرجعية</string>
-    <string name="bookmark.created.just_now">الآن</string>
-    <string name="bookmark.edit.name.label">اسم العلامة</string>
-    <string name="bookmark.edit.title">حرر العلامات</string>
-    <string name="bookmark.title">العلامات المرجعية</string>
     <string name="common.action.add">أضف</string>
     <string name="common.action.close">أغلق</string>
     <string name="common.action.delete">احذف</string>
-    <string name="common.action.edit">حرر</string>
     <string name="common.action.more">المزيد</string>
-    <string name="common.action.remove">أزل</string>
     <string name="common.dialog.cancel">ألغ</string>
     <string name="common.dialog.confirm">عيّن</string>
     <string name="common.error.generic.message">حدث خطأ ما 😢</string>

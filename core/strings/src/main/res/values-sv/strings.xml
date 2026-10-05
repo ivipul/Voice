@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Omslag från internet</string>
     <string name="book.edit.name.label">Namn</string>
     <string name="book.edit.title">Redigera bok</string>
-    <string name="bookmark.added.snackbar">Bokmärke tillagt</string>
-    <string name="bookmark.created.just_now">Just nu</string>
-    <string name="bookmark.edit.name.label">Namn på bokmärke</string>
-    <string name="bookmark.edit.title">Redigera bokmärke</string>
-    <string name="bookmark.title">Bokmärke</string>
     <string name="common.action.add">Lägg till</string>
     <string name="common.action.close">Stäng</string>
     <string name="common.action.delete">Ta bort</string>
-    <string name="common.action.edit">Redigera</string>
     <string name="common.action.more">Mer</string>
-    <string name="common.action.remove">Ta bort</string>
     <string name="common.dialog.cancel">Avbryt</string>
     <string name="common.dialog.confirm">Bekräfta</string>
     <string name="common.dialog.ok">OK</string>

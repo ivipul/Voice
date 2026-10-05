@@ -22,23 +22,13 @@
     <string name="book.edit.name.label">Name</string>
     <!-- Title for the dialog that edits a book title. -->
     <string name="book.edit.title">Edit book</string>
-    <!-- Snackbar message shown after creating a bookmark. -->
-    <string name="bookmark.added.snackbar">Bookmark added</string>
-    <!-- Relative timestamp for a bookmark created moments ago. -->
-    <string name="bookmark.created.just_now">Just now</string>
-    <!-- Label for a bookmark-name text field. -->
-    <string name="bookmark.edit.name.label">Bookmark name</string>
-    <!-- Title for the dialog that edits a bookmark. -->
-    <string name="bookmark.edit.title">Edit bookmark</string>
-    <!-- Title for bookmark screens and bookmark actions. -->
-    <string name="bookmark.title">Bookmark</string>
-    <!-- Tab label for the list of snips (renamed bookmarks) inside the Bookmark screen. -->
+    <!-- Tab label for the snip cards inside the Inventory. -->
     <string name="bookmark.tab.snips">Snips</string>
-    <!-- Tab label for the generated comic strips inside the Bookmark screen. -->
+    <!-- Tab label for the comic strip gallery inside the Inventory. -->
     <string name="bookmark.tab.strips">Strips</string>
-    <!-- Empty-state message on the Strips tab before any comic panels exist. -->
-    <string name="bookmark.strips.empty">Generated comic panels will show up here once Snip &amp; Synthesize is wired up.</string>
-    <!-- Label under a strip card on the Strips tab. %1$d is the chapter number. -->
+    <!-- Empty-state message on the Inventory's strip galleries when the book has no comic strips. -->
+    <string name="bookmark.strips.empty">No comic strips for this book yet.</string>
+    <!-- Tag on a strip card in the Inventory. %1$d is the chapter number. -->
     <string name="bookmark.strips.chapter">Chapter %1$d</string>
     <!-- Generic add action and content description. -->
     <string name="common.action.add">Add</string>
@@ -46,12 +36,8 @@
     <string name="common.action.close">Close</string>
     <!-- Generic delete action and content description. -->
     <string name="common.action.delete">Delete</string>
-    <!-- Generic edit action in popup menus. -->
-    <string name="common.action.edit">Edit</string>
     <!-- Content description for an overflow menu button. -->
     <string name="common.action.more">More</string>
-    <!-- Generic remove action in menus. -->
-    <string name="common.action.remove">Remove</string>
     <!-- Generic action for dismissing a dialog without applying changes. -->
     <string name="common.dialog.cancel">Cancel</string>
     <!-- Generic confirmation action in dialogs that apply a value. -->
@@ -64,8 +50,10 @@
     <string name="common.error.generic.retry">Retry</string>
     <!-- Content description for the Ask co-pilot toolbar button. -->
     <string name="copilot.action.ask">Ask</string>
-    <!-- Content description for the Catch Me Up co-pilot toolbar button. -->
-    <string name="copilot.action.catch_me_up">Catch me up</string>
+    <!-- Label of the player button that asks the AI a spoken question. -->
+    <string name="copilot.action.ask_ai">Ask AI</string>
+    <!-- Content description for the player button that has the AI recap what happened recently. -->
+    <string name="copilot.action.smart_recap">Smart Recap</string>
     <!-- Name of the Smart Recap button on the Android Auto player. -->
     <string name="copilot.action.recap">Recap</string>
     <!-- Content description for the entry point into the co-pilot Feed. -->
@@ -183,6 +171,17 @@
     </plurals>
     <!-- Title for choosing how audiobook files are structured. -->
     <string name="folder.type.title">How are your files structured?</string>
+    <!-- Content description of a snip's comic frame in the Inventory; tapping it shows the frame full screen. -->
+    <string name="inventory.snip.frame">Snip picture, tap to see it full screen</string>
+    <!-- Empty-state message on the Inventory's Snips tab. -->
+    <string name="inventory.snips.empty">No snips yet. Tap Snip while you listen and the moment lands here.</string>
+    <!-- A comic strip the listener has not reached yet. %1$d is the chapter that unlocks it. -->
+    <string name="inventory.strip.locked">Unlocks in Chapter %1$d</string>
+    <!-- Label over the bar that shows how many of the book's comic strips have been reached. -->
+    <string name="inventory.strips.collected">Strips collected</string>
+    <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
+    <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
+    <string name="inventory.title">Your Inventory</string>
     <!-- Library category header for completed books. -->
     <string name="library.category.completed.title">Completed</string>
     <!-- Library category header for books currently being listened to. -->
@@ -261,6 +260,8 @@
     <string name="playback.option.volume_boost">Volume boost</string>
     <!-- Title and content description for playback-speed controls. -->
     <string name="playback.speed.title">Playback speed</string>
+    <!-- The current playback speed on the player, e.g. "1.2×". -->
+    <string name="playback.speed.value">%1$s×</string>
     <!-- Negative button for cancelling feedback. -->
     <string name="review.feedback.action.cancel" tools:ignore="UnusedResources">Cancel</string>
     <!-- Positive button for sending feedback. -->

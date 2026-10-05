@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Cobertedda dae ìnternet</string>
     <string name="book.edit.name.label">Nùmene</string>
     <string name="book.edit.title">Modìfica su libru</string>
-    <string name="bookmark.added.snackbar">Sinnalibru annantu</string>
-    <string name="bookmark.created.just_now">Como como</string>
-    <string name="bookmark.edit.name.label">Nùmene de su sinnalibru</string>
-    <string name="bookmark.edit.title">Modìfica su sinnalibru</string>
-    <string name="bookmark.title">Sinnalibru</string>
     <string name="common.action.add">Agiunghe</string>
     <string name="common.action.close">Serra</string>
     <string name="common.action.delete">Iscantzella</string>
-    <string name="common.action.edit">Modifica</string>
     <string name="common.action.more">De prus</string>
-    <string name="common.action.remove">Boga</string>
     <string name="common.dialog.cancel">Annulla</string>
     <string name="common.dialog.confirm">Cunfigura</string>
     <string name="common.dialog.ok">OK</string>

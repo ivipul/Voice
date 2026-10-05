@@ -29,9 +29,10 @@ import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.launch
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
+import voice.core.ui.crawl.CrawlTheme
 import voice.features.playbackScreen.view.BookPlayView
-import voice.features.playbackScreen.view.holocard.HoloCardDialog
 import voice.features.playbackScreen.view.CoPilotFeedOverlay
+import voice.features.playbackScreen.view.holocard.HoloCardDialog
 import voice.features.sleepTimer.SleepTimerDialog
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
@@ -49,7 +50,6 @@ fun BookPlayScreen(bookId: BookId) {
   val viewState = viewModel.viewState()
     ?: return
   val snipSavedMessage = stringResource(StringsR.string.copilot_snip_saved_snackbar)
-  val bookmarkAddedMessage = stringResource(StringsR.string.bookmark_added_snackbar)
   val batteryOptimizationMessage = stringResource(StringsR.string.playback_battery_optimization_rationale)
   val batteryOptimizationAction = stringResource(StringsR.string.playback_battery_optimization_action)
   val microphonePermissionMessage = stringResource(StringsR.string.copilot_permission_microphone_required)
@@ -87,9 +87,6 @@ fun BookPlayScreen(bookId: BookId) {
         BookPlayViewEffect.SnipSaved -> {
           Toast.makeText(context, snipSavedMessage, Toast.LENGTH_SHORT).show()
         }
-        BookPlayViewEffect.BookmarkAdded -> {
-          snackbarHostState.showSnackbar(message = bookmarkAddedMessage)
-        }
         BookPlayViewEffect.RequestIgnoreBatteryOptimization -> {
           val result = snackbarHostState.showSnackbar(
             message = batteryOptimizationMessage,
@@ -103,79 +100,85 @@ fun BookPlayScreen(bookId: BookId) {
       }
     }
   }
-  BookPlayView(
-    viewState,
-    bookId = bookId,
-    onPlayClick = viewModel::playPause,
-    onFastForwardClick = viewModel::fastForward,
-    onRewindClick = viewModel::rewind,
-    onSeek = viewModel::seekTo,
-    onStripZoneTap = viewModel::onStripZoneTap,
-    onStripFrameClick = viewModel::onStripFrameClick,
-    onBookmarkClick = viewModel::onBookmarkClick,
-    onBookmarkLongClick = viewModel::onBookmarkLongClick,
-    onSkipSilenceClick = viewModel::toggleSkipSilence,
-    onSleepTimerClick = viewModel::toggleSleepTimer,
-    onVolumeBoostClick = viewModel::onVolumeGainIconClick,
-    onSpeedChangeClick = viewModel::onPlaybackSpeedIconClick,
-    onCloseClick = viewModel::onCloseClick,
-    onSkipToNext = viewModel::next,
-    onSkipToPrevious = viewModel::previous,
-    onCurrentChapterClick = viewModel::onCurrentChapterClick,
-    onCatchMeUpClick = viewModel::onCatchMeUpClick,
-    onAskClick = onAskClick,
-    onSnipClick = viewModel::onSnipClick,
-    onFeedClick = viewModel::onFeedClick,
-    onXRayChipClick = viewModel::onXRayChipClick,
-    useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
-    snackbarHostState = snackbarHostState,
-  )
-  if (dialogState != null) {
-    when (dialogState) {
-      is BookPlayDialogViewState.SpeedDialog -> {
-        SpeedDialog(dialogState, viewModel)
-      }
-      is BookPlayDialogViewState.VolumeGainDialog -> {
-        VolumeGainDialog(dialogState, viewModel)
-      }
-      is BookPlayDialogViewState.SelectChapterDialog -> {
-        SelectChapterDialog(dialogState, viewModel)
-      }
-      is BookPlayDialogViewState.XRayCardDialog -> {
-        HoloCardDialog(
-          dialogState = dialogState,
-          positionMs = viewModel.cardPositionMs(dialogState.openedAtMs),
-          onDismiss = viewModel::dismissDialog,
-        )
-      }
-      is BookPlayDialogViewState.SleepTimer -> {
-        SleepTimerDialog(
-          viewState = dialogState.viewState,
-          onDismiss = viewModel::dismissDialog,
-          onIncrementSleepTime = viewModel::incrementSleepTime,
-          onDecrementSleepTime = viewModel::decrementSleepTime,
-          onAcceptSleepTime = viewModel::onAcceptSleepTime,
-          onAcceptSleepAtEndOfChapter = viewModel::onAcceptSleepAtEndOfChapter,
-        )
+  CrawlTheme(edition = viewState.edition) {
+    BookPlayView(
+      viewState,
+      bookId = bookId,
+      onPlayClick = viewModel::playPause,
+      onFastForwardClick = viewModel::fastForward,
+      onRewindClick = viewModel::rewind,
+      onSkipToNext = viewModel::next,
+      onSkipToPrevious = viewModel::previous,
+      onSeek = viewModel::seekTo,
+      onStripZoneTap = viewModel::onStripZoneTap,
+      onStripFrameClick = viewModel::onStripFrameClick,
+      onCloseClick = viewModel::onCloseClick,
+      onFeedClick = viewModel::onFeedClick,
+      onSleepTimerClick = viewModel::toggleSleepTimer,
+      onSkipSilenceClick = viewModel::toggleSkipSilence,
+      onVolumeBoostClick = viewModel::onVolumeGainIconClick,
+      onCurrentChapterClick = viewModel::onCurrentChapterClick,
+      onSmartRecapClick = viewModel::onCatchMeUpClick,
+      onSpeedClick = viewModel::onPlaybackSpeedIconClick,
+      onAskClick = onAskClick,
+      onSnipClick = viewModel::onSnipClick,
+      onInventoryClick = viewModel::onBookmarkClick,
+      onXRayChipClick = viewModel::onXRayChipClick,
+      useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
+      snackbarHostState = snackbarHostState,
+    )
+    if (dialogState != null) {
+      when (dialogState) {
+        is BookPlayDialogViewState.SpeedDialog -> {
+          SpeedSheet(
+            speed = dialogState.speed,
+            edition = viewState.edition,
+            onSpeedChange = viewModel::onPlaybackSpeedChanged,
+            onDismiss = viewModel::dismissDialog,
+          )
+        }
+        is BookPlayDialogViewState.VolumeGainDialog -> {
+          VolumeGainDialog(dialogState, viewModel)
+        }
+        is BookPlayDialogViewState.SelectChapterDialog -> {
+          SelectChapterDialog(dialogState, viewModel)
+        }
+        is BookPlayDialogViewState.XRayCardDialog -> {
+          HoloCardDialog(
+            dialogState = dialogState,
+            positionMs = viewModel.cardPositionMs(dialogState.openedAtMs),
+            onDismiss = viewModel::dismissDialog,
+          )
+        }
+        is BookPlayDialogViewState.SleepTimer -> {
+          SleepTimerDialog(
+            viewState = dialogState.viewState,
+            onDismiss = viewModel::dismissDialog,
+            onIncrementSleepTime = viewModel::incrementSleepTime,
+            onDecrementSleepTime = viewModel::decrementSleepTime,
+            onAcceptSleepTime = viewModel::onAcceptSleepTime,
+            onAcceptSleepAtEndOfChapter = viewModel::onAcceptSleepAtEndOfChapter,
+          )
+        }
       }
     }
-  }
-  if (viewModel.feedVisible.value) {
-    CoPilotFeedOverlay(
-      messages = viewModel.copilotMessages(),
-      isThinking = viewModel.isThinking.value,
-      onSend = viewModel::onSendFeedMessage,
-      onDismiss = viewModel::onFeedDismiss,
-      onSeekToSnip = viewModel::onSnipTimestampClick,
-      snipLocationLabel = viewModel.snipLocationLabel(),
-    )
-  }
-  viewModel.snipSheet.value?.let { snipSheet ->
-    SnipBottomSheet(
-      state = snipSheet,
-      frame = snipSheet.frameState(viewModel.copilotMessages()),
-      onDismiss = viewModel::onSnipSheetDismiss,
-    )
+    if (viewModel.feedVisible.value) {
+      CoPilotFeedOverlay(
+        messages = viewModel.copilotMessages(),
+        isThinking = viewModel.isThinking.value,
+        onSend = viewModel::onSendFeedMessage,
+        onDismiss = viewModel::onFeedDismiss,
+        onSeekToSnip = viewModel::onSnipTimestampClick,
+        snipLocationLabel = viewModel.snipLocationLabel(),
+      )
+    }
+    viewModel.snipSheet.value?.let { snipSheet ->
+      SnipBottomSheet(
+        state = snipSheet,
+        frame = snipSheet.frameState(viewModel.copilotMessages()),
+        onDismiss = viewModel::onSnipSheetDismiss,
+      )
+    }
   }
 }
 

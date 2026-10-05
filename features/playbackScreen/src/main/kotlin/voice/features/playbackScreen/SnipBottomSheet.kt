@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import voice.features.playbackScreen.view.FRAME_ASPECT
+import voice.core.copilot.snipTextOf
 import voice.features.playbackScreen.view.HoloImageLoader
 import voice.core.strings.R as StringsR
 
@@ -80,8 +80,16 @@ internal fun SnipBottomSheet(
             }
           }
           is SnipSheetViewState.Ready -> {
+            val snip = snipTextOf(state.text)
+            snip.title?.let { title ->
+              Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+              )
+              Spacer(modifier = Modifier.size(8.dp))
+            }
             Text(
-              text = state.text,
+              text = snip.text,
               style = MaterialTheme.typography.bodyLarge,
             )
           }

@@ -1,4 +1,4 @@
-package voice.features.playbackScreen.view
+package voice.core.ui
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

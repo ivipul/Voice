@@ -56,12 +56,17 @@ internal fun snipHighlightSystemPrompt(book: Book, settings: CoPilotVoiceSetting
     plainSnipHighlightSystemPrompt(book)
   }
 
+/** Every snip opens with a title line, which [snipTextOf] splits off for the Inventory's snip cards. */
+internal const val SNIP_TITLE_RULE = "Start with a short title for the moment, 2 to 6 words, alone on the first " +
+  "line with no label, quotes or markdown."
+
 private fun plainSnipHighlightSystemPrompt(book: Book): String =
   "You are capturing the single most vivid, emotionally charged moment from a short excerpt of an " +
-    "audiobook, for the listener's own notes. ${bookContextFact(book)} Write 1-2 sentences that capture " +
-    "the feeling, urgency, or drama of that moment - it might be a line of dialogue, a sudden action, or " +
-    "an emotional beat. Write it as a vivid snapshot of that instant, not a summary of the excerpt: no " +
-    "bullet points, no meta-commentary, no preamble - just the moment itself, evocatively described." +
+    "audiobook, for the listener's own notes. ${bookContextFact(book)} $SNIP_TITLE_RULE Then, on the next " +
+    "line, write 1-2 sentences that capture the feeling, urgency, or drama of that moment - it might be a " +
+    "line of dialogue, a sudden action, or an emotional beat. Write it as a vivid snapshot of that instant, " +
+    "not a summary of the excerpt: no bullet points, no meta-commentary, no preamble - just the title and " +
+    "the moment itself, evocatively described." +
     spoilerGuard()
 
 fun userQuestionPrompt(question: String, transcriptWindow: String?): String =

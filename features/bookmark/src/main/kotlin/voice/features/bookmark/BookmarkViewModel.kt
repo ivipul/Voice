@@ -1,10 +1,8 @@
 package voice.features.bookmark
 
-import android.content.Context
-import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,75 +13,52 @@ import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import voice.core.copilot.CoPilotRepository
 import voice.core.data.BookId
-import voice.core.data.Bookmark
 import voice.core.data.Chapter
-import voice.core.data.KioskModeDemoData
-import voice.core.data.formatted
-import voice.core.data.markForPosition
-import voice.core.data.snipLocation
 import voice.core.data.repo.BookRepository
-import voice.core.data.repo.BookmarkRepo
 import voice.core.data.store.CurrentBookStore
-import voice.core.featureflag.FeatureFlag
-import voice.core.featureflag.KioskModeFeatureFlagQualifier
 import voice.core.playback.PlayerController
 import voice.core.playback.playstate.PlayStateManager
-import voice.core.strings.R
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
 import voice.core.strips.bookPositionOf
 import voice.core.strips.isUnlockedAt
-import voice.core.ui.formatTime
+import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.crawlEditionOf
 import voice.navigation.Navigator
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import kotlin.uuid.Uuid
 
 @AssistedInject
 class BookmarkViewModel(
   @CurrentBookStore
   private val currentBookStore: DataStore<BookId?>,
   private val repo: BookRepository,
-  private val bookmarkRepo: BookmarkRepo,
   private val playStateManager: PlayStateManager,
   private val playerController: PlayerController,
   private val navigator: Navigator,
-  private val context: Context,
   private val stripRepository: StripRepository,
-  @KioskModeFeatureFlagQualifier
-  private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
+  private val copilotRepository: CoPilotRepository,
   @Assisted
   private val bookId: BookId,
 ) {
 
   private val scope = MainScope()
-  private var bookmarks by mutableStateOf<List<Bookmark>>(emptyList())
   private var chapters by mutableStateOf<List<Chapter>>(emptyList())
   private var strips by mutableStateOf<List<AvailableStrip>>(emptyList())
   private var savedBookPosition by mutableStateOf(0L)
   private var unlockedStripChapters by mutableStateOf<Set<Int>>(emptySet())
   private var activeStrip by mutableStateOf<AvailableStrip?>(null)
-
-  private var shouldScrollTo by mutableStateOf<Bookmark.Id?>(null)
-  private var dialogViewState: BookmarkDialogViewState by mutableStateOf(BookmarkDialogViewState.None)
+  private var edition by mutableStateOf<CrawlEdition?>(null)
 
   @Composable
   fun viewState(): BookmarkViewState {
-    val kioskMode = remember { kioskModeFeatureFlag.get() }
-    if (kioskMode) return kioskModeViewState()
-
     LaunchedEffect(bookId) {
       val book = repo.get(bookId)
       if (book != null) {
-        bookmarks = bookmarkRepo.bookmarks(book.content)
-          .sortedByDescending { it.addedAt }
         chapters = book.chapters
         savedBookPosition = book.position
         strips = stripRepository.stripsFor(book.content.name)
+        edition = crawlEditionOf(book.content.name)
       }
     }
     val livePlayback by remember(bookId) { playerController.livePlaybackStateFlow(bookId) }
@@ -94,41 +69,14 @@ class BookmarkViewModel(
       val reached = strips.filter { it.isUnlockedAt(currentBookPosition) }.map { it.manifest.chapter }
       unlockedStripChapters = unlockedStripChapters + reached
     }
+    val messagesByBook by remember { copilotRepository.allMessagesByBook }.collectAsState()
+    val (reachedStrips, lockedStrips) = strips.partition { it.manifest.chapter in unlockedStripChapters }
     return BookmarkViewState(
-      bookmarks = bookmarks.map { bookmark ->
-        val currentChapter = chapters.single { it.id == bookmark.chapterId }
-        val bookmarkTitle = bookmark.title
-        val title: String = when {
-          bookmark.setBySleepTimer -> {
-            val justNowThreshold = 1.minutes
-            if (ChronoUnit.MILLIS.between(bookmark.addedAt, Instant.now()).milliseconds < justNowThreshold) {
-              context.getString(R.string.bookmark_created_just_now)
-            } else {
-              DateUtils.getRelativeDateTimeString(
-                context,
-                bookmark.addedAt.toEpochMilli(),
-                justNowThreshold.inWholeMilliseconds,
-                2.days.inWholeMilliseconds,
-                0,
-              ).toString()
-            }
-          }
-          !bookmarkTitle.isNullOrEmpty() -> bookmarkTitle
-          else -> currentChapter.markForPosition(bookmark.time).name ?: ""
-        }
-
-        BookmarkItemViewState(
-          title = title,
-          subtitle = chapters.snipLocation(bookmark.chapterId, bookmark.time)?.formatted()
-            ?: formatTime(bookmark.time),
-          id = bookmark.id,
-          showSleepIcon = bookmark.setBySleepTimer,
-        )
-      },
-      shouldScrollTo = shouldScrollTo,
-      dialogViewState = dialogViewState,
-      strips = strips.filter { it.manifest.chapter in unlockedStripChapters },
+      snips = messagesByBook[bookId].orEmpty().snipCards(chapters),
+      strips = reachedStrips,
+      lockedStrips = lockedStrips,
       activeStrip = activeStrip,
+      edition = edition,
     )
   }
 
@@ -140,94 +88,17 @@ class BookmarkViewModel(
     activeStrip = null
   }
 
-  private fun kioskModeViewState(): BookmarkViewState {
-    return BookmarkViewState(
-      bookmarks = KioskModeDemoData.bookmarkScreen.items.mapIndexed { index, item ->
-        BookmarkItemViewState(
-          title = item.title,
-          subtitle = item.timestamp,
-          id = Bookmark.Id(Uuid.parse("00000000-0000-0000-0000-${(index + 1).toString().padStart(12, '0')}")),
-          showSleepIcon = false,
-        )
-      },
-      shouldScrollTo = null,
-      dialogViewState = BookmarkDialogViewState.None,
-    )
-  }
-
-  fun deleteBookmark(id: Bookmark.Id) {
-    scope.launch {
-      bookmarkRepo.deleteBookmark(id)
-      bookmarks = bookmarks.filter { it.id != id }
-    }
-  }
-
-  fun selectBookmark(id: Bookmark.Id) {
-    val bookmark = bookmarks.find { it.id == id }
-      ?: return
-
+  /** Plays on from where the snip was taken, back on the player. */
+  fun onSnipClick(snip: SnipCardViewState) {
     val wasPlaying = playStateManager.playState == PlayStateManager.PlayState.Playing
-
     scope.launch {
       currentBookStore.updateData { bookId }
     }
-    playerController.setPosition(bookmark.time, bookmark.chapterId)
-
+    playerController.setPosition(snip.positionInChapterMs, snip.chapterId)
     if (wasPlaying) {
       playerController.play()
     }
-
     navigator.goBack()
-  }
-
-  fun editBookmark(
-    id: Bookmark.Id,
-    newTitle: String,
-  ) {
-    scope.launch {
-      bookmarks.find { it.id == id }?.let {
-        val withNewTitle = it.copy(
-          title = newTitle,
-          setBySleepTimer = false,
-        )
-        bookmarkRepo.addBookmark(withNewTitle)
-        val index = bookmarks.indexOfFirst { bookmarkId -> bookmarkId.id == id }
-        bookmarks = bookmarks.toMutableList().apply {
-          this[index] = withNewTitle
-        }
-      }
-    }
-  }
-
-  fun addBookmark(name: String) {
-    scope.launch {
-      val book = repo.get(bookId) ?: return@launch
-      val newBookmark = bookmarkRepo.addBookmarkAtBookPosition(
-        book = book,
-        title = name,
-        setBySleepTimer = false,
-      )
-      bookmarks = (bookmarks + newBookmark)
-        .sortedByDescending { it.addedAt }
-      shouldScrollTo = newBookmark.id
-    }
-  }
-
-  fun onScrollConfirm() {
-    shouldScrollTo = null
-  }
-
-  fun closeDialog() {
-    dialogViewState = BookmarkDialogViewState.None
-  }
-
-  fun onAddClick() {
-    dialogViewState = BookmarkDialogViewState.AddBookmark
-  }
-
-  fun onEditClick(id: Bookmark.Id) {
-    val bookmark = bookmarks.find { it.id == id } ?: return
-    dialogViewState = BookmarkDialogViewState.EditBookmark(id, bookmark.title)
   }
 
   fun closeScreen() {

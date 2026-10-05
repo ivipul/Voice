@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">Obal z internetu</string>
     <string name="book.edit.name.label">Název</string>
     <string name="book.edit.title">Upravit knihu</string>
-    <string name="bookmark.added.snackbar">Záložka přidána</string>
-    <string name="bookmark.created.just_now">Právě teď</string>
-    <string name="bookmark.edit.name.label">Název záložky</string>
-    <string name="bookmark.edit.title">Upravit záložku</string>
-    <string name="bookmark.title">Záložka</string>
     <string name="common.action.add">Přidat</string>
     <string name="common.action.close">Zavřít</string>
     <string name="common.action.delete">Odstranit</string>
-    <string name="common.action.edit">Upravit</string>
     <string name="common.action.more">Více</string>
-    <string name="common.action.remove">Smazat</string>
     <string name="common.dialog.cancel">Ukončit</string>
     <string name="common.dialog.confirm">Nastavit</string>
     <string name="common.dialog.ok">OK</string>

@@ -1,13 +1,12 @@
 package voice.features.playbackScreen.view
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -25,19 +24,21 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import voice.core.strings.R
+import voice.core.ui.crawl.CrawlType
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * A circular "skip N seconds" control (the familiar podcast-app rewind/forward icon): a
  * near-full circle with a gap and an arrowhead showing the direction, and the actual seek
- * amount overlaid in the center rather than a plain static icon.
+ * amount overlaid in the center rather than a plain static icon. A long press skips a whole chapter.
  */
 @Composable
 internal fun SkipButton(
   forward: Boolean,
   seconds: Int,
   onClick: () -> Unit,
+  onLongClick: () -> Unit,
 ) {
   val color = LocalContentColor.current
   val contentDescription = stringResource(
@@ -46,9 +47,13 @@ internal fun SkipButton(
   Box(
     modifier = Modifier
       .semantics { this.contentDescription = contentDescription }
-      .clickable(
+      .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = ripple(bounded = false),
+        onLongClickLabel = stringResource(
+          id = if (forward) R.string.playback_chapter_next else R.string.playback_chapter_previous,
+        ),
+        onLongClick = onLongClick,
         onClick = onClick,
       )
       .size(48.dp),
@@ -116,7 +121,7 @@ internal fun SkipButton(
     }
     Text(
       text = seconds.toString(),
-      style = MaterialTheme.typography.labelSmall,
+      style = CrawlType.digits,
       color = color,
     )
   }

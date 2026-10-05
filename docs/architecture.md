@@ -70,7 +70,7 @@ data and services:
 * `:features:folderPicker` – Folder selection flow
 * `:features:cover` – Cover art management
 * `:features:onboarding` – First-time user flow
-* `:features:bookmark` – Bookmark management
+* `:features:bookmark` – The Inventory: snips and comic strips
 * `:features:widget` – Homescreen widget support
 * `:features:review:play` & `:features:review:noop` – App review prompts
 

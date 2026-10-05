@@ -1,8 +1,8 @@
 package voice.features.playbackScreen
 
 import voice.core.copilot.CoPilotMessage
+import voice.core.ui.FRAME_ASPECT
 import kotlin.test.Test
-import voice.features.playbackScreen.view.FRAME_ASPECT
 import kotlin.test.assertEquals
 
 class SnipSheetViewStateTest {

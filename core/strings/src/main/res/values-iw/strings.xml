@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">עטיפות מהאינטרנט</string>
     <string name="book.edit.name.label">שם</string>
     <string name="book.edit.title">ערוך ספר</string>
-    <string name="bookmark.added.snackbar">סימנייה נוספה</string>
-    <string name="bookmark.created.just_now">ממש עכשיו</string>
-    <string name="bookmark.edit.name.label">שם הסימנייה</string>
-    <string name="bookmark.edit.title">ערוך סימנייה</string>
-    <string name="bookmark.title">סימנייה</string>
     <string name="common.action.add">הוסף</string>
     <string name="common.action.close">סגור</string>
     <string name="common.action.delete">הסר</string>
-    <string name="common.action.edit">ערוך</string>
     <string name="common.action.more">עוד</string>
-    <string name="common.action.remove">מחק</string>
     <string name="common.dialog.cancel">ביטול</string>
     <string name="common.dialog.confirm">אישור</string>
     <string name="common.dialog.ok">אישור</string>

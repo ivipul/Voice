@@ -35,17 +35,23 @@
  */
 package voice.app
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.PathEasing
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.Density
@@ -113,6 +119,36 @@ val SharedZAxisExitTransition =
       transformOrigin = TransformOrigin(0.5f, 1f),
       animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing),
     )
+
+/** The Inventory rises from the bottom edge over the player, which holds still under it until it is covered. */
+internal fun inventoryOpenTransition(): ContentTransform =
+  slideInVertically(animationSpec = tween(durationMillis = DurationLong2, easing = EmphasizedEasing)) { it } togetherWith
+    fadeOut(animationSpec = snap(delayMillis = DurationLong2))
+
+/**
+ * Library to player: the book's card grows into the player over the library, which holds still under it. Both screens
+ * render the growing card as shared bounds, so this only covers what they leave out, like the grid's covers.
+ */
+internal fun bookCardOpenTransition(): ContentTransform =
+  fadeIn(animationSpec = tween(durationMillis = DurationLong1, easing = EmphasizedEasing)) togetherWith
+    fadeOut(animationSpec = snap(delayMillis = DurationLong2))
+
+/** Player to library: the player shrinks back into its card over the library, which is already in place. */
+internal fun bookCardCloseTransition(): ContentTransform =
+  EnterTransition.None togetherWith
+    fadeOut(animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing))
+
+/** Back from the Inventory: it sinks to the bottom edge and uncovers the player. */
+internal fun AnimatedContentTransitionScope<Scene<Destination.Compose>>.popTransition(): ContentTransform {
+  return if (initialState.destination() is Destination.Bookmarks) {
+    EnterTransition.None togetherWith
+      slideOutVertically(animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing)) { it }
+  } else if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
+    bookCardCloseTransition()
+  } else {
+    SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
+  }
+}
 
 internal fun Scene<Destination.Compose>.destination(): Destination.Compose? {
   return entries.lastOrNull()?.metadata?.get(DestinationMetadataKey)

@@ -13,14 +13,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import voice.core.copilot.CoPilotRepository
 import voice.core.data.Book
 import voice.core.data.BookContent
 import voice.core.data.BookId
 import voice.core.data.Chapter
 import voice.core.data.ChapterId
 import voice.core.data.repo.BookRepository
-import voice.core.data.repo.BookmarkRepo
-import voice.core.featureflag.FeatureFlag
 import voice.core.playback.LivePlaybackState
 import voice.core.playback.PlayerController
 import voice.core.playback.playstate.PlayStateManager
@@ -29,7 +28,6 @@ import voice.core.strips.StripFrame
 import voice.core.strips.StripManifest
 import voice.core.strips.StripRepository
 import voice.navigation.Navigator
-import android.content.Context
 import java.io.File
 import java.time.Instant
 import kotlin.test.AfterTest
@@ -76,22 +74,18 @@ class BookmarkStripUnlockTest {
 
   private fun viewModel(): BookmarkViewModel {
     val repo = mockk<BookRepository> { coEvery { get(bookId) } returns book }
-    val bookmarkRepo = mockk<BookmarkRepo> { coEvery { bookmarks(any()) } returns emptyList() }
     val stripRepository = mockk<StripRepository> { coEvery { stripsFor(any()) } returns listOf(strip) }
     val playerController = mockk<PlayerController>(relaxed = true) {
       every { livePlaybackStateFlow(bookId) } returns live
     }
-    val kioskFlag = mockk<FeatureFlag<Boolean>> { every { get() } returns false }
     return BookmarkViewModel(
       currentBookStore = mockk<DataStore<BookId?>>(relaxed = true),
       repo = repo,
-      bookmarkRepo = bookmarkRepo,
       playStateManager = mockk<PlayStateManager>(relaxed = true),
       playerController = playerController,
       navigator = mockk<Navigator>(relaxed = true),
-      context = mockk<Context>(relaxed = true),
       stripRepository = stripRepository,
-      kioskModeFeatureFlag = kioskFlag,
+      copilotRepository = CoPilotRepository(),
       bookId = bookId,
     )
   }
@@ -101,12 +95,15 @@ class BookmarkStripUnlockTest {
     val viewModel = viewModel()
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       assertTrue(awaitItem().strips.isEmpty())
+      assertEquals(listOf(1), awaitUntil { it.lockedStrips.isNotEmpty() }.lockedStrips.map { it.manifest.chapter })
 
       live.value = LivePlaybackState(bookId, first.id, positionMs = 2_999L, isPlaying = true, playbackSpeed = 1f)
       expectNoEvents()
 
       live.value = LivePlaybackState(bookId, first.id, positionMs = 3_000L, isPlaying = true, playbackSpeed = 1f)
-      assertEquals(listOf(1), awaitUntil { it.strips.isNotEmpty() }.strips.map { it.manifest.chapter })
+      val unlocked = awaitUntil { it.strips.isNotEmpty() }
+      assertEquals(listOf(1), unlocked.strips.map { it.manifest.chapter })
+      assertTrue(unlocked.lockedStrips.isEmpty())
       cancelAndIgnoreRemainingEvents()
     }
   }

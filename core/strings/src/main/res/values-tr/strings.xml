@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">İnternetten kitap kapağı</string>
     <string name="book.edit.name.label">Ad</string>
     <string name="book.edit.title">Kitabı düzenle</string>
-    <string name="bookmark.added.snackbar">Yer imi eklendi</string>
-    <string name="bookmark.created.just_now">Şimdi</string>
-    <string name="bookmark.edit.name.label">Yer imi adı</string>
-    <string name="bookmark.edit.title">Yer imini düzenle</string>
-    <string name="bookmark.title">Yer imi</string>
     <string name="common.action.add">Ekle</string>
     <string name="common.action.close">Kapat</string>
     <string name="common.action.delete">Sil</string>
-    <string name="common.action.edit">Düzenle</string>
     <string name="common.action.more">Daha fazla</string>
-    <string name="common.action.remove">Kaldır</string>
     <string name="common.dialog.cancel">İptal</string>
     <string name="common.dialog.confirm">Kur</string>
     <string name="common.dialog.ok">Tamam</string>

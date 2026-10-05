@@ -11,17 +11,10 @@
     <string name="book.edit.cover.internet">دریافت کاور از طریق اینترنت</string>
     <string name="book.edit.name.label">نام</string>
     <string name="book.edit.title">ویرایش کتاب</string>
-    <string name="bookmark.added.snackbar">نشانه‌گذاری انجام شد</string>
-    <string name="bookmark.created.just_now">همین الان</string>
-    <string name="bookmark.edit.name.label">نام گذاری نشانه</string>
-    <string name="bookmark.edit.title">ویرایش نشانه</string>
-    <string name="bookmark.title">نشان‌گذاری</string>
     <string name="common.action.add">اضافه کردن</string>
     <string name="common.action.close">بستن</string>
     <string name="common.action.delete">پاک کردن</string>
-    <string name="common.action.edit">ویرایش</string>
     <string name="common.action.more">گزینه های بیشتر</string>
-    <string name="common.action.remove">حذف</string>
     <string name="common.dialog.cancel">لغو</string>
     <string name="common.dialog.confirm">انتخاب</string>
     <string name="common.dialog.ok">باشه</string>
