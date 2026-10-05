@@ -16,7 +16,6 @@ data class BookmarkViewState(
   val strips: List<AvailableStrip> = emptyList(),
   /** The strips still ahead, which show only as locked slots: no picture and no title. */
   val lockedStrips: List<AvailableStrip> = emptyList(),
-  val activeStrip: AvailableStrip? = null,
   /** The series book this is, whose colors the screen takes; null for any other book. */
   val edition: CrawlEdition? = null,
 )

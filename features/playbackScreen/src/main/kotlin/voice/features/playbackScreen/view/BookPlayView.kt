@@ -18,6 +18,7 @@ import voice.core.ui.VoiceTheme
 import voice.core.ui.bookCardBackdropModifier
 import voice.core.ui.bookCardContentModifier
 import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.features.playbackScreen.BookPlayViewState
@@ -47,8 +48,8 @@ internal fun BookPlayView(
   onSpeedClick: () -> Unit,
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
-  onInventoryClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
+  inventoryContent: InventoryContent,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
   val palette = crawlPaletteOf(viewState.edition)
@@ -96,10 +97,15 @@ internal fun BookPlayView(
           onSpeedClick = onSpeedClick,
           onAskClick = onAskClick,
           onSnipClick = onSnipClick,
-          onInventoryClick = onInventoryClick,
           onXRayChipClick = onXRayChipClick,
         )
       },
+    )
+    InventorySheet(
+      bookId = bookId,
+      count = viewState.inventoryCount,
+      palette = palette,
+      inventoryContent = inventoryContent,
     )
   }
 }
@@ -134,8 +140,8 @@ private fun BookPlayPreview(
         onSpeedClick = {},
         onAskClick = {},
         onSnipClick = {},
-        onInventoryClick = {},
         onXRayChipClick = {},
+        inventoryContent = PreviewInventoryContent,
       )
     }
   }
@@ -177,4 +183,13 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
     )
     yield(initial.copy(title = "Das Ende der Welt", edition = null, xrayChips = emptyList()))
   }
+}
+
+private object PreviewInventoryContent : InventoryContent {
+  @Composable
+  override fun Content(
+    bookId: BookId,
+    onClose: () -> Unit,
+    modifier: Modifier,
+  ) = Unit
 }
