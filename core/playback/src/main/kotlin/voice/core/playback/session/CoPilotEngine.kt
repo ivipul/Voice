@@ -154,6 +154,22 @@ class CoPilotEngine(
     }
   }
 
+  private val waitingLoop = WaitingLoop(ExoWaitingLoopPlayback(context, mainHandler))
+  private val waitingLoopRunning get() = waitingLoop.isRunning
+
+  // Posted, never called inline, so a start queued by the flow can't run after a later stop.
+  private fun startWaitingLoop() {
+    mark("waiting loop start")
+    mainHandler.post { waitingLoop.start() }
+  }
+
+  private fun stopWaitingLoop(fade: Boolean) {
+    mainHandler.post {
+      if (waitingLoopRunning) mark(if (fade) "waiting loop fade-out" else "waiting loop stop")
+      if (fade) waitingLoop.stopWithFade() else waitingLoop.stopNow()
+    }
+  }
+
   private fun playCue(soundId: Int) {
     if (soundId in loadedSoundIds) {
       soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
@@ -185,6 +201,7 @@ class CoPilotEngine(
           finish(onFinished)
           return@launch
         }
+        if (mode != CoPilotMode.OpenMic) startWaitingLoop()
         when (mode) {
           CoPilotMode.OpenMic -> {
             val heard = listenForQuestion(bookId)
@@ -192,6 +209,7 @@ class CoPilotEngine(
               finish(onFinished)
               return@launch
             }
+            startWaitingLoop()
             speakAnswer(
               deltas = copilotPipeline.askStream(bookId, heard),
               nonStreaming = { copilotPipeline.ask(bookId, heard) },
@@ -274,6 +292,7 @@ class CoPilotEngine(
   }
 
   private fun finish(onFinished: () -> Unit) {
+    stopWaitingLoop(fade = false)
     isActive = false
     abandonAudioFocus()
     onFinished()
@@ -320,6 +339,7 @@ class CoPilotEngine(
     textToSpeech?.shutdown()
     textToSpeech = null
     speakGeneration++
+    stopWaitingLoop(fade = false)
     releaseFishPlayer()
     abandonAudioFocus()
   }
@@ -599,6 +619,7 @@ class CoPilotEngine(
           if (state == Player.STATE_READY && !logged) {
             logged = true
             mark("first audio playing")
+            stopWaitingLoop(fade = true)
           }
           if (state == Player.STATE_ENDED && fishAllQueued) finished.complete(true)
         }
@@ -652,6 +673,7 @@ class CoPilotEngine(
           object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
               Logger.d("CoPilotEngine: TTS onStart")
+              stopWaitingLoop(fade = true)
             }
 
             override fun onDone(utteranceId: String?) {
