@@ -6,23 +6,30 @@ import kotlin.test.assertEquals
 class CardTiltTest {
 
   @Test
-  fun scrollingDownLeansTheCardsForward() {
-    assertEquals(5F, cardTilt(scrolledPx = -20F))
+  fun evenASlowScrollDownLeansTheCardsForward() {
+    assertEquals(7.5F, cardTilt(speedPx = -1F))
   }
 
   @Test
   fun scrollingUpLeansTheCardsBack() {
-    assertEquals(-5F, cardTilt(scrolledPx = 20F))
+    assertEquals(-12F, cardTilt(speedPx = 10F))
   }
 
   @Test
-  fun aFastFlingLeansThemNoFurtherThanTenDegrees() {
-    assertEquals(10F, cardTilt(scrolledPx = -400F))
-    assertEquals(-10F, cardTilt(scrolledPx = 400F))
+  fun aFastFlingLeansThemNoFurtherThan14Degrees() {
+    assertEquals(14F, cardTilt(speedPx = -400F))
+    assertEquals(-14F, cardTilt(speedPx = 400F))
   }
 
   @Test
   fun aStillListStandsTheCardsUpright() {
-    assertEquals(0F, cardTilt(scrolledPx = 0F))
+    assertEquals(0F, cardTilt(speedPx = 0F))
+    assertEquals(0F, cardTilt(speedPx = -0.2F))
+  }
+
+  @Test
+  fun eachFrameMovesTheSpeedAFifthOfTheWay() {
+    assertEquals(4F, smoothedScrollSpeed(previous = 0F, scrolledPx = 20F))
+    assertEquals(-8F, smoothedScrollSpeed(previous = -10F, scrolledPx = 0F))
   }
 }
