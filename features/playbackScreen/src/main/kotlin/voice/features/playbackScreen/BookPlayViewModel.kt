@@ -12,6 +12,8 @@ import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -129,6 +131,12 @@ class BookPlayViewModel(
 
   internal val isThinking: State<Boolean>
     field = mutableStateOf(false)
+
+  internal val chatInput: State<ChatInputViewState>
+    field = mutableStateOf(ChatInputViewState())
+
+  private var dictationJob: Job? = null
+  private var autoSendJob: Job? = null
 
   internal val snipSheet: State<SnipSheetViewState?>
     field = mutableStateOf<SnipSheetViewState?>(null)
@@ -490,22 +498,87 @@ class BookPlayViewModel(
   }
 
   fun onFeedDismiss() {
+    stopDictation()
+    cancelAutoSend()
     feedVisible.value = false
   }
 
-  fun onSendFeedMessage(text: String) {
-    runCoPilotExchange(userText = text) { copilotPipeline.ask(bookId, text) }
+  /** The player's Ask button: opens the chat already listening. Needs the microphone permission. */
+  fun onAskClick() {
+    feedVisible.value = true
+    startDictation()
   }
 
-  fun onAskClick() {
-    scope.launch {
-      val question = speechInputController.listen().getOrElse { error ->
-        Logger.w("Speech capture failed: ${error.message}")
-        return@launch
+  /** Toggles the microphone. Starting it needs the microphone permission. */
+  fun onChatMicClick() {
+    if (chatInput.value.isListening) stopDictation() else startDictation()
+  }
+
+  /** Touching the text box means the user wants to type: the mic and any pending send stop. */
+  fun onChatInputTap() {
+    stopDictation()
+    cancelAutoSend()
+  }
+
+  fun onChatInputChange(text: String) {
+    stopDictation()
+    cancelAutoSend()
+    chatInput.value = chatInput.value.copy(text = text)
+  }
+
+  fun onChatAutoSendCancel() {
+    cancelAutoSend()
+  }
+
+  fun onChatSend() {
+    val question = chatInput.value.text.trim()
+    if (question.isEmpty() || isThinking.value) return
+    stopDictation()
+    cancelAutoSend()
+    chatInput.value = ChatInputViewState()
+    runCoPilotExchange(userText = question) { copilotPipeline.ask(bookId, question) }
+  }
+
+  private fun startDictation() {
+    if (isThinking.value) return
+    stopDictation()
+    cancelAutoSend()
+    val typedBefore = chatInput.value.text.trim()
+    chatInput.value = chatInput.value.copy(isListening = true)
+    dictationJob = scope.launch {
+      var heard = false
+      speechInputController.dictate().collect { event ->
+        heard = true
+        val text = if (typedBefore.isEmpty()) event.text else "$typedBefore ${event.text}"
+        chatInput.value = chatInput.value.copy(text = text)
       }
-      feedVisible.value = true
-      runCoPilotExchange(userText = question) { copilotPipeline.ask(bookId, question) }
+      // Only reached when the recognizer stopped listening by itself; a tap cancels this job instead.
+      dictationJob = null
+      chatInput.value = chatInput.value.copy(isListening = false)
+      if (heard) startAutoSend()
     }
+  }
+
+  private fun stopDictation() {
+    dictationJob?.cancel()
+    dictationJob = null
+    if (chatInput.value.isListening) chatInput.value = chatInput.value.copy(isListening = false)
+  }
+
+  private fun startAutoSend() {
+    chatInput.value = chatInput.value.copy(autoSendPending = true)
+    autoSendJob = scope.launch {
+      delay(ChatInputViewState.AUTO_SEND_DELAY_MS)
+      autoSendJob = null
+      chatInput.value = chatInput.value.copy(autoSendPending = false)
+      onChatSend()
+    }
+  }
+
+  private fun cancelAutoSend() {
+    autoSendJob?.cancel()
+    autoSendJob = null
+    if (chatInput.value.autoSendPending) chatInput.value = chatInput.value.copy(autoSendPending = false)
   }
 
   fun onCatchMeUpClick() {

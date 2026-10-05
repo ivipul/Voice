@@ -57,7 +57,7 @@
     <!-- Name of the Smart Recap button on the Android Auto player. -->
     <string name="copilot.action.recap">Recap</string>
     <!-- Content description for the entry point into the co-pilot Feed. -->
-    <string name="copilot.action.feed">Feed</string>
+    <string name="copilot.action.feed">System AI chat</string>
     <!-- Content description for the Snip &amp; Synthesize co-pilot toolbar button. -->
     <string name="copilot.action.snip">Snip</string>
     <!-- Toast shown when Snip &amp; Synthesize starts capturing a moment. -->
@@ -76,10 +76,16 @@
     <string name="copilot.feed.input.placeholder">Ask a follow-up question…</string>
     <!-- Content description for sending a typed co-pilot question. -->
     <string name="copilot.feed.input.send">Send</string>
+    <!-- Content description for the X that stops a dictated co-pilot question from sending itself. -->
+    <string name="copilot.feed.input.cancel_send">Cancel sending</string>
+    <!-- Content description for the chat's microphone button while it is off. -->
+    <string name="copilot.feed.mic.start">Start listening</string>
+    <!-- Content description for the chat's microphone button while it is listening. -->
+    <string name="copilot.feed.mic.stop">Stop listening</string>
     <!-- Empty-state message shown before any co-pilot questions have been asked. -->
     <string name="copilot.feed.empty">Ask about the story with the mic button on the player, or type a question below.</string>
     <!-- Title shown at the top of the co-pilot Feed overlay. -->
-    <string name="copilot.feed.title">Feed</string>
+    <string name="copilot.feed.title">System AI chat</string>
     <!-- Content description for closing the co-pilot Feed overlay. -->
     <string name="copilot.feed.close">Close</string>
     <!-- Shown over the empty comic-frame placeholder while a Snip's image is being drawn. -->
