@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +28,9 @@ internal fun DeckButton(
   contentColor: Color,
   shadowColor: Color,
   modifier: Modifier = Modifier,
+  palette: CrawlPalette? = null,
 ) {
+  val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
       .size(FabSize)
@@ -45,6 +48,14 @@ internal fun DeckButton(
     )
   }
 }
+
+@Composable
+private fun flatElevation() = FloatingActionButtonDefaults.elevation(
+  defaultElevation = 0.dp,
+  pressedElevation = 0.dp,
+  focusedElevation = 0.dp,
+  hoveredElevation = 0.dp,
+)
 
 /** Two cards, the second peeking out behind the first. */
 private val DeckIcon: ImageVector = ImageVector.Builder(

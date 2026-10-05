@@ -194,6 +194,8 @@
     <string name="deck.locked">Meet in Book %1$d</string>
     <!-- Empty-state message on The Deck when no book has card data. -->
     <string name="deck.empty">No crawler cards yet. They show up here once a book with card data is in your library.</string>
+    <!-- Bold title at the top of the library. -->
+    <string name="library.title">The Crawl</string>
     <!-- Library category header for completed books. -->
     <string name="library.category.completed.title">Completed</string>
     <!-- Library category header for books currently being listened to. -->

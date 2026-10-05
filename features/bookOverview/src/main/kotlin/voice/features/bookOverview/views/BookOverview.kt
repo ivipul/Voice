@@ -208,6 +208,7 @@ internal fun BookOverview(
           contentColor = palette.highlight,
           hardShadowColor = Color.White,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
+          palette = viewState.activeEdition?.palette,
         )
       }
     },

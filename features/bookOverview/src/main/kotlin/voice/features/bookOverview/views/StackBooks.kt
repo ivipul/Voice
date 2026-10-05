@@ -156,7 +156,7 @@ internal fun StackBooks(
   LazyColumn(
     state = listState,
     modifier = Modifier.nestedScroll(scrollTilt),
-    contentPadding = PaddingValues(top = 16.dp, start = 12.dp, end = 12.dp),
+    contentPadding = PaddingValues(top = 24.dp, start = 12.dp, end = 12.dp),
   ) {
     if (showPermissionBugCard) {
       item {

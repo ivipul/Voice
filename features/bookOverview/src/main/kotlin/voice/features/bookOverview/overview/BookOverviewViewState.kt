@@ -21,6 +21,8 @@ data class BookOverviewViewState(
   val showStoragePermissionBugCard: Boolean,
   val showFolderPickerIcon: Boolean,
   val dialog: Dialog?,
+  /** The series book that is the current one, whose colors the play and Deck buttons take; null for any other book. */
+  val activeEdition: CrawlEdition? = null,
 ) {
 
   companion object {
