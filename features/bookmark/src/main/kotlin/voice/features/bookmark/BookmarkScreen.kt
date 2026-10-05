@@ -34,7 +34,6 @@ import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.strips.StripGallery
-import voice.features.bookmark.strips.StripGalleryLayout
 import voice.features.bookmark.strips.StripViewer
 import voice.features.bookmark.strips.StripViewerViewModel
 import voice.navigation.Destination
@@ -45,9 +44,6 @@ import voice.core.strings.R as StringsR
 private enum class InventoryTab(val labelRes: Int) {
   Snips(StringsR.string.bookmark_tab_snips),
   Strips(StringsR.string.bookmark_tab_strips),
-
-  // The strips again, one per row, while the two gallery layouts are compared.
-  Issues(StringsR.string.inventory_tab_issues),
 }
 
 @ContributesTo(AppScope::class)
@@ -166,14 +162,6 @@ internal fun BookmarkScreen(
         InventoryTab.Strips -> StripGallery(
           strips = viewState.strips,
           lockedStrips = viewState.lockedStrips,
-          layout = StripGalleryLayout.Grid,
-          palette = palette,
-          onClick = onStripClick,
-        )
-        InventoryTab.Issues -> StripGallery(
-          strips = viewState.strips,
-          lockedStrips = viewState.lockedStrips,
-          layout = StripGalleryLayout.Issues,
           palette = palette,
           onClick = onStripClick,
         )

@@ -45,28 +45,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import voice.core.strips.AvailableStrip
-import voice.core.ui.crawl.CrawlFonts
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.crawl.hardShadow
 import voice.core.strings.R as StringsR
-
-/** The two ways to lay out the unlocked strips, side by side until one of them stays. */
-internal enum class StripGalleryLayout {
-  /** Two columns of tilted comic cards. */
-  Grid,
-
-  /** One big card per row, like a stack of comic issues. */
-  Issues,
-}
 
 /** A strip's place in the gallery: reached, so it shows, or still ahead, so only its slot does. */
 internal sealed interface StripSlot {
@@ -85,28 +72,17 @@ internal fun stripSlots(
   .sortedBy { it.strip.manifest.chapter }
 
 private const val DEFAULT_COVER_ASPECT = 9F / 16F
-
-// An issue's picture is cut to a comic cover's 2:3 when it is taller, so one card stays about a screen high.
-private const val ISSUE_MIN_ASPECT = 2F / 3F
-private const val LOCKED_ISSUE_ASPECT = 2.4F
 private val CardShape = RoundedCornerShape(16.dp)
 private val GridTilts = listOf(-1.6F, 1.2F, -0.8F, 1.6F, -1.2F, 0.9F)
-private val IssueTitle = TextStyle(
-  fontFamily = CrawlFonts.BigShouldersDisplay,
-  fontWeight = FontWeight.SemiBold,
-  fontSize = 26.sp,
-  lineHeight = 28.sp,
-)
 
 /**
- * Every strip of the book as a collection: a bar with how many are collected, then the reached strips as comic cards
- * with their chapter, and the ones still ahead as locked slots that give nothing away.
+ * Every strip of the book as a collection: a bar with how many are collected, then two columns of tilted comic cards
+ * for the reached strips, with their chapter, and locked slots that give nothing away for the ones still ahead.
  */
 @Composable
 internal fun StripGallery(
   strips: List<AvailableStrip>,
   lockedStrips: List<AvailableStrip>,
-  layout: StripGalleryLayout,
   palette: CrawlPalette,
   onClick: (AvailableStrip) -> Unit,
   modifier: Modifier = Modifier,
@@ -128,28 +104,26 @@ internal fun StripGallery(
     return
   }
   LazyVerticalStaggeredGrid(
-    columns = StaggeredGridCells.Fixed(if (layout == StripGalleryLayout.Grid) 2 else 1),
+    columns = StaggeredGridCells.Fixed(2),
     modifier = modifier.fillMaxSize(),
     contentPadding = PaddingValues(start = 20.dp, top = 16.dp, end = 20.dp, bottom = 32.dp),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
-    verticalItemSpacing = if (layout == StripGalleryLayout.Grid) 20.dp else 28.dp,
+    verticalItemSpacing = 20.dp,
   ) {
     item(key = "collected", span = StaggeredGridItemSpan.FullLine) {
       CollectionBar(collected = strips.size, total = slots.size, palette = palette)
     }
     items(slots, key = { it.strip.manifest.chapter }) { slot ->
-      val tilt = GridTilts[slot.strip.manifest.chapter % GridTilts.size] * if (layout == StripGalleryLayout.Grid) 1F else 0.5F
+      val tilt = GridTilts[slot.strip.manifest.chapter % GridTilts.size]
       when (slot) {
         is StripSlot.Unlocked -> StripCard(
           strip = slot.strip,
-          layout = layout,
           palette = palette,
           onClick = { onClick(slot.strip) },
           modifier = Modifier.graphicsLayer { rotationZ = tilt },
         )
         is StripSlot.Locked -> LockedSlot(
           strip = slot.strip,
-          layout = layout,
           palette = palette,
           modifier = Modifier.graphicsLayer { rotationZ = tilt },
         )
@@ -201,7 +175,6 @@ private fun CollectionBar(
 @Composable
 private fun StripCard(
   strip: AvailableStrip,
-  layout: StripGalleryLayout,
   palette: CrawlPalette,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
@@ -224,7 +197,7 @@ private fun StripCard(
         alignment = Alignment.TopCenter,
         modifier = Modifier
           .fillMaxWidth()
-          .aspectRatio(if (layout == StripGalleryLayout.Issues) maxOf(aspect, ISSUE_MIN_ASPECT) else aspect),
+          .aspectRatio(aspect),
       )
       ChapterTag(
         chapter = strip.manifest.chapter,
@@ -234,33 +207,14 @@ private fun StripCard(
           .padding(10.dp),
       )
     }
-    when (layout) {
-      StripGalleryLayout.Grid -> Text(
-        text = strip.manifest.title.uppercase(),
-        style = CrawlType.chip,
-        color = palette.content,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-      )
-      StripGalleryLayout.Issues -> Column(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-      ) {
-        Text(
-          text = strip.manifest.title,
-          style = IssueTitle,
-          color = palette.content,
-        )
-        Text(
-          text = strip.manifest.summary,
-          style = MaterialTheme.typography.bodyMedium,
-          color = palette.content.copy(alpha = 0.8F),
-          maxLines = 3,
-          overflow = TextOverflow.Ellipsis,
-        )
-      }
-    }
+    Text(
+      text = strip.manifest.title.uppercase(),
+      style = CrawlType.chip,
+      color = palette.content,
+      maxLines = 2,
+      overflow = TextOverflow.Ellipsis,
+      modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+    )
   }
 }
 
@@ -268,11 +222,10 @@ private fun StripCard(
 @Composable
 private fun LockedSlot(
   strip: AvailableStrip,
-  layout: StripGalleryLayout,
   palette: CrawlPalette,
   modifier: Modifier = Modifier,
 ) {
-  val aspect = if (layout == StripGalleryLayout.Issues) LOCKED_ISSUE_ASPECT else strip.coverAspect ?: DEFAULT_COVER_ASPECT
+  val aspect = strip.coverAspect ?: DEFAULT_COVER_ASPECT
   val faded = palette.content.copy(alpha = 0.6F)
   Column(
     modifier = modifier

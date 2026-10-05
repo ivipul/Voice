@@ -180,7 +180,6 @@
     <!-- Label over the bar that shows how many of the book's comic strips have been reached. -->
     <string name="inventory.strips.collected">Strips collected</string>
     <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
-    <string name="inventory.tab.issues">Issues</string>
     <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
     <string name="inventory.title">Your Inventory</string>
     <!-- Library category header for completed books. -->
