@@ -46,6 +46,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -58,7 +59,11 @@ import voice.core.ui.icons.VoiceIcons
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-internal val InventoryPeekHeight = 60.dp
+private val InventoryCardHeight = 60.dp
+private val InventoryBottomTrim = 8.dp
+
+/** How much of the bottom edge the collapsed card takes: its row, plus the navigation bar less a little trimmed padding. */
+internal fun inventoryPeekHeight(navigationBar: Dp): Dp = InventoryCardHeight + (navigationBar - InventoryBottomTrim).coerceAtLeast(0.dp)
 private val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
 private val SheetTopGap = 12.dp
 private val CollapsedMargin = 8.dp
@@ -99,7 +104,7 @@ internal fun InventorySheet(
 
   BoxWithConstraints(modifier = modifier.fillMaxSize()) {
     val sheetHeight = maxHeight - statusBar - SheetTopGap
-    val peekPx = with(density) { (InventoryPeekHeight + navigationBar).toPx() }
+    val peekPx = with(density) { inventoryPeekHeight(navigationBar).toPx() }
     val rangePx = (with(density) { sheetHeight.toPx() } - peekPx).coerceAtLeast(1F)
     var dragStartProgress by remember { mutableFloatStateOf(0F) }
     val dragState = rememberDraggableState { delta ->
@@ -178,7 +183,7 @@ private fun InventoryHeader(
   Box(
     modifier = modifier
       .fillMaxWidth()
-      .height(InventoryPeekHeight),
+      .height(InventoryCardHeight),
   ) {
     Box(
       modifier = Modifier

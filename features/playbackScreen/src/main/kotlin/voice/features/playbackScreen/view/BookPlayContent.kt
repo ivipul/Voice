@@ -107,7 +107,7 @@ internal fun BookPlayContent(
   // The Inventory sheet's card runs under the navigation bar and over the bottom of the screen, so only it keeps clear.
   val bottomInset = contentPadding.calculateBottomPadding()
   val inventoryPeekSpace: @Composable () -> Unit = {
-    Spacer(modifier = Modifier.height(InventoryPeekHeight + bottomInset))
+    Spacer(modifier = Modifier.height(inventoryPeekHeight(bottomInset)))
   }
   val layoutDirection = LocalLayoutDirection.current
   if (useLandscapeLayout) {
@@ -128,7 +128,7 @@ internal fun BookPlayContent(
         modifier = Modifier
           .weight(1F)
           .fillMaxHeight()
-          .padding(bottom = bottomInset + InventoryPeekHeight),
+          .padding(bottom = inventoryPeekHeight(bottomInset)),
       )
       Column(
         modifier = Modifier
