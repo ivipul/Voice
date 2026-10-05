@@ -621,7 +621,7 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `a dictated question sends itself three seconds after the mic stops`() = scope.runTest {
+  fun `a dictated question sends itself five seconds after the mic stops`() = scope.runTest {
     every { speechInputController.dictate() } returns flowOf(
       DictationEvent.Partial("who is"),
       DictationEvent.Final("who is Carl"),

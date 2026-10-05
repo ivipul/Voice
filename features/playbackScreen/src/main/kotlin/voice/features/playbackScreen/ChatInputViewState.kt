@@ -13,6 +13,6 @@ internal data class ChatInputViewState(
 ) {
 
   companion object {
-    const val AUTO_SEND_DELAY_MS = 3_000L
+    const val AUTO_SEND_DELAY_MS = 5_000L
   }
 }
