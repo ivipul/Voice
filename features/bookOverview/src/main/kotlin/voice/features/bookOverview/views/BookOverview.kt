@@ -119,9 +119,6 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
     onDeckClick = bookOverviewViewModel::onDeckClick,
-    onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
-    onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
-    onSearchBookClick = bookOverviewViewModel::onSearchBookClick,
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
@@ -183,9 +180,6 @@ internal fun BookOverview(
   onFolderPickerMovedDialogDismiss: () -> Unit,
   onPlayButtonClick: (playing: Boolean) -> Unit,
   onDeckClick: () -> Unit,
-  onSearchActiveChange: (Boolean) -> Unit,
-  onSearchQueryChange: (String) -> Unit,
-  onSearchBookClick: (BookId) -> Unit,
   onPermissionBugCardClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -198,9 +192,6 @@ internal fun BookOverview(
         viewState = viewState,
         onBookFolderClick = onBookFolderClick,
         onSettingsClick = onSettingsClick,
-        onActiveChange = onSearchActiveChange,
-        onQueryChange = onSearchQueryChange,
-        onSearchBookClick = onSearchBookClick,
       )
     },
     floatingActionButton = {
@@ -212,8 +203,9 @@ internal fun BookOverview(
           fabSize = 56.dp,
           iconSize = 24.dp,
           onPlayClick = { onPlayButtonClick(playing) },
-          containerColor = palette.highlight,
-          contentColor = palette.onHighlight,
+          containerColor = palette.background,
+          contentColor = palette.highlight,
+          borderColor = palette.highlight,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
         )
       }
@@ -227,13 +219,16 @@ internal fun BookOverview(
     ) {
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
-          StackBooks(
-            books = viewState.books,
-            onBookClick = onBookClick,
-            onBookLongClick = onBookLongClick,
-            showPermissionBugCard = viewState.showStoragePermissionBugCard,
-            onPermissionBugCardClick = onPermissionBugCardClick,
-          )
+          // StackBooks pads its own top by 16dp; the gap under the title is 24dp.
+          Box(Modifier.padding(top = 8.dp)) {
+            StackBooks(
+              books = viewState.books,
+              onBookClick = onBookClick,
+              onBookLongClick = onBookLongClick,
+              showPermissionBugCard = viewState.showStoragePermissionBugCard,
+              onPermissionBugCardClick = onPermissionBugCardClick,
+            )
+          }
         }
         BookOverviewLayoutMode.Grid -> {
           GridBooks(
@@ -247,8 +242,9 @@ internal fun BookOverview(
       }
       DeckButton(
         onClick = onDeckClick,
-        containerColor = palette.highlight,
-        contentColor = palette.onHighlight,
+        containerColor = palette.background,
+        contentColor = palette.highlight,
+        borderColor = palette.highlight,
         modifier = Modifier
           .align(Alignment.BottomStart)
           .navigationBarsPadding()
@@ -312,9 +308,6 @@ fun BookOverviewPreview(
       onFolderPickerMovedDialogDismiss = {},
       onPlayButtonClick = {},
       onDeckClick = {},
-      onSearchActiveChange = {},
-      onSearchQueryChange = {},
-      onSearchBookClick = {},
       onPermissionBugCardClick = {},
     )
   }

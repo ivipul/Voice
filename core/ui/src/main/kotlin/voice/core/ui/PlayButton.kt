@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
@@ -30,6 +31,7 @@ fun PlayButton(
   sharedElementModifier: Modifier = Modifier,
   containerColor: Color = FloatingActionButtonDefaults.containerColor,
   contentColor: Color = contentColorFor(containerColor),
+  borderColor: Color? = null,
 ) {
   val cornerSize by animateDpAsState(
     targetValue = if (playing) 16.dp else fabSize / 2,
@@ -38,7 +40,14 @@ fun PlayButton(
   FloatingActionButton(
     modifier = modifier
       .size(fabSize)
-      .then(sharedElementModifier),
+      .then(sharedElementModifier)
+      .then(
+        if (borderColor != null) {
+          Modifier.border(width = 2.dp, color = borderColor, shape = RoundedCornerShape(cornerSize))
+        } else {
+          Modifier
+        },
+      ),
     onClick = onPlayClick,
     shape = RoundedCornerShape(cornerSize),
     containerColor = containerColor,

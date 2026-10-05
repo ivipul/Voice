@@ -1,5 +1,6 @@
 package voice.features.bookOverview.views
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -23,10 +24,13 @@ internal fun DeckButton(
   onClick: () -> Unit,
   containerColor: Color,
   contentColor: Color,
+  borderColor: Color,
   modifier: Modifier = Modifier,
 ) {
   FloatingActionButton(
-    modifier = modifier.size(FabSize),
+    modifier = modifier
+      .size(FabSize)
+      .border(width = 2.dp, color = borderColor, shape = CircleShape),
     onClick = onClick,
     shape = CircleShape,
     containerColor = containerColor,

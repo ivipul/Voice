@@ -182,6 +182,8 @@
     <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
     <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
     <string name="inventory.title">Your Inventory</string>
+    <!-- Title at the top of the library. -->
+    <string name="library.title">The Crawl</string>
     <!-- Button on the library that opens The Deck, the gallery of every crawler's holo card. -->
     <string name="deck.open">Open The Deck</string>
     <!-- Title of the screen with every crawler's holo card. -->
