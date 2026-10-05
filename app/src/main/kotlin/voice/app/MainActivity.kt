@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
                 if (targetState.destination() is Destination.Bookmarks) {
                   inventoryOpenTransition()
                 } else if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
-                  SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
+                  bookCardOpenTransition()
                 } else {
                   SharedXAxisEnterTransition(density) togetherWith SharedXAxisExitTransition(density)
                 }

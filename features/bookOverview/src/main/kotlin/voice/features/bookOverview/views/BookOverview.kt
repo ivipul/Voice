@@ -216,7 +216,7 @@ internal fun BookOverview(
     ) {
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
-          ListBooks(
+          StackBooks(
             books = viewState.books,
             onBookClick = onBookClick,
             onBookLongClick = onBookLongClick,
