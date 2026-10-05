@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class HoloImageLoaderTest {
+class SnipFrameLoaderTest {
 
   @Test
   fun `the reveal plays for an image that arrives after the loader appeared`() {

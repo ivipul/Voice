@@ -174,7 +174,7 @@ private fun ChatBubble(
     ) {
       Column {
         if (hasFrame) {
-          HoloImageLoader(
+          SnipFrameLoader(
             imagePath = message.imagePath,
             contentDescription = message.text,
             modifier = if (message.imagePath != null) {
