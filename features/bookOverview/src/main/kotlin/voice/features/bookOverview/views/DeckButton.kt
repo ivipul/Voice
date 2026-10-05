@@ -34,7 +34,7 @@ internal fun DeckButton(
     modifier = modifier
       .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = CircleShape, x = 3.dp, y = 3.dp) else Modifier)
       .size(FabSize)
-      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.content, shape = CircleShape) else Modifier),
+      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.highlight, shape = CircleShape) else Modifier),
     onClick = onClick,
     shape = CircleShape,
     containerColor = containerColor,

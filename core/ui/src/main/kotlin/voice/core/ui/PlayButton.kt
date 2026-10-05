@@ -42,7 +42,7 @@ fun PlayButton(
     modifier = modifier
       .then(if (palette != null) Modifier.hardShadow(color = palette.shadow, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
       .size(fabSize)
-      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.content, shape = shape) else Modifier)
+      .then(if (palette != null) Modifier.border(width = 1.5.dp, color = palette.highlight, shape = shape) else Modifier)
       .then(sharedElementModifier),
     onClick = onPlayClick,
     shape = shape,
