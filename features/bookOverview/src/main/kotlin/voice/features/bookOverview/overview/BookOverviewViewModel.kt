@@ -35,6 +35,7 @@ import voice.core.data.repo.internals.dao.RecentBookSearchDao
 import voice.core.data.store.CurrentBookStore
 import voice.core.data.store.FolderPickerMovedDialogShownStore
 import voice.core.data.store.GridModeStore
+import voice.core.data.store.LibraryUniformFontStore
 import voice.core.featureflag.ExperimentalPlaybackPersistenceQualifier
 import voice.core.featureflag.FeatureFlag
 import voice.core.featureflag.FolderPickerInSettingsFeatureFlagQualifier
@@ -67,6 +68,8 @@ class BookOverviewViewModel(
   private val folderPickerMovedDialogShownStore: DataStore<Boolean>,
   @GridModeStore
   private val gridModeStore: DataStore<GridMode>,
+  @LibraryUniformFontStore
+  private val libraryUniformFontStore: DataStore<Boolean>,
   private val gridCount: GridCount,
   private val navigator: Navigator,
   private val appInfoProvider: AppInfoProvider,
@@ -108,6 +111,8 @@ class BookOverviewViewModel(
     val scannerActive = remember { mediaScanner.scannerActive }
       .collectAsState(initial = false).value
     val folderPickerMovedDialogShown = remember { folderPickerMovedDialogShownStore.data }
+      .collectAsState(initial = false).value
+    val uniformFont = remember { libraryUniformFontStore.data }
       .collectAsState(initial = false).value
     val gridMode = remember { gridModeStore.data }
       .collectAsState(initial = null).value
@@ -152,6 +157,7 @@ class BookOverviewViewModel(
       } else {
         BookOverviewViewState.PlayButtonState.Paused
       }.takeIf { currentBookId != null },
+      uniformFont = uniformFont,
       activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
       showAddBookHint = if (hasStoragePermissionBug) {
         false

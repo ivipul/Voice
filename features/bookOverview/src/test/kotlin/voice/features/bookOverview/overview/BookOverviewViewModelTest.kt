@@ -67,6 +67,7 @@ class BookOverviewViewModelTest {
       currentBookStoreDataStore = MemoryDataStore(currentBook.id),
       folderPickerMovedDialogShownStore = MemoryDataStore(false),
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },
@@ -132,6 +133,7 @@ class BookOverviewViewModelTest {
       currentBookStoreDataStore = MemoryDataStore(null),
       folderPickerMovedDialogShownStore = MemoryDataStore(false),
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },
@@ -369,6 +371,7 @@ class BookOverviewViewModelTest {
       currentBookStoreDataStore = MemoryDataStore(currentBookId),
       folderPickerMovedDialogShownStore = folderPickerMovedDialogShownStore,
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },

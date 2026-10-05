@@ -11,6 +11,7 @@ interface SettingsListener {
   fun setThemeMode(themeMode: ThemeMode)
   fun setThemeColorScheme(themeColorScheme: ThemeColorScheme)
   fun toggleGrid()
+  fun toggleLibraryUniformFont()
   fun seekAmountChanged(seconds: Int)
   fun onSeekAmountRowClick()
   fun seekForwardAmountChanged(seconds: Int)
@@ -42,6 +43,7 @@ interface SettingsListener {
       override fun setThemeMode(themeMode: ThemeMode) {}
       override fun setThemeColorScheme(themeColorScheme: ThemeColorScheme) {}
       override fun toggleGrid() {}
+      override fun toggleLibraryUniformFont() {}
       override fun seekAmountChanged(seconds: Int) {}
       override fun onSeekAmountRowClick() {}
       override fun seekForwardAmountChanged(seconds: Int) {}

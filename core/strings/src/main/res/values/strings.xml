@@ -182,6 +182,9 @@
     <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
     <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
     <string name="inventory.title">Your Inventory</string>
+    <!-- Settings switch: set all text on the library in one font instead of each book's own. -->
+    <string name="settings.library.uniform_font.title">One font for the library</string>
+    <string name="settings.library.uniform_font.description">Sets all text on the library in the header font. Off, each book keeps its own.</string>
     <!-- Title at the top of the library. -->
     <string name="library.title">The Crawl</string>
     <!-- Button on the library that opens The Deck, the gallery of every crawler's holo card. -->

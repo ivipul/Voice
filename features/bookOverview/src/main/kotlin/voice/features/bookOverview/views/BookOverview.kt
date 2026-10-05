@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -220,13 +221,15 @@ internal fun BookOverview(
     ) {
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
-          StackBooks(
-            books = viewState.books,
-            onBookClick = onBookClick,
-            onBookLongClick = onBookLongClick,
-            showPermissionBugCard = viewState.showStoragePermissionBugCard,
-            onPermissionBugCardClick = onPermissionBugCardClick,
-          )
+          CompositionLocalProvider(LocalUniformFont provides viewState.uniformFont) {
+            StackBooks(
+              books = viewState.books,
+              onBookClick = onBookClick,
+              onBookLongClick = onBookLongClick,
+              showPermissionBugCard = viewState.showStoragePermissionBugCard,
+              onPermissionBugCardClick = onPermissionBugCardClick,
+            )
+          }
         }
         BookOverviewLayoutMode.Grid -> {
           GridBooks(
