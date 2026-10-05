@@ -116,6 +116,8 @@ class BookPlayViewModel(
 
   private val scope = MainScope(dispatcherProvider)
 
+  private var knownUnlockedStrips: Set<Int>? = null
+
   internal val viewEffects: Flow<BookPlayViewEffect>
     field = MutableSharedFlow<BookPlayViewEffect>(extraBufferCapacity = 1)
 
@@ -189,6 +191,7 @@ class BookPlayViewModel(
     val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
       value = stripRepository.stripsFor(book.content.name)
     }
+    LaunchedEffect(strips, book.position) { announceUnlockedStrips(strips, book.position) }
     val messagesByBook by remember { copilotRepository.allMessagesByBook }.collectAsState()
     val snipCount = messagesByBook[bookId].orEmpty().count { it.isSnip }
     val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
@@ -218,6 +221,20 @@ class BookPlayViewModel(
       playbackSpeed = book.content.playbackSpeed,
       inventoryCount = snipCount + strips.count { it.isUnlockedAt(book.position) },
     )
+  }
+
+  /** The first strips seen are the baseline, so only strips reached after the screen opened get a toast. */
+  private fun announceUnlockedStrips(
+    strips: List<AvailableStrip>,
+    bookMs: Long,
+  ) {
+    if (strips.isEmpty()) return
+    val unlocked = strips.filter { it.isUnlockedAt(bookMs) }.map { it.manifest.chapter }.toSet()
+    val known = knownUnlockedStrips
+    knownUnlockedStrips = known.orEmpty() + unlocked
+    if (known != null && !known.containsAll(unlocked)) {
+      viewEffects.tryEmit(BookPlayViewEffect.StripUnlocked)
+    }
   }
 
   private fun kioskModeViewState(): BookPlayViewState {
