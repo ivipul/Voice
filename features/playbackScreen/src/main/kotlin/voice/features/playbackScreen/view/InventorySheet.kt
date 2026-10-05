@@ -60,7 +60,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private val InventoryCardHeight = 60.dp
-private val InventoryBottomTrim = 8.dp
+private val InventoryBottomTrim = 16.dp
 
 /** How much of the bottom edge the collapsed card takes: its row, plus the navigation bar less a little trimmed padding. */
 internal fun inventoryPeekHeight(navigationBar: Dp): Dp = InventoryCardHeight + (navigationBar - InventoryBottomTrim).coerceAtLeast(0.dp)
