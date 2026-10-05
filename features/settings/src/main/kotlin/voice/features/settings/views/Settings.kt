@@ -29,6 +29,7 @@ import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
 import voice.core.common.rootGraphAs
 import voice.core.ui.VoiceTheme
+import voice.core.ui.crawl.CrawlLibraryTheme
 import voice.core.ui.icons.VoiceIcons
 import voice.features.settings.SettingsListener
 import voice.features.settings.SettingsViewEffect
@@ -378,7 +379,9 @@ fun Settings() {
       }
     }
   }
-  Settings(viewState, viewModel, snackbarHostState)
+  CrawlLibraryTheme {
+    Settings(viewState, viewModel, snackbarHostState)
+  }
 }
 
 @Composable
