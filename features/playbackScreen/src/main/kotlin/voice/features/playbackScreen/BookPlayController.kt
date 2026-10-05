@@ -176,6 +176,7 @@ fun BookPlayScreen(bookId: BookId) {
       SnipBottomSheet(
         state = snipSheet,
         frame = snipSheet.frameState(viewModel.copilotMessages()),
+        edition = viewState.edition,
         onDismiss = viewModel::onSnipSheetDismiss,
       )
     }
