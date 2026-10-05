@@ -51,6 +51,11 @@ internal fun SelectChapterDialog(
             } else {
               Color.Transparent
             }
+            val textColor = if (chapter.active) {
+              MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+              Color.Unspecified
+            }
             ListItem(
               colors = ListItemDefaults.colors(containerColor = backgroundColor),
               modifier = Modifier
@@ -64,13 +69,13 @@ internal fun SelectChapterDialog(
                   viewModel.onChapterClick(number = chapter.number)
                 },
               leadingContent = {
-                Text(text = chapter.number.toString())
+                Text(text = chapter.number.toString(), color = textColor)
               },
               trailingContent = {
-                Text(text = chapter.time)
+                Text(text = chapter.time, color = textColor)
               },
             ) {
-              Text(text = chapter.name)
+              Text(text = chapter.name, color = textColor)
             }
           }
         },

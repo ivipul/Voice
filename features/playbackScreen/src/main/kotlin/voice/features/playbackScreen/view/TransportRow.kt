@@ -25,6 +25,7 @@ import voice.core.strings.R
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.crawl.hardShadow
+import voice.core.ui.icons.VoiceIcons
 import voice.core.ui.playButtonSharedBoundsModifier
 import voice.core.ui.rememberPlayIconPainter
 import voice.features.playbackScreen.speedLabel
@@ -49,13 +50,13 @@ internal fun TransportRow(
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 12.dp),
+      .padding(horizontal = 20.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
     IconButton(onClick = onSmartRecapClick) {
       Icon(
-        imageVector = PosterIcons.SmartRecap,
+        imageVector = VoiceIcons.History,
         contentDescription = stringResource(id = R.string.copilot_action_smart_recap),
         tint = palette.content,
         modifier = Modifier.size(26.dp),

@@ -31,13 +31,13 @@ object CrawlType {
   val chip = TextStyle(
     fontFamily = CrawlFonts.ChakraPetch,
     fontWeight = FontWeight.Bold,
-    fontSize = 10.sp,
-    letterSpacing = 0.1.em,
+    fontSize = 13.sp,
+    letterSpacing = 0.08.em,
   )
   val pill = TextStyle(
     fontFamily = CrawlFonts.ChakraPetch,
     fontWeight = FontWeight.Bold,
-    fontSize = 11.sp,
+    fontSize = 12.sp,
     letterSpacing = 0.08.em,
   )
   val label = TextStyle(

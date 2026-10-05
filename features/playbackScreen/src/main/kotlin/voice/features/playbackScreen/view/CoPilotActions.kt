@@ -80,7 +80,7 @@ private fun ActionPill(
 ) {
   Row(
     modifier = modifier
-      .height(40.dp)
+      .height(48.dp)
       .clip(CircleShape)
       .then(
         if (container != null) {
@@ -90,7 +90,7 @@ private fun ActionPill(
         },
       )
       .combinedClickable(role = Role.Button, onLongClick = onLongClick, onClick = onClick)
-      .padding(horizontal = 12.dp),
+      .padding(horizontal = 16.dp),
     horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
     verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -98,7 +98,7 @@ private fun ActionPill(
       imageVector = icon,
       contentDescription = null,
       tint = content,
-      modifier = Modifier.size(16.dp),
+      modifier = Modifier.size(18.dp),
     )
     Text(
       text = label.uppercase(),

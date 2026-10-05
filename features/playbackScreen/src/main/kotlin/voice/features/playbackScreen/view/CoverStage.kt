@@ -30,8 +30,9 @@ import java.io.File
 private const val STRIP_FRAME_CROSSFADE_MS = 300
 
 /**
- * The square cover, edge to edge and fading into the screen below. Where the space is shorter than the screen is wide
- * the cover is smaller and its sides fade too. The strip's current frame takes its place while a strip plays.
+ * The square cover, centered in the space it gets and fading into the screen below. It is as wide as the screen unless
+ * the space is shorter, where it is smaller and its sides fade too. The strip's current frame takes its place while a
+ * strip plays.
  */
 @Composable
 internal fun CoverStage(

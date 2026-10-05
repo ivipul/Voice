@@ -28,7 +28,7 @@ import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 import voice.features.playbackScreen.BookPlayViewState
 
-private val ChipHeight = 28.dp
+private val ChipHeight = 40.dp
 
 /**
  * The characters in the scene, in one scrolling row. It keeps its height while nobody is in the scene, so the buttons
@@ -49,7 +49,7 @@ internal fun XRayChipRow(
       .height(ChipHeight)
       .fadeTrailingEdge(enabled = listState.canScrollForward),
     contentPadding = PaddingValues(horizontal = 20.dp),
-    horizontalArrangement = Arrangement.spacedBy(6.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
     items(chips, key = { it.id }) { chip ->
       XRayChip(label = chip.label, palette = palette, onClick = { onChipClick(chip.id) })
@@ -69,7 +69,7 @@ private fun XRayChip(
       .clip(CircleShape)
       .background(palette.highlight)
       .clickable(onClick = onClick)
-      .padding(horizontal = 12.dp),
+      .padding(horizontal = 16.dp),
     contentAlignment = Alignment.Center,
   ) {
     Text(

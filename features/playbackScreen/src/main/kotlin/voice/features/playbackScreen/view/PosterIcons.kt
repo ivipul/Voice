@@ -11,12 +11,6 @@ import androidx.compose.ui.unit.dp
 /** The poster player's own icons, on the 24 unit grid of the Material symbols. */
 internal object PosterIcons {
 
-  /** Two chevrons going back, with a spark: a recap the AI writes. */
-  val SmartRecap: ImageVector = icon("SmartRecap") {
-    stroke("M10 7l-5 5 5 5M17 7l-5 5 5 5")
-    fill("M19.5 1.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z")
-  }
-
   val Ask: ImageVector = icon("Ask") {
     fill("M10 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z")
     fill("M18.5 3.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z")
