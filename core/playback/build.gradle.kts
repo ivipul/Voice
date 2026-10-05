@@ -13,6 +13,7 @@ android {
 dependencies {
   implementation(projects.core.common)
   implementation(projects.core.strings)
+  implementation(projects.core.ui)
   implementation(projects.core.featureflag)
   implementation(projects.core.sleeptimer.api)
   implementation(projects.core.data.api)

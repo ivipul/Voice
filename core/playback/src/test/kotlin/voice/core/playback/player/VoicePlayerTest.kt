@@ -91,7 +91,14 @@ class VoicePlayerTest {
     .build()
 
   private val scope = TestScope()
-  private val mediaItemProvider = MediaItemProvider(mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
+  private val mediaItemProvider = MediaItemProvider(
+    mockk(),
+    mockk(),
+    mockk(),
+    mockk(),
+    mockk { every { artwork(any(), any()) } returns null },
+    mockk(),
+  )
   private val bookId = BookId(Uuid.random().toString())
   private lateinit var currentBook: Book
   private val sleepTimer = FakeSleepTimer()

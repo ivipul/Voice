@@ -1,7 +1,6 @@
 package voice.core.playback.session
 
 import android.app.Application
-import android.net.Uri
 import androidx.datastore.core.DataStore
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -21,7 +20,6 @@ import voice.core.data.repo.BookRepository
 import voice.core.data.repo.ChapterRepo
 import voice.core.data.store.CurrentBookStore
 import voice.core.data.toUri
-import java.io.File
 import voice.core.strings.R as StringsR
 
 @Inject
@@ -138,7 +136,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     subtitle = book.content.author,
-    imageUri = book.content.cover?.toProvidedUri(),
+    imageUri = imageFileProvider.artwork(book.content.name, book.content.cover),
     mediaType = MediaType.AudioBook,
   )
 
@@ -151,7 +149,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     sourceUri = chapter.id.toUri(),
-    imageUri = content.cover?.toProvidedUri(),
+    imageUri = imageFileProvider.artwork(content.name, content.cover),
     album = content.name,
     subtitle = content.name,
     artist = content.author,
@@ -169,7 +167,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     sourceUri = playbackItem.chapter.id.toUri(),
-    imageUri = content.cover?.toProvidedUri(),
+    imageUri = imageFileProvider.artwork(content.name, content.cover),
     album = content.name,
     subtitle = content.name,
     artist = content.author,
@@ -180,6 +178,4 @@ class MediaItemProvider(
       .build(),
     mediaType = MediaType.AudioBookChapter,
   )
-
-  private fun File.toProvidedUri(): Uri = imageFileProvider.uri(this)
 }
