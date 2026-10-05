@@ -120,6 +120,16 @@ class CoPilotEngine(
   private val snipCapturedSoundId = soundPool.load(context, R.raw.copilot_snip, 1)
 
   init {
+    // The transcript takes seconds to find and parse; do it now so the first button press doesn't wait.
+    scope.launch {
+      try {
+        currentBookStoreId.data.first()?.let { copilotPipeline.warmUp(it) }
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        Logger.w(e, "CoPilotEngine: transcript warm-up failed")
+      }
+    }
     soundPool.setOnLoadCompleteListener { _, sampleId, status ->
       if (status == 0) loadedSoundIds += sampleId
     }

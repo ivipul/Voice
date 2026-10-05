@@ -63,6 +63,12 @@ class RealCoPilotPipeline(
     }
   }
 
+  override suspend fun warmUp(bookId: BookId) {
+    val book = bookRepository.get(bookId) ?: return
+    val ignored = transcriptRepository.textForPrecedingWindow(book, 1)
+    Logger.d("CoPilot warm-up done, transcript ${if (ignored == null) "missing" else "loaded"}")
+  }
+
   override suspend fun autoIdentify(bookId: BookId): String {
     val book = bookRepository.get(bookId) ?: return fallbackAnswer()
     val last60Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_RECENT_WINDOW_MS)
