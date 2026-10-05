@@ -7,14 +7,7 @@ import androidx.navigation3.runtime.metadata
 object BottomSheetNav {
   object BottomSheetKey : NavMetadataKey<ModalBottomSheetProperties>
 
-  /** Present when the screen draws its own handle and card, so the sheet adds no container, handle or shape. */
-  object BareKey : NavMetadataKey<Boolean>
-
-  fun bottomSheet(
-    modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
-    bare: Boolean = false,
-  ) = metadata {
+  fun bottomSheet(modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties()) = metadata {
     put(BottomSheetKey, modalBottomSheetProperties)
-    if (bare) put(BareKey, true)
   }
 }

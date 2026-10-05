@@ -26,6 +26,7 @@ import voice.core.strips.bookPositionOf
 import voice.core.strips.isUnlockedAt
 import voice.core.ui.crawl.CrawlEdition
 import voice.core.ui.crawl.crawlEditionOf
+import voice.navigation.Destination
 import voice.navigation.Navigator
 
 @AssistedInject
@@ -47,7 +48,6 @@ class BookmarkViewModel(
   private var strips by mutableStateOf<List<AvailableStrip>>(emptyList())
   private var savedBookPosition by mutableStateOf(0L)
   private var unlockedStripChapters by mutableStateOf<Set<Int>>(emptySet())
-  private var activeStrip by mutableStateOf<AvailableStrip?>(null)
   private var edition by mutableStateOf<CrawlEdition?>(null)
 
   @Composable
@@ -75,20 +75,15 @@ class BookmarkViewModel(
       snips = messagesByBook[bookId].orEmpty().snipCards(chapters),
       strips = reachedStrips,
       lockedStrips = lockedStrips,
-      activeStrip = activeStrip,
       edition = edition,
     )
   }
 
   fun onStripClick(strip: AvailableStrip) {
-    activeStrip = strip
+    navigator.goTo(Destination.StripStory(bookId, strip.manifest.chapter, startFrameIndex = 0, linkedToBook = false))
   }
 
-  fun onStripClose() {
-    activeStrip = null
-  }
-
-  /** Plays on from where the snip was taken, back on the player. */
+  /** Plays on from where the snip was taken. */
   fun onSnipClick(snip: SnipCardViewState) {
     val wasPlaying = playStateManager.playState == PlayStateManager.PlayState.Playing
     scope.launch {
@@ -98,11 +93,6 @@ class BookmarkViewModel(
     if (wasPlaying) {
       playerController.play()
     }
-    navigator.goBack()
-  }
-
-  fun closeScreen() {
-    navigator.goBack()
   }
 
   @AssistedFactory

@@ -29,6 +29,7 @@ import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.launch
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
+import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.features.playbackScreen.view.BookPlayView
 import voice.features.playbackScreen.view.CoPilotFeedOverlay
@@ -126,8 +127,8 @@ fun BookPlayScreen(bookId: BookId) {
       onSpeedClick = viewModel::onPlaybackSpeedIconClick,
       onAskClick = onAskClick,
       onSnipClick = viewModel::onSnipClick,
-      onInventoryClick = viewModel::onBookmarkClick,
       onXRayChipClick = viewModel::onXRayChipClick,
+      inventoryContent = rootGraphAs<BookPlayGraph>().inventoryContent,
       useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
       snackbarHostState = snackbarHostState,
     )
@@ -190,6 +191,7 @@ fun BookPlayScreen(bookId: BookId) {
 @ContributesTo(AppScope::class)
 interface BookPlayGraph {
   val bookPlayViewModelFactory: BookPlayViewModel.Factory
+  val inventoryContent: InventoryContent
 }
 
 @ContributesTo(AppScope::class)

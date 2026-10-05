@@ -1,20 +1,9 @@
 package voice.features.bookmark
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,12 +11,9 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
@@ -39,13 +25,12 @@ import voice.core.data.repo.BookRepository
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripRepository
 import voice.core.ui.FrameCardViewer
+import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
-import voice.core.ui.icons.VoiceIcons
 import voice.features.bookmark.strips.StripGallery
 import voice.features.bookmark.strips.StripViewer
 import voice.features.bookmark.strips.StripViewerViewModel
-import voice.navigation.BottomSheetNav
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
 import voice.navigation.Navigator
@@ -70,17 +55,21 @@ interface BookmarkProvider {
 
   @Provides
   @IntoSet
-  fun bookmarkNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.Bookmarks> { key ->
-    NavEntry(key, metadata = BottomSheetNav.bottomSheet(bare = true)) {
-      BookmarkScreen(bookId = key.bookId)
+  fun stripStoryNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.StripStory> { key ->
+    NavEntry(key) {
+      StripStoryScreen(key)
     }
   }
 
   @Provides
-  @IntoSet
-  fun stripStoryNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.StripStory> { key ->
-    NavEntry(key) {
-      StripStoryScreen(key)
+  fun inventoryContent(): InventoryContent = object : InventoryContent {
+    @Composable
+    override fun Content(
+      bookId: BookId,
+      onClose: () -> Unit,
+      modifier: Modifier,
+    ) {
+      Inventory(bookId = bookId, onClose = onClose, modifier = modifier)
     }
   }
 }
@@ -101,34 +90,31 @@ fun StripStoryScreen(destination: Destination.StripStory) {
 }
 
 @Composable
-fun BookmarkScreen(bookId: BookId) {
+private fun Inventory(
+  bookId: BookId,
+  onClose: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val viewModel = retain(bookId.value) {
     rootGraphAs<Graph>().bookmarkViewModelFactory.create(bookId)
   }
   val viewState = viewModel.viewState()
-  Box {
-    // The open strip viewer is black, so the book's colors (and its dark status bar icons) give way while it shows.
-    CrawlTheme(edition = viewState.edition.takeIf { viewState.activeStrip == null }) {
-      BookmarkScreen(
-        viewState = viewState,
-        onClose = viewModel::closeScreen,
-        onSnipClick = viewModel::onSnipClick,
-        onStripClick = viewModel::onStripClick,
-      )
-    }
-    viewState.activeStrip?.let { strip ->
-      val storyViewModel = remember(bookId, strip) {
-        rootGraphAs<Graph>().stripViewerViewModelFactory.create(bookId, strip, 0, linkedToBook = false)
-      }
-      StripViewer(viewModel = storyViewModel, onClose = viewModel::onStripClose)
-    }
+  CrawlTheme(edition = viewState.edition) {
+    Inventory(
+      viewState = viewState,
+      onSnipClick = {
+        viewModel.onSnipClick(it)
+        onClose()
+      },
+      onStripClick = viewModel::onStripClick,
+      modifier = modifier,
+    )
   }
 }
 
 @Composable
-internal fun BookmarkScreen(
+internal fun Inventory(
   viewState: BookmarkViewState,
-  onClose: () -> Unit,
   onSnipClick: (SnipCardViewState) -> Unit,
   onStripClick: (AvailableStrip) -> Unit,
   modifier: Modifier = Modifier,
@@ -137,48 +123,31 @@ internal fun BookmarkScreen(
   var viewedFrame by remember { mutableStateOf<SnipCardViewState?>(null) }
   val palette = crawlPaletteOf(viewState.edition)
 
-  Scaffold(
-    modifier = modifier.clip(SheetShape),
-    topBar = {
-      Column {
-      InventoryHandle(color = palette.content)
-      TopAppBar(
-        title = { Text(text = stringResource(id = StringsR.string.inventory_title)) },
-        navigationIcon = {
-          IconButton(onClick = onClose) {
-            Icon(
-              imageVector = VoiceIcons.Close,
-              contentDescription = stringResource(id = StringsR.string.common_action_close),
-            )
-          }
-        },
+  Column(modifier = modifier) {
+    SecondaryTabRow(
+      selectedTabIndex = selectedTab.ordinal,
+      containerColor = Color.Transparent,
+    ) {
+      InventoryTab.entries.forEach { tab ->
+        Tab(
+          selected = selectedTab == tab,
+          onClick = { selectedTab = tab },
+          text = { Text(text = stringResource(id = tab.labelRes)) },
+        )
+      }
+    }
+    when (selectedTab) {
+      InventoryTab.Snips -> SnipCardList(
+        snips = viewState.snips,
+        onClick = onSnipClick,
+        onImageClick = { viewedFrame = it },
       )
-      }
-    },
-  ) { paddingValues ->
-    Column(modifier = Modifier.padding(paddingValues)) {
-      SecondaryTabRow(selectedTabIndex = selectedTab.ordinal) {
-        InventoryTab.entries.forEach { tab ->
-          Tab(
-            selected = selectedTab == tab,
-            onClick = { selectedTab = tab },
-            text = { Text(text = stringResource(id = tab.labelRes)) },
-          )
-        }
-      }
-      when (selectedTab) {
-        InventoryTab.Snips -> SnipCardList(
-          snips = viewState.snips,
-          onClick = onSnipClick,
-          onImageClick = { viewedFrame = it },
-        )
-        InventoryTab.Strips -> StripGallery(
-          strips = viewState.strips,
-          lockedStrips = viewState.lockedStrips,
-          palette = palette,
-          onClick = onStripClick,
-        )
-      }
+      InventoryTab.Strips -> StripGallery(
+        strips = viewState.strips,
+        lockedStrips = viewState.lockedStrips,
+        palette = palette,
+        onClick = onStripClick,
+      )
     }
   }
 
@@ -190,25 +159,5 @@ internal fun BookmarkScreen(
         onDismiss = { viewedFrame = null },
       )
     }
-  }
-}
-
-private val SheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-
-/** The sheet's drag handle, drawn in the book's colors because the sheet itself is bare. */
-@Composable
-private fun InventoryHandle(color: Color) {
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(top = 10.dp),
-    contentAlignment = Alignment.Center,
-  ) {
-    Box(
-      modifier = Modifier
-        .size(width = 36.dp, height = 4.dp)
-        .clip(CircleShape)
-        .background(color.copy(alpha = 0.4F)),
-    )
   }
 }

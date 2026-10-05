@@ -481,13 +481,6 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `the Inventory card opens the Inventory screen`() = scope.runTest {
-    viewModel.onBookmarkClick()
-
-    verify { navigator.goTo(Destination.Bookmarks(book.id)) }
-  }
-
-  @Test
   fun `the Inventory card counts the book's snips and the strips reached so far`() = scope.runTest {
     val copilotRepository = CoPilotRepository()
     copilotRepository.addMessage(book.id, snipMessage("first"))

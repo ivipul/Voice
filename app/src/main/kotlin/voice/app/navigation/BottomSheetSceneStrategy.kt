@@ -7,9 +7,6 @@ import androidx.compose.material3.SheetValue.Hidden
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.rememberLifecycleOwner
 import androidx.navigation3.runtime.NavEntry
@@ -33,7 +30,6 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
         overlaidEntries = entries.dropLast(1),
         entry = lastEntry,
         modalBottomSheetProperties = properties,
-        bare = lastEntry.metadata[BottomSheetNav.BareKey] == true,
         onBack = onBack,
       )
     }
@@ -46,7 +42,6 @@ private data class BottomSheetScene<T : Any>(
   override val overlaidEntries: List<NavEntry<T>>,
   private val entry: NavEntry<T>,
   private val modalBottomSheetProperties: ModalBottomSheetProperties,
-  private val bare: Boolean,
   private val onBack: () -> Unit,
 ) : OverlayScene<T> {
 
@@ -58,30 +53,13 @@ private data class BottomSheetScene<T : Any>(
       initialValue = Hidden,
       enabledValues = setOf(Hidden, Expanded),
     )
-    val content: @Composable () -> Unit = {
+    ModalBottomSheet(
+      onDismissRequest = onBack,
+      properties = modalBottomSheetProperties,
+      sheetState = sheetState,
+    ) {
       CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
         entry.Content()
-      }
-    }
-    if (bare) {
-      ModalBottomSheet(
-        onDismissRequest = onBack,
-        properties = modalBottomSheetProperties,
-        sheetState = sheetState,
-        shape = RectangleShape,
-        containerColor = Color.Transparent,
-        tonalElevation = 0.dp,
-        dragHandle = null,
-      ) {
-        content()
-      }
-    } else {
-      ModalBottomSheet(
-        onDismissRequest = onBack,
-        properties = modalBottomSheetProperties,
-        sheetState = sheetState,
-      ) {
-        content()
       }
     }
   }

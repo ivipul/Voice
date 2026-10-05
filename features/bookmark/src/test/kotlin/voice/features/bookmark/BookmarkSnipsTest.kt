@@ -106,9 +106,8 @@ class BookmarkSnipsTest {
     verifyOrder {
       playerController.setPosition(341_000L, chapter.id)
       playerController.play()
-      navigator.goBack()
     }
-    verify(exactly = 1) { navigator.goBack() }
+    verify(exactly = 0) { navigator.goBack() }
   }
 
   private fun snip(

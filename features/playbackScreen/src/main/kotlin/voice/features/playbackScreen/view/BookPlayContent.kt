@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -52,7 +53,6 @@ internal fun BookPlayContent(
   onSpeedClick: () -> Unit,
   onAskClick: () -> Unit,
   onSnipClick: () -> Unit,
-  onInventoryClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
 ) {
   val palette = crawlPaletteOf(viewState.edition)
@@ -104,15 +104,10 @@ internal fun BookPlayContent(
       onSnipClick = onSnipClick,
     )
   }
-  // The Inventory card runs under the navigation bar, so only the card keeps clear of it.
+  // The Inventory sheet's card runs under the navigation bar and over the bottom of the screen, so only it keeps clear.
   val bottomInset = contentPadding.calculateBottomPadding()
-  val inventoryPeek: @Composable () -> Unit = {
-    InventoryPeek(
-      count = viewState.inventoryCount,
-      palette = palette,
-      bottomInset = bottomInset,
-      onClick = onInventoryClick,
-    )
+  val inventoryPeekSpace: @Composable () -> Unit = {
+    Spacer(modifier = Modifier.height(InventoryPeekHeight + bottomInset))
   }
   val layoutDirection = LocalLayoutDirection.current
   if (useLandscapeLayout) {
@@ -133,7 +128,7 @@ internal fun BookPlayContent(
         modifier = Modifier
           .weight(1F)
           .fillMaxHeight()
-          .padding(bottom = bottomInset),
+          .padding(bottom = bottomInset + InventoryPeekHeight),
       )
       Column(
         modifier = Modifier
@@ -155,7 +150,7 @@ internal fun BookPlayContent(
           }
         }
         Spacer(modifier = Modifier.size(12.dp))
-        inventoryPeek()
+        inventoryPeekSpace()
       }
     }
   } else {
@@ -178,7 +173,7 @@ internal fun BookPlayContent(
       )
       controls()
       Spacer(modifier = Modifier.size(24.dp))
-      inventoryPeek()
+      inventoryPeekSpace()
     }
   }
 }
