@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import voice.core.strings.R as StringsR
 import voice.core.ui.VoiceTheme
@@ -32,9 +31,7 @@ import voice.features.bookOverview.search.BookSearchViewState
 import voice.features.bookOverview.views.BookFolderIcon
 import voice.features.bookOverview.views.SettingsIcon
 import kotlin.time.Duration.Companion.seconds
-import voice.core.strings.R as StringsR
 
-/** The library's title in the author-name face of the cards, with the folder and settings buttons to its right. */
 @Composable
 internal fun BookOverviewTopBar(
   viewState: BookOverviewViewState,

@@ -167,7 +167,6 @@ class BookOverviewViewModel(
         !folderPickerMovedDialogShown &&
         appInfoProvider.installTime < FolderPickerMigrationInstallTimeCutoff,
       dialog = dialog,
-      activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
     )
   }
 

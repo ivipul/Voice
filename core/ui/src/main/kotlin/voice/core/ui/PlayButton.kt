@@ -37,11 +37,8 @@ fun PlayButton(
     targetValue = if (playing) 16.dp else fabSize / 2,
     label = "cornerSize",
   )
-  val shape = RoundedCornerShape(cornerSize)
-  val containerColor = palette?.background ?: FloatingActionButtonDefaults.containerColor
   FloatingActionButton(
     modifier = modifier
-      .then(if (palette != null) Modifier.hardShadow(color = Color.White, shape = shape, x = 3.dp, y = 3.dp) else Modifier)
       .size(fabSize)
       .then(sharedElementModifier)
       .then(
@@ -84,12 +81,3 @@ fun rememberPlayIconPainter(playing: Boolean): Painter {
     atEnd = !playing,
   )
 }
-
-/** With a palette the button casts a white hard shadow instead of a soft one, so it stands off a card of its own color. */
-@Composable
-private fun flatElevation() = FloatingActionButtonDefaults.elevation(
-  defaultElevation = 0.dp,
-  pressedElevation = 0.dp,
-  focusedElevation = 0.dp,
-  hoveredElevation = 0.dp,
-)

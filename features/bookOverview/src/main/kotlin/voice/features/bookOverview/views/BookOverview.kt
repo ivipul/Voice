@@ -208,7 +208,6 @@ internal fun BookOverview(
           contentColor = palette.highlight,
           hardShadowColor = Color.White,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
-          palette = viewState.activeEdition?.palette,
         )
       }
     },
@@ -221,16 +220,13 @@ internal fun BookOverview(
     ) {
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
-          // StackBooks pads its own top by 16dp; the gap under the title is 24dp.
-          Box(Modifier.padding(top = 8.dp)) {
-            StackBooks(
-              books = viewState.books,
-              onBookClick = onBookClick,
-              onBookLongClick = onBookLongClick,
-              showPermissionBugCard = viewState.showStoragePermissionBugCard,
-              onPermissionBugCardClick = onPermissionBugCardClick,
-            )
-          }
+          StackBooks(
+            books = viewState.books,
+            onBookClick = onBookClick,
+            onBookLongClick = onBookLongClick,
+            showPermissionBugCard = viewState.showStoragePermissionBugCard,
+            onPermissionBugCardClick = onPermissionBugCardClick,
+          )
         }
         BookOverviewLayoutMode.Grid -> {
           GridBooks(

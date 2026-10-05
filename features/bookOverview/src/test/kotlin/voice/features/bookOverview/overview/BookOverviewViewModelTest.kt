@@ -292,37 +292,35 @@ class BookOverviewViewModelTest {
       currentBookId = currentBook.id,
     )
 
-    viewModel.onPlayButtonClick()
+    viewModel.onPlayButtonClick(playing = false)
 
-    verify(exactly = 1) { playerController.play() }
+    verify(exactly = 1) { playerController.playPause() }
     verify(exactly = 1) { navigator.goTo(Destination.Playback(currentBook.id)) }
   }
 
   @Test
-  fun `play button on a playing book only opens its player`() = runTest {
+  fun `play button on a playing book only pauses it`() = runTest {
     val currentBook = book(name = "Current")
     val navigator = mockk<Navigator>(relaxed = true)
     val playerController = mockk<PlayerController>(relaxed = true)
-    val playStateManager = PlayStateManager().apply { playState = PlayStateManager.PlayState.Playing }
     val viewModel = viewModel(
       navigator = navigator,
       playerController = playerController,
-      playStateManager = playStateManager,
       currentBookId = currentBook.id,
     )
 
-    viewModel.onPlayButtonClick()
+    viewModel.onPlayButtonClick(playing = true)
 
-    verify(exactly = 0) { playerController.play() }
-    verify(exactly = 1) { navigator.goTo(Destination.Playback(currentBook.id)) }
+    verify(exactly = 1) { playerController.playPause() }
+    verify(exactly = 0) { navigator.goTo(any()) }
   }
 
   @Test
-  fun `play button does nothing without a current book`() = runTest {
+  fun `play button opens no player without a current book`() = runTest {
     val navigator = mockk<Navigator>(relaxed = true)
-    val viewModel = viewModel(navigator = navigator)
+    val viewModel = viewModel(navigator = navigator, playerController = mockk(relaxed = true))
 
-    viewModel.onPlayButtonClick()
+    viewModel.onPlayButtonClick(playing = false)
 
     verify(exactly = 0) { navigator.goTo(any()) }
   }
@@ -349,8 +347,8 @@ class BookOverviewViewModelTest {
   }
 
   private fun viewModel(
-    folderPickerInSettingsFeatureFlag: MemoryFeatureFlag<Boolean>,
-    folderPickerMovedDialogShownStore: DataStore<Boolean>,
+    folderPickerInSettingsFeatureFlag: MemoryFeatureFlag<Boolean> = MemoryFeatureFlag(false),
+    folderPickerMovedDialogShownStore: DataStore<Boolean> = MemoryDataStore(false),
     navigator: Navigator = mockk(),
     appInfoProvider: AppInfoProvider = appInfoProvider(),
     books: List<Book> = emptyList(),
