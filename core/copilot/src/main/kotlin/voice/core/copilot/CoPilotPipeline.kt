@@ -24,4 +24,7 @@ interface CoPilotPipeline {
 
   /** Snip & Synthesize: silently extracts a 3-bullet summary of the last 3 minutes to the Feed. */
   suspend fun snip(bookId: BookId)
+
+  /** Loads the current book's transcript into memory ahead of the first co-pilot action. */
+  suspend fun warmUp(bookId: BookId) = Unit
 }

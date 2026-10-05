@@ -100,8 +100,10 @@ class GeminiClient {
         Thread.sleep(RETRY_BACKOFF_MS * attempt)
       }
       try {
+        val sentAt = System.currentTimeMillis()
         httpClient.newCall(request).execute().use { response ->
           val responseBody = response.body.string()
+          Logger.d("GeminiClient: ${response.code} in ${System.currentTimeMillis() - sentAt} ms (prompt ${userPrompt.length} chars)")
           check(response.isSuccessful) { "Gemini request failed: ${response.code} $responseBody" }
           val json = Json.parseToJsonElement(responseBody).jsonObject
           return json.getValue("candidates").jsonArray[0].jsonObject
