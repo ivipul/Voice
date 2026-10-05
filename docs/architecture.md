@@ -63,7 +63,7 @@ Core modules provide the underlying services and abstractions:
 Feature modules are screen- or flow-based. Each module owns its UI (Compose) and presentation logic, while delegating to `:core` modules for
 data and services:
 
-* `:features:playbackScreen` – Main playback interface
+* `:features:playbackScreen` – Main playback interface, the holo cards and The Deck (every crawler's card in one gallery, opened from the library)
 * `:features:bookOverview` – Library / book list
 * `:features:sleepTimer` – Sleep timer control UI
 * `:features:settings` – App settings

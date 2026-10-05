@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -116,6 +117,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::playPause,
+    onDeckClick = bookOverviewViewModel::onDeckClick,
     onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
     onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
     onSearchBookClick = bookOverviewViewModel::onSearchBookClick,
@@ -179,6 +181,7 @@ internal fun BookOverview(
   onBookFolderClick: () -> Unit,
   onFolderPickerMovedDialogDismiss: () -> Unit,
   onPlayButtonClick: () -> Unit,
+  onDeckClick: () -> Unit,
   onSearchActiveChange: (Boolean) -> Unit,
   onSearchQueryChange: (String) -> Unit,
   onSearchBookClick: (BookId) -> Unit,
@@ -237,6 +240,13 @@ internal fun BookOverview(
           )
         }
       }
+      DeckButton(
+        onClick = onDeckClick,
+        modifier = Modifier
+          .align(Alignment.BottomStart)
+          .navigationBarsPadding()
+          .padding(16.dp),
+      )
     }
   }
   Dialog(
@@ -294,6 +304,7 @@ fun BookOverviewPreview(
       onBookFolderClick = {},
       onFolderPickerMovedDialogDismiss = {},
       onPlayButtonClick = {},
+      onDeckClick = {},
       onSearchActiveChange = {},
       onSearchQueryChange = {},
       onSearchBookClick = {},

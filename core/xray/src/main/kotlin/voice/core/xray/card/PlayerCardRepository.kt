@@ -28,6 +28,8 @@ class PlayerCardSet(
 
   fun card(entityId: String): PlayerCardData? = cards[entityId]
 
+  fun allCards(): Collection<PlayerCardData> = cards.values
+
   // Resolving a path lists its folders with the storage provider, which is slow, so each path is resolved once.
   private val resolved = ConcurrentHashMap<String, Optional<Uri>>()
 

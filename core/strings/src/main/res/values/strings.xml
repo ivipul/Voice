@@ -182,6 +182,16 @@
     <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
     <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
     <string name="inventory.title">Your Inventory</string>
+    <!-- Button on the library that opens The Deck, the gallery of every crawler's holo card. -->
+    <string name="deck.open">Open The Deck</string>
+    <!-- Title of the screen with every crawler's holo card. -->
+    <string name="deck.title">The Deck</string>
+    <!-- Label over the bar that shows how many of the series' crawler cards have been reached. -->
+    <string name="deck.collected">Crawlers collected</string>
+    <!-- A crawler card still ahead. %1$d is the book number where the crawler first shows up. -->
+    <string name="deck.locked">Meet in Book %1$d</string>
+    <!-- Empty-state message on The Deck when no book has card data. -->
+    <string name="deck.empty">No crawler cards yet. They show up here once a book with card data is in your library.</string>
     <!-- Library category header for completed books. -->
     <string name="library.category.completed.title">Completed</string>
     <!-- Library category header for books currently being listened to. -->

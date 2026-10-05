@@ -247,6 +247,10 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Settings)
   }
 
+  fun onDeckClick() {
+    navigator.goTo(Destination.Deck)
+  }
+
   fun onBookClick(id: BookId) {
     navigator.goTo(Destination.Playback(id))
   }

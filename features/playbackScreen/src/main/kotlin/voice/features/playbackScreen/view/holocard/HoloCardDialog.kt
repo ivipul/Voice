@@ -100,25 +100,33 @@ internal fun HoloCardDialog(
         width = cardWidth,
         reducedMotion = reducedMotion,
         onDismiss = onDismiss,
+        hintColor = Color.White.copy(alpha = 0.6f),
       )
     }
   }
 }
 
+/**
+ * The flippable, tiltable card. [hintColor] colors the "tap to flip" line under it, `null` leaves the line out.
+ * With [popIn] false the card is there at full size from the first frame, for a caller that animates it itself.
+ */
 @Composable
-private fun HoloCard(
+internal fun HoloCard(
   dialogState: BookPlayDialogViewState.XRayCardDialog,
   positionMs: Long,
   width: Dp,
   reducedMotion: Boolean,
   onDismiss: () -> Unit,
+  modifier: Modifier = Modifier,
+  hintColor: Color? = null,
+  popIn: Boolean = true,
 ) {
   val density = LocalDensity.current
   val u = remember(width, density) { CardUnit(with(density) { width.toPx() } / 100f, density) }
   val height = with(density) { u.dp(CardHeightUnits) }
   val tilt = remember(reducedMotion) { HoloTiltState(reducedMotion) }
   val flip = remember { Animatable(FlipFrontDegrees) }
-  val appear = remember { Animatable(if (reducedMotion) 1f else 0f) }
+  val appear = remember { Animatable(if (reducedMotion || !popIn) 1f else 0f) }
   var showingBack by remember { mutableStateOf(false) }
   val card = remember(dialogState.data, positionMs) { dialogState.data.composeAt(positionMs) }
   val lookImage = card.look?.image?.let(dialogState.imageUris::get)
@@ -146,7 +154,11 @@ private fun HoloCard(
 
   val description = stringResource(R.string.holo_card_description, dialogState.name)
   val flipLabel = stringResource(R.string.holo_card_flip)
-  Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+  Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
     Box(
       modifier = Modifier
         .size(width, height)
@@ -202,11 +214,13 @@ private fun HoloCard(
         }
       }
     }
-    Text(
-      text = stringResource(if (showingBack) R.string.holo_card_hint_back else R.string.holo_card_hint_front),
-      style = MaterialTheme.typography.labelMedium,
-      color = Color.White.copy(alpha = 0.6f),
-    )
+    if (hintColor != null) {
+      Text(
+        text = stringResource(if (showingBack) R.string.holo_card_hint_back else R.string.holo_card_hint_front),
+        style = MaterialTheme.typography.labelMedium,
+        color = hintColor,
+      )
+    }
   }
 }
 
@@ -245,7 +259,7 @@ private fun Modifier.cardGestures(
   }
 }
 
-private fun animationsDisabled(context: Context): Boolean = try {
+internal fun animationsDisabled(context: Context): Boolean = try {
   Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
 } catch (e: Exception) {
   false
