@@ -415,10 +415,6 @@ class BookPlayViewModel(
     )
   }
 
-  fun onBookmarkClick() {
-    navigator.goTo(Destination.Bookmarks(bookId))
-  }
-
   /** A tap inside a strip's zone on the seek bar: jump to where that strip starts. */
   fun onStripZoneTap(startBookMs: Long) {
     scope.launch {

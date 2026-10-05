@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,11 +22,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import voice.core.strings.R
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
+import voice.core.ui.icons.VoiceIcons
 
-/** Ask AI, filled in the accent color, and Snip as an outline, side by side at the same width. */
+/** Ask system AI, filled in the accent color, and Snip as an outline, side by side at the same width. */
 @Composable
 internal fun CoPilotActions(
   palette: CrawlPalette,
@@ -40,7 +43,7 @@ internal fun CoPilotActions(
     horizontalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     ActionPill(
-      icon = PosterIcons.Ask,
+      icon = VoiceIcons.Mic,
       label = stringResource(id = R.string.copilot_action_ask_ai),
       container = palette.accent,
       content = palette.onAccent,
@@ -95,6 +98,7 @@ private fun ActionPill(
       style = CrawlType.button,
       color = content,
       maxLines = 1,
+      autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = CrawlType.button.fontSize, stepSize = 0.5.sp),
     )
   }
 }

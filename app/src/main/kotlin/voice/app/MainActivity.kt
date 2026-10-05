@@ -100,9 +100,7 @@ class MainActivity : AppCompatActivity() {
               sceneStrategies = listOf(bottomSheetStrategy, dialogStrategy),
               sharedTransitionScope = this,
               transitionSpec = {
-                if (targetState.destination() is Destination.Bookmarks) {
-                  inventoryOpenTransition()
-                } else if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
+                if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
                   bookCardOpenTransition()
                 } else {
                   SharedXAxisEnterTransition(density) togetherWith SharedXAxisExitTransition(density)

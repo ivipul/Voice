@@ -11,11 +11,6 @@ import androidx.compose.ui.unit.dp
 /** The poster player's own icons, on the 24 unit grid of the Material symbols. */
 internal object PosterIcons {
 
-  val Ask: ImageVector = icon("Ask") {
-    fill("M10 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z")
-    fill("M18.5 3.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z")
-  }
-
   /** A viewfinder: capture this moment. */
   val Snip: ImageVector = icon("Snip") {
     stroke("M4 9V5h4M16 5h4v4M20 15v4h-4M8 19H4v-4")

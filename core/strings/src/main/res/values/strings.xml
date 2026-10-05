@@ -51,7 +51,7 @@
     <!-- Content description for the Ask co-pilot toolbar button. -->
     <string name="copilot.action.ask">Ask</string>
     <!-- Label of the player button that asks the AI a spoken question. -->
-    <string name="copilot.action.ask_ai">Ask AI</string>
+    <string name="copilot.action.ask_ai">Ask system AI</string>
     <!-- Content description for the player button that has the AI recap what happened recently. -->
     <string name="copilot.action.smart_recap">Smart Recap</string>
     <!-- Name of the Smart Recap button on the Android Auto player. -->

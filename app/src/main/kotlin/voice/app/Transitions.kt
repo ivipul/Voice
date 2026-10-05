@@ -48,9 +48,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.TransformOrigin
@@ -120,11 +118,6 @@ val SharedZAxisExitTransition =
       animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing),
     )
 
-/** The Inventory rises from the bottom edge over the player, which holds still under it until it is covered. */
-internal fun inventoryOpenTransition(): ContentTransform =
-  slideInVertically(animationSpec = tween(durationMillis = DurationLong2, easing = EmphasizedEasing)) { it } togetherWith
-    fadeOut(animationSpec = snap(delayMillis = DurationLong2))
-
 /**
  * Library to player: the book's card grows into the player over the library, which holds still under it. Both screens
  * render the growing card as shared bounds, so this only covers what they leave out, like the grid's covers.
@@ -138,12 +131,8 @@ internal fun bookCardCloseTransition(): ContentTransform =
   EnterTransition.None togetherWith
     fadeOut(animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing))
 
-/** Back from the Inventory: it sinks to the bottom edge and uncovers the player. */
 internal fun AnimatedContentTransitionScope<Scene<Destination.Compose>>.popTransition(): ContentTransform {
-  return if (initialState.destination() is Destination.Bookmarks) {
-    EnterTransition.None togetherWith
-      slideOutVertically(animationSpec = tween(durationMillis = DurationMedium2, easing = EmphasizedAccelerateEasing)) { it }
-  } else if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
+  return if (isBookOverviewPlaybackTransition(initialState.destination(), targetState.destination())) {
     bookCardCloseTransition()
   } else {
     SharedZAxisEnterTransition togetherWith SharedZAxisExitTransition
