@@ -90,7 +90,7 @@ private const val TILT_CAMERA_DISTANCE = 12F
  * How far the cards lean for a scroll of [scrolledPx] in one frame: forward (top edge away) while the list scrolls down,
  * back while it scrolls up. [scrolledPx] is the content's move, negative when it moves up as the list scrolls down.
  */
-internal fun cardTilt(scrolledPx: Float): Float = (-scrolledPx * TILT_DEGREES_PER_PX).coerceIn(-MAX_TILT_DEGREES, MAX_TILT_DEGREES)
+internal fun cardTilt(scrolledPx: Float): Float = (0F - scrolledPx * TILT_DEGREES_PER_PX).coerceIn(-MAX_TILT_DEGREES, MAX_TILT_DEGREES)
 
 /** The library as a stack of cards in each book's own colors, each tucked under the next like cards in a wallet. */
 @Composable
