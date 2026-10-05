@@ -181,6 +181,8 @@
     <string name="folder.type.title">How are your files structured?</string>
     <!-- Content description of a snip's comic frame in the Inventory; tapping it shows the frame full screen. -->
     <string name="inventory.snip.frame">Snip picture, tap to see it full screen</string>
+    <!-- Content description for the three-dot button on a snip card in the Inventory, which opens its menu. -->
+    <string name="inventory.snip.more">More options for this snip</string>
     <!-- Empty-state message on the Inventory's Snips tab. -->
     <string name="inventory.snips.empty">No snips yet. Tap Snip while you listen and the moment lands here.</string>
     <!-- A comic strip the listener has not reached yet. %1$d is the chapter that unlocks it. -->

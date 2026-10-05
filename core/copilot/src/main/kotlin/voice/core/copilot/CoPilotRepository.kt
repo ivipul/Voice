@@ -30,17 +30,23 @@ class CoPilotRepository internal constructor(
   private val dao: CoPilotMessageDao,
   private val scope: CoroutineScope,
   private val imageExists: (String) -> Boolean,
+  private val deleteImage: (String) -> Unit,
 ) {
 
   @Inject
-  constructor(dao: CoPilotMessageDao) : this(dao, CoroutineScope(SupervisorJob() + Dispatchers.IO), { File(it).isFile })
+  constructor(dao: CoPilotMessageDao) : this(
+    dao = dao,
+    scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+    imageExists = { File(it).isFile },
+    deleteImage = { File(it).delete() },
+  )
 
   /** A repository that does not save anything, for tests of code that only reads or adds messages. */
-  constructor() : this(NoHistoryDao, CoroutineScope(SupervisorJob() + Dispatchers.Unconfined), { true })
+  constructor() : this(NoHistoryDao, CoroutineScope(SupervisorJob() + Dispatchers.Unconfined), { true }, {})
 
   private val messagesByBook = MutableStateFlow<Map<BookId, List<CoPilotMessage>>>(emptyMap())
 
-  private val writes = Channel<Pair<BookId, CoPilotMessage>>(Channel.UNLIMITED)
+  private val writes = Channel<Write>(Channel.UNLIMITED)
   private val orders = mutableMapOf<String, Long>()
   private var lastOrder = -1L
 
@@ -49,9 +55,20 @@ class CoPilotRepository internal constructor(
   init {
     scope.launch {
       loadJob.join()
-      for ((bookId, message) in writes) {
-        runCatching { dao.upsert(message.toStored(bookId, orders.getOrPut(message.id) { ++lastOrder })) }
-          .onFailure { Logger.w(it, "Could not save co-pilot message ${message.id}") }
+      for (write in writes) {
+        when (write) {
+          is Write.Save -> {
+            val message = write.message
+            runCatching { dao.upsert(message.toStored(write.bookId, orders.getOrPut(message.id) { ++lastOrder })) }
+              .onFailure { Logger.w(it, "Could not save co-pilot message ${message.id}") }
+          }
+          is Write.Delete -> {
+            runCatching {
+              dao.delete(write.messageId)
+              write.imagePath?.let(deleteImage)
+            }.onFailure { Logger.w(it, "Could not delete co-pilot message ${write.messageId}") }
+          }
+        }
       }
     }
   }
@@ -75,7 +92,7 @@ class CoPilotRepository internal constructor(
 
   fun addMessage(bookId: BookId, message: CoPilotMessage) {
     messagesByBook.update { all -> all + (bookId to (all[bookId].orEmpty() + message)) }
-    writes.trySend(bookId to message)
+    writes.trySend(Write.Save(bookId, message))
   }
 
   fun updateMessage(bookId: BookId, messageId: String, transform: (CoPilotMessage) -> CoPilotMessage) {
@@ -84,7 +101,18 @@ class CoPilotRepository internal constructor(
       val messages = all[bookId] ?: return@update all
       all + (bookId to messages.map { if (it.id == messageId) transform(it).also { new -> updated = new } else it })
     }
-    updated?.let { writes.trySend(bookId to it) }
+    updated?.let { writes.trySend(Write.Save(bookId, it)) }
+  }
+
+  /** Removes a message for good, from the history, the database and, for a snip with a picture, its image file. */
+  fun removeMessage(bookId: BookId, messageId: String) {
+    var removed: CoPilotMessage? = null
+    messagesByBook.update { all ->
+      val messages = all[bookId] ?: return@update all
+      removed = messages.firstOrNull { it.id == messageId }
+      all + (bookId to messages.filterNot { it.id == messageId })
+    }
+    removed?.let { writes.trySend(Write.Delete(messageId, it.imagePath)) }
   }
 
   val allMessagesByBook: StateFlow<Map<BookId, List<CoPilotMessage>>> get() = messagesByBook.asStateFlow()
@@ -97,6 +125,12 @@ class CoPilotRepository internal constructor(
 
   fun emitSnipEvent(event: SnipEvent) {
     snipEventFlow.tryEmit(event)
+  }
+
+  /** Saves and deletes go through one queue so a delete never overtakes the save it follows. */
+  private sealed interface Write {
+    data class Save(val bookId: BookId, val message: CoPilotMessage) : Write
+    data class Delete(val messageId: String, val imagePath: String?) : Write
   }
 
   private companion object {
@@ -133,4 +167,5 @@ private fun StoredCoPilotMessage.toMessage(imageExists: (String) -> Boolean) = C
 private object NoHistoryDao : CoPilotMessageDao() {
   override suspend fun all(): List<StoredCoPilotMessage> = emptyList()
   override suspend fun upsert(message: StoredCoPilotMessage) = Unit
+  override suspend fun delete(id: String) = Unit
 }

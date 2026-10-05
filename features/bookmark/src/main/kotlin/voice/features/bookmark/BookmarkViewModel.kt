@@ -95,6 +95,10 @@ class BookmarkViewModel(
     }
   }
 
+  fun onSnipDelete(snip: SnipCardViewState) {
+    copilotRepository.removeMessage(bookId, snip.id)
+  }
+
   @AssistedFactory
   interface Factory {
     fun create(bookId: BookId): BookmarkViewModel

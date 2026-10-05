@@ -106,6 +106,7 @@ private fun Inventory(
         viewModel.onSnipClick(it)
         onClose()
       },
+      onSnipDelete = viewModel::onSnipDelete,
       onStripClick = viewModel::onStripClick,
       modifier = modifier,
     )
@@ -116,6 +117,7 @@ private fun Inventory(
 internal fun Inventory(
   viewState: BookmarkViewState,
   onSnipClick: (SnipCardViewState) -> Unit,
+  onSnipDelete: (SnipCardViewState) -> Unit,
   onStripClick: (AvailableStrip) -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -141,6 +143,7 @@ internal fun Inventory(
         snips = viewState.snips,
         onClick = onSnipClick,
         onImageClick = { viewedFrame = it },
+        onDelete = onSnipDelete,
       )
       InventoryTab.Strips -> StripGallery(
         strips = viewState.strips,

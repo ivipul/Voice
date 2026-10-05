@@ -56,6 +56,21 @@ class CoPilotMessageDaoTest {
   }
 
   @Test
+  fun `deleting a message removes only that one`() = runTest {
+    val db = database()
+    val dao = db.coPilotMessageDao()
+    dao.upsert(message("m1", orderIndex = 0))
+    dao.upsert(message("s1", orderIndex = 1, "/frames/s1.png", ChapterId("file-3"), 123_000L))
+    dao.upsert(message("m2", orderIndex = 2))
+
+    dao.delete("s1")
+    dao.delete("not-there")
+
+    assertEquals(listOf("m1", "m2"), dao.all().map { it.id })
+    db.close()
+  }
+
+  @Test
   fun `upserting an existing message replaces it in place`() = runTest {
     val db = database()
     val dao = db.coPilotMessageDao()

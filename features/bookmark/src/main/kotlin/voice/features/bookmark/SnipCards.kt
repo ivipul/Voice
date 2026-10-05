@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,9 +19,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +44,7 @@ import coil.compose.AsyncImage
 import voice.core.ui.FRAME_ASPECT
 import voice.core.ui.crawl.CrawlFonts
 import voice.core.ui.crawl.CrawlType
+import voice.core.ui.icons.VoiceIcons
 import java.io.File
 import voice.core.strings.R as StringsR
 
@@ -53,6 +64,7 @@ internal fun SnipCardList(
   snips: List<SnipCardViewState>,
   onClick: (SnipCardViewState) -> Unit,
   onImageClick: (SnipCardViewState) -> Unit,
+  onDelete: (SnipCardViewState) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   if (snips.isEmpty()) {
@@ -79,6 +91,7 @@ internal fun SnipCardList(
           snip = snip,
           onClick = { onClick(snip) },
           onImageClick = { onImageClick(snip) },
+          onDelete = { onDelete(snip) },
           modifier = Modifier.animateItem(),
         )
       }
@@ -88,13 +101,15 @@ internal fun SnipCardList(
 
 /**
  * The snip's comic frame on the left, when it has one, and its place in the book, title and text on the right.
- * A tap on the frame opens it full screen; a tap anywhere else plays on from the snip.
+ * A tap on the frame opens it full screen; a tap anywhere else plays on from the snip. The three dots in the
+ * corner hold the option to delete it.
  */
 @Composable
 private fun SnipCard(
   snip: SnipCardViewState,
   onClick: () -> Unit,
   onImageClick: () -> Unit,
+  onDelete: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Row(
@@ -103,8 +118,7 @@ private fun SnipCard(
       .clip(CardShape)
       .background(MaterialTheme.colorScheme.surfaceContainerHigh)
       .clickable(onClick = onClick)
-      .padding(12.dp),
-    horizontalArrangement = Arrangement.spacedBy(14.dp),
+      .padding(start = 12.dp, top = 12.dp, bottom = 12.dp),
   ) {
     when {
       snip.imagePath != null -> AsyncImage(
@@ -128,6 +142,9 @@ private fun SnipCard(
         CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
       }
     }
+    if (snip.imagePath != null || snip.drawingImage) {
+      Spacer(modifier = Modifier.width(14.dp))
+    }
     Column(
       modifier = Modifier.weight(1F),
       verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -150,6 +167,35 @@ private fun SnipCard(
         text = snip.text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurface,
+      )
+    }
+    SnipOverflowMenu(onDelete = onDelete)
+  }
+}
+
+/** Sits in the card's top corner, pulled up so the dots line up with the first line of text. */
+@Composable
+private fun SnipOverflowMenu(onDelete: () -> Unit) {
+  var expanded by remember { mutableStateOf(false) }
+  Box(modifier = Modifier.offset(y = (-10).dp)) {
+    IconButton(onClick = { expanded = true }) {
+      Icon(
+        imageVector = VoiceIcons.MoreVert,
+        contentDescription = stringResource(id = StringsR.string.inventory_snip_more),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    }
+    DropdownMenu(
+      expanded = expanded,
+      onDismissRequest = { expanded = false },
+    ) {
+      DropdownMenuItem(
+        text = { Text(text = stringResource(id = StringsR.string.common_action_delete)) },
+        leadingIcon = { Icon(imageVector = VoiceIcons.Delete, contentDescription = null) },
+        onClick = {
+          expanded = false
+          onDelete()
+        },
       )
     }
   }

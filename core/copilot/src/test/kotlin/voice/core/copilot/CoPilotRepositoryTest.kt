@@ -31,15 +31,21 @@ class CoPilotRepositoryTest {
     override suspend fun upsert(message: StoredCoPilotMessage) {
       rows[message.id] = message
     }
+
+    override suspend fun delete(id: String) {
+      rows.remove(id)
+    }
   }
 
   private fun TestScope.repository(
     dao: CoPilotMessageDao,
     imageExists: (String) -> Boolean = { true },
+    deleteImage: (String) -> Unit = {},
   ) = CoPilotRepository(
     dao,
     CoroutineScope(backgroundScope.coroutineContext + UnconfinedTestDispatcher(testScheduler)),
     imageExists,
+    deleteImage,
   )
 
   private fun message(
@@ -94,6 +100,38 @@ class CoPilotRepositoryTest {
     assertEquals(123_000L, restored.snipPositionInChapterMs)
     assertTrue(restored.isVisualPriority)
     assertEquals("a snipped moment", restored.text)
+  }
+
+  @Test
+  fun `a removed snip is gone from the history, the database and the disk, and stays gone after a restart`() = runTest {
+    val dao = FakeDao()
+    val deletedImages = mutableListOf<String>()
+    val first = repository(dao, deleteImage = { deletedImages += it })
+    first.addMessage(book, message("m1"))
+    first.addMessage(book, message("s1").copy(imagePath = "/frames/s1.png"))
+    first.addMessage(otherBook, message("o1"))
+
+    first.removeMessage(book, "s1")
+
+    assertEquals(listOf("m1"), first.messages().map { it.id })
+    assertEquals(setOf("m1", "o1"), dao.rows.keys)
+    assertEquals(listOf("/frames/s1.png"), deletedImages)
+    val restarted = repository(dao)
+    assertEquals(listOf("m1"), restarted.messages().map { it.id })
+    assertEquals(listOf("o1"), restarted.messages(otherBook).map { it.id })
+  }
+
+  @Test
+  fun `removing a message that is not there changes nothing`() = runTest {
+    val dao = FakeDao()
+    val repository = repository(dao)
+    repository.addMessage(book, message("m1"))
+
+    repository.removeMessage(book, "nope")
+    repository.removeMessage(otherBook, "m1")
+
+    assertEquals(listOf("m1"), repository.messages().map { it.id })
+    assertEquals(setOf("m1"), dao.rows.keys)
   }
 
   @Test
