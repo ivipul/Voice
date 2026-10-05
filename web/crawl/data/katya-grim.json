@@ -1,0 +1,466 @@
+{
+ "slug": "katya-grim",
+ "name": "Katya Grim",
+ "epithet": null,
+ "sample": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 2,
+   "ms": 32027827,
+   "t": "08:53:47",
+   "description": "A blonde-haired woman with a poorly sculpted, still-transforming face and a ghoulish, sheepish smile, a crooked, sideways nose, a lumpy chin and unusually thick hair, wearing a poorly sewn tracksuit and blocky snow boots.",
+   "change": "Scene-only: half-formed face with crooked nose, lumpy chin, poorly sewn tracksuit and snow boots.",
+   "images": {
+    "standing": "looks/katya-grim/look-001-standing.webp",
+    "action": "looks/katya-grim/look-001-action.webp"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 3,
+   "ms": 3936860,
+   "t": "01:05:36",
+   "description": "A blonde-haired woman with a natural human face, wearing a blue tracksuit and holding a small axe.",
+   "change": "Scene-only: blue tracksuit and small axe.",
+   "images": {
+    "standing": "looks/katya-grim/look-002-standing.webp",
+    "action": "looks/katya-grim/look-002-action.webp"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 3,
+   "ms": 11892740,
+   "t": "03:18:12",
+   "description": "A blonde-haired woman with a purple mohawk and a natural-looking face, like someone who has had a lot of cosmetic surgery, wearing a slick black bodysuit and poorly shaped knee-high boots.",
+   "change": "Scene-only: purple mohawk, black bodysuit and knee-high boots.",
+   "images": {
+    "standing": "looks/katya-grim/look-003-standing.webp",
+    "action": "looks/katya-grim/look-003-action.webp"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 3,
+   "ms": 22768880,
+   "t": "06:19:28",
+   "description": "A blonde-haired creature with a pale, surgically-altered-looking face, about seven feet tall with a torso three times thicker than normal and arms that reach the ground like a gorilla's, one hand turned into a curved metal shield.",
+   "change": "Scene-only: seven-foot gorilla-armed form with a metal shield hand.",
+   "images": {
+    "standing": "looks/katya-grim/look-004-standing.webp",
+    "action": "looks/katya-grim/look-004-action.webp"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 3,
+   "ms": 37730420,
+   "t": "10:28:50",
+   "description": "A flesh-colored, plow-shaped form in front of a subway car, with a pair of eyes and a mouth sitting in a little divot near the top of the scoop.",
+   "change": "Scene-only: flesh-colored plow shape with a face in a divot.",
+   "images": {
+    "standing": "looks/katya-grim/look-005-standing.webp",
+    "action": "looks/katya-grim/look-005-action.webp"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 3,
+   "ms": 39470540,
+   "t": "10:57:50",
+   "description": "A blonde-haired woman wearing a red leather outfit.",
+   "change": "Baseline: regular human form in red leather.",
+   "images": {
+    "standing": "looks/katya-grim/look-006-standing.webp",
+    "action": "looks/katya-grim/look-006-action.webp"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 3,
+   "ms": 53013860,
+   "t": "14:43:33",
+   "description": "A blonde-haired woman in a hulking she-hulk form, about eight feet tall and wide, carrying a riot shield on her left arm.",
+   "change": "Scene-only: eight-foot she-hulk form with riot shield.",
+   "images": {
+    "standing": "looks/katya-grim/look-007-standing.webp",
+    "action": "looks/katya-grim/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 4,
+   "ms": 5619960,
+   "t": "01:33:39",
+   "description": "A shapeshifter formed into a half-shell shape, acting as a shield against an incoming plane.",
+   "change": "Scene-only: half-shell shield shape.",
+   "images": {
+    "standing": "looks/katya-grim/look-008-standing.webp",
+    "action": "looks/katya-grim/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 4,
+   "ms": 12330360,
+   "t": "03:25:30",
+   "description": "A blonde-haired woman in a regular human form, holding an iced tea with a little umbrella in her hand.",
+   "change": "Scene-only: holding an iced tea with a little umbrella.",
+   "images": {
+    "standing": "looks/katya-grim/look-009-standing.webp",
+    "action": "looks/katya-grim/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 4,
+   "ms": 19906560,
+   "t": "05:31:46",
+   "description": "A shapeshifter who has formed herself into the entire back seat of a chariot, also shaping the duct-taped body of a gnome figure seated atop it as a disguise, with a fake dromedarian neck added to complete the disguise; her real eyes are hidden within the duct tape.",
+   "change": "Scene-only: chariot back seat with duct-taped gnome decoy and fake dromedarian neck.",
+   "images": {
+    "standing": "looks/katya-grim/look-010-standing.webp",
+    "action": "looks/katya-grim/look-010-action.webp"
+   }
+  },
+  {
+   "seq": 11,
+   "book": 4,
+   "ms": 21598400,
+   "t": "05:59:58",
+   "description": "A blonde-haired woman in a tank-like form, with a shield on her arm and a crossbow over her head.",
+   "change": "Scene-only: tank form with shield and crossbow.",
+   "images": {
+    "standing": "looks/katya-grim/look-011-standing.webp",
+    "action": "looks/katya-grim/look-011-action.webp"
+   }
+  },
+  {
+   "seq": 12,
+   "book": 4,
+   "ms": 44000520,
+   "t": "12:13:20",
+   "description": "A shapeshifter who has transformed herself to cover a submarine hull, camouflaging herself against it.",
+   "change": "Scene-only: spread across a submarine hull as camouflage.",
+   "images": {
+    "standing": "looks/katya-grim/look-012-standing.webp",
+    "action": "looks/katya-grim/look-012-action.webp"
+   }
+  },
+  {
+   "seq": 13,
+   "book": 5,
+   "ms": 135000,
+   "t": "00:02:15",
+   "description": "A blonde-haired woman in a regular human form, grinning with worry in her eyes, looking haggard and exhausted.",
+   "change": "Scene-only: haggard, exhausted, worried grin.",
+   "images": {
+    "standing": "looks/katya-grim/look-013-standing.webp",
+    "action": "looks/katya-grim/look-013-action.webp"
+   }
+  },
+  {
+   "seq": 14,
+   "book": 5,
+   "ms": 53635800,
+   "t": "14:53:55",
+   "description": "A blonde-haired woman in a large she-hulk form with a determined look on her face, wearing a backpack that lets her add mass and with a second pair of arms holding a jacket in place.",
+   "change": "Scene-only: large she-hulk form with backpack and extra pair of arms.",
+   "images": {
+    "standing": "looks/katya-grim/look-014-standing.webp",
+    "action": "looks/katya-grim/look-014-action.webp"
+   }
+  },
+  {
+   "seq": 15,
+   "book": 5,
+   "ms": 78997400,
+   "t": "21:56:37",
+   "description": "A woman whose body has formed into a sentinel gun, with a metal arm that looks like flesh, wearing a backpack that lets her add mass.",
+   "change": "Scene-only: sentinel gun form with backpack and flesh-like metal arm.",
+   "images": {
+    "standing": "looks/katya-grim/look-015-standing.webp",
+    "action": "looks/katya-grim/look-015-action.webp"
+   }
+  },
+  {
+   "seq": 16,
+   "book": 5,
+   "ms": 84139020,
+   "t": "23:22:19",
+   "description": "A little, almost human girl with dark hair and a bare head, with all her original parts except missing fingers and a missing nose.",
+   "change": "Scene-only: small girl with missing fingers and nose.",
+   "images": {
+    "standing": "looks/katya-grim/look-016-standing.webp",
+    "action": "looks/katya-grim/look-016-action.webp"
+   }
+  },
+  {
+   "seq": 17,
+   "book": 6,
+   "ms": 21322040,
+   "t": "05:55:22",
+   "description": "A blonde-haired woman wearing a crown on her head.",
+   "change": "Scene-only: wearing a crown.",
+   "images": {
+    "standing": "looks/katya-grim/look-017-standing.webp",
+    "action": "looks/katya-grim/look-017-action.webp"
+   }
+  },
+  {
+   "seq": 18,
+   "book": 6,
+   "ms": 85566360,
+   "t": "23:46:06",
+   "description": "A large, blonde she-hulk with heavy rings under her eyes. Multiple stalks containing eyeballs have grown on the back of her neck.",
+   "change": "Scene-only: large she-hulk with eyeball stalks on neck.",
+   "images": {
+    "standing": "looks/katya-grim/look-018-standing.webp",
+    "action": "looks/katya-grim/look-018-action.webp"
+   }
+  },
+  {
+   "seq": 19,
+   "book": 6,
+   "ms": 92691440,
+   "t": "25:44:51",
+   "description": "A manta-like creature with four legs instead of arms.",
+   "change": "Scene-only: manta-like creature with four legs.",
+   "images": {
+    "standing": "looks/katya-grim/look-019-standing.webp",
+    "action": "looks/katya-grim/look-019-action.webp"
+   }
+  },
+  {
+   "seq": 20,
+   "book": 7,
+   "ms": 9148880,
+   "t": "02:32:28",
+   "description": "A small-looking blonde woman in a regular human form, with a hollow look in her eyes and one scoop-shaped hand, with an extra set of hands grown.",
+   "change": "Scene-only: hollow eyes and scoop-shaped hand.",
+   "images": {
+    "standing": "looks/katya-grim/look-020-standing.webp",
+    "action": "looks/katya-grim/look-020-action.webp"
+   }
+  },
+  {
+   "seq": 21,
+   "book": 7,
+   "ms": 25397760,
+   "t": "07:03:17",
+   "description": "A small-looking blonde woman in a regular human form, with a crow with the skull of an infant sitting on her shoulder, blended into her.",
+   "change": "Scene-only: skull-faced crow on shoulder.",
+   "images": {
+    "standing": "looks/katya-grim/look-021-standing.webp",
+    "action": "looks/katya-grim/look-021-action.webp"
+   }
+  },
+  {
+   "seq": 22,
+   "book": 7,
+   "ms": 54260720,
+   "t": "15:04:20",
+   "description": "A blonde-haired woman transformed into a towering mantaar with giant manta hands, in the process of forming a mullet, with a second set of arms and bulging muscles so she towers over those near her.",
+   "change": "Scene-only: towering mantaar form with extra arms.",
+   "images": {
+    "standing": "looks/katya-grim/look-022-standing.webp",
+    "action": "looks/katya-grim/look-022-action.webp"
+   }
+  },
+  {
+   "seq": 23,
+   "book": 7,
+   "ms": 78432800,
+   "t": "21:47:12",
+   "description": "A blonde-haired woman with eyes gone completely white, as if frozen.",
+   "change": "Scene-only: completely white eyes.",
+   "images": {
+    "standing": "looks/katya-grim/look-023-standing.webp",
+    "action": "looks/katya-grim/look-023-action.webp"
+   }
+  },
+  {
+   "seq": 24,
+   "book": 7,
+   "ms": 100239733,
+   "t": "27:50:39",
+   "description": "A small woman with black hair, missing her left leg, her right leg below the knee, and an ear, with a raised cybernetic right arm.",
+   "change": "Scene-only: black hair, missing limbs and ear, cybernetic right arm.",
+   "images": {
+    "standing": "looks/katya-grim/look-024-standing.webp",
+    "action": "looks/katya-grim/look-024-action.webp"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "class",
+   "book": 2,
+   "ms": 31698600,
+   "value": "Monster Truck Driver"
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 31698600,
+   "value": 9
+  },
+  {
+   "field": "race",
+   "book": 2,
+   "ms": 31698600,
+   "value": "Human"
+  },
+  {
+   "field": "cha",
+   "book": 2,
+   "ms": 32290480,
+   "value": 8
+  },
+  {
+   "field": "con",
+   "book": 2,
+   "ms": 32290480,
+   "value": 51
+  },
+  {
+   "field": "dex",
+   "book": 2,
+   "ms": 32290480,
+   "value": 30
+  },
+  {
+   "field": "int",
+   "book": 2,
+   "ms": 32290480,
+   "value": 8
+  },
+  {
+   "field": "str",
+   "book": 2,
+   "ms": 32290480,
+   "value": 11
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 40464800,
+   "value": 21
+  },
+  {
+   "field": "gear:hands",
+   "book": 3,
+   "ms": 3942540,
+   "value": "Arm-racer"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 20053220,
+   "value": 24
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 39871460,
+   "value": 37
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 43016660,
+   "value": "Monster Truck Driver"
+  },
+  {
+   "field": "race",
+   "book": 3,
+   "ms": 43016660,
+   "value": "Doppelganger"
+  },
+  {
+   "field": "skill:Crossbow",
+   "book": 3,
+   "ms": 47478180,
+   "value": 4
+  },
+  {
+   "field": "gear:off hand",
+   "book": 3,
+   "ms": 49837460,
+   "value": "Enchanted Shade Knoll Riot Force's Crowd Control Shield"
+  },
+  {
+   "field": "race",
+   "book": 4,
+   "ms": 4891120,
+   "value": "Doppelganger"
+  },
+  {
+   "field": "gear:off hand",
+   "book": 4,
+   "ms": 5342680,
+   "value": "Riot Shield"
+  },
+  {
+   "field": "gear:ranged",
+   "book": 4,
+   "ms": 5484320,
+   "value": "Crossbow"
+  },
+  {
+   "field": "gear:neck",
+   "book": 4,
+   "ms": 14315400,
+   "value": "Feathered Boa"
+  },
+  {
+   "field": "gear:off hand",
+   "book": 4,
+   "ms": 21986680,
+   "value": "Shield"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 33690760,
+   "value": 41
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 48289160,
+   "value": 44
+  },
+  {
+   "field": "class",
+   "book": 5,
+   "ms": 901000,
+   "value": "Monster Truck Driver"
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 4029000,
+   "value": 52
+  },
+  {
+   "field": "gear:back",
+   "book": 5,
+   "ms": 39239320,
+   "value": "New Backpack"
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 70260440,
+   "value": 55
+  },
+  {
+   "field": "gear:head",
+   "book": 5,
+   "ms": 84154000,
+   "value": "Atiara"
+  }
+ ]
+}

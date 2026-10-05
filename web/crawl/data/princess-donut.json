@@ -1,0 +1,1222 @@
+{
+ "slug": "princess-donut",
+ "name": "Princess Donut",
+ "epithet": null,
+ "sample": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 121440,
+   "t": "00:02:01",
+   "description": "A chunky tortoiseshell Persian cat with a tail.",
+   "change": "Initial appearance",
+   "images": {
+    "standing": "looks/princess-donut/look-001-standing.webp",
+    "action": "looks/princess-donut/look-001-action.webp"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 1,
+   "ms": 9965880,
+   "t": "02:46:05",
+   "description": "A chunky tortoiseshell Persian cat with a fuzzy head and a long tail. She is wearing a small, jeweled, cat-sized crown that glitters with smoky, dark gems and a deep purple stone, along with a little bell and a silver butterfly collar charm.",
+   "change": "Wears a small jeweled crown, bell and butterfly collar charm.",
+   "images": {
+    "standing": "looks/princess-donut/look-002-standing.webp",
+    "action": "looks/princess-donut/look-002-action.webp"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 1,
+   "ms": 16692133,
+   "t": "04:38:12",
+   "description": "A chunky tortoiseshell Persian cat with a fuzzy head and a long tail. She is wearing a small, jeweled tiara on her head, a little bell, and a collar charm that is a little silver butterfly. A gold-colored mark is on her back over her right shoulder blade, and silver-scale armor is draped over the back half of her body like a skirt with a tail slot, not covering her stomach.",
+   "change": "Gold mark on back and silver-scale armor skirt added.",
+   "images": {
+    "standing": "looks/princess-donut/look-003-standing.webp",
+    "action": "looks/princess-donut/look-003-action.webp"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 2,
+   "ms": 6683000,
+   "t": "01:51:23",
+   "description": "A cat, wearing a tiara and backside armor, along with a collar with a charm. An Enchanted Anklet of the Fallen Oak sits around her rear left ankle, hidden within her fur.",
+   "change": "Enchanted anklet added on rear left ankle.",
+   "images": {
+    "standing": "looks/princess-donut/look-004-standing.webp",
+    "action": "looks/princess-donut/look-004-action.webp"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 2,
+   "ms": 21763120,
+   "t": "06:02:43",
+   "description": "A small cat, wearing a purple tiara and backside armor, along with a collar with a charm. An Enchanted Anklet of the Fallen Oak sits around her rear left ankle, hidden within her fur. Her fur is soft. She is riddled with long black spikes like a pin cushion.",
+   "change": "Tiara is purple; body riddled with long black spikes (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-005-standing.webp",
+    "action": "looks/princess-donut/look-005-action.webp"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 2,
+   "ms": 41048480,
+   "t": "11:24:08",
+   "description": "A small Persian cat with large eyes, wearing a purple crown, backside armor, and a collar with a charm. An Enchanted Anklet of the Fallen Oak, a small magical anklet with three little beads, sits around her rear leg, hidden within her fur. A crupper hangs like a skirt across her backside.",
+   "change": "Spikes gone; large eyes, purple crown, crupper skirt, beaded anklet.",
+   "images": {
+    "standing": "looks/princess-donut/look-006-standing.webp",
+    "action": "looks/princess-donut/look-006-action.webp"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 3,
+   "ms": 3735020,
+   "t": "01:02:15",
+   "description": "A cat wearing a tiara topped with white jewels.",
+   "change": "New tiara topped with white jewels.",
+   "images": {
+    "standing": "looks/princess-donut/look-007-standing.webp",
+    "action": "looks/princess-donut/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 3,
+   "ms": 26778660,
+   "t": "07:26:18",
+   "description": "A cat wearing a tiara topped with white jewels, and wearing large, round sunglasses that make her look like a bug, special high-fashion goggles magically affixed to her face; the frames have no arms, and her nose is too squished to hold ordinary frames anyway.",
+   "change": "Large round bug-like sunglasses added.",
+   "images": {
+    "standing": "looks/princess-donut/look-008-standing.webp",
+    "action": "looks/princess-donut/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 3,
+   "ms": 38792873,
+   "t": "10:46:32",
+   "description": "A cat wearing a tiara topped with white jewels and large, round bug-like sunglasses magically affixed to her face. She is small in stature and wears a pink feather boa around her neck. She is soaked in dripping, steaming guts, with a severed hand clutched tight around her tail.",
+   "change": "Pink feather boa, soaked in guts, severed hand on tail (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-009-standing.webp",
+    "action": "looks/princess-donut/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 4,
+   "ms": 22890240,
+   "t": "06:21:30",
+   "description": "A cat with bright yellow eyes.",
+   "change": "Yellow eye color established.",
+   "images": {
+    "standing": "looks/princess-donut/look-010-standing.webp",
+    "action": "looks/princess-donut/look-010-action.webp"
+   }
+  },
+  {
+   "seq": 11,
+   "book": 4,
+   "ms": 39282680,
+   "t": "10:54:42",
+   "description": "A cat with bright yellow eyes, her long hair flowing around her underwater like a sea anemone. She has just been pierced through the stomach by a shard of glass.",
+   "change": "Underwater hair flow and glass shard through stomach (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-011-standing.webp",
+    "action": "looks/princess-donut/look-011-action.webp"
+   }
+  },
+  {
+   "seq": 12,
+   "book": 4,
+   "ms": 62353560,
+   "t": "17:19:13",
+   "description": "A cat with a tiara and yellow eyes. Her skin is smoldering and her hair is singed; her fur is covered in soot, blackened by the heat.",
+   "change": "Smoldering skin, singed hair, soot-blackened fur (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-012-standing.webp",
+    "action": "looks/princess-donut/look-012-action.webp"
+   }
+  },
+  {
+   "seq": 13,
+   "book": 5,
+   "ms": 4259000,
+   "t": "01:10:59",
+   "description": "A cat with clean, groomed fur, wearing sunglasses.",
+   "change": "Clean and groomed, sunglasses on.",
+   "images": {
+    "standing": "looks/princess-donut/look-013-standing.webp",
+    "action": "looks/princess-donut/look-013-action.webp"
+   }
+  },
+  {
+   "seq": 14,
+   "book": 5,
+   "ms": 46513940,
+   "t": "12:55:13",
+   "description": "A cat wearing a collar with an enchanted charm with a plain turquoise gem. She wears an obsidian bracelet on her front right leg, a new silver bracelet with little purple gems on her left front leg, a fallen oak anklet on one back leg and a +2 dexterity anklet on the other back leg, so all four legs have bracelets or anklets.",
+   "change": "Bracelets and anklets on all four legs.",
+   "images": {
+    "standing": "looks/princess-donut/look-014-standing.webp",
+    "action": "looks/princess-donut/look-014-action.webp"
+   }
+  },
+  {
+   "seq": 15,
+   "book": 5,
+   "ms": 49576320,
+   "t": "13:46:16",
+   "description": "A cat wearing a glittering tiara and a collar with an enchanted charm with a plain turquoise gem. She wears an obsidian bracelet on her front right leg, a silver bracelet with little purple gems on her left front leg, a fallen oak anklet on one back leg and a +2 dexterity anklet on the other back leg.",
+   "change": "Glittering tiara added.",
+   "images": {
+    "standing": "looks/princess-donut/look-015-standing.webp",
+    "action": "looks/princess-donut/look-015-action.webp"
+   }
+  },
+  {
+   "seq": 16,
+   "book": 5,
+   "ms": 72954840,
+   "t": "20:15:54",
+   "description": "A cat with her belly completely covered in fur and with eight nipples, wearing a gleaming tiara, a little headset microphone, sunglasses, and a collar with an enchanted charm with a plain turquoise gem. She wears an obsidian bracelet on her front right leg, a silver bracelet with little purple gems on her left front leg, a fallen oak anklet on one back leg and a +2 dexterity anklet on the other back leg.",
+   "change": "Headset microphone and sunglasses added.",
+   "images": {
+    "standing": "looks/princess-donut/look-016-standing.webp",
+    "action": "looks/princess-donut/look-016-action.webp"
+   }
+  },
+  {
+   "seq": 17,
+   "book": 5,
+   "ms": 81512560,
+   "t": "22:38:32",
+   "description": "A cat matted down with gore, her head bloody and matted and her fur sticky with blood. She wears a little fake headset microphone and a collar with an enchanted charm with a plain turquoise gem, an obsidian bracelet on her front right leg, a silver bracelet with little purple gems on her left front leg, a fallen oak anklet on one back leg and a +2 dexterity anklet on the other back leg.",
+   "change": "Matted with gore and blood (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-017-standing.webp",
+    "action": "looks/princess-donut/look-017-action.webp"
+   }
+  },
+  {
+   "seq": 18,
+   "book": 6,
+   "ms": 8214680,
+   "t": "02:16:54",
+   "description": "A small cat with a red beret on her head and a white tiara.",
+   "change": "Red beret and white tiara.",
+   "images": {
+    "standing": "looks/princess-donut/look-018-standing.webp",
+    "action": "looks/princess-donut/look-018-action.webp"
+   }
+  },
+  {
+   "seq": 19,
+   "book": 6,
+   "ms": 34746460,
+   "t": "09:39:06",
+   "description": "A small cat with a fuzzy face, a tail and paws. She wears a simple silver-colored tiara with an installed citrine jewel, an enchanted headset microphone, and sunglasses, and has a nipple ring and patches of yellow-orange fur.",
+   "change": "Silver citrine tiara; nipple ring and yellow-orange fur patches.",
+   "images": {
+    "standing": "looks/princess-donut/look-019-standing.webp",
+    "action": "looks/princess-donut/look-019-action.webp"
+   }
+  },
+  {
+   "seq": 20,
+   "book": 6,
+   "ms": 51134080,
+   "t": "14:12:14",
+   "description": "A cat, larger than usual after taking a size-up potion, with a fuzzy face, a tail and paws. She wears a silver citrine tiara, an enchanted headset microphone, and sunglasses, and has a nipple ring and patches of yellow-orange fur. Her lower mouth trembles when she is really upset.",
+   "change": "Larger after a size-up potion (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-020-standing.webp",
+    "action": "looks/princess-donut/look-020-action.webp"
+   }
+  },
+  {
+   "seq": 21,
+   "book": 6,
+   "ms": 56935200,
+   "t": "15:48:55",
+   "description": "A small cat with a fuzzy face, a tail and paws. She wears a white sailor hat (a Dixie cup) sitting cock-eyed on her head, along with sunglasses and an enchanted headset microphone, and has a nipple ring and patches of yellow-orange fur. Her lower mouth trembles when she is really upset.",
+   "change": "White sailor hat on her head (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-021-standing.webp",
+    "action": "looks/princess-donut/look-021-action.webp"
+   }
+  },
+  {
+   "seq": 22,
+   "book": 6,
+   "ms": 67925860,
+   "t": "18:52:05",
+   "description": "A small cat with a fuzzy face, a tail and paws. She wears sunglasses and an enchanted headset microphone, has a nipple ring and patches of yellow-orange fur, and is completely covered in tinsel.",
+   "change": "Completely covered in tinsel (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-022-standing.webp",
+    "action": "looks/princess-donut/look-022-action.webp"
+   }
+  },
+  {
+   "seq": 23,
+   "book": 6,
+   "ms": 86469680,
+   "t": "24:01:09",
+   "description": "A small cat with a fuzzy face, a tail and paws. She wears a dragonfly tiara, sunglasses and an enchanted headset microphone, and has a nipple ring and patches of yellow-orange fur, with a small opalescent longhorn-cow pin on her neck collar.",
+   "change": "Dragonfly tiara and longhorn-cow collar pin.",
+   "images": {
+    "standing": "looks/princess-donut/look-023-standing.webp",
+    "action": "looks/princess-donut/look-023-action.webp"
+   }
+  },
+  {
+   "seq": 24,
+   "book": 7,
+   "ms": 3770720,
+   "t": "01:02:50",
+   "description": "A cat wearing a beige, extra floppy booney hat and a cat-sized ghillie suit made of long shredded bits of color-changing fabric that blends into the background.",
+   "change": "Booney hat and ghillie suit added.",
+   "images": {
+    "standing": "looks/princess-donut/look-024-standing.webp",
+    "action": "looks/princess-donut/look-024-action.webp"
+   }
+  },
+  {
+   "seq": 25,
+   "book": 7,
+   "ms": 6264640,
+   "t": "01:44:24",
+   "description": "A cat wearing a beige, extra floppy booney hat, a cat-sized ghillie suit of long shredded color-changing fabric that blends into the background, a cat-sized green and black tartan kilt, sunglasses, and a dainty tiara of about a hundred tiny multicolored jewels on her head. A resized cloak with a cerulean lining sits over her shoulders, ridiculously short on her.",
+   "change": "Kilt, short cerulean-lined cloak, sunglasses and jeweled tiara added.",
+   "images": {
+    "standing": "looks/princess-donut/look-025-standing.webp",
+    "action": "looks/princess-donut/look-025-action.webp"
+   }
+  },
+  {
+   "seq": 26,
+   "book": 7,
+   "ms": 34982320,
+   "t": "09:43:02",
+   "description": "A cat with a flat face, covered in mud and blood, wearing a beige, extra floppy booney hat, a cat-sized ghillie suit of long shredded color-changing fabric, a cat-sized green and black tartan kilt, sunglasses, and a dainty tiara of about a hundred tiny multicolored jewels. A short cloak with a cerulean lining sits over her shoulders, and a bubble surrounds her head as ear protection.",
+   "change": "Flat face; mud, blood and head bubble (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-026-standing.webp",
+    "action": "looks/princess-donut/look-026-action.webp"
+   }
+  },
+  {
+   "seq": 27,
+   "book": 7,
+   "ms": 63882160,
+   "t": "17:44:42",
+   "description": "A cat with a flat face, wearing a beige, extra floppy booney hat, a cat-sized ghillie suit of long shredded color-changing fabric, a cat-sized green and black tartan kilt, a short cloak with a cerulean lining, a glittering multicolored jeweled tiara, sunglasses and a headset. She sits regally in a howda mounted on a rhinoceros.",
+   "change": "Sits in a howda on a rhinoceros (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-027-standing.webp",
+    "action": "looks/princess-donut/look-027-action.webp"
+   }
+  },
+  {
+   "seq": 28,
+   "book": 7,
+   "ms": 85582400,
+   "t": "23:46:22",
+   "description": "A cat with a flat face, wearing a beige, extra floppy booney hat, a cat-sized ghillie suit of long shredded color-changing fabric, a cat-sized green and black tartan kilt, a short cloak with a cerulean lining, sunglasses, a headset, and a multicolored jeweled tiara. Her eyes look hollow, as if focused far away.",
+   "change": "Hollow, far-away eyes (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-028-standing.webp",
+    "action": "looks/princess-donut/look-028-action.webp"
+   }
+  },
+  {
+   "seq": 29,
+   "book": 7,
+   "ms": 87085600,
+   "t": "24:11:25",
+   "description": "A cat with a flat face, wearing a beige, extra floppy booney hat, a cat-sized green and black tartan kilt, a short cloak with a cerulean lining, sunglasses, a headset, and a multicolored jeweled tiara. A small, round bald patch is shaved on her right flank, and a line art tattoo of a dog sits on her mottled skin.",
+   "change": "Bald patch and dog tattoo appear; no ghillie suit.",
+   "images": {
+    "standing": "looks/princess-donut/look-029-standing.webp",
+    "action": "looks/princess-donut/look-029-action.webp"
+   }
+  },
+  {
+   "seq": 30,
+   "book": 7,
+   "ms": 99645840,
+   "t": "27:40:45",
+   "description": "A cat with a flat face, wearing a beige, extra floppy booney hat, a cat-sized green and black tartan kilt, a short cloak with a cerulean lining, a lovely shawl, new knee pads, sunglasses, a headset, and a multicolored jeweled tiara. A small, round bald patch is shaved on her right flank, and a line art tattoo of a dog sits on her mottled skin. A quadrapad weapon mount on her back holds a large repeating crossbow, bigger than she is.",
+   "change": "Shawl, knee pads and back-mounted crossbow (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-030-standing.webp",
+    "action": "looks/princess-donut/look-030-action.webp"
+   }
+  },
+  {
+   "seq": 31,
+   "book": 8,
+   "ms": 578000,
+   "t": "00:09:38",
+   "description": "A long-haired cat with an annoying flat face. She is blood-soaked and wild-eyed, with red ash splattered over her fur, and she wears a glittering tiara.",
+   "change": "Blood-soaked with red ash on fur (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-031-standing.webp",
+    "action": "looks/princess-donut/look-031-action.webp"
+   }
+  },
+  {
+   "seq": 32,
+   "book": 8,
+   "ms": 8396600,
+   "t": "02:19:56",
+   "description": "A long-haired cat with an annoying flat face. She wears an Egyptian-style beaded headdress with red, yellow and orange beads cascading down either side of her face, matching her fur. She wears a chainmail crupper over a shaved patch of skin bearing a tattoo of a dog licking itself. The four front claws on her right paw are covered with red claw caps.",
+   "change": "Egyptian beaded headdress, chainmail crupper, red claw caps (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-032-standing.webp",
+    "action": "looks/princess-donut/look-032-action.webp"
+   }
+  },
+  {
+   "seq": 33,
+   "book": 8,
+   "ms": 57913000,
+   "t": "16:05:13",
+   "description": "A cat, grown huge and much bigger than a man, with an annoying flat face. She wears an Egyptian-style beaded headdress with red, yellow and orange beads cascading down either side of her face, matching her fur. She wears a chainmail crupper over a shaved patch of skin bearing a tattoo of a dog licking itself. She also wears a cheap green and yellow trucker hat. A weapon mount is formed on her back along with a crossbow. She sits secured in a passenger seat, held in place by straps that tighten around her. She wears knee pads, a headset microphone and sunglasses.",
+   "change": "Huge size, trucker hat, back weapon mount, strapped into a seat (this scene only).",
+   "images": {
+    "standing": "looks/princess-donut/look-033-standing.webp",
+    "action": "looks/princess-donut/look-033-action.webp"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 1618840,
+   "value": 1
+  },
+  {
+   "field": "race",
+   "book": 1,
+   "ms": 1618840,
+   "value": "Cat"
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 6990760,
+   "value": 25
+  },
+  {
+   "field": "con",
+   "book": 1,
+   "ms": 6990760,
+   "value": 2
+  },
+  {
+   "field": "dex",
+   "book": 1,
+   "ms": 6990760,
+   "value": 8
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 6990760,
+   "value": 11
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 6990760,
+   "value": 11
+  },
+  {
+   "field": "gear:head",
+   "book": 1,
+   "ms": 7215040,
+   "value": "Enchanted Crown of the Sepsis Whore"
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 8811920,
+   "value": 17
+  },
+  {
+   "field": "gear:neck",
+   "book": 1,
+   "ms": 9569080,
+   "value": "Talisman of the Slate Butterfly"
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 10361400,
+   "value": 5
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 10382280,
+   "value": 15
+  },
+  {
+   "field": "skill:Back Claw",
+   "book": 1,
+   "ms": 10404200,
+   "value": 4
+  },
+  {
+   "field": "skill:Slice Attack",
+   "book": 1,
+   "ms": 10404200,
+   "value": 4
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 13699160,
+   "value": 7
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 13964720,
+   "value": 37
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 15659120,
+   "value": 8
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 15831620,
+   "value": 39
+  },
+  {
+   "field": "int",
+   "book": 1,
+   "ms": 20689360,
+   "value": 24
+  },
+  {
+   "field": "str",
+   "book": 1,
+   "ms": 20846680,
+   "value": 18
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 22158360,
+   "value": 9
+  },
+  {
+   "field": "gear:wrist",
+   "book": 1,
+   "ms": 22351040,
+   "value": "Bracelet"
+  },
+  {
+   "field": "skill:Dodge",
+   "book": 1,
+   "ms": 22493520,
+   "value": 4
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 24887280,
+   "value": 10
+  },
+  {
+   "field": "floor",
+   "book": 1,
+   "ms": 25650160,
+   "value": 2
+  },
+  {
+   "field": "skill:Second Chance Spell",
+   "book": 1,
+   "ms": 30365580,
+   "value": 3
+  },
+  {
+   "field": "cha",
+   "book": 1,
+   "ms": 31307200,
+   "value": 43
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 44748880,
+   "value": 12
+  },
+  {
+   "field": "skill:Second Chance Spell",
+   "book": 1,
+   "ms": 45000400,
+   "value": 5
+  },
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 47251040,
+   "value": 13
+  },
+  {
+   "field": "floor",
+   "book": 2,
+   "ms": 169000,
+   "value": 3
+  },
+  {
+   "field": "gear:head",
+   "book": 2,
+   "ms": 471000,
+   "value": "Tiara"
+  },
+  {
+   "field": "race",
+   "book": 2,
+   "ms": 471000,
+   "value": "Cat"
+  },
+  {
+   "field": "class",
+   "book": 2,
+   "ms": 1508000,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 1508000,
+   "value": 13
+  },
+  {
+   "field": "gear:brush",
+   "book": 2,
+   "ms": 2959000,
+   "value": "Brush"
+  },
+  {
+   "field": "gear:charm",
+   "book": 2,
+   "ms": 2959000,
+   "value": "Charm"
+  },
+  {
+   "field": "gear:crupper",
+   "book": 2,
+   "ms": 2959000,
+   "value": "Crupper"
+  },
+  {
+   "field": "gear:wrist",
+   "book": 2,
+   "ms": 2959000,
+   "value": "Bracelet"
+  },
+  {
+   "field": "con",
+   "book": 2,
+   "ms": 2959000,
+   "value": 4
+  },
+  {
+   "field": "dex",
+   "book": 2,
+   "ms": 2959000,
+   "value": 12
+  },
+  {
+   "field": "int",
+   "book": 2,
+   "ms": 2959000,
+   "value": 23
+  },
+  {
+   "field": "str",
+   "book": 2,
+   "ms": 2959000,
+   "value": 20
+  },
+  {
+   "field": "cha",
+   "book": 2,
+   "ms": 2988000,
+   "value": 70
+  },
+  {
+   "field": "skill:Clockwork Triplicate Spell",
+   "book": 2,
+   "ms": 5607000,
+   "value": 1
+  },
+  {
+   "field": "skill:Heel",
+   "book": 2,
+   "ms": 5607000,
+   "value": 1
+  },
+  {
+   "field": "skill:Heel Critter",
+   "book": 2,
+   "ms": 5607000,
+   "value": 1
+  },
+  {
+   "field": "skill:Magic Missile",
+   "book": 2,
+   "ms": 5607000,
+   "value": 9
+  },
+  {
+   "field": "skill:Puddlejumper",
+   "book": 2,
+   "ms": 5607000,
+   "value": 3
+  },
+  {
+   "field": "skill:Second Chance",
+   "book": 2,
+   "ms": 5607000,
+   "value": 5
+  },
+  {
+   "field": "skill:Torch",
+   "book": 2,
+   "ms": 5607000,
+   "value": 10
+  },
+  {
+   "field": "con",
+   "book": 2,
+   "ms": 6707000,
+   "value": 7
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 8687520,
+   "value": 14
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 16302000,
+   "value": 15
+  },
+  {
+   "field": "skill:Clockwork Triplicate Spell",
+   "book": 2,
+   "ms": 16864000,
+   "value": 3
+  },
+  {
+   "field": "skill:Acute Ears",
+   "book": 2,
+   "ms": 17764320,
+   "value": 3
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 19911400,
+   "value": 16
+  },
+  {
+   "field": "class",
+   "book": 2,
+   "ms": 21250080,
+   "value": "Merchant"
+  },
+  {
+   "field": "cha",
+   "book": 2,
+   "ms": 21250080,
+   "value": 76
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 33416760,
+   "value": 19
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 40449040,
+   "value": 26
+  },
+  {
+   "field": "class",
+   "book": 2,
+   "ms": 40590160,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 397440,
+   "value": "Football Hooligan"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 2661420,
+   "value": 26
+  },
+  {
+   "field": "gear:head",
+   "book": 3,
+   "ms": 3758780,
+   "value": "Enchanted Tiara of Mana Genita"
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 6017060,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "race",
+   "book": 3,
+   "ms": 6017060,
+   "value": "Cat"
+  },
+  {
+   "field": "skill:Second Chance",
+   "book": 3,
+   "ms": 11543300,
+   "value": 7
+  },
+  {
+   "field": "int",
+   "book": 3,
+   "ms": 11556260,
+   "value": 41
+  },
+  {
+   "field": "con",
+   "book": 3,
+   "ms": 12591460,
+   "value": 8
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 12597060,
+   "value": "Hooligan"
+  },
+  {
+   "field": "skill:Dodge",
+   "book": 3,
+   "ms": 17394100,
+   "value": 7
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 19648580,
+   "value": 28
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 26631860,
+   "value": 30
+  },
+  {
+   "field": "cha",
+   "book": 3,
+   "ms": 26631860,
+   "value": 100
+  },
+  {
+   "field": "gear:head",
+   "book": 3,
+   "ms": 27107540,
+   "value": "Sunglasses"
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 40400020,
+   "value": 32
+  },
+  {
+   "field": "class",
+   "book": 3,
+   "ms": 42983620,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "race",
+   "book": 4,
+   "ms": 2575520,
+   "value": "Cat"
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 8410080,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 8410080,
+   "value": 33
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 19384440,
+   "value": "Glass Cannon"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 20356040,
+   "value": 34
+  },
+  {
+   "field": "skill:Animal Wrangling",
+   "book": 4,
+   "ms": 23092520,
+   "value": 8
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 29675080,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 29675080,
+   "value": 36
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 37996600,
+   "value": "Glass Cannon"
+  },
+  {
+   "field": "skill:Dodge",
+   "book": 4,
+   "ms": 40505160,
+   "value": 10
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 43620600,
+   "value": 38
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 48295400,
+   "value": 39
+  },
+  {
+   "field": "class",
+   "book": 4,
+   "ms": 62363240,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "class",
+   "book": 5,
+   "ms": 949000,
+   "value": "Legendary Diva"
+  },
+  {
+   "field": "skill:Character Actor",
+   "book": 5,
+   "ms": 1045000,
+   "value": 6
+  },
+  {
+   "field": "skill:Magic Missile",
+   "book": 5,
+   "ms": 4558000,
+   "value": 11
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 8035000,
+   "value": 41
+  },
+  {
+   "field": "class",
+   "book": 5,
+   "ms": 10649000,
+   "value": "Former Child Actor"
+  },
+  {
+   "field": "race",
+   "book": 5,
+   "ms": 10649000,
+   "value": "Cat"
+  },
+  {
+   "field": "skill:Snitch",
+   "book": 5,
+   "ms": 13732000,
+   "value": 10
+  },
+  {
+   "field": "skill:Torch",
+   "book": 5,
+   "ms": 26151000,
+   "value": 13
+  },
+  {
+   "field": "skill:Fireball",
+   "book": 5,
+   "ms": 29565280,
+   "value": 10
+  },
+  {
+   "field": "skill:Singing",
+   "book": 5,
+   "ms": 39881080,
+   "value": 4
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 43361960,
+   "value": 45
+  },
+  {
+   "field": "gear:obsidian bracelet",
+   "book": 5,
+   "ms": 46501280,
+   "value": "Obsidian Bracelet"
+  },
+  {
+   "field": "gear:feet",
+   "book": 5,
+   "ms": 46507600,
+   "value": "Fallen Oak Anklet"
+  },
+  {
+   "field": "gear:enchanted silver bracelet of the ab solar",
+   "book": 5,
+   "ms": 46559620,
+   "value": "Enchanted Silver Bracelet of the Ab Solar"
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 54408360,
+   "value": 47
+  },
+  {
+   "field": "str",
+   "book": 5,
+   "ms": 54436160,
+   "value": 58
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 63469000,
+   "value": 50
+  },
+  {
+   "field": "gear:head",
+   "book": 5,
+   "ms": 72865080,
+   "value": "Tiara"
+  },
+  {
+   "field": "cha",
+   "book": 5,
+   "ms": 74418160,
+   "value": 138
+  },
+  {
+   "field": "floor",
+   "book": 5,
+   "ms": 82567960,
+   "value": 7
+  },
+  {
+   "field": "class",
+   "book": 5,
+   "ms": 82760880,
+   "value": "Viper Queen"
+  },
+  {
+   "field": "class",
+   "book": 6,
+   "ms": 2329000,
+   "value": "Psychic"
+  },
+  {
+   "field": "gear:nipple ring",
+   "book": 6,
+   "ms": 14721040,
+   "value": "Nipple Ring"
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 32183800,
+   "value": 57
+  },
+  {
+   "field": "gear:head",
+   "book": 6,
+   "ms": 33136320,
+   "value": "Tiara of Managinita"
+  },
+  {
+   "field": "skill:Hover",
+   "book": 6,
+   "ms": 34815640,
+   "value": 10
+  },
+  {
+   "field": "floor",
+   "book": 6,
+   "ms": 49436520,
+   "value": 8
+  },
+  {
+   "field": "gear:head",
+   "book": 6,
+   "ms": 52420480,
+   "value": "Sailor Hat"
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 53566560,
+   "value": 59
+  },
+  {
+   "field": "skill:Trap",
+   "book": 6,
+   "ms": 78045800,
+   "value": 3
+  },
+  {
+   "field": "class",
+   "book": 7,
+   "ms": 3652080,
+   "value": "Deathbed Hellcat"
+  },
+  {
+   "field": "con",
+   "book": 7,
+   "ms": 6180480,
+   "value": 4
+  },
+  {
+   "field": "skill:Bad Attitude",
+   "book": 7,
+   "ms": 21184000,
+   "value": 15
+  },
+  {
+   "field": "level",
+   "book": 7,
+   "ms": 85601600,
+   "value": 74
+  },
+  {
+   "field": "class",
+   "book": 7,
+   "ms": 88162720,
+   "value": "Oak Fell"
+  },
+  {
+   "field": "level",
+   "book": 7,
+   "ms": 89455200,
+   "value": 135
+  },
+  {
+   "field": "skill:Magic Missile",
+   "book": 7,
+   "ms": 92730720,
+   "value": 15
+  },
+  {
+   "field": "gear:back",
+   "book": 7,
+   "ms": 99589680,
+   "value": "The Scorpion's Bite"
+  },
+  {
+   "field": "class",
+   "book": 8,
+   "ms": 2740000,
+   "value": "Assassin of Sekhbit"
+  },
+  {
+   "field": "level",
+   "book": 8,
+   "ms": 4432000,
+   "value": 135
+  },
+  {
+   "field": "gear:head",
+   "book": 8,
+   "ms": 7855000,
+   "value": "The Assassin's Veil"
+  },
+  {
+   "field": "skill:Puddle Jumper",
+   "book": 8,
+   "ms": 9085000,
+   "value": 16
+  },
+  {
+   "field": "skill:Wall of Fire",
+   "book": 8,
+   "ms": 23425000,
+   "value": 16
+  },
+  {
+   "field": "skill:Puddle Jumper",
+   "book": 8,
+   "ms": 44463000,
+   "value": 17
+  },
+  {
+   "field": "gear:head",
+   "book": 8,
+   "ms": 51413000,
+   "value": "Sunglasses"
+  }
+ ]
+}

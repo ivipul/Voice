@@ -1,0 +1,274 @@
+{
+ "slug": "mongo",
+ "name": "Mongo",
+ "epithet": null,
+ "sample": false,
+ "looks": [
+  {
+   "seq": 1,
+   "book": 1,
+   "ms": 46389240,
+   "t": "12:53:09",
+   "description": "A small bipedal creature standing approximately seven inches tall that looks like a raw piece of chicken, featuring random pink-hued feathers, two tiny forearms instead of wings, a long serpentine tail, a beaked mouth revealing a row of sharp, tiny teeth, and beady, reptilian eyes.",
+   "change": "Initial appearance.",
+   "images": {
+    "standing": "looks/mongo/look-001-standing.webp",
+    "action": "looks/mongo/look-001-action.webp"
+   }
+  },
+  {
+   "seq": 2,
+   "book": 2,
+   "ms": 5216800,
+   "t": "01:26:56",
+   "description": "A young velociraptor-like dinosaur with pink-hued feathers along its arms, grown longer and thicker and mixed with a line of deep red feathers, a tail that has grown longer and more dinosaur-like, and skin around its eyes that has taken on a bluish tone.",
+   "change": "Grown larger; red feather line, bluish eye skin.",
+   "images": {
+    "standing": "looks/mongo/look-002-standing.webp",
+    "action": "looks/mongo/look-002-action.webp"
+   }
+  },
+  {
+   "seq": 3,
+   "book": 2,
+   "ms": 11247400,
+   "t": "03:07:27",
+   "description": "A velociraptor-like dinosaur now a hand taller than a nearby cat companion and about the size of an actual turkey, with pink-hued feathers along its arms mixed with a line of deep red feathers, a tail that has grown even longer with a set of long feathers sprouting from its back, skin around its eyes with a bluish tone, and a beak that has widened and grown larger.",
+   "change": "Turkey-sized, longer tail with feathers.",
+   "images": {
+    "standing": "looks/mongo/look-003-standing.webp",
+    "action": "looks/mongo/look-003-action.webp"
+   }
+  },
+  {
+   "seq": 4,
+   "book": 2,
+   "ms": 16038420,
+   "t": "04:27:18",
+   "description": "A velociraptor-like dinosaur that has grown to nearly the waist height of an adult human, its body covered in colorful feathers (pink hues mixed with a line of deep red) and studded with long black spikes, with a tail carrying a set of long feathers sprouting from its back, skin around its eyes with a bluish tone, and a beak that has widened and grown larger.",
+   "change": "Waist-high; long black spikes (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-004-standing.webp",
+    "action": "looks/mongo/look-004-action.webp"
+   }
+  },
+  {
+   "seq": 5,
+   "book": 2,
+   "ms": 18402467,
+   "t": "05:06:42",
+   "description": "A large, mastiff-sized velociraptor-like dinosaur covered in colorful feathers (pink hues mixed with a line of deep red). Its face is mostly the beak of an overgrown chicken; when the beak opens, a row of sharp, ripping teeth circles the interior, and little tendrils of electricity crackle from its mouth whenever it snaps its teeth. Skin around its eyes carries a bluish tone.",
+   "change": "Mastiff-sized; ring of teeth; electricity from mouth (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-005-standing.webp",
+    "action": "looks/mongo/look-005-action.webp"
+   }
+  },
+  {
+   "seq": 6,
+   "book": 2,
+   "ms": 34112280,
+   "t": "09:28:32",
+   "description": "A large velociraptor-like dinosaur that has grown to the height of an adult's chest, now pony-sized rather than dog-sized. It is covered in colorful feathers (pink hues mixed with a line of deep red). Its face is mostly the beak of an overgrown chicken; when the beak opens, a row of sharp, ripping teeth circles the interior. Skin around its eyes carries a bluish tone.",
+   "change": "Pony-sized, chest height.",
+   "images": {
+    "standing": "looks/mongo/look-006-standing.webp",
+    "action": "looks/mongo/look-006-action.webp"
+   }
+  },
+  {
+   "seq": 7,
+   "book": 3,
+   "ms": 13003860,
+   "t": "03:36:43",
+   "description": "A dinosaur-chicken-like creature, the height of a pony, coming up to just below shoulder height, about 13 feet long from the tip of its beak to the end of a colorful red-and-blue feathered tail (the tail making up more than half that total length), with claws on its feet now bigger than its entire body had been when first acquired.",
+   "change": "13 feet long, red-and-blue tail, huge claws.",
+   "images": {
+    "standing": "looks/mongo/look-007-standing.webp",
+    "action": "looks/mongo/look-007-action.webp"
+   }
+  },
+  {
+   "seq": 8,
+   "book": 4,
+   "ms": 27470120,
+   "t": "07:37:50",
+   "description": "A creature with a collar around its neck, bleeding from dozens of wounds across its body.",
+   "change": "Collar; bleeding from dozens of wounds (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-008-standing.webp",
+    "action": "looks/mongo/look-008-action.webp"
+   }
+  },
+  {
+   "seq": 9,
+   "book": 5,
+   "ms": 52378240,
+   "t": "14:32:58",
+   "description": "A winged creature carrying a saddle on its back, with wings that flap up and down and a long tail sticking out of its stomach.",
+   "change": "Saddle and a tail sticking out of its stomach (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-009-standing.webp",
+    "action": "looks/mongo/look-009-action.webp"
+   }
+  },
+  {
+   "seq": 10,
+   "book": 5,
+   "ms": 78460450,
+   "t": "21:47:40",
+   "description": "A dinosaur-like creature with little wings, blue and red feathers and a slight insinuation of youthful pink, wearing a crab costume that has fallen around its neck.",
+   "change": "Blue and red feathers, crab costume around neck (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-010-standing.webp",
+    "action": "looks/mongo/look-010-action.webp"
+   }
+  },
+  {
+   "seq": 11,
+   "book": 6,
+   "ms": 92645040,
+   "t": "25:44:05",
+   "description": "A heavy dinosaur like a giant dog, with a large, heavy head, a beak, talons and a long feathered tail. His right wing is gone and the whole right side of his body is missing scales and feathers.",
+   "change": "Right wing gone; right side missing scales and feathers (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-011-standing.webp",
+    "action": "looks/mongo/look-011-action.webp"
+   }
+  },
+  {
+   "seq": 12,
+   "book": 8,
+   "ms": 10026000,
+   "t": "02:47:06",
+   "description": "A large clockwork dinosaur with a long tail, wings that he waves, and feathers, including tail feathers that reach all the way to the back of a long truck, wearing a blue and gold striped pharaoh-style fabric hat (nemes) with floppy side bands.",
+   "change": "Clockwork body; pharaoh-style hat (this scene only).",
+   "images": {
+    "standing": "looks/mongo/look-012-standing.webp",
+    "action": "looks/mongo/look-012-action.webp"
+   }
+  }
+ ],
+ "card": [
+  {
+   "field": "level",
+   "book": 1,
+   "ms": 47356800,
+   "value": 1
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 5263000,
+   "value": 3
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 6770000,
+   "value": 4
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 8675680,
+   "value": 6
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 16189280,
+   "value": 10
+  },
+  {
+   "field": "gear:golden fangs",
+   "book": 2,
+   "ms": 18464680,
+   "value": "Golden Fangs"
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 19918280,
+   "value": 11
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 26523040,
+   "value": 12
+  },
+  {
+   "field": "level",
+   "book": 2,
+   "ms": 32794480,
+   "value": 13
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 10908660,
+   "value": 14
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 12049940,
+   "value": 15
+  },
+  {
+   "field": "level",
+   "book": 3,
+   "ms": 44756020,
+   "value": 23
+  },
+  {
+   "field": "gear:neck",
+   "book": 4,
+   "ms": 14315400,
+   "value": "Boa"
+  },
+  {
+   "field": "gear:fang caps",
+   "book": 4,
+   "ms": 23097720,
+   "value": "Fang Caps"
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 23112360,
+   "value": 29
+  },
+  {
+   "field": "level",
+   "book": 4,
+   "ms": 28786840,
+   "value": 33
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 14919000,
+   "value": 33
+  },
+  {
+   "field": "level",
+   "book": 5,
+   "ms": 72890440,
+   "value": 34
+  },
+  {
+   "field": "race",
+   "book": 5,
+   "ms": 72890440,
+   "value": "Mongoliansis"
+  },
+  {
+   "field": "level",
+   "book": 6,
+   "ms": 53570320,
+   "value": 40
+  }
+ ]
+}
