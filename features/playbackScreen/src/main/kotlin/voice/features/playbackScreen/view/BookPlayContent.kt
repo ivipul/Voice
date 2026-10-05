@@ -70,7 +70,9 @@ internal fun BookPlayContent(
       type = viewState.edition?.chapterType ?: CrawlDisplayType.Default,
       onChapterClick = onCurrentChapterClick,
     )
-    Spacer(modifier = Modifier.size(4.dp))
+    Spacer(modifier = Modifier.size(12.dp))
+    XRayChipRow(chips = viewState.xrayChips, palette = palette, onChipClick = onXRayChipClick)
+    Spacer(modifier = Modifier.size(12.dp))
     SliderRow(
       duration = viewState.duration,
       playedTime = viewState.playedTime,
@@ -96,8 +98,6 @@ internal fun BookPlayContent(
       onSpeedClick = onSpeedClick,
     )
     Spacer(modifier = Modifier.size(24.dp))
-    XRayChipRow(chips = viewState.xrayChips, palette = palette, onChipClick = onXRayChipClick)
-    Spacer(modifier = Modifier.size(16.dp))
     CoPilotActions(
       palette = palette,
       onAskClick = onAskClick,
