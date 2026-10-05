@@ -29,4 +29,11 @@ class TranscriptParserTest {
   fun `parses empty transcript`() {
     assertEquals(expected = emptyList(), actual = TranscriptParser.parse("[]"))
   }
+
+  @Test
+  fun `parses the same cues from a stream`() {
+    val json = """[{"timestamp_start":0,"timestamp_end":10,"text":"a","extra":1},{"timestamp_start":10,"timestamp_end":20,"text":"b"}]"""
+
+    assertEquals(expected = TranscriptParser.parse(json), actual = TranscriptParser.parse(json.byteInputStream()))
+  }
 }

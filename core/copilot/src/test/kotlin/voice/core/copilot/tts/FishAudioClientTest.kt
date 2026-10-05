@@ -82,4 +82,11 @@ class FishAudioClientTest {
   fun `an empty body is an error`() {
     assertFailsWith<IllegalStateException> { fetch(client(200, body = ByteArray(0)), request, 0) }
   }
+
+  @Test
+  fun `the body can be consumed without loading it into a byte array`() {
+    val size = runBlocking { FishAudioClient.fetch(client(200), request, 0) { body -> body.source().readByteArray().size } }
+
+    assertEquals(audio.size, size)
+  }
 }

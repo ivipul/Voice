@@ -16,6 +16,7 @@
 
   <application
     android:enableOnBackInvokedCallback="true"
+    android:largeHeap="true"
     android:name=".di.App"
     android:icon="@drawable/ic_launcher"
     android:appCategory="audio"
