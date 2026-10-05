@@ -24,6 +24,7 @@ import voice.core.data.store.AnalyticsConsentStore
 import voice.core.data.store.AutoRewindAmountStore
 import voice.core.data.store.DeveloperMenuUnlockedStore
 import voice.core.data.store.GridModeStore
+import voice.core.data.store.LibraryUniformFontStore
 import voice.core.data.store.SeekForwardTimeStore
 import voice.core.data.store.SeekTimeStore
 import voice.core.data.store.SleepTimerPreferenceStore
@@ -57,6 +58,8 @@ class SettingsViewModel(
   private val sleepTimerPreferenceStore: DataStore<SleepTimerPreference>,
   @AnalyticsConsentStore
   private val analyticsConsentStore: DataStore<Boolean>,
+  @LibraryUniformFontStore
+  private val libraryUniformFontStore: DataStore<Boolean>,
   private val gridCount: GridCount,
   @KioskModeFeatureFlagQualifier
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
@@ -80,6 +83,7 @@ class SettingsViewModel(
     val seekTime by remember { seekTimeStore.data }.collectAsState(initial = 0)
     val seekForwardTime by remember { seekForwardTimeStore.data }.collectAsState(initial = 0)
     val gridMode by remember { gridModeStore.data }.collectAsState(initial = GridMode.GRID)
+    val libraryUniformFont by remember { libraryUniformFontStore.data }.collectAsState(initial = false)
     val autoSleepTimer by remember { sleepTimerPreferenceStore.data }.collectAsState(
       initial = SleepTimerPreference.Default,
     )
@@ -105,6 +109,7 @@ class SettingsViewModel(
         GridMode.GRID -> true
         GridMode.FOLLOW_DEVICE -> gridCount.useGridAsDefault()
       },
+      libraryUniformFont = libraryUniformFont,
       autoSleepTimer = SettingsViewState.AutoSleepTimerViewState(
         enabled = autoSleepTimer.autoSleepTimerEnabled,
         startTime = autoSleepTimer.autoSleepStartTime,
@@ -157,6 +162,12 @@ class SettingsViewModel(
           }
         }
       }
+    }
+  }
+
+  override fun toggleLibraryUniformFont() {
+    mainScope.launch {
+      libraryUniformFontStore.updateData { !it }
     }
   }
 

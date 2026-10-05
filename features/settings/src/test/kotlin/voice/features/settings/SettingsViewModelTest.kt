@@ -68,6 +68,7 @@ class SettingsViewModelTest {
     navigator = navigator,
     appInfoProvider = appInfoProvider,
     gridModeStore = gridModeStore,
+    libraryUniformFontStore = MemoryDataStore(false),
     sleepTimerPreferenceStore = sleepTimerPreferenceStore,
     analyticsConsentStore = analyticsConsentStore,
     gridCount = gridCount,
@@ -104,6 +105,21 @@ class SettingsViewModelTest {
 
       viewModel.setThemeMode(ThemeMode.FollowSystem)
       assertEquals(expected = ThemeMode.FollowSystem, actual = awaitItem().themeMode)
+    }
+  }
+
+  @Test
+  fun `the library uniform font is off until toggled`() = scope.runTest {
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.viewState()
+    }.test {
+      assertEquals(expected = false, actual = awaitItem().libraryUniformFont)
+
+      viewModel.toggleLibraryUniformFont()
+      assertEquals(expected = true, actual = awaitItem().libraryUniformFont)
+
+      viewModel.toggleLibraryUniformFont()
+      assertEquals(expected = false, actual = awaitItem().libraryUniformFont)
     }
   }
 

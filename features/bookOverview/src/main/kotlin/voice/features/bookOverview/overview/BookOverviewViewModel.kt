@@ -18,6 +18,7 @@ import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
@@ -34,6 +35,7 @@ import voice.core.data.repo.internals.dao.RecentBookSearchDao
 import voice.core.data.store.CurrentBookStore
 import voice.core.data.store.FolderPickerMovedDialogShownStore
 import voice.core.data.store.GridModeStore
+import voice.core.data.store.LibraryUniformFontStore
 import voice.core.featureflag.ExperimentalPlaybackPersistenceQualifier
 import voice.core.featureflag.FeatureFlag
 import voice.core.featureflag.FolderPickerInSettingsFeatureFlagQualifier
@@ -46,6 +48,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
+import voice.core.ui.crawl.crawlEditionOf
 import voice.features.bookOverview.di.BookOverviewScope
 import voice.features.bookOverview.search.BookSearchViewState
 import voice.navigation.Destination
@@ -65,6 +68,8 @@ class BookOverviewViewModel(
   private val folderPickerMovedDialogShownStore: DataStore<Boolean>,
   @GridModeStore
   private val gridModeStore: DataStore<GridMode>,
+  @LibraryUniformFontStore
+  private val libraryUniformFontStore: DataStore<Boolean>,
   private val gridCount: GridCount,
   private val navigator: Navigator,
   private val appInfoProvider: AppInfoProvider,
@@ -106,6 +111,8 @@ class BookOverviewViewModel(
     val scannerActive = remember { mediaScanner.scannerActive }
       .collectAsState(initial = false).value
     val folderPickerMovedDialogShown = remember { folderPickerMovedDialogShownStore.data }
+      .collectAsState(initial = false).value
+    val uniformFont = remember { libraryUniformFontStore.data }
       .collectAsState(initial = false).value
     val gridMode = remember { gridModeStore.data }
       .collectAsState(initial = null).value
@@ -150,6 +157,8 @@ class BookOverviewViewModel(
       } else {
         BookOverviewViewState.PlayButtonState.Paused
       }.takeIf { currentBookId != null },
+      uniformFont = uniformFont,
+      activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
       showAddBookHint = if (hasStoragePermissionBug) {
         false
       } else {
@@ -247,6 +256,10 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Settings)
   }
 
+  fun onDeckClick() {
+    navigator.goTo(Destination.Deck)
+  }
+
   fun onBookClick(id: BookId) {
     navigator.goTo(Destination.Playback(id))
   }
@@ -284,8 +297,14 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Playback(id))
   }
 
-  fun playPause() {
+  /** Starts or pauses the current book, and opens the player when it starts. */
+  fun onPlayButtonClick(playing: Boolean) {
     playerController.playPause()
+    if (!playing) {
+      scope.launch {
+        currentBookStoreDataStore.data.first()?.let { navigator.goTo(Destination.Playback(it)) }
+      }
+    }
   }
 
   fun onPermissionBugCardClick() {

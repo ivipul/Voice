@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
@@ -45,6 +48,7 @@ import voice.core.ui.PlayButton
 import voice.core.ui.VoiceTheme
 import voice.core.ui.crawl.CrawlLibraryTheme
 import voice.core.ui.icons.VoiceIcons
+import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.playButtonSharedBoundsModifier
 import voice.features.bookOverview.bottomSheet.BottomSheetContent
 import voice.features.bookOverview.bottomSheet.BottomSheetItem
@@ -115,10 +119,8 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     },
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
-    onPlayButtonClick = bookOverviewViewModel::playPause,
-    onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
-    onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
-    onSearchBookClick = bookOverviewViewModel::onSearchBookClick,
+    onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
+    onDeckClick = bookOverviewViewModel::onDeckClick,
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
@@ -178,14 +180,13 @@ internal fun BookOverview(
   onBookLongClick: (BookId) -> Unit,
   onBookFolderClick: () -> Unit,
   onFolderPickerMovedDialogDismiss: () -> Unit,
-  onPlayButtonClick: () -> Unit,
-  onSearchActiveChange: (Boolean) -> Unit,
-  onSearchQueryChange: (String) -> Unit,
-  onSearchBookClick: (BookId) -> Unit,
+  onPlayButtonClick: (playing: Boolean) -> Unit,
+  onDeckClick: () -> Unit,
   onPermissionBugCardClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+  val palette = crawlPaletteOf(viewState.activeEdition)
   Scaffold(
     modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {
@@ -193,19 +194,20 @@ internal fun BookOverview(
         viewState = viewState,
         onBookFolderClick = onBookFolderClick,
         onSettingsClick = onSettingsClick,
-        onActiveChange = onSearchActiveChange,
-        onQueryChange = onSearchQueryChange,
-        onSearchBookClick = onSearchBookClick,
       )
     },
     floatingActionButton = {
       if (viewState.playButtonState != null) {
+        val playing = viewState.playButtonState == BookOverviewViewState.PlayButtonState.Playing
         PlayButton(
           modifier = Modifier.navigationBarsPadding(),
-          playing = viewState.playButtonState == BookOverviewViewState.PlayButtonState.Playing,
+          playing = playing,
           fabSize = 56.dp,
           iconSize = 24.dp,
-          onPlayClick = onPlayButtonClick,
+          onPlayClick = { onPlayButtonClick(playing) },
+          containerColor = palette.background,
+          contentColor = palette.highlight,
+          hardShadowColor = Color.White,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
         )
       }
@@ -219,13 +221,15 @@ internal fun BookOverview(
     ) {
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
-          StackBooks(
-            books = viewState.books,
-            onBookClick = onBookClick,
-            onBookLongClick = onBookLongClick,
-            showPermissionBugCard = viewState.showStoragePermissionBugCard,
-            onPermissionBugCardClick = onPermissionBugCardClick,
-          )
+          CompositionLocalProvider(LocalUniformFont provides viewState.uniformFont) {
+            StackBooks(
+              books = viewState.books,
+              onBookClick = onBookClick,
+              onBookLongClick = onBookLongClick,
+              showPermissionBugCard = viewState.showStoragePermissionBugCard,
+              onPermissionBugCardClick = onPermissionBugCardClick,
+            )
+          }
         }
         BookOverviewLayoutMode.Grid -> {
           GridBooks(
@@ -237,6 +241,16 @@ internal fun BookOverview(
           )
         }
       }
+      DeckButton(
+        onClick = onDeckClick,
+        containerColor = palette.background,
+        contentColor = palette.highlight,
+        shadowColor = Color.White,
+        modifier = Modifier
+          .align(Alignment.BottomStart)
+          .navigationBarsPadding()
+          .padding(16.dp),
+      )
     }
   }
   Dialog(
@@ -294,9 +308,7 @@ fun BookOverviewPreview(
       onBookFolderClick = {},
       onFolderPickerMovedDialogDismiss = {},
       onPlayButtonClick = {},
-      onSearchActiveChange = {},
-      onSearchQueryChange = {},
-      onSearchBookClick = {},
+      onDeckClick = {},
       onPermissionBugCardClick = {},
     )
   }

@@ -138,6 +138,22 @@ private fun Settings(
       }
       item {
         ListItem(
+          modifier = Modifier.clickable { listener.toggleLibraryUniformFont() },
+          supportingContent = {
+            Text(stringResource(StringsR.string.settings_library_uniform_font_description))
+          },
+          trailingContent = {
+            Switch(
+              checked = viewState.libraryUniformFont,
+              onCheckedChange = { listener.toggleLibraryUniformFont() },
+            )
+          },
+        ) {
+          Text(stringResource(StringsR.string.settings_library_uniform_font_title))
+        }
+      }
+      item {
+        ListItem(
           modifier = Modifier.clickable { listener.toggleGrid() },
           leadingContent = {
             val icon = if (viewState.useGrid) {

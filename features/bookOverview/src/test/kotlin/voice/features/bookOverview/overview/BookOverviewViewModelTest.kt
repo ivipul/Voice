@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
+import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.GridMode
 import voice.core.data.KioskModeDemoData
@@ -33,6 +34,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
+import voice.core.ui.crawl.crawlEditionOf
 import voice.features.bookOverview.book
 import voice.navigation.Destination
 import voice.navigation.Navigator
@@ -65,6 +67,7 @@ class BookOverviewViewModelTest {
       currentBookStoreDataStore = MemoryDataStore(currentBook.id),
       folderPickerMovedDialogShownStore = MemoryDataStore(false),
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },
@@ -130,6 +133,7 @@ class BookOverviewViewModelTest {
       currentBookStoreDataStore = MemoryDataStore(null),
       folderPickerMovedDialogShownStore = MemoryDataStore(false),
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },
@@ -279,29 +283,95 @@ class BookOverviewViewModelTest {
     }
   }
 
+  @Test
+  fun `play button starts a paused current book and opens its player`() = runTest {
+    val currentBook = book(name = "Current")
+    val navigator = mockk<Navigator>(relaxed = true)
+    val playerController = mockk<PlayerController>(relaxed = true)
+    val viewModel = viewModel(
+      navigator = navigator,
+      playerController = playerController,
+      currentBookId = currentBook.id,
+    )
+
+    viewModel.onPlayButtonClick(playing = false)
+
+    verify(exactly = 1) { playerController.playPause() }
+    verify(exactly = 1) { navigator.goTo(Destination.Playback(currentBook.id)) }
+  }
+
+  @Test
+  fun `play button on a playing book only pauses it`() = runTest {
+    val currentBook = book(name = "Current")
+    val navigator = mockk<Navigator>(relaxed = true)
+    val playerController = mockk<PlayerController>(relaxed = true)
+    val viewModel = viewModel(
+      navigator = navigator,
+      playerController = playerController,
+      currentBookId = currentBook.id,
+    )
+
+    viewModel.onPlayButtonClick(playing = true)
+
+    verify(exactly = 1) { playerController.playPause() }
+    verify(exactly = 0) { navigator.goTo(any()) }
+  }
+
+  @Test
+  fun `play button opens no player without a current book`() = runTest {
+    val navigator = mockk<Navigator>(relaxed = true)
+    val viewModel = viewModel(navigator = navigator, playerController = mockk(relaxed = true))
+
+    viewModel.onPlayButtonClick(playing = false)
+
+    verify(exactly = 0) { navigator.goTo(any()) }
+  }
+
+  @Test
+  fun `the current series book gives the buttons its edition`() = runTest {
+    val currentBook = book(name = "Carl's Doomsday Scenario")
+    val otherBook = book(name = "Not in the series")
+    val viewModel = viewModel(
+      books = listOf(currentBook, otherBook),
+      currentBookId = currentBook.id,
+    )
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
+      viewModel.state()
+    }.test {
+      assertEquals(expected = BookOverviewViewState.Loading, actual = awaitItem())
+      assertEquals(expected = crawlEditionOf("Carl's Doomsday Scenario"), actual = awaitItem().activeEdition)
+    }
+  }
+
   private fun BookOverviewViewState.currentBook(bookId: BookId): BookOverviewItemViewState {
     return books.getValue(BookOverviewCategory.CURRENT).getValue(bookId).value
   }
 
   private fun viewModel(
-    folderPickerInSettingsFeatureFlag: MemoryFeatureFlag<Boolean>,
-    folderPickerMovedDialogShownStore: DataStore<Boolean>,
+    folderPickerInSettingsFeatureFlag: MemoryFeatureFlag<Boolean> = MemoryFeatureFlag(false),
+    folderPickerMovedDialogShownStore: DataStore<Boolean> = MemoryDataStore(false),
     navigator: Navigator = mockk(),
     appInfoProvider: AppInfoProvider = appInfoProvider(),
+    books: List<Book> = emptyList(),
+    currentBookId: BookId? = null,
+    playerController: PlayerController = mockk(),
+    playStateManager: PlayStateManager = PlayStateManager(),
   ): BookOverviewViewModel {
     return BookOverviewViewModel(
       repo = mockk<BookRepository> {
-        every { flow() } returns MutableStateFlow(emptyList())
+        every { flow() } returns MutableStateFlow(books)
       },
       mediaScanner = mockk<MediaScanTrigger> {
         every { scannerActive } returns MutableStateFlow(false)
         every { scan(any()) } just Runs
       },
-      playStateManager = PlayStateManager(),
-      playerController = mockk(),
-      currentBookStoreDataStore = MemoryDataStore(null),
+      playStateManager = playStateManager,
+      playerController = playerController,
+      currentBookStoreDataStore = MemoryDataStore(currentBookId),
       folderPickerMovedDialogShownStore = folderPickerMovedDialogShownStore,
       gridModeStore = MemoryDataStore(GridMode.LIST),
+      libraryUniformFontStore = MemoryDataStore(false),
       gridCount = mockk<GridCount> {
         every { useGridAsDefault() } returns false
       },

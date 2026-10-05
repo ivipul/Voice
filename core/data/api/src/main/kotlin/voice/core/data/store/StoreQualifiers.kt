@@ -54,4 +54,7 @@ public annotation class AnalyticsConsentStore
 public annotation class DeveloperMenuUnlockedStore
 
 @Qualifier
+public annotation class LibraryUniformFontStore
+
+@Qualifier
 public annotation class FeatureFlagOverridesStore

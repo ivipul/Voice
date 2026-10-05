@@ -230,6 +230,13 @@ public interface StoreModule {
 
   @Provides
   @SingleIn(AppScope::class)
+  @LibraryUniformFontStore
+  private fun libraryUniformFont(factory: VoiceDataStoreFactory): DataStore<Boolean> {
+    return factory.boolean("libraryUniformFont", defaultValue = false)
+  }
+
+  @Provides
+  @SingleIn(AppScope::class)
   @FeatureFlagOverridesStore
   private fun featureFlagOverrides(factory: VoiceDataStoreFactory): DataStore<Map<String, FeatureFlagOverride>> {
     return factory.create(

@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
@@ -47,10 +48,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlin.math.abs
 import kotlinx.coroutines.flow.collectLatest
@@ -61,6 +64,7 @@ import voice.core.ui.bookCardContentModifier
 import voice.core.ui.crawl.CrawlDisplayType
 import voice.core.ui.crawl.CrawlEdition
 import voice.core.ui.crawl.CrawlPalette
+import voice.core.ui.crawl.CrawlFonts
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.crawl.hardShadow
@@ -156,7 +160,7 @@ internal fun StackBooks(
   LazyColumn(
     state = listState,
     modifier = Modifier.nestedScroll(scrollTilt),
-    contentPadding = PaddingValues(top = 16.dp, start = 12.dp, end = 12.dp),
+    contentPadding = PaddingValues(top = 24.dp, start = 12.dp, end = 12.dp),
   ) {
     if (showPermissionBugCard) {
       item {
@@ -257,13 +261,20 @@ internal fun StackBookCard(
   }
 }
 
+/** Whether the cards set their text in the header font rather than each book's own. */
+internal val LocalUniformFont = compositionLocalOf { false }
+
 @Composable
 private fun CardText(
   book: BookOverviewItemViewState,
   palette: CrawlPalette,
   modifier: Modifier = Modifier,
 ) {
-  val titleType = book.edition?.chapterType ?: CrawlDisplayType.Default
+  val uniform = LocalUniformFont.current
+  val titleType = when {
+    uniform -> CrawlDisplayType(CrawlFonts.ChakraPetch, FontWeight.Bold, CrawlDisplayType.Default.fontSize)
+    else -> book.edition?.chapterType ?: CrawlDisplayType.Default
+  }
   Column(modifier = modifier) {
     if (book.author != null) {
       Text(
@@ -290,14 +301,14 @@ private fun CardText(
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(
         text = book.remainingTime,
-        style = CrawlType.time,
+        style = if (uniform) CrawlType.speed.copy(fontSize = 13.sp) else CrawlType.time,
         color = palette.content,
         modifier = Modifier.weight(1F),
       )
       if (book.progress > 0F) {
         Text(
           text = "${(book.progress * FULL_PERCENT).toInt()}%",
-          style = CrawlType.badge,
+          style = if (uniform) CrawlType.speed.copy(fontSize = 13.sp) else CrawlType.badge,
           color = palette.content,
         )
       }
