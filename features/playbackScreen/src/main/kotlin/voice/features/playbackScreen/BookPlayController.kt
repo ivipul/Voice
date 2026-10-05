@@ -153,6 +153,8 @@ fun BookPlayScreen(bookId: BookId) {
         onSend = viewModel::onChatSend,
         onCancelAutoSend = viewModel::onChatAutoSendCancel,
         onMicClick = onChatMicClick,
+        spokenMessage = viewModel.spokenMessage(),
+        onMessagePlayClick = viewModel::onMessagePlayClick,
         onDismiss = viewModel::onFeedDismiss,
         onSeekToSnip = viewModel::onSnipTimestampClick,
         snipLocationLabel = viewModel.snipLocationLabel(),

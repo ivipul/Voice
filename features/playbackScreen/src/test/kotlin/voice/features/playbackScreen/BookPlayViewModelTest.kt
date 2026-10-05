@@ -62,6 +62,8 @@ import voice.core.xray.card.PlayerCardFields
 import voice.core.xray.card.PlayerCardRepository
 import voice.core.xray.card.PlayerCardSet
 import voice.core.xray.card.composeAt
+import voice.core.playback.speech.MessageSpeaker
+import voice.core.playback.speech.SpokenMessage
 import voice.features.playbackScreen.copilot.DictationEvent
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -115,6 +117,12 @@ class BookPlayViewModelTest {
   private val copilotRepository = CoPilotRepository()
   private val copilotPipeline = mockk<CoPilotPipeline>()
   private val speechInputController = mockk<SpeechInputController>()
+  private val spokenMessage = MutableStateFlow<SpokenMessage?>(null)
+  private val messageSpeaker = mockk<MessageSpeaker> {
+    every { speaking } returns spokenMessage
+    every { speak(any(), any()) } answers { spokenMessage.value = SpokenMessage(firstArg(), audible = false) }
+    every { stop() } answers { spokenMessage.value = null }
+  }
   private val bookmarkRepository = mockk<BookmarkRepo> {
     coEvery { addBookmarkAtBookPosition(book, any(), any()) } returns Bookmark(
       bookId = book.id,
@@ -153,6 +161,7 @@ class BookPlayViewModelTest {
     copilotRepository = copilotRepository,
     copilotPipeline = copilotPipeline,
     speechInputController = speechInputController,
+    messageSpeaker = messageSpeaker,
     xrayRepository = mockk {
       coEvery { manifestFor(any()) } returns null
     },
@@ -725,6 +734,64 @@ class BookPlayViewModelTest {
   }
 
   @Test
+  fun `the play button reads a reply aloud, and a second tap stops it`() = scope.runTest {
+    val reply = CoPilotMessage(id = "a1", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 1L)
+
+    viewModel.onMessagePlayClick(reply)
+    verify(exactly = 1) { messageSpeaker.speak("a1", "Carl is a crawler.") }
+
+    viewModel.onMessagePlayClick(reply)
+    assertEquals(null, spokenMessage.value)
+    verify(exactly = 1) { messageSpeaker.speak(any(), any()) }
+  }
+
+  @Test
+  fun `tapping play on another reply switches to it`() = scope.runTest {
+    val first = CoPilotMessage(id = "a1", role = CoPilotMessage.Role.CoPilot, text = "First.", timestampMs = 1L)
+    val second = CoPilotMessage(id = "a2", role = CoPilotMessage.Role.CoPilot, text = "Second.", timestampMs = 2L)
+
+    viewModel.onMessagePlayClick(first)
+    viewModel.onMessagePlayClick(second)
+
+    verifyOrder {
+      messageSpeaker.speak("a1", "First.")
+      messageSpeaker.speak("a2", "Second.")
+    }
+    assertEquals(SpokenMessage("a2", audible = false), spokenMessage.value)
+  }
+
+  @Test
+  fun `leaving the chat stops the reply being read`() = scope.runTest {
+    val reply = CoPilotMessage(id = "a1", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 1L)
+    viewModel.onFeedClick()
+    viewModel.onMessagePlayClick(reply)
+
+    viewModel.onFeedDismiss()
+
+    assertEquals(null, spokenMessage.value)
+    assertEquals(false, viewModel.feedVisible.value)
+  }
+
+  @Test
+  fun `turning the mic on stops the reply being read, and reading a reply turns the mic off`() = scope.runTest {
+    val heard = MutableSharedFlow<DictationEvent>()
+    every { speechInputController.dictate() } returns heard
+    val reply = CoPilotMessage(id = "a1", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 1L)
+
+    viewModel.onMessagePlayClick(reply)
+    viewModel.onChatMicClick()
+    runCurrent()
+    assertEquals(null, spokenMessage.value)
+    assertEquals(true, viewModel.chatInput.value.isListening)
+
+    viewModel.onMessagePlayClick(reply)
+    runCurrent()
+    assertEquals(false, viewModel.chatInput.value.isListening)
+    assertEquals(SpokenMessage("a1", audible = false), spokenMessage.value)
+    assertEquals(0, heard.subscriptionCount.value)
+  }
+
+  @Test
   fun `Snip button runs Snip and Synthesize, not a plain bookmark`() = scope.runTest {
     coEvery { copilotPipeline.snip(book.id) } just Runs
 
@@ -1037,6 +1104,7 @@ class BookPlayViewModelTest {
       copilotRepository = copilotRepository,
       copilotPipeline = mockk(),
       speechInputController = mockk(),
+      messageSpeaker = mockk(relaxed = true),
       xrayRepository = mockk {
         coEvery { manifestFor(any()) } returns xrayManifest
       },

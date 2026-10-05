@@ -48,6 +48,8 @@ import voice.core.featureflag.KioskModeFeatureFlagQualifier
 import voice.core.logging.api.Logger
 import voice.core.playback.CurrentBookResolver
 import voice.core.playback.PlayerController
+import voice.core.playback.speech.MessageSpeaker
+import voice.core.playback.speech.SpokenMessage
 import voice.core.playback.misc.Decibel
 import voice.core.playback.misc.VolumeGain
 import voice.core.playback.overlay
@@ -109,6 +111,7 @@ class BookPlayViewModel(
   private val copilotRepository: CoPilotRepository,
   private val copilotPipeline: CoPilotPipeline,
   private val speechInputController: SpeechInputController,
+  private val messageSpeaker: MessageSpeaker,
   private val xrayRepository: XRayRepository,
   private val playerCardRepository: PlayerCardRepository,
   private val stripRepository: StripRepository,
@@ -500,7 +503,26 @@ class BookPlayViewModel(
   fun onFeedDismiss() {
     stopDictation()
     cancelAutoSend()
+    messageSpeaker.stop()
     feedVisible.value = false
+  }
+
+  /** The chat message being read aloud, if any, for its play button. */
+  @Composable
+  internal fun spokenMessage(): SpokenMessage? {
+    return remember { messageSpeaker.speaking }.collectAsState().value
+  }
+
+  /** The play button beside a reply: reads it aloud, or stops it when it is the one being read. */
+  fun onMessagePlayClick(message: CoPilotMessage) {
+    if (messageSpeaker.speaking.value?.id == message.id) {
+      messageSpeaker.stop()
+    } else {
+      // The microphone would only hear the reply being read.
+      stopDictation()
+      cancelAutoSend()
+      messageSpeaker.speak(message.id, message.text)
+    }
   }
 
   /** The player's Ask button: opens the chat already listening. Needs the microphone permission. */
@@ -543,6 +565,7 @@ class BookPlayViewModel(
     if (isThinking.value) return
     stopDictation()
     cancelAutoSend()
+    messageSpeaker.stop()
     val typedBefore = chatInput.value.text.trim()
     chatInput.value = chatInput.value.copy(isListening = true)
     dictationJob = scope.launch {
@@ -630,7 +653,7 @@ class BookPlayViewModel(
     positionInChapterMs: Long,
   ) {
     player.setPosition(positionInChapterMs, chapterId)
-    feedVisible.value = false
+    onFeedDismiss()
   }
 
   private fun runCoPilotExchange(
