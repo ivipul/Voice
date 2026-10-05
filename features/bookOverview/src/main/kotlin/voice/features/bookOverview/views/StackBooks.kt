@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kotlin.math.abs
 import kotlinx.coroutines.flow.collectLatest
 import voice.core.data.BookId
 import voice.core.ui.BookCardCorner
@@ -82,9 +83,19 @@ private const val TITLE_SCALE = 0.5F
 private const val TITLE_LINE_HEIGHT = 1.1F
 private const val FULL_PERCENT = 100
 
-// How far the cards lean while the list moves: a degree for every px it scrolls in a frame, at most 24 degrees.
-private const val TILT_DEGREES_PER_PX = 1F
-private const val MAX_TILT_DEGREES = 24F
+// Any scroll leans the cards 10 degrees; a faster one adds half a degree per px a frame, up to 20 degrees.
+private const val BASE_TILT_DEGREES = 10F
+private const val TILT_DEGREES_PER_PX = 0.5F
+private const val MAX_TILT_DEGREES = 20F
+
+// Below this speed (px a frame) the list counts as still, so a resting finger doesn't make the cards flicker.
+private const val STILL_SPEED_PX = 0.3F
+
+// Each frame's scroll moves the speed only a fifth of the way, so a jumpy finger gives a steady lean.
+private const val SPEED_SMOOTHING = 0.2F
+
+// The lean eases in and out slowly, with no bounce.
+private val TiltSpring = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = 60F)
 
 // A near camera, so the edge that tips away visibly narrows.
 private const val TILT_CAMERA_DISTANCE = 7F
@@ -93,10 +104,21 @@ private const val TILT_CAMERA_DISTANCE = 7F
 private val TiltPivot = TransformOrigin(pivotFractionX = 0.5F, pivotFractionY = 0.36F)
 
 /**
- * How far the cards lean for a scroll of [scrolledPx] in one frame: forward (top edge away) while the list scrolls down,
- * back while it scrolls up. [scrolledPx] is the content's move, negative when it moves up as the list scrolls down.
+ * How far the cards lean at a scroll speed of [speedPx] a frame: forward (top edge away) while the list scrolls down,
+ * back while it scrolls up. [speedPx] is the content's move, negative when it moves up as the list scrolls down.
  */
-internal fun cardTilt(scrolledPx: Float): Float = (0F - scrolledPx * TILT_DEGREES_PER_PX).coerceIn(-MAX_TILT_DEGREES, MAX_TILT_DEGREES)
+internal fun cardTilt(speedPx: Float): Float {
+  val speed = abs(speedPx)
+  if (speed < STILL_SPEED_PX) return 0F
+  val lean = (BASE_TILT_DEGREES + speed * TILT_DEGREES_PER_PX).coerceAtMost(MAX_TILT_DEGREES)
+  return if (speedPx < 0F) lean else -lean
+}
+
+/** The scroll speed after a frame that moved [scrolledPx], from the [previous] speed. */
+internal fun smoothedScrollSpeed(
+  previous: Float,
+  scrolledPx: Float,
+): Float = previous + (scrolledPx - previous) * SPEED_SMOOTHING
 
 /** The library as a stack of cards in each book's own colors, each tucked under the next like cards in a wallet. */
 @Composable
@@ -108,7 +130,7 @@ internal fun StackBooks(
   onPermissionBugCardClick: () -> Unit,
 ) {
   val listState = rememberLazyListState()
-  val targetTilt = remember { mutableFloatStateOf(0F) }
+  val scrollSpeed = remember { mutableFloatStateOf(0F) }
   val scrollTilt = remember {
     object : NestedScrollConnection {
       override fun onPostScroll(
@@ -116,19 +138,18 @@ internal fun StackBooks(
         available: Offset,
         source: NestedScrollSource,
       ): Offset {
-        targetTilt.floatValue = cardTilt(consumed.y)
+        scrollSpeed.floatValue = smoothedScrollSpeed(scrollSpeed.floatValue, consumed.y)
         return Offset.Zero
       }
     }
   }
   LaunchedEffect(listState.isScrollInProgress) {
-    if (!listState.isScrollInProgress) targetTilt.floatValue = 0F
+    if (!listState.isScrollInProgress) scrollSpeed.floatValue = 0F
   }
   val tilt = remember { Animatable(0F) }
   LaunchedEffect(tilt) {
-    // The cards follow the lean on a soft spring, so they sway into it and settle back once the list stops.
-    snapshotFlow { targetTilt.floatValue }.collectLatest { target ->
-      tilt.animateTo(target, spring(dampingRatio = 0.5F, stiffness = Spring.StiffnessMediumLow))
+    snapshotFlow { cardTilt(scrollSpeed.floatValue) }.collectLatest { target ->
+      tilt.animateTo(target, TiltSpring)
     }
   }
   LazyColumn(
