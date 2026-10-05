@@ -46,6 +46,7 @@ import voice.core.ui.PlayButton
 import voice.core.ui.VoiceTheme
 import voice.core.ui.crawl.CrawlLibraryTheme
 import voice.core.ui.icons.VoiceIcons
+import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.playButtonSharedBoundsModifier
 import voice.features.bookOverview.bottomSheet.BottomSheetContent
 import voice.features.bookOverview.bottomSheet.BottomSheetItem
@@ -116,7 +117,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     },
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
-    onPlayButtonClick = bookOverviewViewModel::playPause,
+    onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
     onDeckClick = bookOverviewViewModel::onDeckClick,
     onSearchActiveChange = bookOverviewViewModel::onSearchActiveChange,
     onSearchQueryChange = bookOverviewViewModel::onSearchQueryChange,
@@ -180,7 +181,7 @@ internal fun BookOverview(
   onBookLongClick: (BookId) -> Unit,
   onBookFolderClick: () -> Unit,
   onFolderPickerMovedDialogDismiss: () -> Unit,
-  onPlayButtonClick: () -> Unit,
+  onPlayButtonClick: (playing: Boolean) -> Unit,
   onDeckClick: () -> Unit,
   onSearchActiveChange: (Boolean) -> Unit,
   onSearchQueryChange: (String) -> Unit,
@@ -189,6 +190,7 @@ internal fun BookOverview(
   modifier: Modifier = Modifier,
 ) {
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+  val palette = crawlPaletteOf(viewState.activeEdition)
   Scaffold(
     modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {
@@ -203,12 +205,15 @@ internal fun BookOverview(
     },
     floatingActionButton = {
       if (viewState.playButtonState != null) {
+        val playing = viewState.playButtonState == BookOverviewViewState.PlayButtonState.Playing
         PlayButton(
           modifier = Modifier.navigationBarsPadding(),
-          playing = viewState.playButtonState == BookOverviewViewState.PlayButtonState.Playing,
+          playing = playing,
           fabSize = 56.dp,
           iconSize = 24.dp,
-          onPlayClick = onPlayButtonClick,
+          onPlayClick = { onPlayButtonClick(playing) },
+          containerColor = palette.highlight,
+          contentColor = palette.onHighlight,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
         )
       }
@@ -242,6 +247,8 @@ internal fun BookOverview(
       }
       DeckButton(
         onClick = onDeckClick,
+        containerColor = palette.highlight,
+        contentColor = palette.onHighlight,
         modifier = Modifier
           .align(Alignment.BottomStart)
           .navigationBarsPadding()

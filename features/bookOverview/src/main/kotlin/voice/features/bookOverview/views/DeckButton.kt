@@ -17,16 +17,20 @@ import voice.core.strings.R as StringsR
 private val FabSize = 56.dp
 private val IconSize = 24.dp
 
-/** Opens The Deck. The same size and colors as the play button on the other side of the library. */
+/** Opens The Deck. Sized like the play button on the other side of the library, and in the same colors. */
 @Composable
 internal fun DeckButton(
   onClick: () -> Unit,
+  containerColor: Color,
+  contentColor: Color,
   modifier: Modifier = Modifier,
 ) {
   FloatingActionButton(
     modifier = modifier.size(FabSize),
     onClick = onClick,
     shape = CircleShape,
+    containerColor = containerColor,
+    contentColor = contentColor,
   ) {
     Icon(
       modifier = Modifier.size(IconSize),

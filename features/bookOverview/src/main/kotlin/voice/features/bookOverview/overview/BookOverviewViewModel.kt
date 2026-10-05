@@ -18,6 +18,7 @@ import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
@@ -46,6 +47,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
+import voice.core.ui.crawl.crawlEditionOf
 import voice.features.bookOverview.di.BookOverviewScope
 import voice.features.bookOverview.search.BookSearchViewState
 import voice.navigation.Destination
@@ -150,6 +152,7 @@ class BookOverviewViewModel(
       } else {
         BookOverviewViewState.PlayButtonState.Paused
       }.takeIf { currentBookId != null },
+      activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
       showAddBookHint = if (hasStoragePermissionBug) {
         false
       } else {
@@ -288,8 +291,14 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Playback(id))
   }
 
-  fun playPause() {
+  /** Starts or pauses the current book, and opens the player when it starts. */
+  fun onPlayButtonClick(playing: Boolean) {
     playerController.playPause()
+    if (!playing) {
+      scope.launch {
+        currentBookStoreDataStore.data.first()?.let { navigator.goTo(Destination.Playback(it)) }
+      }
+    }
   }
 
   fun onPermissionBugCardClick() {
