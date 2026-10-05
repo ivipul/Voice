@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
@@ -19,6 +18,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import voice.core.ui.crawl.hardShadow
 import voice.core.strings.R as StringsR
 
 @Composable
@@ -31,7 +31,7 @@ fun PlayButton(
   sharedElementModifier: Modifier = Modifier,
   containerColor: Color = FloatingActionButtonDefaults.containerColor,
   contentColor: Color = contentColorFor(containerColor),
-  borderColor: Color? = null,
+  hardShadowColor: Color? = null,
 ) {
   val cornerSize by animateDpAsState(
     targetValue = if (playing) 16.dp else fabSize / 2,
@@ -42,8 +42,8 @@ fun PlayButton(
       .size(fabSize)
       .then(sharedElementModifier)
       .then(
-        if (borderColor != null) {
-          Modifier.border(width = 2.dp, color = borderColor, shape = RoundedCornerShape(cornerSize))
+        if (hardShadowColor != null) {
+          Modifier.hardShadow(color = hardShadowColor, shape = RoundedCornerShape(cornerSize), x = 3.dp, y = 3.dp)
         } else {
           Modifier
         },
@@ -52,6 +52,11 @@ fun PlayButton(
     shape = RoundedCornerShape(cornerSize),
     containerColor = containerColor,
     contentColor = contentColor,
+    elevation = if (hardShadowColor != null) {
+      FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp)
+    } else {
+      FloatingActionButtonDefaults.elevation()
+    },
   ) {
     Icon(
       modifier = Modifier.size(iconSize),

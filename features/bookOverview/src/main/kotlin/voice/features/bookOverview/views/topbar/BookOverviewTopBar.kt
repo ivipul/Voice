@@ -17,12 +17,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import voice.core.strings.R as StringsR
 import voice.core.ui.VoiceTheme
+import voice.core.ui.crawl.CrawlType
 import voice.features.bookOverview.overview.BookOverviewLayoutMode
 import voice.features.bookOverview.overview.BookOverviewViewState
 import voice.features.bookOverview.search.BookSearchViewState
@@ -47,8 +49,8 @@ internal fun BookOverviewTopBar(
       Text(
         modifier = Modifier.weight(1F),
         text = stringResource(StringsR.string.library_title),
-        style = MaterialTheme.typography.headlineLarge,
-        fontWeight = FontWeight.Bold,
+        style = CrawlType.label.copy(fontSize = 28.sp, letterSpacing = 0.02.em),
+        color = MaterialTheme.colorScheme.onSurface,
       )
       if (viewState.showFolderPickerIcon) {
         BookFolderIcon(withHint = viewState.showAddBookHint, onClick = onBookFolderClick)

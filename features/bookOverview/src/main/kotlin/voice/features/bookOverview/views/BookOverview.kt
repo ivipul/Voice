@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
@@ -205,7 +206,7 @@ internal fun BookOverview(
           onPlayClick = { onPlayButtonClick(playing) },
           containerColor = palette.background,
           contentColor = palette.highlight,
-          borderColor = palette.highlight,
+          hardShadowColor = Color.White,
           sharedElementModifier = Modifier.playButtonSharedBoundsModifier(),
         )
       }
@@ -244,7 +245,7 @@ internal fun BookOverview(
         onClick = onDeckClick,
         containerColor = palette.background,
         contentColor = palette.highlight,
-        borderColor = palette.highlight,
+        shadowColor = Color.White,
         modifier = Modifier
           .align(Alignment.BottomStart)
           .navigationBarsPadding()
