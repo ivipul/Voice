@@ -2,12 +2,15 @@ package voice.core.transcript
 
 import android.content.Context
 import android.net.Uri
+import android.provider.DocumentsContract
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import voice.core.data.Book
 import voice.core.data.folders.AudiobookFolders
 import voice.core.data.toUri
@@ -15,6 +18,7 @@ import voice.core.documentfile.CachedDocumentFileFactory
 import voice.core.documentfile.nameWithoutExtension
 import voice.core.documentfile.walk
 import voice.core.logging.api.Logger
+import java.io.FileNotFoundException
 
 /**
  * Resolves the transcript for a book's current chapter file and slices out preceding
@@ -24,8 +28,8 @@ import voice.core.logging.api.Logger
  * that live in a subfolder of the configured root.
  *
  * Finding (a SAF folder walk), reading and parsing the transcript took about 7 s per lookup on a
- * Pixel and Auto-Identify does two, so the parsed cues are kept in memory per chapter file. A
- * transcript replaced on disk is picked up after the app process restarts.
+ * Pixel and Auto-Identify does two, so the parsed cues of the current chapter file are kept in
+ * memory. A transcript replaced on disk is picked up after the app process restarts.
  */
 @SingleIn(AppScope::class)
 @Inject
@@ -62,57 +66,76 @@ class TranscriptRepository(
 
   private val uriCache by lazy { context.getSharedPreferences("transcript_uris", Context.MODE_PRIVATE) }
 
-  private suspend fun loadCues(chapterUri: Uri): List<TranscriptCue>? {
+  /**
+   * Finds, reads and parses the transcript on [Dispatchers.IO]: on the main thread this froze
+   * the app for 6-10 s (and far longer when memory was tight), which also stalled everything the
+   * co-pilot does while waiting. Tried in order: the JSON sitting next to the audio file (no
+   * folder walk), the location remembered from an earlier walk, then a walk of the audiobook
+   * folders. Running out of memory counts as "no transcript" instead of crashing the app.
+   */
+  private suspend fun loadCues(chapterUri: Uri): List<TranscriptCue>? = withContext(Dispatchers.IO) {
     val startedAt = System.currentTimeMillis()
-    // Finding the transcript is a SAF folder walk that took 1-7+ s; remember where it was found.
-    uriCache.getString(chapterUri.toString(), null)?.let { saved ->
-      val json = readJson(Uri.parse(saved))
-      val cues = json?.let { parseCues(it, saved) }
-      if (cues != null) {
-        Logger.d("Transcript loaded from remembered location in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
-        return cues
+    try {
+      siblingJson(chapterUri)?.let { sibling ->
+        parse(sibling)?.let { cues ->
+          Logger.d("Transcript loaded from the sibling file in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
+          return@withContext cues
+        }
       }
-    }
-    val audioFile = documentFileFactory.create(chapterUri)
-    val targetBaseName = audioFile.nameWithoutExtension()
+      uriCache.getString(chapterUri.toString(), null)?.let { saved ->
+        parse(Uri.parse(saved))?.let { cues ->
+          Logger.d("Transcript loaded from remembered location in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
+          return@withContext cues
+        }
+      }
+      val audioFile = documentFileFactory.create(chapterUri)
+      val targetBaseName = audioFile.nameWithoutExtension()
 
-    val folders = audiobookFolders.all().first().values.flatten()
-    for (folder in folders) {
-      val match = folder.documentFile.walk().firstOrNull {
-        it.isFile && it.name?.endsWith(".json", ignoreCase = true) == true && it.nameWithoutExtension() == targetBaseName
-      }
-      if (match != null) {
-        val foundAt = System.currentTimeMillis()
-        return readJson(match.uri)?.let { json ->
-          val readAt = System.currentTimeMillis()
-          parseCues(json, match.uri.toString())?.also {
+      val folders = audiobookFolders.all().first().values.flatten()
+      for (folder in folders) {
+        val match = folder.documentFile.walk().firstOrNull {
+          it.isFile && it.name?.endsWith(".json", ignoreCase = true) == true && it.nameWithoutExtension() == targetBaseName
+        }
+        if (match != null) {
+          val foundAt = System.currentTimeMillis()
+          return@withContext parse(match.uri)?.also {
             uriCache.edit().putString(chapterUri.toString(), match.uri.toString()).apply()
             Logger.d(
-              "Transcript loaded: find ${foundAt - startedAt} ms, read ${readAt - foundAt} ms, " +
-                "parse ${System.currentTimeMillis() - readAt} ms (${it.size} cues)",
+              "Transcript loaded: find ${foundAt - startedAt} ms, read and parse " +
+                "${System.currentTimeMillis() - foundAt} ms (${it.size} cues)",
             )
           }
         }
       }
+      null
+    } catch (e: OutOfMemoryError) {
+      Logger.w(e, "Out of memory loading the transcript for $chapterUri")
+      null
     }
-    return null
   }
 
-  private fun parseCues(json: String, source: String): List<TranscriptCue>? = try {
-    TranscriptParser.parse(json)
-  } catch (e: Exception) {
-    Logger.w(e, "Could not parse transcript at $source")
+  /** `<same folder>/<same name>.json` for providers whose document ids are paths (local storage). */
+  private fun siblingJson(chapterUri: Uri): Uri? = try {
+    val documentId = DocumentsContract.getDocumentId(chapterUri)
+    if (documentId.substringAfterLast('/').contains('.')) {
+      DocumentsContract.buildDocumentUriUsingTree(chapterUri, documentId.substringBeforeLast('.') + ".json")
+    } else {
+      null
+    }
+  } catch (e: IllegalArgumentException) {
     null
   }
 
-  private fun readJson(uri: Uri): String? = try {
-    context.contentResolver.openInputStream(uri)?.bufferedReader().use { it?.readText() }
+  /** Parses straight from the stream, so the 2-4 MB file is never held in memory as one string. */
+  private fun parse(uri: Uri): List<TranscriptCue>? = try {
+    context.contentResolver.openInputStream(uri)?.use { TranscriptParser.parse(it) }
   } catch (e: Exception) {
-    Logger.w(e, "Could not read transcript file at $uri")
+    // The sibling guess simply not existing is expected; anything else is worth a line.
+    if (e !is FileNotFoundException) Logger.w(e, "Could not load transcript at $uri")
     null
   }
 
   private companion object {
-    const val MAX_CACHED_CHAPTERS = 2
+    const val MAX_CACHED_CHAPTERS = 1
   }
 }

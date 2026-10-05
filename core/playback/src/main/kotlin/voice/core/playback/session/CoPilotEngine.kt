@@ -99,8 +99,16 @@ class CoPilotEngine(
   /** Logs `TIMING +ms event`, with ms counted from the button press (logcat also stamps every line). */
   private fun mark(event: String) {
     if (event.startsWith("trigger")) clockStart = System.currentTimeMillis()
-    Logger.d("CoPilotEngine TIMING +${System.currentTimeMillis() - clockStart} ms $event")
+    val line = "+${System.currentTimeMillis() - clockStart} ms $event"
+    Logger.d("CoPilotEngine TIMING $line")
+    flightLog.log(line)
   }
+
+  private val flightLog = CoPilotFlightLog(context)
+
+  // Set once the answer is audible; until then the watchdog may give up on the flow.
+  private var audioStarted = false
+  private var watchdog: Job? = null
   private var fishPlayer: ExoPlayer? = null
   private val fishFiles = mutableListOf<File>()
   private var noSpeechTimeout: Runnable? = null
@@ -112,11 +120,14 @@ class CoPilotEngine(
   private val audioManager = context.getSystemService(AudioManager::class.java)
   private var audioFocusRequest: AudioFocusRequest? = null
 
+  // Every co-pilot sound is guidance audio: it follows the media volume, and Android Auto routes it to
+  // the car. USAGE_ASSISTANT plays on the assistant stream, which the phone can mute on its own and
+  // which an app cannot unmute, so the whole answer was silent.
   private val soundPool = SoundPool.Builder()
     .setMaxStreams(2)
     .setAudioAttributes(
       AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_ASSISTANT)
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build(),
     )
@@ -145,7 +156,7 @@ class CoPilotEngine(
         if (bookId != null) copilotPipeline.warmUp(bookId)
       } catch (e: CancellationException) {
         throw e
-      } catch (e: Exception) {
+      } catch (e: Throwable) {
         Logger.w(e, "CoPilotEngine: transcript warm-up failed")
       }
     }
@@ -156,6 +167,37 @@ class CoPilotEngine(
 
   private val waitingLoop = WaitingLoop(ExoWaitingLoopPlayback(context, mainHandler))
   private val waitingLoopRunning get() = waitingLoop.isRunning
+
+  /** The flow is now waiting for its answer: play the loop and arm the no-audio watchdog. */
+  private fun startWaiting(onFinished: () -> Unit) {
+    audioStarted = false
+    startWaitingLoop()
+    watchdog?.cancel()
+    watchdog = scope.launch {
+      delay(NO_AUDIO_TIMEOUT_MS)
+      if (!this@CoPilotEngine.isActive || audioStarted) return@launch
+      // Never leave the listener in silence with the book paused: give up and resume it.
+      Logger.w("CoPilotEngine: no audio after $NO_AUDIO_TIMEOUT_MS ms, giving up")
+      mark("watchdog: no audio, resuming the book")
+      activeJob?.cancel()
+      activeJob = null
+      speakGeneration++
+      textToSpeech?.stop()
+      releaseFishPlayer()
+      playCue(endListeningSoundId)
+      finish(onFinished)
+    }
+  }
+
+  private fun onAudioStarted() {
+    audioStarted = true
+    watchdog?.cancel()
+    stopWaitingLoop(fade = true)
+  }
+
+  private fun releaseFishPlayerOnMain() {
+    mainHandler.post { releaseFishPlayer() }
+  }
 
   // Posted, never called inline, so a start queued by the flow can't run after a later stop.
   private fun startWaitingLoop() {
@@ -201,7 +243,7 @@ class CoPilotEngine(
           finish(onFinished)
           return@launch
         }
-        if (mode != CoPilotMode.OpenMic) startWaitingLoop()
+        if (mode != CoPilotMode.OpenMic) startWaiting(onFinished)
         when (mode) {
           CoPilotMode.OpenMic -> {
             val heard = listenForQuestion(bookId)
@@ -209,7 +251,7 @@ class CoPilotEngine(
               finish(onFinished)
               return@launch
             }
-            startWaitingLoop()
+            startWaiting(onFinished)
             speakAnswer(
               deltas = copilotPipeline.askStream(bookId, heard),
               nonStreaming = { copilotPipeline.ask(bookId, heard) },
@@ -230,15 +272,23 @@ class CoPilotEngine(
         throw e
       } catch (e: Exception) {
         Logger.w(e, "CoPilotEngine: $mode failed")
+        mark("failed: ${e.javaClass.simpleName} ${e.message?.take(120)}")
         val message = runCatching { copilotPipeline.failureMessage() }
           .getOrDefault("Sorry, something went wrong.")
         try {
           speakAnswer(flowOf(message), { message })
         } catch (e: CancellationException) {
           throw e
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
           Logger.w(e, "CoPilotEngine: could not speak the failure message")
         }
+        finish(onFinished)
+      } catch (e: Throwable) {
+        // Out of memory and the like: don't try to speak, just hand the book back instead of
+        // crashing the app (after a crash the headset buttons do nothing at all).
+        Logger.w(e, "CoPilotEngine: $mode failed hard")
+        mark("failed hard: ${e.javaClass.simpleName}")
+        releaseFishPlayerOnMain()
         finish(onFinished)
       }
     }
@@ -292,7 +342,9 @@ class CoPilotEngine(
   }
 
   private fun finish(onFinished: () -> Unit) {
+    watchdog?.cancel()
     stopWaitingLoop(fade = false)
+    mark("finished")
     isActive = false
     abandonAudioFocus()
     onFinished()
@@ -302,7 +354,7 @@ class CoPilotEngine(
     val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
       .setAudioAttributes(
         AudioAttributes.Builder()
-          .setUsage(AudioAttributes.USAGE_ASSISTANT)
+          .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
           .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
           .build(),
       )
@@ -339,6 +391,8 @@ class CoPilotEngine(
     textToSpeech?.shutdown()
     textToSpeech = null
     speakGeneration++
+    watchdog?.cancel()
+    mark("interrupted")
     stopWaitingLoop(fade = false)
     releaseFishPlayer()
     abandonAudioFocus()
@@ -478,6 +532,7 @@ class CoPilotEngine(
           throw e
         } catch (e: Exception) {
           Logger.w(e, "CoPilotEngine: answer stream failed")
+          flightLog.log("answer stream failed: ${e.javaClass.simpleName} ${e.message?.take(120)}")
           streamError = e
           if (chunkTexts.isNotEmpty()) chunker.finish().forEach(::submit)
         }
@@ -523,14 +578,19 @@ class CoPilotEngine(
 
   private suspend fun fetchChunk(chunk: String, number: Int): File? {
     val started = System.currentTimeMillis()
+    val file = File.createTempFile("fish-tts", ".wav", context.cacheDir)
     return try {
-      File.createTempFile("fish-tts", ".wav", context.cacheDir)
-        .also { it.writeBytes(fishAudioClient.synthesize(chunk)) }
-        .also { Logger.d("CoPilotEngine: Fish chunk $number (${chunk.length} chars) fetched in ${System.currentTimeMillis() - started} ms") }
+      fishAudioClient.synthesizeTo(chunk, file)
+      Logger.d("CoPilotEngine: Fish chunk $number (${chunk.length} chars) fetched in ${System.currentTimeMillis() - started} ms")
+      file
     } catch (e: CancellationException) {
+      file.delete()
       throw e
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
+      // Includes running out of memory: the chunk is then spoken by the phone TTS instead.
+      file.delete()
       Logger.w(e, "CoPilotEngine: Fish chunk $number failed")
+      flightLog.log("Fish chunk $number failed: ${e.javaClass.simpleName} ${e.message?.take(120)}")
       null
     }
   }
@@ -605,7 +665,7 @@ class CoPilotEngine(
     val player = ExoPlayer.Builder(context)
       .setAudioAttributes(
         MediaAudioAttributes.Builder()
-          .setUsage(C.USAGE_ASSISTANT)
+          .setUsage(C.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
           .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
           .build(),
         // The engine already holds audio focus for the whole round trip.
@@ -619,7 +679,7 @@ class CoPilotEngine(
           if (state == Player.STATE_READY && !logged) {
             logged = true
             mark("first audio playing")
-            stopWaitingLoop(fade = true)
+            onAudioStarted()
           }
           if (state == Player.STATE_ENDED && fishAllQueued) finished.complete(true)
         }
@@ -662,10 +722,10 @@ class CoPilotEngine(
       val tts = textToSpeech
       if (status == TextToSpeech.SUCCESS && tts != null) {
         // On Android Auto the spoken answer played on the phone speaker only while the book was paused,
-        // so tag it (and the cues) as assistant audio, which Android Auto can route to the car.
+        // so tag it (and the cues) as guidance audio, which Android Auto can route to the car.
         tts.setAudioAttributes(
           AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_ASSISTANT)
+            .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
             .build(),
         )
@@ -673,7 +733,10 @@ class CoPilotEngine(
           object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
               Logger.d("CoPilotEngine: TTS onStart")
-              stopWaitingLoop(fade = true)
+              mainHandler.post {
+                mark("phone TTS speaking")
+                onAudioStarted()
+              }
             }
 
             override fun onDone(utteranceId: String?) {
@@ -709,5 +772,6 @@ class CoPilotEngine(
   private companion object {
     const val RESPONSE_END_PAUSE_MS = 500L
     const val NO_SPEECH_TIMEOUT_MS = 5_000L
+    const val NO_AUDIO_TIMEOUT_MS = 30_000L
   }
 }

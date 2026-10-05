@@ -12,9 +12,13 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import okhttp3.coroutines.executeAsync
+import okio.buffer
+import okio.sink
 import voice.core.copilot.BuildConfig
 import voice.core.logging.api.Logger
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /** A non-2xx answer from Fish Audio. */
@@ -22,7 +26,7 @@ class FishAudioException(val code: Int, message: String) : IllegalStateException
 
 /**
  * Fish Audio text-to-speech for the co-pilot's spoken answers, using the custom System AI voice
- * model. Returns WAV bytes; any failure throws so the caller can fall back to the phone's TTS.
+ * model. Writes WAV audio to a file; any failure throws so the caller can fall back to the phone's TTS.
  * Requests are cancelled together with the calling coroutine. The paid [PAID_MODEL] answers a
  * short sentence in about half the time of the free one, so it is tried first; on a 402 (out of
  * credit) it is skipped for the rest of the process, and on any other failure the free
@@ -45,14 +49,21 @@ class FishAudioClient {
 
   val isConfigured: Boolean get() = BuildConfig.FISH_API_KEY.isNotBlank()
 
-  suspend fun synthesize(text: String): ByteArray {
+  /**
+   * Synthesizes [text] straight into [file]. The audio is streamed to disk rather than returned as
+   * a byte array, because several chunks are fetched at once and each clip is around a megabyte.
+   */
+  suspend fun synthesizeTo(text: String, file: File) {
     val apiKey = BuildConfig.FISH_API_KEY
     check(apiKey.isNotBlank()) { "FISH_API_KEY not set (add fish.apiKey to ~/.gradle/gradle.properties)" }
     val models = if (paidUnavailable) listOf(FREE_MODEL) else listOf(PAID_MODEL, FREE_MODEL)
     var lastError: Exception? = null
     for (model in models) {
       try {
-        return fetchAudio(httpClient, buildRequest(apiKey, text, model), RETRY_BACKOFF_MS)
+        fetch(httpClient, buildRequest(apiKey, text, model), RETRY_BACKOFF_MS) { body ->
+          file.sink().buffer().use { sink -> check(sink.writeAll(body.source()) > 0) { "Fish Audio returned an empty body" } }
+        }
+        return
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
@@ -107,7 +118,13 @@ class FishAudioClient {
         .build()
     }
 
-    suspend fun fetchAudio(client: Call.Factory, request: Request, backoffMs: Long): ByteArray {
+    suspend fun fetchAudio(client: Call.Factory, request: Request, backoffMs: Long): ByteArray =
+      fetch(client, request, backoffMs) { body ->
+        body.bytes().also { check(it.isNotEmpty()) { "Fish Audio returned an empty body" } }
+      }
+
+    /** Runs the request with one retry on 429/5xx and hands a successful body to [read]. */
+    suspend fun <T> fetch(client: Call.Factory, request: Request, backoffMs: Long, read: (ResponseBody) -> T): T {
       var lastError: Exception? = null
       for (attempt in 0 until MAX_ATTEMPTS) {
         if (attempt > 0) {
@@ -115,11 +132,7 @@ class FishAudioClient {
           delay(backoffMs)
         }
         client.newCall(request).executeAsync().use { response ->
-          if (response.isSuccessful) {
-            val bytes = response.body.bytes()
-            check(bytes.isNotEmpty()) { "Fish Audio returned an empty body" }
-            return bytes
-          }
+          if (response.isSuccessful) return read(response.body)
           val error = FishAudioException(
             response.code,
             "Fish Audio TTS failed: ${response.code} ${response.body.string().take(ERROR_BODY_CHARS)}",
