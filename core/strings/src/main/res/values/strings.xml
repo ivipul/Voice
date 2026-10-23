@@ -545,12 +545,10 @@
     <string name="setup.look.font">Chapter name face</string>
     <!-- Content description of the Extra page menu button. -->
     <string name="extra.menu">More</string>
-    <!-- Asks Claude to repair an Extra page. -->
-    <string name="extra.fix">Fix it</string>
     <!-- Shown while Claude repairs an Extra page. -->
-    <string name="extra.fixing">Fixing the page…</string>
+    <string name="extra.fixing">Updating the page…</string>
     <!-- Repairing an Extra failed, with the reason. -->
-    <string name="extra.fix_failed">Couldn\'t fix it: %1$s</string>
+    <string name="extra.fix_failed">Couldn\'t update it: %1$s</string>
     <!-- Shown when an Extra page reported an error. -->
     <string name="extra.error">Something on this page went wrong.</string>
     <!-- Dismisses the error banner of an Extra page. -->
@@ -605,4 +603,10 @@
     <string name="library.empty.add">Add a book</string>
     <!-- One line under the empty library headline -->
     <string name="library.empty.body">Pick an m4b or mp3 file. If you have its transcript or PDFs, select them too.</string>
+    <!-- Opens a box to describe changes to an Extra page, or fixes for it. -->
+    <string name="extra.ask_changes">Ask for changes</string>
+    <!-- Placeholder of the Ask for changes box. -->
+    <string name="extra.ask_changes_hint">What should change? For example: bigger text, add a search box, or the totals are wrong.</string>
+    <!-- Sends the requested changes to Claude. -->
+    <string name="extra.ask_changes_send">Send</string>
 </resources>

@@ -70,9 +70,9 @@ class ExtraBuilder(
 
   /** Sends the page and the error the viewer saw back to Claude, and saves the fixed page in its place. */
   @IgnorableReturnValue
-  suspend fun repair(bookId: BookId, extraId: String, error: String): Extra {
+  suspend fun change(bookId: BookId, extraId: String, request: String, error: String?): Extra {
     val extra = checkNotNull(stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }) { "No Extra $extraId" }
-    val fixed = validated(claude.write(system = BUILDER_SYSTEM, prompt = repairPrompt(extra, error)))
+    val fixed = validated(claude.write(system = BUILDER_SYSTEM, prompt = changePrompt(extra, request, error)))
     val repaired = extra.copy(html = fixed, lastError = null)
     stores.shelf.update(bookId) { shelf -> shelf.copy(extras = shelf.extras.map { if (it.id == extraId) repaired else it }) }
     return repaired
@@ -162,10 +162,14 @@ internal fun buildPrompt(profile: BookProfile, scene: SceneIndex, brief: String)
   }
 }
 
-internal fun repairPrompt(extra: Extra, error: String): String = buildString {
-  append("This Extra page hit an error in the app. Fix it and return the whole corrected page.\n\n")
+/** Asks for [extra] changed the way the listener describes in [request], and fixed if it last hit [error]. */
+internal fun changePrompt(extra: Extra, request: String, error: String?): String = buildString {
+  append("The listener wants changes to this Extra page. Make them, keep everything else that works, and return the ")
+  append("whole updated page.\n\n")
   append("What it is for: ${extra.brief.ifBlank { extra.title + ": " + extra.description }}\n\n")
-  append("Error: $error\n\nThe page:\n```html\n${extra.html}\n```")
+  if (request.isNotBlank()) append("The listener asks: ${request.trim()}\n\n")
+  if (error != null) append("The page last hit this error in the app; fix it too: $error\n\n")
+  append("The page:\n```html\n${extra.html}\n```")
 }
 
 private const val MAX_TOPICS_IN_PROMPT = 60

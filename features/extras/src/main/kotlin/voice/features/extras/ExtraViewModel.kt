@@ -47,6 +47,8 @@ data class ExtraViewState(
   val lastError: String?,
   val fixing: Boolean,
   val fixError: String?,
+  /** What the listener is typing into the Ask for changes box, or null while it is closed. */
+  val changeRequest: String?,
 )
 
 /**
@@ -73,6 +75,7 @@ class ExtraViewModel(
   private val scope = MainScope()
   private var fixing by mutableStateOf(false)
   private var fixError by mutableStateOf<String?>(null)
+  private var changeRequest by mutableStateOf<String?>(null)
   private var closed = false
 
   @Composable
@@ -95,6 +98,7 @@ class ExtraViewModel(
       lastError = extra.lastError,
       fixing = fixing,
       fixError = fixError,
+      changeRequest = changeRequest,
     )
   }
 
@@ -137,15 +141,28 @@ class ExtraViewModel(
     scope.launch { builder.reportError(bookId, extraId, error.take(MAX_ERROR_CHARS)) }
   }
 
-  fun onFix() {
+  fun onAskForChanges() {
+    if (!fixing) changeRequest = ""
+  }
+
+  fun onChangeRequestChange(text: String) {
+    changeRequest = text
+  }
+
+  fun onChangeRequestDismiss() {
+    changeRequest = null
+  }
+
+  fun onChangeRequestSend() {
+    val request = changeRequest ?: return
     if (fixing) return
+    changeRequest = null
     fixing = true
     fixError = null
     scope.launch {
       try {
         val error = stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }?.lastError
-          ?: "The listener says the page doesn't work as it should."
-        withContext(Dispatchers.Default) { builder.repair(bookId, extraId, error) }
+        withContext(Dispatchers.Default) { builder.change(bookId, extraId, request.take(MAX_REQUEST_CHARS), error) }
       } catch (e: Exception) {
         Logger.w(e, "Fixing Extra $extraId failed")
         fixError = e.message ?: e.javaClass.simpleName
@@ -184,6 +201,7 @@ class ExtraViewModel(
   private companion object {
     const val MAX_QUESTION_CHARS = 2_000
     const val MAX_ERROR_CHARS = 1_000
+    const val MAX_REQUEST_CHARS = 2_000
   }
 }
 

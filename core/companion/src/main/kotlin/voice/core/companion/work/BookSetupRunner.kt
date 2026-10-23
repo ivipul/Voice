@@ -15,7 +15,9 @@ import voice.core.companion.ExtensionPoint
 import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaStatus
 import voice.core.companion.StepState
+import voice.core.companion.LookSource
 import voice.core.companion.extras.ExtraBuilder
+import voice.core.companion.look.LookMaker
 import voice.core.companion.materials.MaterialStudy
 import voice.core.companion.scene.SceneIndexer
 import voice.core.companion.setup.BookResearcher
@@ -54,11 +56,16 @@ class BookSetupRunner(
   private val sceneIndexer: SceneIndexer,
   private val summarizer: ChapterSummarizer,
   private val materials: MaterialStudy,
+  private val lookMaker: LookMaker,
 ) {
 
   /** Starts whatever part of the setup hasn't finished yet. Safe to call again; running jobs keep running. */
   suspend fun start(bookId: BookId) {
     val setup = stores.setup.get(bookId)
+    // A new book starts in its cover's colors, so the player and the cover read as one surface.
+    if (setup.research == StepState.NotStarted && stores.look.get(bookId).source == LookSource.Default) {
+      val _ = runCatching { lookMaker.useCoverColors(bookId) }
+    }
     if (setup.transcription.state != StepState.Done) {
       enqueue(SetupJob.Transcribe, bookId)
     } else if (setup.summaries != StepState.Done) {

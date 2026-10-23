@@ -44,7 +44,7 @@ class LookMaker(
   suspend fun useCoverColors(bookId: BookId): Boolean {
     restoreOriginalCover(bookId)
     val cover = bookRepository.get(bookId)?.content?.cover?.takeIf { it.isFile } ?: return false
-    val palette = withContext(Dispatchers.Default) { decodeSmall(cover)?.let { paletteFromPixels(it.pixels()) } } ?: return false
+    val palette = withContext(Dispatchers.Default) { decodeSmall(cover)?.let { paletteFromPixels(it.pixels(), it.width) } } ?: return false
     stores.look.update(bookId) { it.copy(source = LookSource.Cover, palette = palette) }
     return true
   }
@@ -66,7 +66,7 @@ class LookMaker(
       File(bookFiles.bookDir(bookId), "generated-cover-${System.currentTimeMillis()}.png").apply { writeBytes(bytes) }
     }
     coverSaver.save(bookId, bitmap)
-    val palette = withContext(Dispatchers.Default) { paletteFromPixels(bitmap.scale(SAMPLE_SIZE, SAMPLE_SIZE).pixels()) }
+    val palette = withContext(Dispatchers.Default) { bitmap.scale(SAMPLE_SIZE, SAMPLE_SIZE).let { paletteFromPixels(it.pixels(), it.width) } }
     val previous = stores.look.get(bookId).generatedCover
     val look = stores.look.update(bookId) {
       it.copy(source = LookSource.Generated, palette = palette, generatedCover = file.absolutePath, extraCoverPrompt = extraPrompt)

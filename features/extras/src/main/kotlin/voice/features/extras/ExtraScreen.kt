@@ -30,10 +30,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,8 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -103,18 +107,27 @@ private fun ExtraScreen(
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
         if (viewState.lastError != null || viewState.fixing || viewState.fixError != null) {
-          FixBanner(viewState = viewState, palette = palette, onFix = viewModel::onFix, onDismiss = viewModel::onDismissError)
+          FixBanner(viewState = viewState, palette = palette, onFix = viewModel::onAskForChanges, onDismiss = viewModel::onDismissError)
         }
         ExtraWebView(page = viewState.page, viewModel = viewModel, modifier = Modifier.weight(1F))
       }
       ExtraActions(
         palette = palette,
         onClose = viewModel::close,
-        onFix = viewModel::onFix,
+        onFix = viewModel::onAskForChanges,
         onDelete = viewModel::onDelete,
         modifier = Modifier
           .align(Alignment.TopEnd)
           .padding(8.dp),
+      )
+    }
+    viewState.changeRequest?.let { request ->
+      AskForChangesDialog(
+        request = request,
+        canSendEmpty = viewState.lastError != null,
+        onRequestChange = viewModel::onChangeRequestChange,
+        onDismiss = viewModel::onChangeRequestDismiss,
+        onSend = viewModel::onChangeRequestSend,
       )
     }
   }
@@ -137,7 +150,7 @@ private fun ExtraActions(
       }
       DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
         DropdownMenuItem(
-          text = { Text(text = stringResource(StringsR.string.extra_fix)) },
+          text = { Text(text = stringResource(StringsR.string.extra_ask_changes)) },
           onClick = {
             menuOpen = false
             onFix()
@@ -178,6 +191,44 @@ private fun ExtraActions(
       },
     )
   }
+}
+
+/** A box to describe what should change on the page. With an error to fix, it can be sent empty. */
+@Composable
+private fun AskForChangesDialog(
+  request: String,
+  canSendEmpty: Boolean,
+  onRequestChange: (String) -> Unit,
+  onDismiss: () -> Unit,
+  onSend: () -> Unit,
+) {
+  val focusRequester = remember { FocusRequester() }
+  LaunchedEffect(Unit) { focusRequester.requestFocus() }
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(text = stringResource(StringsR.string.extra_ask_changes)) },
+    text = {
+      OutlinedTextField(
+        value = request,
+        onValueChange = onRequestChange,
+        placeholder = { Text(text = stringResource(StringsR.string.extra_ask_changes_hint)) },
+        minLines = 4,
+        modifier = Modifier
+          .fillMaxWidth()
+          .focusRequester(focusRequester),
+      )
+    },
+    confirmButton = {
+      TextButton(onClick = onSend, enabled = canSendEmpty || request.isNotBlank()) {
+        Text(text = stringResource(StringsR.string.extra_ask_changes_send))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) {
+        Text(text = stringResource(StringsR.string.common_dialog_cancel))
+      }
+    },
+  )
 }
 
 @Composable
@@ -224,7 +275,7 @@ private fun FixBanner(
     }
     if (!viewState.fixing) {
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = onFix) { Text(text = stringResource(StringsR.string.extra_fix)) }
+        Button(onClick = onFix) { Text(text = stringResource(StringsR.string.extra_ask_changes)) }
         TextButton(onClick = onDismiss) {
           Text(text = stringResource(StringsR.string.extra_error_dismiss), color = palette.onHighlight)
         }
