@@ -3,6 +3,7 @@ package voice.features.bookSetup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -52,9 +54,11 @@ import voice.core.companion.BookKind
 import voice.core.companion.BookProfile
 import voice.core.companion.StepState
 import voice.core.data.BookId
+import voice.core.ui.crawl.BookStyle
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.CrawlType
+import voice.core.ui.crawl.DefaultPalette
 import voice.core.ui.crawl.hardShadow
 import voice.core.ui.icons.VoiceIcons
 import voice.navigation.Destination
@@ -88,9 +92,39 @@ private fun BookSetupScreen(
   val viewModel = retain(bookId.value) {
     rootGraphAs<BookSetupGraph>().bookSetupViewModelFactory.create(bookId, autoStart)
   }
-  val viewState = viewModel.viewState() ?: return
+  val viewState = viewModel.viewState()
+  if (viewState == null) {
+    AddingBook(onClose = viewModel::onClose)
+    return
+  }
   CrawlTheme(bookStyle = viewState.bookStyle) {
     BookSetupScreen(viewState = viewState, viewModel = viewModel)
+  }
+}
+
+/** Shown while a freshly picked file is still being scanned into the library. */
+@Composable
+private fun AddingBook(onClose: () -> Unit) {
+  CrawlTheme(bookStyle = BookStyle()) {
+    val palette = DefaultPalette
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(palette.background)
+        .safeDrawingPadding(),
+    ) {
+      IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopStart)) {
+        Icon(imageVector = VoiceIcons.Close, contentDescription = stringResource(StringsR.string.common_action_close), tint = palette.content)
+      }
+      Column(
+        modifier = Modifier.align(Alignment.Center),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        CircularProgressIndicator(color = palette.highlight)
+        Text(text = stringResource(StringsR.string.setup_adding), color = palette.content, style = MaterialTheme.typography.bodyLarge)
+      }
+    }
   }
 }
 

@@ -565,4 +565,6 @@
     <string name="extra.keep">Keep</string>
     <!-- Player menu item that opens the book setup screen. -->
     <string name="playback.option.book_setup">Book setup &amp; Extras</string>
+    <!-- Shown while a picked audiobook file is scanned. -->
+    <string name="setup.adding">Adding the book to your library…</string>
 </resources>

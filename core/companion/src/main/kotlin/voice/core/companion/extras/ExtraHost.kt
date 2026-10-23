@@ -100,8 +100,10 @@ class ExtraHost(
   }
 
   /** Forgets everything a deleted Extra saved. */
-  suspend fun clearValues(bookId: BookId, extraId: String) = valuesLock.withLock {
-    withContext(Dispatchers.IO) { valuesFile(bookId, extraId).delete() }
+  suspend fun clearValues(bookId: BookId, extraId: String) {
+    valuesLock.withLock {
+      val _ = withContext(Dispatchers.IO) { valuesFile(bookId, extraId).delete() }
+    }
   }
 
   private suspend fun readValues(bookId: BookId, extraId: String): Map<String, String> = withContext(Dispatchers.IO) {
@@ -110,13 +112,15 @@ class ExtraHost(
     runCatching { companionJson.decodeFromString(ValuesSerializer, file.readText()) }.getOrElse { emptyMap() }
   }
 
-  private suspend fun writeValues(bookId: BookId, extraId: String, values: Map<String, String>) = withContext(Dispatchers.IO) {
-    val file = valuesFile(bookId, extraId)
-    val pending = File(file.parentFile, "${file.name}.tmp")
-    pending.writeText(companionJson.encodeToString(ValuesSerializer, values))
-    if (!pending.renameTo(file)) {
-      file.delete()
-      pending.renameTo(file)
+  private suspend fun writeValues(bookId: BookId, extraId: String, values: Map<String, String>) {
+    withContext(Dispatchers.IO) {
+      val file = valuesFile(bookId, extraId)
+      val pending = File(file.parentFile, "${file.name}.tmp")
+      pending.writeText(companionJson.encodeToString(ValuesSerializer, values))
+      if (!pending.renameTo(file)) {
+        val _ = file.delete()
+        check(pending.renameTo(file)) { "Could not save $file" }
+      }
     }
   }
 

@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.withTimeoutOrNull
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
@@ -272,8 +274,14 @@ class BookOverviewViewModel(
   /** A book file picked with the library's add button: it joins the library and its guided setup opens. */
   fun onAudioFilePicked(uri: Uri) {
     audiobookFolders.add(uri, FolderType.SingleFile)
-    mediaScanner.scan()
     navigator.goTo(Destination.BookSetup(BookId(uri), autoStart = true))
+    scope.launch {
+      // The folder list is saved in the background, so the scan waits until it holds the new file.
+      val _ = withTimeoutOrNull(5.seconds) {
+        audiobookFolders.all().first { folders -> folders.values.flatten().any { it.uri == uri } }
+      }
+      mediaScanner.scan(restartIfScanning = true)
+    }
   }
 
   private fun looksOf(ids: List<BookId>): Flow<Map<BookId, BookLook>> {
