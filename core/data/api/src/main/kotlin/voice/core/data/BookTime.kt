@@ -1,7 +1,7 @@
 package voice.core.data
 
 /** The position in the whole book of [positionInChapterMs] in the audio file [chapterId], or null if it isn't in the book. */
-fun List<Chapter>.bookPositionOf(
+public fun List<Chapter>.bookPositionOf(
   chapterId: ChapterId,
   positionInChapterMs: Long,
 ): Long? {
@@ -14,7 +14,7 @@ fun List<Chapter>.bookPositionOf(
 }
 
 /** The audio file and position in it of [bookMs], a position in the whole book; null past the end. */
-fun List<Chapter>.chapterPositionOf(bookMs: Long): Pair<ChapterId, Long>? {
+public fun List<Chapter>.chapterPositionOf(bookMs: Long): Pair<ChapterId, Long>? {
   if (bookMs < 0) return null
   var offset = 0L
   for (chapter in this) {
