@@ -12,6 +12,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import voice.core.data.Book
+import voice.core.data.ChapterId
 import voice.core.data.folders.AudiobookFolders
 import voice.core.data.toUri
 import voice.core.documentfile.CachedDocumentFileFactory
@@ -37,12 +38,32 @@ class TranscriptRepository(
   private val documentFileFactory: CachedDocumentFileFactory,
   private val audiobookFolders: AudiobookFolders,
   private val context: Context,
+  private val bookFiles: BookFiles,
 ) {
 
   private val cacheLock = Mutex()
   private val cache = object : LinkedHashMap<String, List<TranscriptCue>>(MAX_CACHED_CHAPTERS, 0.75f, true) {
     override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<TranscriptCue>>?) =
       size > MAX_CACHED_CHAPTERS
+  }
+
+  /** Whether the current chapter file has a transcript Earwig made, or one placed next to the audio file. */
+  suspend fun hasTranscript(book: Book): Boolean = cuesForCurrentChapter(book) != null
+
+  /** Drops the cached cues of [chapterId], so a transcript that was just written is read on the next lookup. */
+  suspend fun invalidate(chapterId: ChapterId) {
+    cacheLock.withLock { cache.remove(chapterId.toUri().toString()) }
+  }
+
+  /** Every cue of the current chapter file, or null without a transcript. */
+  suspend fun cues(book: Book): List<TranscriptCue>? = cuesForCurrentChapter(book)
+
+  /** Every cue of the audio file [chapterId], or null without a transcript. */
+  suspend fun cues(chapterId: ChapterId): List<TranscriptCue>? {
+    val chapterUri = chapterId.toUri()
+    return cacheLock.withLock {
+      cache[chapterUri.toString()] ?: loadCues(chapterUri)?.also { cache[chapterUri.toString()] = it }
+    }
   }
 
   suspend fun textForPrecedingWindow(book: Book, windowMs: Long): String? =
@@ -57,12 +78,7 @@ class TranscriptRepository(
     return cues.textForPrecedingWindow(endPositionMs, windowMs).takeUnless { it.isBlank() }
   }
 
-  private suspend fun cuesForCurrentChapter(book: Book): List<TranscriptCue>? {
-    val chapterUri = book.currentChapter.id.toUri()
-    return cacheLock.withLock {
-      cache[chapterUri.toString()] ?: loadCues(chapterUri)?.also { cache[chapterUri.toString()] = it }
-    }
-  }
+  private suspend fun cuesForCurrentChapter(book: Book): List<TranscriptCue>? = cues(book.currentChapter.id)
 
   private val uriCache by lazy { context.getSharedPreferences("transcript_uris", Context.MODE_PRIVATE) }
 
@@ -71,11 +87,21 @@ class TranscriptRepository(
    * the app for 6-10 s (and far longer when memory was tight), which also stalled everything the
    * co-pilot does while waiting. Tried in order: the JSON sitting next to the audio file (no
    * folder walk), the location remembered from an earlier walk, then a walk of the audiobook
-   * folders. Running out of memory counts as "no transcript" instead of crashing the app.
+   * folders. A transcript Earwig made itself, in its private storage, wins over all of them. Running out of memory
+   * counts as "no transcript" instead of crashing the app.
    */
   private suspend fun loadCues(chapterUri: Uri): List<TranscriptCue>? = withContext(Dispatchers.IO) {
     val startedAt = System.currentTimeMillis()
     try {
+      val own = bookFiles.transcriptFile(ChapterId(chapterUri))
+      if (own.isFile) {
+        runCatching { own.inputStream().use { TranscriptParser.parse(it) } }
+          .onFailure { Logger.w(it, "Could not parse the transcript at $own") }
+          .getOrNull()?.let { cues ->
+          Logger.d("Transcript loaded from app storage in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
+          return@withContext cues
+        }
+      }
       siblingJson(chapterUri)?.let { sibling ->
         parse(sibling)?.let { cues ->
           Logger.d("Transcript loaded from the sibling file in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")

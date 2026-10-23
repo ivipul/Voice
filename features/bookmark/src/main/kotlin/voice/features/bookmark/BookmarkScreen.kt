@@ -7,59 +7,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation3.runtime.NavEntry
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
-import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
-import voice.core.data.repo.BookRepository
-import voice.core.strips.AvailableStrip
-import voice.core.strips.StripRepository
 import voice.core.ui.FrameCardViewer
 import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
-import voice.features.bookmark.strips.StripGallery
-import voice.features.bookmark.strips.StripViewer
-import voice.features.bookmark.strips.StripViewerViewModel
-import voice.navigation.Destination
-import voice.navigation.NavEntryProvider
-import voice.navigation.Navigator
 import voice.core.strings.R as StringsR
 
 private enum class InventoryTab(val labelRes: Int) {
   Snips(StringsR.string.bookmark_tab_snips),
-  Strips(StringsR.string.bookmark_tab_strips),
+  Extras(StringsR.string.bookmark_tab_extras),
 }
 
 @ContributesTo(AppScope::class)
 interface Graph {
   val bookmarkViewModelFactory: BookmarkViewModel.Factory
-  val stripViewerViewModelFactory: StripViewerViewModel.Factory
-  val stripRepository: StripRepository
-  val bookRepository: BookRepository
-  val navigator: Navigator
 }
 
 @ContributesTo(AppScope::class)
 interface BookmarkProvider {
-
-  @Provides
-  @IntoSet
-  fun stripStoryNavEntryProvider(): NavEntryProvider<*> = NavEntryProvider<Destination.StripStory> { key ->
-    NavEntry(key) {
-      StripStoryScreen(key)
-    }
-  }
 
   @Provides
   fun inventoryContent(): InventoryContent = object : InventoryContent {
@@ -75,21 +51,6 @@ interface BookmarkProvider {
 }
 
 @Composable
-fun StripStoryScreen(destination: Destination.StripStory) {
-  val graph = rootGraphAs<Graph>()
-  val strip by produceState<AvailableStrip?>(null, destination) {
-    val book = graph.bookRepository.get(destination.bookId) ?: return@produceState
-    value = graph.stripRepository.stripsFor(book.content.name).firstOrNull { it.manifest.chapter == destination.chapter }
-  }
-  strip?.let { loaded ->
-    val storyViewModel = remember(destination, loaded) {
-      graph.stripViewerViewModelFactory.create(destination.bookId, loaded, destination.startFrameIndex, destination.linkedToBook)
-    }
-    StripViewer(viewModel = storyViewModel, onClose = graph.navigator::goBack)
-  }
-}
-
-@Composable
 private fun Inventory(
   bookId: BookId,
   onClose: () -> Unit,
@@ -99,7 +60,7 @@ private fun Inventory(
     rootGraphAs<Graph>().bookmarkViewModelFactory.create(bookId)
   }
   val viewState = viewModel.viewState()
-  CrawlTheme(edition = viewState.edition) {
+  CrawlTheme(bookStyle = viewState.bookStyle) {
     Inventory(
       viewState = viewState,
       onSnipClick = {
@@ -107,7 +68,14 @@ private fun Inventory(
         onClose()
       },
       onSnipDelete = viewModel::onSnipDelete,
-      onStripClick = viewModel::onStripClick,
+      onExtraClick = {
+        viewModel.onExtraClick(it)
+        if (!it.locked) onClose()
+      },
+      onMoreExtrasClick = {
+        viewModel.onMoreExtrasClick()
+        onClose()
+      },
       modifier = modifier,
     )
   }
@@ -118,12 +86,13 @@ internal fun Inventory(
   viewState: BookmarkViewState,
   onSnipClick: (SnipCardViewState) -> Unit,
   onSnipDelete: (SnipCardViewState) -> Unit,
-  onStripClick: (AvailableStrip) -> Unit,
+  onExtraClick: (ExtraCardViewState) -> Unit,
+  onMoreExtrasClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var selectedTab by remember { mutableStateOf(InventoryTab.Snips) }
   var viewedFrame by remember { mutableStateOf<SnipCardViewState?>(null) }
-  val palette = crawlPaletteOf(viewState.edition)
+  val palette = crawlPaletteOf(viewState.bookStyle)
 
   Column(modifier = modifier) {
     SecondaryTabRow(
@@ -145,11 +114,11 @@ internal fun Inventory(
         onImageClick = { viewedFrame = it },
         onDelete = onSnipDelete,
       )
-      InventoryTab.Strips -> StripGallery(
-        strips = viewState.strips,
-        lockedStrips = viewState.lockedStrips,
+      InventoryTab.Extras -> ExtrasShelf(
+        extras = viewState.extras,
         palette = palette,
-        onClick = onStripClick,
+        onClick = onExtraClick,
+        onMoreClick = onMoreExtrasClick,
       )
     }
   }

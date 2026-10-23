@@ -48,7 +48,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
-import voice.core.ui.crawl.crawlEditionOf
+import voice.core.ui.crawl.toStyle
 import voice.features.bookOverview.di.BookOverviewScope
 import voice.features.bookOverview.search.BookSearchViewState
 import voice.navigation.Destination
@@ -158,7 +158,7 @@ class BookOverviewViewModel(
         BookOverviewViewState.PlayButtonState.Paused
       }.takeIf { currentBookId != null },
       uniformFont = uniformFont,
-      activeEdition = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
+      activeBookStyle = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
       showAddBookHint = if (hasStoragePermissionBug) {
         false
       } else {

@@ -96,7 +96,7 @@ class VoicePlayerTest {
     mockk(),
     mockk(),
     mockk(),
-    mockk { every { artwork(any(), any()) } returns null },
+    mockk { every { artwork(any()) } returns null },
     mockk(),
   )
   private val bookId = BookId(Uuid.random().toString())

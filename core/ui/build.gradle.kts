@@ -13,6 +13,7 @@ dependencies {
   implementation(libs.appCompat)
   implementation(libs.androidxCore)
   api(projects.core.data.api)
+  api(projects.core.companion)
   implementation(projects.core.initializer)
   implementation(projects.core.strings)
   implementation(libs.lifecycle.compose)

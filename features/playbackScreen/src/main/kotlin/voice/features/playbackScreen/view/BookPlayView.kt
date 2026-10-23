@@ -17,7 +17,7 @@ import voice.core.strips.ActiveStripFrame
 import voice.core.ui.VoiceTheme
 import voice.core.ui.bookCardBackdropModifier
 import voice.core.ui.bookCardContentModifier
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
@@ -52,7 +52,7 @@ internal fun BookPlayView(
   inventoryContent: InventoryContent,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-  val palette = crawlPaletteOf(viewState.edition)
+  val palette = crawlPaletteOf(viewState.bookStyle)
   // The player is what the book's library card grows into: its color first, then the screen on top of it.
   Box(modifier = Modifier.fillMaxSize()) {
     Box(
@@ -117,7 +117,7 @@ private fun BookPlayPreview(
   viewState: BookPlayViewState,
 ) {
   VoiceTheme {
-    CrawlTheme(viewState.edition) {
+    CrawlTheme(viewState.bookStyle) {
       BookPlayView(
         viewState = viewState,
         bookId = BookId("preview"),
@@ -167,7 +167,7 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
         BookPlayViewState.XRayChipViewState(id = "mongo", label = "Mongo"),
         BookPlayViewState.XRayChipViewState(id = "mordecai", label = "Mordecai"),
       ),
-      edition = CrawlEdition.DungeonCrawlerCarl,
+      bookStyle = BookStyle.DungeonCrawlerCarl,
       playbackSpeed = 1.1F,
       inventoryCount = 7,
     )
@@ -177,11 +177,11 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
         title = "4. The Gate of the Feral Gods",
         chapterName = "Chapter 21",
         playing = false,
-        edition = CrawlEdition.GateOfTheFeralGods,
+        bookStyle = BookStyle.GateOfTheFeralGods,
         sleepTimerState = BookPlayViewState.SleepTimerViewState.Enabled.WithDuration(12.minutes),
       ),
     )
-    yield(initial.copy(title = "Das Ende der Welt", edition = null, xrayChips = emptyList()))
+    yield(initial.copy(title = "Das Ende der Welt", bookStyle = null, xrayChips = emptyList()))
   }
 }
 

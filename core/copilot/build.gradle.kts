@@ -4,45 +4,14 @@ plugins {
   alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-  buildFeatures {
-    buildConfig = true
-  }
-
-  // Set gemini.apiKey / openrouter.apiKey / ideogram.apiKey / fish.apiKey in
-  // ~/.gradle/gradle.properties (outside the repo, never committed) to enable the co-pilot's
-  // Gemini and Jev router calls, the Snip comic-frame image generation and the spoken answers'
-  // Fish Audio voice.
-  defaultConfig {
-    buildConfigField(
-      type = "String",
-      name = "GEMINI_API_KEY",
-      value = "\"${providers.gradleProperty("gemini.apiKey").getOrElse("")}\"",
-    )
-    buildConfigField(
-      type = "String",
-      name = "OPENROUTER_API_KEY",
-      value = "\"${providers.gradleProperty("openrouter.apiKey").getOrElse("")}\"",
-    )
-    buildConfigField(
-      type = "String",
-      name = "IDEOGRAM_API_KEY",
-      value = "\"${providers.gradleProperty("ideogram.apiKey").getOrElse("")}\"",
-    )
-    buildConfigField(
-      type = "String",
-      name = "FISH_API_KEY",
-      value = "\"${providers.gradleProperty("fish.apiKey").getOrElse("")}\"",
-    )
-  }
-}
-
 dependencies {
   implementation(projects.core.common)
   implementation(projects.core.data.api)
-  // api, not implementation: Metro needs TranscriptRepository's @Inject constructor visible
-  // on :app's compile classpath to resolve RealCoPilotPipeline's dependency graph.
+  // api, not implementation: Metro needs the @Inject constructors of these modules visible on :app's compile
+  // classpath to resolve RealCoPilotPipeline's dependency graph.
   api(projects.core.transcript)
+  api(projects.core.ai)
+  api(projects.core.companion)
   implementation(projects.core.logging.api)
 
   implementation(libs.serialization.json)

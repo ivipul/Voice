@@ -22,40 +22,36 @@ import voice.core.ui.LocalThemeColorScheme
 import voice.core.ui.VoiceTheme
 
 /**
- * Colors everything inside in [edition]'s palette and turns the system bar icons to match it.
- * Any other book keeps the app theme.
+ * Colors everything inside in [bookStyle]'s palette and turns the system bar icons to match it.
+ * Without a style the app theme is kept.
  */
 @Composable
 fun CrawlTheme(
-  edition: CrawlEdition?,
+  bookStyle: BookStyle?,
   content: @Composable () -> Unit,
 ) {
-  val colorScheme = if (edition != null) {
-    remember(edition) { edition.palette.colorScheme() }
+  val colorScheme = if (bookStyle != null) {
+    remember(bookStyle.palette) { bookStyle.palette.colorScheme() }
   } else {
     MaterialTheme.colorScheme
   }
-  if (edition != null) {
-    SystemBarIcons(dark = edition.palette.darkSystemBarIcons)
+  if (bookStyle != null) {
+    SystemBarIcons(dark = bookStyle.palette.darkSystemBarIcons)
   }
   MaterialTheme(colorScheme = colorScheme, content = content)
 }
 
-/** The library on white: the app's light colors whatever the phone's dark mode, with dark system bar icons to match. */
+/** The library and settings: the app's own light colors whatever the phone's dark mode, with dark system bar icons. */
 @Composable
 fun CrawlLibraryTheme(content: @Composable () -> Unit) {
   SystemBarIcons(dark = true)
-  VoiceTheme(themeMode = ThemeMode.Light, themeColorScheme = LocalThemeColorScheme.current) {
-    val colorScheme = MaterialTheme.colorScheme
-    val onWhite = remember(colorScheme) { colorScheme.copy(background = Color.White, surface = Color.White) }
-    MaterialTheme(colorScheme = onWhite, content = content)
-  }
+  VoiceTheme(themeMode = ThemeMode.Light, themeColorScheme = LocalThemeColorScheme.current, content = content)
 }
 
-/** [edition]'s palette, or one taken from the app theme for a book outside the series. */
+/** [bookStyle]'s palette, or one taken from the app theme without a style. */
 @Composable
-fun crawlPaletteOf(edition: CrawlEdition?): CrawlPalette {
-  if (edition != null) return edition.palette
+fun crawlPaletteOf(bookStyle: BookStyle?): CrawlPalette {
+  if (bookStyle != null) return bookStyle.palette
   val colors = MaterialTheme.colorScheme
   return CrawlPalette(
     background = colors.surface,

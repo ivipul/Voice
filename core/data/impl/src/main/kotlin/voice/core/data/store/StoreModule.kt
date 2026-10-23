@@ -13,9 +13,9 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import voice.core.data.ApiKeys
 import voice.core.data.BookId
 import voice.core.data.CoPilotButtonMapping
-import voice.core.data.CoPilotVoiceSettings
 import voice.core.data.GridMode
 import voice.core.data.ThemeColorScheme
 import voice.core.data.ThemeMode
@@ -128,12 +128,12 @@ public interface StoreModule {
 
   @Provides
   @SingleIn(AppScope::class)
-  @CoPilotVoiceSettingsStore
-  private fun copilotVoiceSettings(factory: VoiceDataStoreFactory): DataStore<CoPilotVoiceSettings> {
+  @ApiKeysStore
+  private fun apiKeys(factory: VoiceDataStoreFactory): DataStore<ApiKeys> {
     return factory.create(
-      serializer = CoPilotVoiceSettings.serializer(),
-      defaultValue = CoPilotVoiceSettings(),
-      fileName = "copilotVoiceSettings",
+      serializer = ApiKeys.serializer(),
+      defaultValue = ApiKeys(),
+      fileName = "apiKeys",
     )
   }
 

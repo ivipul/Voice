@@ -34,7 +34,7 @@ import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
 import voice.core.ui.GridCount
-import voice.core.ui.crawl.crawlEditionOf
+import voice.core.ui.crawl.toStyle
 import voice.features.bookOverview.book
 import voice.navigation.Destination
 import voice.navigation.Navigator
@@ -328,7 +328,7 @@ class BookOverviewViewModelTest {
   }
 
   @Test
-  fun `the current series book gives the buttons its edition`() = runTest {
+  fun `the current series book gives the buttons its bookStyle`() = runTest {
     val currentBook = book(name = "Carl's Doomsday Scenario")
     val otherBook = book(name = "Not in the series")
     val viewModel = viewModel(
@@ -340,7 +340,7 @@ class BookOverviewViewModelTest {
       viewModel.state()
     }.test {
       assertEquals(expected = BookOverviewViewState.Loading, actual = awaitItem())
-      assertEquals(expected = crawlEditionOf("Carl's Doomsday Scenario"), actual = awaitItem().activeEdition)
+      assertEquals(expected = crawlEditionOf("Carl's Doomsday Scenario"), actual = awaitItem().activeBookStyle)
     }
   }
 

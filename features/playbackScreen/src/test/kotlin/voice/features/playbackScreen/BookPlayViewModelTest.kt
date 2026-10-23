@@ -53,7 +53,7 @@ import voice.core.strips.ActiveStripFrame
 import voice.core.strips.AvailableStrip
 import voice.core.strips.StripFrame
 import voice.core.strips.StripManifest
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
 import voice.core.xray.card.PlayerCardData
@@ -465,20 +465,20 @@ class BookPlayViewModelTest {
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
       while (state == null) state = awaitItem()
-      assertEquals(CrawlEdition.CarlsDoomsdayScenario, state.edition)
+      assertEquals(BookStyle.CarlsDoomsdayScenario, state.bookStyle)
       assertEquals(1.3F, state.playbackSpeed)
       cancelAndIgnoreRemainingEvents()
     }
   }
 
   @Test
-  fun `a book outside the series has no edition`() = scope.runTest {
+  fun `a book outside the series has no bookStyle`() = scope.runTest {
     val viewModel = viewModel()
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
       while (state == null) state = awaitItem()
-      assertEquals(null, state.edition)
+      assertEquals(null, state.bookStyle)
       cancelAndIgnoreRemainingEvents()
     }
   }

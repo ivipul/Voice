@@ -65,7 +65,7 @@ import voice.core.strips.activeFrameAt
 import voice.core.strips.chapterPositionOf
 import voice.core.strips.isUnlockedAt
 import voice.core.strips.zonesWithin
-import voice.core.ui.crawl.crawlEditionOf
+import voice.core.ui.crawl.toStyle
 import voice.core.ui.formatTime
 import voice.core.xray.XRayEntityInfo
 import voice.core.xray.XRayManifest
@@ -212,7 +212,7 @@ class BookPlayViewModel(
     val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
     }.orEmpty()
-    val edition = remember(book.content.name) { crawlEditionOf(book.content.name) }
+    val bookStyle = remember(book.content.name) { crawlEditionOf(book.content.name) }
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -228,7 +228,7 @@ class BookPlayViewModel(
       xrayChips = xrayChips,
       stripZones = stripZones,
       stripFrame = strips.activeFrameAt(book.position),
-      edition = edition,
+      bookStyle = bookStyle,
       playbackSpeed = book.content.playbackSpeed,
       inventoryCount = snipCount + strips.count { it.isUnlockedAt(book.position) },
     )

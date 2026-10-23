@@ -2,23 +2,22 @@ package voice.core.copilot
 
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
-import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import voice.core.copilot.frame.FrameRequest
-import voice.core.copilot.frame.SnipFrameRunner
+import voice.core.ai.ClaudeClient
+import voice.core.ai.MissingApiKeyException
+import voice.core.companion.BookProfile
+import voice.core.companion.CompanionStores
+import voice.core.companion.StepState
+import voice.core.data.Book
 import voice.core.data.BookId
-import voice.core.data.CoPilotVoiceSettings
-import voice.core.data.store.CoPilotVoiceSettingsStore
 import voice.core.data.repo.BookRepository
 import voice.core.logging.api.Logger
 import voice.core.transcript.TranscriptRepository
 import java.util.UUID
-import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -27,87 +26,70 @@ import kotlin.time.Duration.Companion.seconds
 class RealCoPilotPipeline(
   private val bookRepository: BookRepository,
   private val transcriptRepository: TranscriptRepository,
-  private val jevRouter: JevRouter,
-  private val geminiClient: GeminiClient,
+  private val claudeClient: ClaudeClient,
   private val coPilotRepository: CoPilotRepository,
-  @CoPilotVoiceSettingsStore
-  private val voiceSettingsStore: DataStore<CoPilotVoiceSettings>,
-  private val snipFrameRunner: SnipFrameRunner,
+  private val stores: CompanionStores,
+  private val snipPictureRunner: SnipPictureRunner,
 ) : CoPilotPipeline {
 
-  internal var random: Random = Random.Default
-
-  private suspend fun currentStyle(budget: WordBudget, flavor: SystemFlavor? = null): AnswerStyle =
-    answerStyle(voiceSettingsStore.data.first(), budget, flavor ?: pickSystemFlavor(random))
-
-  private suspend fun fallbackAnswer(): String =
-    if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_ANSWER else FALLBACK_ANSWER
-
-  private suspend fun fallbackNoTranscript(): String =
-    if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_NO_TRANSCRIPT else FALLBACK_NO_TRANSCRIPT
-
   override suspend fun failureMessage(): String =
-    if (voiceSettingsStore.data.first().useSystemAiVoice) SYSTEM_FALLBACK_ANSWER else GENERIC_FAILURE
+    if (claudeClient.isConfigured()) GENERIC_FAILURE else NO_KEY
 
-  /** What a spoken/typed action needs: either an answer already known, or the prompts to send to Gemini. */
+  /** What a spoken or typed action needs: either an answer already known, or the prompts to send to Claude. */
   private sealed interface Plan {
     data class Direct(val answer: String) : Plan
-    data class Gemini(val systemPrompt: String, val userPrompt: String) : Plan
+    data class Claude(val systemPrompt: String, val userPrompt: String) : Plan
   }
 
+  private suspend fun profileOf(book: Book): BookProfile? = stores.profile.get(book.id).takeIf { it.summary.isNotBlank() }
+
   private suspend fun askPlan(bookId: BookId, question: String): Plan {
-    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
-    val transcript = if (jevRouter.needsTranscriptContext(question)) {
-      transcriptRepository.textForPrecedingWindow(book, ASK_TRANSCRIPT_WINDOW_MS)
-    } else {
-      null
-    }
-    return Plan.Gemini(
-      askSystemPrompt(book, currentStyle(WordBudget.Answer)),
-      userQuestionPrompt(question, transcript),
-    )
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(FALLBACK_ANSWER)
+    val transcript = transcriptRepository.textForPrecedingWindow(book, ASK_TRANSCRIPT_WINDOW_MS)
+    return Plan.Claude(askSystemPrompt(book, profileOf(book)), userQuestionPrompt(question, transcript))
   }
 
   private suspend fun autoIdentifyPlan(bookId: BookId): Plan {
-    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(FALLBACK_ANSWER)
     val last60Seconds = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_RECENT_WINDOW_MS)
-      ?: return Plan.Direct(fallbackNoTranscript())
+      ?: return Plan.Direct(noTranscriptAnswer(book))
     val last30Minutes = transcriptRepository.textForPrecedingWindow(book, AUTO_IDENTIFY_CONTEXT_WINDOW_MS)
-    val task = "Explain what is happening right now in the book, based specifically on the last 60 seconds " +
-      "provided below. Use the last 30 minutes of context only to understand who or what is involved - don't " +
-      "summarize that older context itself, focus your explanation on the current moment."
-    return Plan.Gemini(
-      spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Answer)),
-      autoIdentifyPrompt(last30Minutes, last60Seconds),
-    )
+    return Plan.Claude(autoIdentifySystemPrompt(book, profileOf(book)), autoIdentifyPrompt(last30Minutes, last60Seconds))
   }
 
   private suspend fun catchMeUpPlan(bookId: BookId): Plan {
-    val book = bookRepository.get(bookId) ?: return Plan.Direct(fallbackAnswer())
+    val book = bookRepository.get(bookId) ?: return Plan.Direct(FALLBACK_ANSWER)
     val transcript = transcriptRepository.textForPrecedingWindow(book, CATCH_UP_WINDOW_MS)
-      ?: return Plan.Direct(fallbackNoTranscript())
-    val task = "Give a spoken summary of what happened in the last 30 minutes of the book, shown below. " +
-      "Start your answer with the exact words \"In the last 30 minutes,\" and continue directly from there."
-    return Plan.Gemini(
-      // The recap must open with an exact phrase, so it never takes a banner flavor.
-      spokenAnswerSystemPrompt(book, task, currentStyle(WordBudget.Recap, SystemFlavor.Plain)),
-      transcriptOnlyPrompt(transcript),
-    )
+      ?: return Plan.Direct(noTranscriptAnswer(book))
+    return Plan.Claude(catchUpSystemPrompt(book, profileOf(book)), transcriptOnlyPrompt(transcript))
+  }
+
+  private suspend fun noTranscriptAnswer(book: Book): String {
+    val transcribing = stores.setup.get(book.id).transcription.state == StepState.Running
+    return if (transcribing) STILL_TRANSCRIBING else FALLBACK_NO_TRANSCRIPT
   }
 
   private suspend fun answer(plan: Plan, label: String): String = when (plan) {
     is Plan.Direct -> plan.answer
-    is Plan.Gemini -> runCatching { geminiClient.ask(plan.systemPrompt, plan.userPrompt) }.getOrElse { e ->
+    is Plan.Claude -> try {
+      claudeClient.ask(plan.systemPrompt, plan.userPrompt)
+    } catch (e: MissingApiKeyException) {
+      NO_KEY
+    } catch (e: Exception) {
       Logger.w(e, "CoPilot $label() failed")
-      fallbackAnswer()
+      FALLBACK_ANSWER
     }
   }
 
   private fun stream(label: String, plan: suspend () -> Plan): Flow<String> = flow {
     Logger.d("CoPilot $label stream: pipeline start")
+    if (!claudeClient.isConfigured()) {
+      emit(NO_KEY)
+      return@flow
+    }
     when (val resolved = plan()) {
       is Plan.Direct -> emit(resolved.answer)
-      is Plan.Gemini -> emitAll(geminiClient.askStream(resolved.systemPrompt, resolved.userPrompt))
+      is Plan.Claude -> emitAll(claudeClient.askStream(resolved.systemPrompt, resolved.userPrompt))
     }
   }
 
@@ -124,8 +106,8 @@ class RealCoPilotPipeline(
       Logger.d("CoPilot warm-up: book not available")
       return
     }
-    val loaded = transcriptRepository.textForPrecedingWindow(book, 1)
-    Logger.d("CoPilot warm-up done (attempt $attempts), transcript ${if (loaded == null) "missing" else "loaded"}")
+    val loaded = transcriptRepository.hasTranscript(book)
+    Logger.d("CoPilot warm-up done (attempt $attempts), transcript ${if (loaded) "loaded" else "missing"}")
   }
 
   override suspend fun ask(bookId: BookId, question: String): String = answer(askPlan(bookId, question), "ask")
@@ -141,16 +123,16 @@ class RealCoPilotPipeline(
   override fun catchMeUpStream(bookId: BookId): Flow<String> = stream("catchMeUp") { catchMeUpPlan(bookId) }
 
   override suspend fun snip(bookId: BookId) {
-    val drawFrame = snipFrameRunner.isAvailable()
-    coPilotRepository.emitSnipEvent(SnipEvent.Started(drawFrame))
+    val style = snipPictureRunner.styleFor(bookId)
+    coPilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = style != null))
     val book = bookRepository.get(bookId) ?: return snipFailed()
-    val transcript = transcriptRepository.textForPrecedingWindow(book, SNIP_TRANSCRIPT_WINDOW_MS) ?: return snipFailed()
-    val highlight = runCatching {
-      geminiClient.ask(
-        systemPrompt = snipHighlightSystemPrompt(book, voiceSettingsStore.data.first(), pickSnipFlavor(random)),
-        userPrompt = transcriptOnlyPrompt(transcript),
-      )
-    }.getOrElse { e ->
+    val position = book.content.positionInChapter
+    val before = transcriptRepository.textForWindow(book, endPositionMs = position, windowMs = SNIP_BEFORE_MS)
+      ?: return snipFailed()
+    val after = transcriptRepository.textForWindow(book, endPositionMs = position + SNIP_AFTER_MS, windowMs = SNIP_AFTER_MS)
+    val highlight = try {
+      claudeClient.ask(snipSystemPrompt(book, profileOf(book)), snipPrompt(before, after))
+    } catch (e: Exception) {
       Logger.w(e, "CoPilot snip() failed")
       return snipFailed()
     }
@@ -163,19 +145,13 @@ class RealCoPilotPipeline(
         text = highlight,
         timestampMs = System.currentTimeMillis(),
         isVisualPriority = true,
-        isGeneratingImage = drawFrame,
+        isGeneratingImage = style != null,
         snipChapterId = book.currentChapter.id,
-        snipPositionInChapterMs = book.content.positionInChapter,
+        snipPositionInChapterMs = position,
       ),
     )
     coPilotRepository.emitSnipEvent(SnipEvent.Ready(highlight, messageId))
-    if (drawFrame) {
-      snipFrameRunner.start(
-        bookId,
-        messageId,
-        FrameRequest(book = book, highlight = highlight, transcript = transcript, positionMs = book.position),
-      )
-    }
+    if (style != null) snipPictureRunner.start(bookId, messageId, highlight, style)
   }
 
   private fun snipFailed() = coPilotRepository.emitSnipEvent(SnipEvent.Failed)
@@ -185,14 +161,14 @@ class RealCoPilotPipeline(
     const val WARM_UP_RETRY_MS = 2_000L
     const val FALLBACK_ANSWER = "Sorry, I couldn't get an answer just now."
     const val FALLBACK_NO_TRANSCRIPT = "I don't have a transcript for this book yet, so I can't answer that."
+    const val STILL_TRANSCRIBING = "This book is still being transcribed. I can answer once that part is done."
     const val GENERIC_FAILURE = "Sorry, something went wrong."
-    const val SYSTEM_FALLBACK_ANSWER = "System message. Something went wrong on our end. Try again in a moment, crawler."
-    const val SYSTEM_FALLBACK_NO_TRANSCRIPT =
-      "Warning! No transcript on file for this book. Nothing to look up. Good luck."
+    const val NO_KEY = "Add your Claude API key in Settings first, then try again."
     val ASK_TRANSCRIPT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val AUTO_IDENTIFY_RECENT_WINDOW_MS = 60.seconds.inWholeMilliseconds
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds
-    val SNIP_TRANSCRIPT_WINDOW_MS = 3.minutes.inWholeMilliseconds
+    val SNIP_BEFORE_MS = 3.minutes.inWholeMilliseconds
+    val SNIP_AFTER_MS = 30.seconds.inWholeMilliseconds
   }
 }

@@ -24,12 +24,8 @@
     <string name="book.edit.title">Edit book</string>
     <!-- Tab label for the snip cards inside the Inventory. -->
     <string name="bookmark.tab.snips">Snips</string>
-    <!-- Tab label for the comic strip gallery inside the Inventory. -->
-    <string name="bookmark.tab.strips">Strips</string>
-    <!-- Empty-state message on the Inventory's strip galleries when the book has no comic strips. -->
-    <string name="bookmark.strips.empty">No comic strips for this book yet.</string>
-    <!-- Tag on a strip card in the Inventory. %1$d is the chapter number. -->
-    <string name="bookmark.strips.chapter">Chapter %1$d</string>
+    <!-- Tab label for the shelf of Extras inside the Notebook. -->
+    <string name="bookmark.tab.extras">Extras</string>
     <!-- Generic add action and content description. -->
     <string name="common.action.add">Add</string>
     <!-- Generic content description for closing the current screen or dialog. -->
@@ -56,14 +52,12 @@
     <string name="copilot.action.smart_recap">Smart Recap</string>
     <!-- Name of the Smart Recap button on the Android Auto player. -->
     <string name="copilot.action.recap">Recap</string>
-    <!-- Content description for the entry point into the co-pilot Feed. -->
-    <string name="copilot.action.feed">System AI chat</string>
-    <!-- Content description for the Snip &amp; Synthesize co-pilot toolbar button. -->
+    <!-- Content description for the button that opens the book chat. -->
+    <string name="copilot.action.feed">Book chat</string>
+    <!-- Content description for the Snip button on the player. -->
     <string name="copilot.action.snip">Snip</string>
-    <!-- Toast shown when Snip &amp; Synthesize starts capturing a moment. -->
+    <!-- Toast shown when Snip starts capturing a moment. -->
     <string name="copilot.snip.saved.snackbar">Snipped</string>
-    <!-- Toast shown when playback reaches a comic strip for the first time and it unlocks in the Inventory. -->
-    <string name="strip.unlocked.snackbar">New strip unlocked!</string>
     <!-- Title of the bottom sheet that shows the text of a just-snipped moment. -->
     <string name="copilot.snip.sheet.title">Snipped moment</string>
     <!-- Shown in the snip bottom sheet while the snipped text is still being written. -->
@@ -78,7 +72,7 @@
     <string name="copilot.feed.input.send">Send</string>
     <!-- Content description for the X that stops a dictated co-pilot question from sending itself. -->
     <string name="copilot.feed.input.cancel_send">Cancel sending</string>
-    <!-- Content description for the play button beside a System AI reply, which reads it aloud. -->
+    <!-- Content description for the play button beside a chat reply, which reads it aloud. -->
     <string name="copilot.feed.message.play">Read aloud</string>
     <!-- Content description for that button while its reply is being read aloud. -->
     <string name="copilot.feed.message.stop">Stop reading</string>
@@ -87,19 +81,19 @@
     <!-- Content description for the chat's microphone button while it is listening. -->
     <string name="copilot.feed.mic.stop">Stop listening</string>
     <!-- Empty-state message shown before any co-pilot questions have been asked. -->
-    <string name="copilot.feed.empty">Ask about the story with the mic button on the player, or type a question below.</string>
-    <!-- Title shown in the header of the System AI chat sheet. -->
-    <string name="copilot.feed.title">System AI chat</string>
-    <!-- Shown over the empty comic-frame placeholder while a Snip's image is being drawn. -->
-    <string name="copilot.feed.frame.drawing">Crawler footage incoming…</string>
-    <!-- Click label for a Snip's comic frame in the Feed; opens it as a large card. -->
-    <string name="copilot.feed.frame.open">View comic frame</string>
+    <string name="copilot.feed.empty">Ask about the book with the mic button on the player, or type a question below.</string>
+    <!-- Title shown in the header of the book chat sheet. -->
+    <string name="copilot.feed.title">Book chat</string>
+    <!-- Shown over the empty picture placeholder while a snip picture is being drawn. -->
+    <string name="copilot.feed.frame.drawing">Drawing the picture…</string>
+    <!-- Click label for a snip picture in the chat; opens it as a large card. -->
+    <string name="copilot.feed.frame.open">View picture</string>
     <!-- Shown while the co-pilot is thinking of a response. -->
     <string name="copilot.feed.thinking">Thinking…</string>
     <!-- Snackbar shown when microphone permission is required for Ask. -->
     <string name="copilot.permission.microphone_required">Microphone access is needed for Ask</string>
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
-    <string name="copilot.settings.title">Co-Pilot</string>
+    <string name="copilot.settings.title">Companion</string>
     <!-- Section header for the co-pilot settings screen. -->
     <string name="copilot.settings.description">Choose what each headset button press does.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
@@ -117,21 +111,13 @@
     <!-- Trigger action option: the default fixed skip forward, same as the on-screen skip-forward button's default. -->
     <string name="copilot.settings.action.default_forward">Default (+30s)</string>
     <!-- Trigger action option: mic Q&amp;A co-pilot. -->
-    <string name="copilot.settings.action.open_mic">Open Mic Co-Pilot</string>
+    <string name="copilot.settings.action.open_mic">Ask by voice</string>
     <!-- Trigger action option: zero-voice proper-noun recap. -->
-    <string name="copilot.settings.action.auto_identify">Auto-Identify</string>
+    <string name="copilot.settings.action.auto_identify">What\'s happening now</string>
     <!-- Trigger action option: recap of the recent story so far. -->
-    <string name="copilot.settings.action.catch_me_up">Catch-Me-Up Recap</string>
+    <string name="copilot.settings.action.catch_me_up">Recap last 30 minutes</string>
     <!-- Trigger action option: silently capture an evocative moment to the Feed. -->
-    <string name="copilot.settings.action.snip">Snip &amp; Synthesize</string>
-    <!-- Switch title: answer in the Dungeon Crawler Carl System AI's voice. -->
-    <string name="copilot.settings.voice.system_ai.title">Use System AI voice</string>
-    <!-- Switch summary for the System AI voice setting. -->
-    <string name="copilot.settings.voice.system_ai.summary">Answers in the snarky, deadpan voice of the dungeon\'s System AI.</string>
-    <!-- Switch title: forbid swearing and sexual lines in the System AI voice. -->
-    <string name="copilot.settings.voice.keep_clean.title">Keep it clean</string>
-    <!-- Switch summary for the keep-it-clean setting. -->
-    <string name="copilot.settings.voice.keep_clean.summary">No swearing or sexual lines. Handy for demos.</string>
+    <string name="copilot.settings.action.snip">Snip</string>
     <!-- Content description for a cover preview that can be selected. -->
     <string name="cover.content_description.selectable">Shows cover to choose</string>
     <!-- Content description for an icon indicating the author in cover search results. -->
@@ -181,34 +167,19 @@
     </plurals>
     <!-- Title for choosing how audiobook files are structured. -->
     <string name="folder.type.title">How are your files structured?</string>
-    <!-- Content description of a snip's comic frame in the Inventory; tapping it shows the frame full screen. -->
+    <!-- Content description of a snip's picture in the Notebook; tapping it shows the frame full screen. -->
     <string name="inventory.snip.frame">Snip picture, tap to see it full screen</string>
     <!-- Content description for the three-dot button on a snip card in the Inventory, which opens its menu. -->
     <string name="inventory.snip.more">More options for this snip</string>
     <!-- Empty-state message on the Inventory's Snips tab. -->
     <string name="inventory.snips.empty">No snips yet. Tap Snip while you listen and the moment lands here.</string>
-    <!-- A comic strip the listener has not reached yet. %1$d is the chapter that unlocks it. -->
-    <string name="inventory.strip.locked">Unlocks in Chapter %1$d</string>
-    <!-- Label over the bar that shows how many of the book's comic strips have been reached. -->
-    <string name="inventory.strips.collected">Strips collected</string>
-    <!-- Tab label for the one-per-row comic strip gallery inside the Inventory. -->
-    <!-- Title of the screen with a book's snips and comic strips, and of the card on the player that opens it. -->
-    <string name="inventory.title">Your Inventory</string>
+    <!-- Title of the sheet with a book's snips and Extras, and of the card on the player that opens it. -->
+    <string name="inventory.title">Notebook</string>
     <!-- Settings switch: set all text on the library in one font instead of each book's own. -->
     <string name="settings.library.uniform_font.title">One font for the library</string>
     <string name="settings.library.uniform_font.description">Sets all text on the library in the header font. Off, each book keeps its own.</string>
     <!-- Title at the top of the library. -->
     <string name="library.title">Earwig</string>
-    <!-- Button on the library that opens The Deck, the gallery of every crawler's holo card. -->
-    <string name="deck.open">Open The Deck</string>
-    <!-- Title of the screen with every crawler's holo card. -->
-    <string name="deck.title">The Deck</string>
-    <!-- Label over the bar that shows how many of the series' crawler cards have been reached. -->
-    <string name="deck.collected">Crawlers collected</string>
-    <!-- A crawler card still ahead. %1$d is the book number where the crawler first shows up. -->
-    <string name="deck.locked">Meet in Book %1$d</string>
-    <!-- Empty-state message on The Deck when no book has card data. -->
-    <string name="deck.empty">No crawler cards yet. They show up here once a book with card data is in your library.</string>
     <!-- Library category header for completed books. -->
     <string name="library.category.completed.title">Completed</string>
     <!-- Library category header for books currently being listened to. -->
@@ -321,7 +292,7 @@
     <!-- Description for Android dynamic color. -->
     <string name="settings.appearance.color_scheme.dynamic.summary">Uses colors from your wallpaper and system theme.</string>
     <!-- Label for selecting Voice blue as app color scheme. -->
-    <string name="settings.appearance.color_scheme.voice_blue">Earwig blue</string>
+    <string name="settings.appearance.color_scheme.voice_blue">Cream and red</string>
     <!-- Label for forcing dark mode. -->
     <string name="settings.appearance.theme.dark">Dark</string>
     <!-- Label for following the system light or dark setting. -->
@@ -390,4 +361,18 @@
     <string name="sleep_timer.dialog.title">Sweet dreams! 🌙</string>
     <!-- Sleep timer option and playback status for stopping at the end of a chapter. -->
     <string name="sleep_timer.end_of_chapter">End of Chapter</string>
+    <!-- Empty-state message on the Notebook\'s Extras tab. -->
+    <string name="inventory.extras.empty">No Extras yet. Open the book\'s setup to pick some, or describe your own.</string>
+    <!-- An Extra the listener has not reached yet. %1$s is a book position like 2 h 14 min. -->
+    <string name="inventory.extra.locked">Unlocks at %1$s</string>
+    <!-- Button at the end of the Extras shelf that opens the book\'s setup screen with idea cards. -->
+    <string name="inventory.extras.more">Get more Extras</string>
+    <!-- Label over the bar that shows how many of the book\'s Extras have been reached. -->
+    <string name="inventory.extras.collected">Extras unlocked</string>
+    <!-- Toast shown when playback reaches the point where an Extra unlocks. -->
+    <string name="extra.unlocked.snackbar">New Extra on your shelf</string>
+    <!-- Name of the notification channel for transcription and other book setup work. -->
+    <string name="setup.notification_channel">Book setup</string>
+    <!-- Ongoing notification while Earwig transcribes a book or builds its Extras. -->
+    <string name="setup.notification_title">Setting up your book…</string>
 </resources>

@@ -55,8 +55,8 @@ internal fun BookPlayContent(
   onSnipClick: () -> Unit,
   onXRayChipClick: (String) -> Unit,
 ) {
-  val palette = crawlPaletteOf(viewState.edition)
-  val cover: Any? = viewState.edition?.cover ?: viewState.cover
+  val palette = crawlPaletteOf(viewState.bookStyle)
+  val cover: Any? = viewState.bookStyle?.cover ?: viewState.cover
   var scrubFraction by remember { mutableStateOf<Float?>(null) }
   val shownTime = scrubFraction?.let { viewState.duration * it.toDouble() } ?: viewState.playedTime
   val controls: @Composable ColumnScope.() -> Unit = {
@@ -67,7 +67,7 @@ internal fun BookPlayContent(
         durationMs = viewState.duration.inWholeMilliseconds,
       ),
       palette = palette,
-      type = viewState.edition?.chapterType ?: CrawlDisplayType.Default,
+      type = viewState.bookStyle?.chapterType ?: CrawlDisplayType.Default,
       onChapterClick = onCurrentChapterClick,
     )
     Spacer(modifier = Modifier.size(12.dp))

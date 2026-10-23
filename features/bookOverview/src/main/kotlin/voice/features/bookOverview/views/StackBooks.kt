@@ -62,7 +62,7 @@ import voice.core.ui.BookCardCorner
 import voice.core.ui.bookCardBackdropModifier
 import voice.core.ui.bookCardContentModifier
 import voice.core.ui.crawl.CrawlDisplayType
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlFonts
 import voice.core.ui.crawl.CrawlType
@@ -209,7 +209,7 @@ internal fun StackBookCard(
   onBookLongClick: (BookId) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val palette = cardPaletteOf(book.edition)
+  val palette = cardPaletteOf(book.bookStyle)
   Box(
     modifier = modifier
       .fillMaxWidth()
@@ -273,7 +273,7 @@ private fun CardText(
   val uniform = LocalUniformFont.current
   val titleType = when {
     uniform -> CrawlDisplayType(CrawlFonts.ChakraPetch, FontWeight.Bold, CrawlDisplayType.Default.fontSize)
-    else -> book.edition?.chapterType ?: CrawlDisplayType.Default
+    else -> book.bookStyle?.chapterType ?: CrawlDisplayType.Default
   }
   Column(modifier = modifier) {
     if (book.author != null) {
@@ -344,9 +344,9 @@ private fun ProgressTrack(
 
 /** A series book's palette; any other book gets a card a shade off the screen so it still stands out from it. */
 @Composable
-private fun cardPaletteOf(edition: CrawlEdition?): CrawlPalette {
-  val palette = crawlPaletteOf(edition)
-  return if (edition == null) palette.copy(background = MaterialTheme.colorScheme.surfaceContainerHigh) else palette
+private fun cardPaletteOf(bookStyle: BookStyle?): CrawlPalette {
+  val palette = crawlPaletteOf(bookStyle)
+  return if (bookStyle == null) palette.copy(background = MaterialTheme.colorScheme.surfaceContainerHigh) else palette
 }
 
 /** Takes up only the card above [tucked], so the next item in the list is laid over the rest of it. */
@@ -364,7 +364,7 @@ private fun StackBookCardPreview() {
     book = BookOverviewPreviewParameterProvider().book().copy(
       name = "1. Dungeon Crawler Carl",
       progress = 0.6F,
-      edition = CrawlEdition.DungeonCrawlerCarl,
+      bookStyle = BookStyle.DungeonCrawlerCarl,
     ),
     onBookClick = {},
     onBookLongClick = {},

@@ -31,7 +31,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import voice.core.ui.crawl.CrawlDisplayType
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.crawl.crawlPaletteOf
@@ -53,12 +53,12 @@ private val SheetShape = RoundedCornerShape(24.dp)
 @Composable
 internal fun SpeedSheet(
   speed: Float,
-  edition: CrawlEdition?,
+  bookStyle: BookStyle?,
   onSpeedChange: (Float) -> Unit,
   onDismiss: () -> Unit,
 ) {
-  val palette = crawlPaletteOf(edition)
-  val type = edition?.chapterType ?: CrawlDisplayType.Default
+  val palette = crawlPaletteOf(bookStyle)
+  val type = bookStyle?.chapterType ?: CrawlDisplayType.Default
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = rememberBottomSheetState(

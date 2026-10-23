@@ -6,21 +6,45 @@ import voice.core.data.Chapter
 import voice.core.data.ChapterId
 import voice.core.data.formatted
 import voice.core.data.snipLocation
-import voice.core.strips.AvailableStrip
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.companion.Extra
+import voice.core.ui.crawl.BookStyle
+import voice.core.ui.formatTime
 
 data class BookmarkViewState(
   /** The book's snips, newest first. */
   val snips: List<SnipCardViewState> = emptyList(),
-  /** The strips reached so far, in chapter order. */
-  val strips: List<AvailableStrip> = emptyList(),
-  /** The strips still ahead, which show only as locked slots: no picture and no title. */
-  val lockedStrips: List<AvailableStrip> = emptyList(),
-  /** The series book this is, whose colors the screen takes; null for any other book. */
-  val edition: CrawlEdition? = null,
+  /** The book's shelf of Extras, in the order they unlock. */
+  val extras: List<ExtraCardViewState> = emptyList(),
+  /** The book's colors and type. */
+  val bookStyle: BookStyle? = null,
 )
 
-/** A snip as a card: its comic frame (or the frame still being drawn), title, text and where in the book it was taken. */
+/** An Extra on the shelf. A locked one is still ahead in the book and shows only when it unlocks, nothing more. */
+data class ExtraCardViewState(
+  val id: String,
+  val title: String,
+  val description: String,
+  /** What kind of page it is, like "calculator" or "explainer", as a tag. */
+  val kind: String,
+  /** Where in the book it unlocks, like "2:14:05", while it is still locked; null once it is unlocked. */
+  val unlocksAt: String?,
+) {
+  val locked: Boolean get() = unlocksAt != null
+}
+
+internal fun List<Extra>.extraCards(bookPositionMs: Long): List<ExtraCardViewState> = this
+  .sortedWith(compareBy<Extra> { it.unlockAtMs }.thenBy { it.createdAtMs })
+  .map { extra ->
+    ExtraCardViewState(
+      id = extra.id,
+      title = extra.title,
+      description = extra.description,
+      kind = extra.kind,
+      unlocksAt = formatTime(extra.unlockAtMs).takeIf { extra.unlockAtMs > bookPositionMs },
+    )
+  }
+
+/** A snip as a card: its picture (or the picture still being drawn), title, text and where in the book it was taken. */
 data class SnipCardViewState(
   val id: String,
   val title: String?,

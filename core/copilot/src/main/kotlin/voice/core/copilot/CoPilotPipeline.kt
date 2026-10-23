@@ -5,10 +5,9 @@ import kotlinx.coroutines.flow.flow
 import voice.core.data.BookId
 
 /**
- * The Smart Router pipeline (Jev -> transcript -> Gemini) behind every co-pilot action,
- * shared by the Bluetooth-triggered modes (core:playback's CoPilotEngine) and the Feed's
- * typed/spoken interactions (features:playbackScreen's BookPlayViewModel) so both call
- * sites get identical routing/prompting behavior.
+ * The transcript -> Claude pipeline behind every co-pilot action, shared by the headset-triggered modes
+ * (core:playback's CoPilotEngine) and the chat's typed/spoken questions (features:playbackScreen's
+ * BookPlayViewModel) so both get identical prompting.
  */
 interface CoPilotPipeline {
 
@@ -24,7 +23,7 @@ interface CoPilotPipeline {
   /** What to say when a co-pilot round trip fails outright, worded in the current voice. */
   suspend fun failureMessage(): String
 
-  /** Snip & Synthesize: silently extracts a 3-bullet summary of the last 3 minutes to the Feed. */
+  /** Snip: silently summarizes what is being discussed around the current moment into the chat and Notebook. */
   suspend fun snip(bookId: BookId)
 
   /** Loads the current book's transcript into memory ahead of the first co-pilot action. */

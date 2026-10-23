@@ -14,24 +14,19 @@ sealed interface Destination {
     override val trackingName: String get() = "Playback"
   }
 
-  /**
-   * The full-screen story of a chapter's strip, starting at one of its frames. [linkedToBook] makes the story the
-   * book's own playback (opened from the player) instead of a separate player that leaves the book untouched.
-   */
-  /** The Deck: every crawler's holo card across the series, in one gallery. */
+  /** A book's guided setup: transcription progress, what Claude found out about it, and Extras to build. */
   @Serializable
-  data object Deck : Compose {
-    override val trackingName: String get() = "Deck"
+  data class BookSetup(val bookId: BookId) : Compose {
+    override val trackingName: String get() = "BookSetup"
   }
 
+  /** One Extra from a book's shelf, full screen. */
   @Serializable
-  data class StripStory(
+  data class Extra(
     val bookId: BookId,
-    val chapter: Int,
-    val startFrameIndex: Int,
-    val linkedToBook: Boolean = false,
+    val extraId: String,
   ) : Compose {
-    override val trackingName: String get() = "StripStory"
+    override val trackingName: String get() = "Extra"
   }
 
   @Serializable

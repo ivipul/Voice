@@ -186,7 +186,7 @@ internal fun BookOverview(
   modifier: Modifier = Modifier,
 ) {
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-  val palette = crawlPaletteOf(viewState.activeEdition)
+  val palette = crawlPaletteOf(viewState.activeBookStyle)
   Scaffold(
     modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     topBar = {

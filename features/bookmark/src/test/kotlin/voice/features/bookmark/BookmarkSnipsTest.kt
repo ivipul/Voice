@@ -95,8 +95,8 @@ class BookmarkSnipsTest {
       playStateManager = mockk<PlayStateManager> { every { playState } returns PlayStateManager.PlayState.Playing },
       playerController = playerController,
       navigator = navigator,
-      stripRepository = mockk(relaxed = true),
       copilotRepository = CoPilotRepository(),
+      stores = mockk(relaxed = true),
       bookId = BookId("book"),
     )
     val card = listOf(snip(id = "snip", text = "Moment", takenAtMs = 1L, positionMs = 341_000L)).snipCards(listOf(chapter)).single()
@@ -124,8 +124,8 @@ class BookmarkSnipsTest {
       playStateManager = mockk(relaxed = true),
       playerController = mockk(relaxed = true),
       navigator = mockk(relaxed = true),
-      stripRepository = mockk(relaxed = true),
       copilotRepository = copilotRepository,
+      stores = mockk(relaxed = true),
       bookId = bookId,
     )
     val card = listOf(kept, deleted).snipCards(listOf(chapter)).first { it.id == "deleted" }

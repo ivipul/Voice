@@ -113,7 +113,7 @@ fun BookPlayScreen(bookId: BookId) {
       }
     }
   }
-  CrawlTheme(edition = viewState.edition) {
+  CrawlTheme(bookStyle = viewState.bookStyle) {
     // The chat sheet slides over the whole player, Inventory card included.
     Box(modifier = Modifier.fillMaxSize()) {
       BookPlayView(
@@ -144,7 +144,7 @@ fun BookPlayScreen(bookId: BookId) {
       )
       SystemAiChatSheet(
         visible = viewModel.feedVisible.value,
-        palette = crawlPaletteOf(viewState.edition),
+        palette = crawlPaletteOf(viewState.bookStyle),
         messages = viewModel.copilotMessages(),
         isThinking = viewModel.isThinking.value,
         input = viewModel.chatInput.value,
@@ -165,7 +165,7 @@ fun BookPlayScreen(bookId: BookId) {
         is BookPlayDialogViewState.SpeedDialog -> {
           SpeedSheet(
             speed = dialogState.speed,
-            edition = viewState.edition,
+            bookStyle = viewState.bookStyle,
             onSpeedChange = viewModel::onPlaybackSpeedChanged,
             onDismiss = viewModel::dismissDialog,
           )
@@ -199,7 +199,7 @@ fun BookPlayScreen(bookId: BookId) {
       SnipBottomSheet(
         state = snipSheet,
         frame = snipSheet.frameState(viewModel.copilotMessages()),
-        edition = viewState.edition,
+        bookStyle = viewState.bookStyle,
         onDismiss = viewModel::onSnipSheetDismiss,
       )
     }

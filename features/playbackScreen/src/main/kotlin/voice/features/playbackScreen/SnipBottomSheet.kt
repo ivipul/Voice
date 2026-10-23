@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import voice.core.copilot.snipTextOf
 import voice.core.ui.crawl.CrawlDisplayType
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.ui.crawl.CrawlType
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.crawl.hardShadow
@@ -53,11 +53,11 @@ private val FrameShape = RoundedCornerShape(16.dp)
 internal fun SnipBottomSheet(
   state: SnipSheetViewState,
   frame: SnipFrameViewState,
-  edition: CrawlEdition?,
+  bookStyle: BookStyle?,
   onDismiss: () -> Unit,
 ) {
-  val palette = crawlPaletteOf(edition)
-  val type = edition?.chapterType ?: CrawlDisplayType.Default
+  val palette = crawlPaletteOf(bookStyle)
+  val type = bookStyle?.chapterType ?: CrawlDisplayType.Default
   val maxHeight = LocalConfiguration.current.screenHeightDp.dp * 2 / 3
   ModalBottomSheet(
     onDismissRequest = onDismiss,

@@ -22,6 +22,8 @@ import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamiccolor.ColorSpec
 import voice.core.data.ThemeColorScheme
 import voice.core.data.ThemeMode
+import voice.core.ui.crawl.DefaultPalette
+import voice.core.ui.crawl.colorScheme
 
 val VoiceBlue = Color(0xFF003b7f)
 
@@ -50,6 +52,11 @@ fun VoiceTheme(
       MaterialExpressiveTheme(
         colorScheme = systemDynamicColorScheme(darkTheme),
       ) {
+        themedContent()
+      }
+    } else if (themeColorScheme == ThemeColorScheme.VoiceBlue) {
+      // Earwig's own look: cream paper, black ink and a bold red, always light.
+      MaterialExpressiveTheme(colorScheme = remember { DefaultPalette.colorScheme() }) {
         themedContent()
       }
     } else {

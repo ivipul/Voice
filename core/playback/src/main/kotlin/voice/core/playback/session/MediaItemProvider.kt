@@ -136,7 +136,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     subtitle = book.content.author,
-    imageUri = imageFileProvider.artwork(book.content.name, book.content.cover),
+    imageUri = imageFileProvider.artwork(book.content.cover),
     mediaType = MediaType.AudioBook,
   )
 
@@ -149,7 +149,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     sourceUri = chapter.id.toUri(),
-    imageUri = imageFileProvider.artwork(content.name, content.cover),
+    imageUri = imageFileProvider.artwork(content.cover),
     album = content.name,
     subtitle = content.name,
     artist = content.author,
@@ -167,7 +167,7 @@ class MediaItemProvider(
     browsable = false,
     isPlayable = true,
     sourceUri = playbackItem.chapter.id.toUri(),
-    imageUri = imageFileProvider.artwork(content.name, content.cover),
+    imageUri = imageFileProvider.artwork(content.cover),
     album = content.name,
     subtitle = content.name,
     artist = content.author,

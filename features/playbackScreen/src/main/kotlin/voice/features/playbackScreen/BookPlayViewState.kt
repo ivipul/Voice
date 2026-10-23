@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import voice.core.playback.misc.Decibel
 import voice.core.strips.ActiveStripFrame
 import voice.core.strips.StripZone
-import voice.core.ui.crawl.CrawlEdition
+import voice.core.ui.crawl.BookStyle
 import voice.core.xray.card.ComposedPlayerCard
 import voice.core.xray.card.PlayerCardData
 import voice.core.xray.card.composeAt
@@ -31,7 +31,7 @@ data class BookPlayViewState(
   /** The strip frame to show in place of the cover while a strip is playing. */
   val stripFrame: ActiveStripFrame? = null,
   /** The series book this is, for its cover art, colors and display type; null for any other book. */
-  val edition: CrawlEdition? = null,
+  val bookStyle: BookStyle? = null,
   val playbackSpeed: Float = 1F,
   /** The book's snips plus the strips reached so far: what the Inventory card counts. */
   val inventoryCount: Int = 0,

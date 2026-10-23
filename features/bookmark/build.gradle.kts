@@ -7,12 +7,12 @@ plugins {
 dependencies {
   implementation(projects.core.common)
   implementation(projects.core.copilot)
+  implementation(projects.core.companion)
   implementation(projects.core.strings)
   implementation(projects.core.ui)
   implementation(projects.core.playback)
   implementation(projects.navigation)
   implementation(projects.core.data.api)
-  api(projects.core.strips)
   implementation(libs.coil)
 
   testImplementation(libs.molecule)
