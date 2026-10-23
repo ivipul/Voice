@@ -176,7 +176,13 @@ dependencies {
   implementation(projects.core.documentfile)
   implementation(projects.features.onboarding)
   implementation(projects.features.bookmark)
+  implementation(projects.features.bookSetup)
+  implementation(projects.features.extras)
   implementation(projects.features.widget)
+  implementation(projects.core.ai)
+  implementation(projects.core.companion)
+  implementation(projects.core.copilot)
+  implementation(projects.core.transcript)
 
   implementation(libs.appCompat)
   implementation(libs.lifecycle.compose)

@@ -21,6 +21,7 @@ internal fun BookPlayAppBar(
   onSleepTimerClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
+  onBookSetupClick: () -> Unit,
 ) {
   val iconColor = LocalContentColor.current
   TopAppBar(
@@ -40,6 +41,7 @@ internal fun BookPlayAppBar(
         onSleepTimerClick = onSleepTimerClick,
         onSkipSilenceClick = onSkipSilenceClick,
         onVolumeBoostClick = onVolumeBoostClick,
+        onBookSetupClick = onBookSetupClick,
       )
     },
     expandedHeight = 48.dp,

@@ -23,6 +23,7 @@ internal fun OverflowMenu(
   onSleepTimerClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
+  onBookSetupClick: () -> Unit,
 ) {
   Box {
     var expanded by remember { mutableStateOf(false) }
@@ -47,6 +48,15 @@ internal fun OverflowMenu(
         },
         text = {
           Text(text = stringResource(id = R.string.copilot_action_feed))
+        },
+      )
+      DropdownMenuItem(
+        onClick = {
+          expanded = false
+          onBookSetupClick()
+        },
+        text = {
+          Text(text = stringResource(id = R.string.playback_option_book_setup))
         },
       )
       DropdownMenuItem(

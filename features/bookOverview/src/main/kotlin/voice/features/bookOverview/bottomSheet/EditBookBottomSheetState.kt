@@ -11,6 +11,7 @@ enum class BottomSheetItem(
   @StringRes val titleRes: Int,
   val icon: ImageVector,
 ) {
+  BookSetup(StringsR.string.playback_option_book_setup, VoiceIcons.AutoAwesome),
   Title(StringsR.string.book_edit_name_label, VoiceIcons.Title),
   InternetCover(StringsR.string.book_edit_cover_internet, VoiceIcons.Download),
   FileCover(StringsR.string.book_edit_cover_file, VoiceIcons.Image),

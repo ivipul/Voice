@@ -74,7 +74,7 @@ internal const val SCRIM_ALPHA = 0.32F
 
 /**
  * The Inventory as a sheet over the player. Collapsed it is a card at the bottom edge, under the navigation bar,
- * with how many snips and reached strips it holds. Its header follows the finger up or down, and let go anywhere
+ * with how many snips and unlocked Extras it holds. Its header follows the finger up or down, and let go anywhere
  * it carries on from there: up opens it all the way, down closes it. A tap on the header does the same.
  */
 @Composable

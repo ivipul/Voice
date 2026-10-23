@@ -53,11 +53,16 @@ class BookTranscriber(
   /** Runs to the end or throws; the setup state says how far it got either way. */
   suspend fun transcribe(bookId: BookId) {
     val book = checkNotNull(bookRepository.get(bookId)) { "Book $bookId is not in the library" }
+    val chapters = book.chapters.filterNot { hasSidecarTranscript(it.id) }
+    if (chapters.isEmpty()) {
+      setState(bookId) { it.copy(state = StepState.Done, error = null) }
+      return
+    }
     if (!deepgram.isConfigured()) throw MissingApiKeyException("Deepgram")
     setState(bookId) { it.copy(state = StepState.Running, error = null) }
     try {
       val jobs = withContext(Dispatchers.IO) {
-        book.chapters.map { chapter ->
+        chapters.map { chapter ->
           FileJob(chapter.id, chunker.plan(chapter.id.toUri()), bookFiles.transcriptionWorkDir(chapter.id))
         }
       }
@@ -131,6 +136,10 @@ class BookTranscriber(
     }
     transcriptRepository.invalidate(job.chapterId)
   }
+
+  /** A transcript that came with the audio file, next to it, so there is nothing to pay Deepgram for. */
+  private suspend fun hasSidecarTranscript(chapterId: ChapterId): Boolean =
+    !withContext(Dispatchers.IO) { bookFiles.transcriptFile(chapterId).isFile } && !transcriptRepository.cues(chapterId).isNullOrEmpty()
 
   private fun FileJob.isComplete(): Boolean = plan.parts.all { partFile(workDir, it).isFile }
 

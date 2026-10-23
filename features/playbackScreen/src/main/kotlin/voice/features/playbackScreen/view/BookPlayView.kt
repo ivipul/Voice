@@ -43,6 +43,7 @@ internal fun BookPlayView(
   onSleepTimerClick: () -> Unit,
   onSkipSilenceClick: () -> Unit,
   onVolumeBoostClick: () -> Unit,
+  onBookSetupClick: () -> Unit,
   onCurrentChapterClick: () -> Unit,
   onSmartRecapClick: () -> Unit,
   onSpeedClick: () -> Unit,
@@ -76,6 +77,7 @@ internal fun BookPlayView(
           onSleepTimerClick = onSleepTimerClick,
           onSkipSilenceClick = onSkipSilenceClick,
           onVolumeBoostClick = onVolumeBoostClick,
+          onBookSetupClick = onBookSetupClick,
         )
       },
       content = {
@@ -131,6 +133,7 @@ private fun BookPlayPreview(
         onSleepTimerClick = {},
         onSkipSilenceClick = {},
         onVolumeBoostClick = {},
+        onBookSetupClick = {},
         onCurrentChapterClick = {},
         onSmartRecapClick = {},
         onSpeedClick = {},

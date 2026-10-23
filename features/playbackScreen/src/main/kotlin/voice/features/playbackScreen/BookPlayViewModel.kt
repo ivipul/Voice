@@ -384,6 +384,10 @@ class BookPlayViewModel(
     }
   }
 
+  fun onBookSetupClick() {
+    navigator.goTo(Destination.BookSetup(bookId))
+  }
+
   fun onVolumeGainIconClick() {
     scope.launch {
       val content = currentBook()?.content ?: return@launch

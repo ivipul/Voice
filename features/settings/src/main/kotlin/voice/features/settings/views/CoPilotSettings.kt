@@ -1,17 +1,23 @@
 package voice.features.settings.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,6 +28,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
@@ -31,11 +40,11 @@ import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.IntoSet
 import dev.zacsweers.metro.Provides
 import kotlinx.coroutines.launch
+import voice.core.data.ApiKeys
 import voice.core.data.CoPilotButtonMapping
 import voice.core.data.CoPilotTriggerAction
-import voice.core.data.CoPilotVoiceSettings
 import voice.core.data.store.CoPilotButtonMappingStore
-import voice.core.data.store.CoPilotVoiceSettingsStore
+import voice.core.data.store.ApiKeysStore
 import voice.core.ui.VoiceTheme
 import voice.core.ui.crawl.CrawlLibraryTheme
 import voice.core.ui.icons.VoiceIcons
@@ -51,6 +60,26 @@ private enum class TriggerSlot(val labelRes: Int) {
   DoubleNext(StringsR.string.copilot_settings_trigger_double_next),
   TripleNext(StringsR.string.copilot_settings_trigger_triple_next),
   DoublePrevious(StringsR.string.copilot_settings_trigger_double_previous),
+}
+
+/** A service whose API key the listener types in here. */
+private enum class KeyService(val titleRes: Int, val hintRes: Int) {
+  Claude(StringsR.string.copilot_settings_keys_claude, StringsR.string.copilot_settings_keys_claude_hint),
+  Deepgram(StringsR.string.copilot_settings_keys_deepgram, StringsR.string.copilot_settings_keys_deepgram_hint),
+  Ideogram(StringsR.string.copilot_settings_keys_ideogram, StringsR.string.copilot_settings_keys_ideogram_hint),
+  ;
+
+  fun read(keys: ApiKeys): String = when (this) {
+    Claude -> keys.claude
+    Deepgram -> keys.deepgram
+    Ideogram -> keys.ideogram
+  }
+
+  fun write(keys: ApiKeys, key: String): ApiKeys = when (this) {
+    Claude -> keys.copy(claude = key)
+    Deepgram -> keys.copy(deepgram = key)
+    Ideogram -> keys.copy(ideogram = key)
+  }
 }
 
 private val CoPilotTriggerAction.labelRes: Int
@@ -99,28 +128,23 @@ private fun CoPilotButtonMapping.with(slot: TriggerSlot, action: CoPilotTriggerA
 fun CoPilotSettingsScreen(
   navigator: Navigator,
   mappingStore: DataStore<CoPilotButtonMapping>,
-  voiceStore: DataStore<CoPilotVoiceSettings>,
+  keysStore: DataStore<ApiKeys>,
 ) {
   val mapping by remember { mappingStore.data }.collectAsState(initial = CoPilotButtonMapping())
-  val voice by remember { voiceStore.data }.collectAsState(initial = CoPilotVoiceSettings())
+  val keys by remember { keysStore.data }.collectAsState(initial = ApiKeys())
   val coroutineScope = rememberCoroutineScope()
   CoPilotSettingsScreen(
     mapping = mapping,
-    voice = voice,
+    keys = keys,
     onClose = navigator::goBack,
     onSelect = { slot, action ->
       coroutineScope.launch {
         mappingStore.updateData { it.with(slot, action) }
       }
     },
-    onUseSystemAiVoiceChange = { enabled ->
+    onKeyChange = { service, key ->
       coroutineScope.launch {
-        voiceStore.updateData { it.copy(useSystemAiVoice = enabled) }
-      }
-    },
-    onKeepItCleanChange = { enabled ->
-      coroutineScope.launch {
-        voiceStore.updateData { it.copy(keepItClean = enabled) }
+        keysStore.updateData { service.write(it, key.trim()) }
       }
     },
   )
@@ -129,12 +153,12 @@ fun CoPilotSettingsScreen(
 @Composable
 private fun CoPilotSettingsScreen(
   mapping: CoPilotButtonMapping,
-  voice: CoPilotVoiceSettings,
+  keys: ApiKeys,
   onClose: () -> Unit,
   onSelect: (TriggerSlot, CoPilotTriggerAction) -> Unit,
-  onUseSystemAiVoiceChange: (Boolean) -> Unit,
-  onKeepItCleanChange: (Boolean) -> Unit,
+  onKeyChange: (KeyService, String) -> Unit,
 ) {
+  var editing by remember { mutableStateOf<KeyService?>(null) }
   Scaffold(
     topBar = {
       TopAppBar(
@@ -150,12 +174,21 @@ private fun CoPilotSettingsScreen(
       )
     },
   ) { contentPadding ->
-    Column(modifier = Modifier.padding(contentPadding)) {
+    Column(
+      modifier = Modifier
+        .padding(contentPadding)
+        .verticalScroll(rememberScrollState()),
+    ) {
+      SectionHeader(StringsR.string.copilot_settings_keys_header)
       Text(
-        text = stringResource(id = StringsR.string.copilot_settings_description),
+        text = stringResource(id = StringsR.string.copilot_settings_keys_description),
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
       )
+      KeyService.entries.forEach { service ->
+        KeyRow(service = service, key = service.read(keys), onClick = { editing = service })
+      }
+      SectionHeader(StringsR.string.copilot_settings_buttons_header)
       TriggerSlot.entries.forEach { slot ->
         TriggerRow(
           slot = slot,
@@ -163,22 +196,97 @@ private fun CoPilotSettingsScreen(
           onSelect = { action -> onSelect(slot, action) },
         )
       }
-      VoiceSwitchRow(
-        title = StringsR.string.copilot_settings_voice_system_ai_title,
-        summary = StringsR.string.copilot_settings_voice_system_ai_summary,
-        checked = voice.useSystemAiVoice,
-        onCheckedChange = onUseSystemAiVoiceChange,
-      )
-      if (voice.useSystemAiVoice) {
-        VoiceSwitchRow(
-          title = StringsR.string.copilot_settings_voice_keep_clean_title,
-          summary = StringsR.string.copilot_settings_voice_keep_clean_summary,
-          checked = voice.keepItClean,
-          onCheckedChange = onKeepItCleanChange,
-        )
-      }
     }
   }
+  editing?.let { service ->
+    KeyDialog(
+      service = service,
+      current = service.read(keys),
+      onSave = { key ->
+        onKeyChange(service, key)
+        editing = null
+      },
+      onDismiss = { editing = null },
+    )
+  }
+}
+
+@Composable
+private fun SectionHeader(text: Int) {
+  Text(
+    text = stringResource(id = text),
+    style = MaterialTheme.typography.titleSmall,
+    color = MaterialTheme.colorScheme.primary,
+    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 4.dp),
+  )
+}
+
+@Composable
+private fun KeyRow(
+  service: KeyService,
+  key: String,
+  onClick: () -> Unit,
+) {
+  ListItem(
+    modifier = Modifier.clickable(onClick = onClick),
+    overlineContent = { Text(text = stringResource(id = service.hintRes)) },
+    supportingContent = {
+      Text(
+        text = if (key.isBlank()) {
+          stringResource(id = StringsR.string.copilot_settings_keys_not_set)
+        } else {
+          stringResource(id = StringsR.string.copilot_settings_keys_set, key.takeLast(4))
+        },
+        color = if (key.isBlank()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    },
+  ) {
+    Text(text = stringResource(id = service.titleRes))
+  }
+}
+
+@Composable
+private fun KeyDialog(
+  service: KeyService,
+  current: String,
+  onSave: (String) -> Unit,
+  onDismiss: () -> Unit,
+) {
+  var text by remember { mutableStateOf(current) }
+  var visible by remember { mutableStateOf(false) }
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(text = stringResource(id = service.titleRes)) },
+    text = {
+      Column {
+        Text(text = stringResource(id = service.hintRes), style = MaterialTheme.typography.bodyMedium)
+        OutlinedTextField(
+          value = text,
+          onValueChange = { text = it },
+          label = { Text(text = stringResource(id = StringsR.string.copilot_settings_keys_dialog_label)) },
+          singleLine = true,
+          visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false),
+          modifier = Modifier.padding(top = 12.dp),
+        )
+        TextButton(onClick = { visible = !visible }) {
+          Text(text = stringResource(id = StringsR.string.copilot_settings_keys_dialog_show))
+        }
+      }
+    },
+    confirmButton = {
+      TextButton(onClick = { onSave(text) }) {
+        Text(text = stringResource(id = StringsR.string.copilot_settings_keys_dialog_save))
+      }
+    },
+    dismissButton = {
+      if (current.isNotBlank()) {
+        TextButton(onClick = { onSave("") }) {
+          Text(text = stringResource(id = StringsR.string.copilot_settings_keys_dialog_clear))
+        }
+      }
+    },
+  )
 }
 
 @Composable
@@ -214,31 +322,15 @@ private fun TriggerRow(
 }
 
 @Composable
-private fun VoiceSwitchRow(
-  title: Int,
-  summary: Int,
-  checked: Boolean,
-  onCheckedChange: (Boolean) -> Unit,
-) {
-  ListItem(
-    supportingContent = { Text(text = stringResource(id = summary)) },
-    trailingContent = { Switch(checked = checked, onCheckedChange = onCheckedChange) },
-  ) {
-    Text(text = stringResource(id = title))
-  }
-}
-
-@Composable
 @Preview
 private fun CoPilotSettingsPreview() {
   VoiceTheme {
     CoPilotSettingsScreen(
       mapping = CoPilotButtonMapping(),
-      voice = CoPilotVoiceSettings(),
+      keys = ApiKeys(claude = "sk-ant-example-1234"),
       onClose = {},
       onSelect = { _, _ -> },
-      onUseSystemAiVoiceChange = {},
-      onKeepItCleanChange = {},
+      onKeyChange = { _, _ -> },
     )
   }
 }
@@ -251,12 +343,12 @@ interface CoPilotSettingsProvider {
   fun coPilotSettingsNavEntryProvider(
     navigator: Navigator,
     @CoPilotButtonMappingStore mappingStore: DataStore<CoPilotButtonMapping>,
-    @CoPilotVoiceSettingsStore voiceStore: DataStore<CoPilotVoiceSettings>,
+    @ApiKeysStore keysStore: DataStore<ApiKeys>,
   ): NavEntryProvider<*> =
     NavEntryProvider<Destination.CoPilotSettings> { key ->
       NavEntry(key) {
         CrawlLibraryTheme {
-          CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore, voiceStore = voiceStore)
+          CoPilotSettingsScreen(navigator = navigator, mappingStore = mappingStore, keysStore = keysStore)
         }
       }
     }

@@ -95,7 +95,7 @@
     <!-- Title for the co-pilot Bluetooth button settings screen. -->
     <string name="copilot.settings.title">Companion</string>
     <!-- Section header for the co-pilot settings screen. -->
-    <string name="copilot.settings.description">Choose what each headset button press does.</string>
+    <string name="copilot.settings.description">Your API keys and what each headset button does.</string>
     <!-- Settings row label for the single-tap NEXT trigger slot. -->
     <string name="copilot.settings.trigger.single_next">Single tap NEXT</string>
     <!-- Settings row label for the single-tap PREVIOUS trigger slot. -->
@@ -385,4 +385,184 @@
     <string name="scene.card.open_extra">Open %1$s</string>
     <!-- Content description of the library button that picks an audiobook file and opens its guided setup. -->
     <string name="library.add_book">Add a book</string>
+    <!-- Section header for the API keys on the companion settings screen. -->
+    <string name="copilot.settings.keys.header">API keys</string>
+    <!-- Explains where API keys are kept. -->
+    <string name="copilot.settings.keys.description">Keys stay on this phone and are never backed up. Each service bills your own account.</string>
+    <!-- API key row title for Claude. -->
+    <string name="copilot.settings.keys.claude">Claude</string>
+    <!-- What the Claude key is for and where to get it. -->
+    <string name="copilot.settings.keys.claude.hint">Answers, snips, recaps, book research and Extras. Get a key at console.anthropic.com.</string>
+    <!-- API key row title for Deepgram. -->
+    <string name="copilot.settings.keys.deepgram">Deepgram</string>
+    <!-- What the Deepgram key is for and where to get it. -->
+    <string name="copilot.settings.keys.deepgram.hint">Transcribes a book when you add it. Get a key at console.deepgram.com.</string>
+    <!-- API key row title for Ideogram. -->
+    <string name="copilot.settings.keys.ideogram">Ideogram</string>
+    <!-- What the Ideogram key is for and where to get it. -->
+    <string name="copilot.settings.keys.ideogram.hint">Snip pictures and custom covers. Optional. Get a key at ideogram.ai/manage-api.</string>
+    <!-- Shown on an API key row when no key has been entered. -->
+    <string name="copilot.settings.keys.not_set">Not set</string>
+    <!-- Shown on an API key row when a key is saved, with its last four characters. -->
+    <string name="copilot.settings.keys.set">Saved · ends in %1$s</string>
+    <!-- Label of the text field in the API key dialog. -->
+    <string name="copilot.settings.keys.dialog.label">API key</string>
+    <!-- Save button of the API key dialog. -->
+    <string name="copilot.settings.keys.dialog.save">Save</string>
+    <!-- Button that removes a saved API key. -->
+    <string name="copilot.settings.keys.dialog.clear">Remove</string>
+    <!-- Content description of the button that reveals the typed API key. -->
+    <string name="copilot.settings.keys.dialog.show">Show key</string>
+    <!-- Section header for the headset button mapping on the companion settings screen. -->
+    <string name="copilot.settings.buttons.header">Headset buttons</string>
+    <!-- Title of the guided book setup screen. -->
+    <string name="setup.title">Book setup</string>
+    <!-- Button at the bottom of the setup screen that opens the player. -->
+    <string name="setup.listen">Start listening</string>
+    <!-- Retry button for a failed setup step. -->
+    <string name="setup.retry">Try again</string>
+    <!-- Label of the card that asks for missing API keys. -->
+    <string name="setup.keys.label">Keys needed</string>
+    <!-- Shown when the Claude API key is missing. -->
+    <string name="setup.keys.claude">Add your Claude key to research the book, suggest Extras and answer questions.</string>
+    <!-- Shown when the Deepgram API key is missing. -->
+    <string name="setup.keys.deepgram">Add your Deepgram key to transcribe the book.</string>
+    <!-- Button that opens the API key settings. -->
+    <string name="setup.keys.open_settings">Open settings</string>
+    <!-- Label of the card that starts the setup. -->
+    <string name="setup.start.label">Get started</string>
+    <!-- Explains what starting the setup does. -->
+    <string name="setup.start.body">Earwig transcribes the book in the background and looks it up online, then suggests Extras made for it.</string>
+    <!-- Duration of the book and the estimated transcription cost. -->
+    <string name="setup.start.cost">About %1$s of audio, roughly %2$s with Deepgram.</string>
+    <!-- Button that starts transcription and research. -->
+    <string name="setup.start.button">Start setup</string>
+    <!-- Label of the transcription progress card. -->
+    <string name="setup.transcript.label">Transcript</string>
+    <!-- Transcription is queued, for example waiting for a network connection. -->
+    <string name="setup.transcript.waiting">Waiting to start…</string>
+    <!-- Transcription is preparing parts. -->
+    <string name="setup.transcript.preparing">Splitting the audio…</string>
+    <!-- Transcription progress in parts. -->
+    <string name="setup.transcript.progress">Transcribing: %1$d of %2$d parts done</string>
+    <!-- Hint shown while transcription runs. -->
+    <string name="setup.transcript.partial_hint">Ask, Recap and Snip already work on the parts that are done. You can leave this screen.</string>
+    <!-- Shown when transcription is finished. -->
+    <string name="setup.transcript.done">Transcript ready. Ask, Recap, Snip and scene chips use it.</string>
+    <!-- Transcription failed, with the reason. -->
+    <string name="setup.transcript.failed">Transcription stopped: %1$s</string>
+    <!-- Explains that retrying resumes transcription. -->
+    <string name="setup.transcript.resume_hint">Finished parts are kept, so trying again picks up where it stopped.</string>
+    <!-- Label of the research card. -->
+    <string name="setup.research.label">About the book</string>
+    <!-- Shown while Claude researches the book. -->
+    <string name="setup.research.running">Looking the book up online…</string>
+    <!-- Research failed, with the reason. -->
+    <string name="setup.research.failed">Couldn\'t look the book up: %1$s</string>
+    <!-- Book kind label. -->
+    <string name="setup.research.fiction">Fiction</string>
+    <!-- Book kind label. -->
+    <string name="setup.research.nonfiction">Non-fiction</string>
+    <!-- Header of the idea cards on the setup screen. -->
+    <string name="setup.ideas.title">Extras</string>
+    <!-- Explains the idea cards. -->
+    <string name="setup.ideas.body">Ideas made for this book. Build the ones you like and skip the rest; built Extras appear in the Notebook and on the player.</string>
+    <!-- Shown before ideas are generated. -->
+    <string name="setup.ideas.waiting">Ideas come once the book is looked up…</string>
+    <!-- Shown while ideas are generated. -->
+    <string name="setup.ideas.running">Coming up with ideas…</string>
+    <!-- Idea generation failed, with the reason. -->
+    <string name="setup.ideas.failed">Couldn\'t come up with ideas: %1$s</string>
+    <!-- Button that asks for more idea cards. -->
+    <string name="setup.ideas.more">More ideas</string>
+    <!-- Toggle that shows skipped idea cards, with their number. -->
+    <string name="setup.ideas.skipped">Skipped (%1$d)</string>
+    <!-- Idea card label: changes the picture drawn for each snip. -->
+    <string name="setup.point.snip_picture">Snip picture</string>
+    <!-- Idea card label: an interactive page on the Notebook's Extras shelf. -->
+    <string name="setup.point.shelf">Notebook Extra</string>
+    <!-- Idea card label: character or topic chips on the player. -->
+    <string name="setup.point.scene_chips">Scene chips</string>
+    <!-- Tag on an idea card the listener typed in. -->
+    <string name="setup.idea.yours">Your idea</string>
+    <!-- Button that builds an idea card. -->
+    <string name="setup.idea.build">Build</string>
+    <!-- Button that skips an idea card. -->
+    <string name="setup.idea.skip">Skip</string>
+    <!-- Button that restores a skipped idea card. -->
+    <string name="setup.idea.restore">Bring back</string>
+    <!-- Shown while an idea is built. -->
+    <string name="setup.idea.building">Building…</string>
+    <!-- Scene chips wait for the whole transcript. -->
+    <string name="setup.idea.waiting_for_transcript">Starts when the transcript is ready…</string>
+    <!-- Shown on a built idea card. -->
+    <string name="setup.idea.built">BUILT</string>
+    <!-- Button that opens a built Extra. -->
+    <string name="setup.idea.open">Open</string>
+    <!-- Building an idea failed, with the reason. -->
+    <string name="setup.idea.failed">Building failed: %1$s</string>
+    <!-- Label of the card where the listener types an idea. -->
+    <string name="setup.own.label">Your own idea</string>
+    <!-- Explains the own-idea card. -->
+    <string name="setup.own.body">Describe an Extra you\'d like. Claude checks whether Earwig can build it.</string>
+    <!-- Placeholder of the own-idea field. -->
+    <string name="setup.own.placeholder">A map of the places so far, a glossary, a quiz…</string>
+    <!-- Button that sends the idea for a feasibility check. -->
+    <string name="setup.own.check">Check idea</string>
+    <!-- Shown while the idea is checked. -->
+    <string name="setup.own.checking">Checking…</string>
+    <!-- The feasibility check failed, with the reason. -->
+    <string name="setup.own.failed">Couldn\'t check the idea: %1$s</string>
+    <!-- The idea is feasible and was added as a card. -->
+    <string name="setup.own.added">Added to your cards: %1$s</string>
+    <!-- A buildable alternative to an idea that is not feasible. -->
+    <string name="setup.own.alternative">What would work: %1$s</string>
+    <!-- Puts the alternative into the idea field. -->
+    <string name="setup.own.use_alternative">Use this instead</string>
+    <!-- Label of the colors and cover card. -->
+    <string name="setup.look.label">Look</string>
+    <!-- Look option: cream, red and black. -->
+    <string name="setup.look.default">App colors</string>
+    <!-- Look option: colors from the book cover. -->
+    <string name="setup.look.cover">Cover colors</string>
+    <!-- Look option: a cover drawn by Ideogram. -->
+    <string name="setup.look.generated">New cover</string>
+    <!-- Shown when no Ideogram key is set. -->
+    <string name="setup.look.needs_ideogram">Add an Ideogram key in settings to draw a new cover.</string>
+    <!-- Label of the extra cover prompt field. -->
+    <string name="setup.look.prompt_label">Anything to add to the cover?</string>
+    <!-- Placeholder of the extra cover prompt field. -->
+    <string name="setup.look.prompt_placeholder">Watercolor, a lighthouse at dawn, bold type…</string>
+    <!-- Button that generates a cover. -->
+    <string name="setup.look.generate">Draw a cover</string>
+    <!-- Button that regenerates the cover. -->
+    <string name="setup.look.regenerate">Draw again</string>
+    <!-- Shown while colors or the cover change. -->
+    <string name="setup.look.working">Updating the look…</string>
+    <!-- Changing the look failed, with the reason. -->
+    <string name="setup.look.failed">Couldn\'t change the look: %1$s</string>
+    <!-- Header of the display font choices. -->
+    <string name="setup.look.font">Chapter name face</string>
+    <!-- Content description of the Extra page menu button. -->
+    <string name="extra.menu">More</string>
+    <!-- Asks Claude to repair an Extra page. -->
+    <string name="extra.fix">Fix it</string>
+    <!-- Shown while Claude repairs an Extra page. -->
+    <string name="extra.fixing">Fixing the page…</string>
+    <!-- Repairing an Extra failed, with the reason. -->
+    <string name="extra.fix_failed">Couldn\'t fix it: %1$s</string>
+    <!-- Shown when an Extra page reported an error. -->
+    <string name="extra.error">Something on this page went wrong.</string>
+    <!-- Dismisses the error banner of an Extra page. -->
+    <string name="extra.error_dismiss">Ignore</string>
+    <!-- Deletes an Extra. -->
+    <string name="extra.delete">Delete</string>
+    <!-- Title of the delete confirmation for an Extra. -->
+    <string name="extra.delete_title">Delete this Extra?</string>
+    <!-- Body of the delete confirmation for an Extra. -->
+    <string name="extra.delete_body">It leaves the Notebook, along with anything you saved in it. You can build it again from Book setup.</string>
+    <!-- Cancels deleting an Extra. -->
+    <string name="extra.keep">Keep</string>
+    <!-- Player menu item that opens the book setup screen. -->
+    <string name="playback.option.book_setup">Book setup &amp; Extras</string>
 </resources>
