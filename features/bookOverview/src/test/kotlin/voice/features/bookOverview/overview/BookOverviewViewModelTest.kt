@@ -18,6 +18,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
+import voice.core.companion.BookLook
+import voice.core.companion.CompanionStores
+import voice.core.companion.LookSource
+import voice.core.companion.StoredPalette
 import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.GridMode
@@ -33,16 +37,22 @@ import voice.core.playback.playstate.PlayStateManager
 import voice.core.scanner.DeviceHasStoragePermissionBug
 import voice.core.scanner.MediaScanTrigger
 import voice.core.search.BookSearch
+import voice.core.transcript.BookFiles
 import voice.core.ui.GridCount
 import voice.core.ui.crawl.toStyle
 import voice.features.bookOverview.book
 import voice.navigation.Destination
 import voice.navigation.Navigator
+import java.io.File
+import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Instant
 
 class BookOverviewViewModelTest {
+
+  private val filesDir: File = createTempDirectory().toFile()
+  private val stores = CompanionStores(BookFiles(mockk { every { filesDir } returns this@BookOverviewViewModelTest.filesDir }))
 
   private val testDispatcher = UnconfinedTestDispatcher()
   private val dispatcherProvider = DispatcherProvider(testDispatcher, testDispatcher, testDispatcher)
@@ -86,6 +96,8 @@ class BookOverviewViewModelTest {
       folderPickerInSettingsFeatureFlag = MemoryFeatureFlag(false),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(true),
       kioskModeFeatureFlag = MemoryFeatureFlag(false),
+      stores = stores,
+      audiobookFolders = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
 
@@ -152,6 +164,8 @@ class BookOverviewViewModelTest {
       folderPickerInSettingsFeatureFlag = MemoryFeatureFlag(false),
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
       kioskModeFeatureFlag = MemoryFeatureFlag(true),
+      stores = stores,
+      audiobookFolders = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
 
@@ -328,9 +342,14 @@ class BookOverviewViewModelTest {
   }
 
   @Test
-  fun `the current series book gives the buttons its bookStyle`() = runTest {
-    val currentBook = book(name = "Carl's Doomsday Scenario")
-    val otherBook = book(name = "Not in the series")
+  fun `the current book's look colors the buttons and every card takes its own`() = runTest {
+    val currentBook = book(name = "The Psychology of Money")
+    val otherBook = book(name = "Pride and Prejudice")
+    val look = BookLook(
+      source = LookSource.Cover,
+      palette = StoredPalette(0xFFE7EEF2.toInt(), 0xFF101820.toInt(), 0xFF2F5D8A.toInt(), -1, 0xFF101820.toInt(), -1, 0xFFB4C4CF.toInt()),
+    )
+    stores.look.set(currentBook.id, look)
     val viewModel = viewModel(
       books = listOf(currentBook, otherBook),
       currentBookId = currentBook.id,
@@ -339,8 +358,11 @@ class BookOverviewViewModelTest {
     backgroundScope.launchMolecule(RecompositionMode.Immediate) {
       viewModel.state()
     }.test {
-      assertEquals(expected = BookOverviewViewState.Loading, actual = awaitItem())
-      assertEquals(expected = crawlEditionOf("Carl's Doomsday Scenario"), actual = awaitItem().activeBookStyle)
+      var state = awaitItem()
+      while (state.activeBookStyle == null) state = awaitItem()
+      assertEquals(expected = look.toStyle(), actual = state.activeBookStyle)
+      assertEquals(expected = BookLook().toStyle(), actual = state.currentBook(otherBook.id).bookStyle)
+      cancelAndIgnoreRemainingEvents()
     }
   }
 
@@ -390,6 +412,8 @@ class BookOverviewViewModelTest {
       folderPickerInSettingsFeatureFlag = folderPickerInSettingsFeatureFlag,
       experimentalPlaybackPersistenceFeatureFlag = MemoryFeatureFlag(false),
       kioskModeFeatureFlag = MemoryFeatureFlag(false),
+      stores = stores,
+      audiobookFolders = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
   }

@@ -33,11 +33,12 @@ import kotlinx.coroutines.launch
 import voice.core.common.rootGraphAs
 import voice.core.data.BookId
 import voice.core.ui.InventoryContent
+import voice.core.ui.crawl.CrawlDisplayType
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.features.playbackScreen.view.BookPlayView
-import voice.features.playbackScreen.view.SystemAiChatSheet
-import voice.features.playbackScreen.view.holocard.HoloCardDialog
+import voice.features.playbackScreen.view.BookChatSheet
+import voice.features.playbackScreen.view.SceneCardDialog
 import voice.features.sleepTimer.SleepTimerDialog
 import voice.navigation.Destination
 import voice.navigation.NavEntryProvider
@@ -55,7 +56,7 @@ fun BookPlayScreen(bookId: BookId) {
   val viewState = viewModel.viewState()
     ?: return
   val snipSavedMessage = stringResource(StringsR.string.copilot_snip_saved_snackbar)
-  val stripUnlockedMessage = stringResource(StringsR.string.strip_unlocked_snackbar)
+  val extraUnlockedMessage = stringResource(StringsR.string.extra_unlocked_snackbar)
   val batteryOptimizationMessage = stringResource(StringsR.string.playback_battery_optimization_rationale)
   val batteryOptimizationAction = stringResource(StringsR.string.playback_battery_optimization_action)
   val microphonePermissionMessage = stringResource(StringsR.string.copilot_permission_microphone_required)
@@ -97,8 +98,8 @@ fun BookPlayScreen(bookId: BookId) {
         BookPlayViewEffect.SnipSaved -> {
           Toast.makeText(context, snipSavedMessage, Toast.LENGTH_SHORT).show()
         }
-        BookPlayViewEffect.StripUnlocked -> {
-          Toast.makeText(context, stripUnlockedMessage, Toast.LENGTH_SHORT).show()
+        BookPlayViewEffect.ExtraUnlocked -> {
+          Toast.makeText(context, extraUnlockedMessage, Toast.LENGTH_SHORT).show()
         }
         BookPlayViewEffect.RequestIgnoreBatteryOptimization -> {
           val result = snackbarHostState.showSnackbar(
@@ -125,8 +126,6 @@ fun BookPlayScreen(bookId: BookId) {
         onSkipToNext = viewModel::next,
         onSkipToPrevious = viewModel::previous,
         onSeek = viewModel::seekTo,
-        onStripZoneTap = viewModel::onStripZoneTap,
-        onStripFrameClick = viewModel::onStripFrameClick,
         onCloseClick = viewModel::onCloseClick,
         onFeedClick = viewModel::onFeedClick,
         onSleepTimerClick = viewModel::toggleSleepTimer,
@@ -142,7 +141,7 @@ fun BookPlayScreen(bookId: BookId) {
         useLandscapeLayout = LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE,
         snackbarHostState = snackbarHostState,
       )
-      SystemAiChatSheet(
+      BookChatSheet(
         visible = viewModel.feedVisible.value,
         palette = crawlPaletteOf(viewState.bookStyle),
         messages = viewModel.copilotMessages(),
@@ -176,10 +175,13 @@ fun BookPlayScreen(bookId: BookId) {
         is BookPlayDialogViewState.SelectChapterDialog -> {
           SelectChapterDialog(dialogState, viewModel)
         }
-        is BookPlayDialogViewState.XRayCardDialog -> {
-          HoloCardDialog(
+        is BookPlayDialogViewState.SceneCardDialog -> {
+          SceneCardDialog(
             dialogState = dialogState,
             positionMs = viewModel.cardPositionMs(dialogState.openedAtMs),
+            palette = crawlPaletteOf(viewState.bookStyle),
+            type = viewState.bookStyle?.chapterType ?: CrawlDisplayType.Default,
+            onExtraClick = viewModel::onSceneCardExtraClick,
             onDismiss = viewModel::dismissDialog,
           )
         }

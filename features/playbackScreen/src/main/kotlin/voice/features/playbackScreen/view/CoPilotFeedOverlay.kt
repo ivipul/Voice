@@ -91,11 +91,11 @@ import voice.core.ui.rememberPlayIconPainter
 private val FRAME_BUBBLE_MAX_WIDTH = 280.dp
 
 /**
- * The System AI chat as a sheet over the player, built like the Inventory's: it slides up from the bottom edge
+ * The book chat as a sheet over the player, built like the Inventory's: it slides up from the bottom edge
  * under a header with a handle bar. Dragging the header down, tapping it, tapping outside or going back closes it.
  */
 @Composable
-internal fun SystemAiChatSheet(
+internal fun BookChatSheet(
   visible: Boolean,
   palette: CrawlPalette,
   messages: List<CoPilotMessage>,

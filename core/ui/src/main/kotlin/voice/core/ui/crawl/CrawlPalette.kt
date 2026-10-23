@@ -43,7 +43,7 @@ data class CrawlDisplayType(
 ) {
 
   companion object {
-    val Default = CrawlDisplayType(CrawlFonts.InstrumentSerif, FontWeight.Normal, 40.sp)
+    val Default = CrawlDisplayType(CrawlFonts.Anton, FontWeight.Normal, 44.sp, uppercase = true)
   }
 }
 

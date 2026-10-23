@@ -375,4 +375,14 @@
     <string name="setup.notification_channel">Book setup</string>
     <!-- Ongoing notification while Earwig transcribes a book or builds its Extras. -->
     <string name="setup.notification_title">Setting up your book…</string>
+    <!-- Tag on the card of a character chip on the player. -->
+    <string name="scene.card.character">Character</string>
+    <!-- Tag on the card of a topic chip on the player, for non-fiction books. -->
+    <string name="scene.card.topic">Topic</string>
+    <!-- Header over what the book has said so far about a character or topic, on its card. -->
+    <string name="scene.card.so_far">So far</string>
+    <!-- Button on a topic card that opens the Extra tied to it. %1$s is the Extra\'s title. -->
+    <string name="scene.card.open_extra">Open %1$s</string>
+    <!-- Content description of the library button that picks an audiobook file and opens its guided setup. -->
+    <string name="library.add_book">Add a book</string>
 </resources>

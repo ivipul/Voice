@@ -41,7 +41,7 @@ internal fun ListBookRow(
   ) {
     Column(Modifier.padding()) {
       Row(verticalAlignment = Alignment.CenterVertically) {
-        CoverImage(book.id, book.artwork ?: book.cover)
+        CoverImage(book.id, book.cover)
 
         Column(
           Modifier

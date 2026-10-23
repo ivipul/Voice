@@ -9,15 +9,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import voice.core.data.BookId
-import voice.core.strips.ActiveStripFrame
 import voice.core.ui.VoiceTheme
 import voice.core.ui.bookCardBackdropModifier
 import voice.core.ui.bookCardContentModifier
 import voice.core.ui.crawl.BookStyle
+import voice.core.ui.crawl.ChapterTypes
+import voice.core.ui.crawl.DefaultPalette
 import voice.core.ui.InventoryContent
 import voice.core.ui.crawl.CrawlTheme
 import voice.core.ui.crawl.crawlPaletteOf
@@ -36,8 +38,6 @@ internal fun BookPlayView(
   onSkipToNext: () -> Unit,
   onSkipToPrevious: () -> Unit,
   onSeek: (Duration) -> Unit,
-  onStripZoneTap: (Long) -> Unit,
-  onStripFrameClick: (ActiveStripFrame) -> Unit,
   onCloseClick: () -> Unit,
   onFeedClick: () -> Unit,
   onSleepTimerClick: () -> Unit,
@@ -90,8 +90,6 @@ internal fun BookPlayView(
           onSkipToNext = onSkipToNext,
           onSkipToPrevious = onSkipToPrevious,
           onSeek = onSeek,
-          onStripZoneTap = onStripZoneTap,
-          onStripFrameClick = onStripFrameClick,
           onCurrentChapterClick = onCurrentChapterClick,
           onSmartRecapClick = onSmartRecapClick,
           onSpeedClick = onSpeedClick,
@@ -128,8 +126,6 @@ private fun BookPlayPreview(
         onSkipToNext = {},
         onSkipToPrevious = {},
         onSeek = {},
-        onStripZoneTap = {},
-        onStripFrameClick = {},
         onCloseClick = {},
         onFeedClick = {},
         onSleepTimerClick = {},
@@ -160,28 +156,34 @@ private class BookPlayViewStatePreviewProvider : PreviewParameterProvider<BookPl
       skipBackSeconds = 15,
       skipForwardSeconds = 30,
       sleepTimerState = BookPlayViewState.SleepTimerViewState.Disabled,
-      title = "1. Dungeon Crawler Carl",
+      title = "The Psychology of Money",
       xrayChips = listOf(
-        BookPlayViewState.XRayChipViewState(id = "carl", label = "Carl"),
-        BookPlayViewState.XRayChipViewState(id = "donut", label = "Princess Donut"),
-        BookPlayViewState.XRayChipViewState(id = "mongo", label = "Mongo"),
-        BookPlayViewState.XRayChipViewState(id = "mordecai", label = "Mordecai"),
+        BookPlayViewState.XRayChipViewState(id = "compounding", label = "Compounding"),
+        BookPlayViewState.XRayChipViewState(id = "tail-events", label = "Tail events"),
+        BookPlayViewState.XRayChipViewState(id = "room-for-error", label = "Room for error"),
       ),
-      bookStyle = BookStyle.DungeonCrawlerCarl,
+      bookStyle = BookStyle(),
       playbackSpeed = 1.1F,
       inventoryCount = 7,
     )
     yield(initial)
     yield(
       initial.copy(
-        title = "4. The Gate of the Feral Gods",
+        title = "Pride and Prejudice",
         chapterName = "Chapter 21",
         playing = false,
-        bookStyle = BookStyle.GateOfTheFeralGods,
+        xrayChips = listOf(
+          BookPlayViewState.XRayChipViewState(id = "elizabeth", label = "Elizabeth Bennet"),
+          BookPlayViewState.XRayChipViewState(id = "darcy", label = "Mr. Darcy"),
+        ),
+        bookStyle = BookStyle(
+          palette = DefaultPalette.copy(background = Color(0xFFE7EEF2), highlight = Color(0xFF2F5D8A), shadow = Color(0xFFB4C4CF)),
+          chapterType = ChapterTypes.getValue("classic"),
+        ),
         sleepTimerState = BookPlayViewState.SleepTimerViewState.Enabled.WithDuration(12.minutes),
       ),
     )
-    yield(initial.copy(title = "Das Ende der Welt", bookStyle = null, xrayChips = emptyList()))
+    yield(initial.copy(title = "Das Ende der Welt", xrayChips = emptyList()))
   }
 }
 

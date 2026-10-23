@@ -41,11 +41,18 @@ fun CrawlTheme(
   MaterialTheme(colorScheme = colorScheme, content = content)
 }
 
-/** The library and settings: the app's own light colors whatever the phone's dark mode, with dark system bar icons. */
+/**
+ * The library and settings on white: the app's light colors whatever the phone's dark mode, with dark system bar
+ * icons. White keeps the cream cards of books in the default look standing out.
+ */
 @Composable
 fun CrawlLibraryTheme(content: @Composable () -> Unit) {
   SystemBarIcons(dark = true)
-  VoiceTheme(themeMode = ThemeMode.Light, themeColorScheme = LocalThemeColorScheme.current, content = content)
+  VoiceTheme(themeMode = ThemeMode.Light, themeColorScheme = LocalThemeColorScheme.current) {
+    val colorScheme = MaterialTheme.colorScheme
+    val onWhite = remember(colorScheme) { colorScheme.copy(background = Color.White, surface = Color.White) }
+    MaterialTheme(colorScheme = onWhite, content = content)
+  }
 }
 
 /** [bookStyle]'s palette, or one taken from the app theme without a style. */

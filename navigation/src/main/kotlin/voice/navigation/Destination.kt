@@ -14,9 +14,15 @@ sealed interface Destination {
     override val trackingName: String get() = "Playback"
   }
 
-  /** A book's guided setup: transcription progress, what Claude found out about it, and Extras to build. */
+  /**
+   * A book's guided setup: transcription progress, what Claude found out about it, and Extras to build. [autoStart]
+   * starts transcription and research right away, for a book that was just added.
+   */
   @Serializable
-  data class BookSetup(val bookId: BookId) : Compose {
+  data class BookSetup(
+    val bookId: BookId,
+    val autoStart: Boolean = false,
+  ) : Compose {
     override val trackingName: String get() = "BookSetup"
   }
 

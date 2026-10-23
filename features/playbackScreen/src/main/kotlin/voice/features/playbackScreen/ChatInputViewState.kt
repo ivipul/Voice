@@ -2,7 +2,7 @@ package voice.features.playbackScreen
 
 import androidx.compose.runtime.Immutable
 
-/** The System AI chat's input bar: what is in the text box, and whether the mic or the send countdown is running. */
+/** The book chat's input bar: what is in the text box, and whether the mic or the send countdown is running. */
 @Immutable
 internal data class ChatInputViewState(
   val text: String = "",

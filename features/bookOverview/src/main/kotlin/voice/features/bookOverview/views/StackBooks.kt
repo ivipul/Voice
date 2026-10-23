@@ -239,7 +239,7 @@ internal fun StackBookCard(
       horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       AsyncImage(
-        model = book.artwork ?: book.cover,
+        model = book.cover,
         contentDescription = null,
         contentScale = ContentScale.Crop,
         placeholder = painterResource(id = UiR.drawable.album_art),
@@ -342,7 +342,7 @@ private fun ProgressTrack(
   }
 }
 
-/** A series book's palette; any other book gets a card a shade off the screen so it still stands out from it. */
+/** The book's palette; before its look has loaded, a card a shade off the screen so it still stands out from it. */
 @Composable
 private fun cardPaletteOf(bookStyle: BookStyle?): CrawlPalette {
   val palette = crawlPaletteOf(bookStyle)
@@ -362,9 +362,9 @@ private fun Modifier.tuckedUnderNext(tucked: Dp): Modifier = layout { measurable
 private fun StackBookCardPreview() {
   StackBookCard(
     book = BookOverviewPreviewParameterProvider().book().copy(
-      name = "1. Dungeon Crawler Carl",
+      name = "The Psychology of Money",
       progress = 0.6F,
-      bookStyle = BookStyle.DungeonCrawlerCarl,
+      bookStyle = BookStyle(),
     ),
     onBookClick = {},
     onBookLongClick = {},

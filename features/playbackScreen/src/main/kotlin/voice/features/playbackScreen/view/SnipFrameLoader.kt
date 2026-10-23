@@ -53,7 +53,7 @@ private const val REVEAL_MS = 700
 private const val PULSE_MS = 1_100
 
 /**
- * A snip's comic frame, in the snip sheet and in the Feed. While there is no image yet it shows a quietly pulsing
+ * A snip's picture, in the snip sheet and in the chat. While there is no image yet it shows a quietly pulsing
  * panel in the screen's own colors with a "footage incoming" label; when the image arrives it fades in with a small
  * dip and spring back. An image that is already there when this first appears (a Feed scrolled back to an old snip)
  * is just shown.

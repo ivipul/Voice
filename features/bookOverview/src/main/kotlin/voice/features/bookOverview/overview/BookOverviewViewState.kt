@@ -11,7 +11,7 @@ data class BookOverviewViewState(
   val books: Map<BookOverviewCategory, Map<BookId, State<BookOverviewItemViewState>>>,
   val layoutMode: BookOverviewLayoutMode,
   val playButtonState: PlayButtonState?,
-  /** The series bookStyle of the book the play button controls; its palette colors the play and Deck buttons. */
+  /** The look of the book the play button controls; its palette colors the play and add buttons. */
   val activeBookStyle: BookStyle? = null,
   /** Set all text on the library in the one header font instead of each book's own. */
   val uniformFont: Boolean = false,

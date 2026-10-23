@@ -1,6 +1,9 @@
 package voice.features.bookOverview.overview
 
-import voice.core.ui.crawl.BookStyle
+import voice.core.companion.BookLook
+import voice.core.companion.LookSource
+import voice.core.companion.StoredPalette
+import voice.core.ui.crawl.toStyle
 import voice.features.bookOverview.book
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,18 +12,18 @@ import kotlin.test.assertNull
 class BookOverviewItemViewStateTest {
 
   @Test
-  fun aSeriesBookCarriesItsEditionForTheColorsAndTypeOfItsCard() {
-    val item = book(name = "2. Carl's Doomsday Scenario").toItemViewState()
+  fun aBookCarriesItsLookForTheColorsAndTypeOfItsCard() {
+    val look = BookLook(
+      source = LookSource.Cover,
+      palette = StoredPalette(0xFFE7EEF2.toInt(), 0xFF101820.toInt(), 0xFF2F5D8A.toInt(), -1, 0xFF101820.toInt(), -1, 0xFFB4C4CF.toInt()),
+      displayFont = "serif",
+    )
 
-    assertEquals(BookStyle.CarlsDoomsdayScenario, item.bookStyle)
-    assertEquals(BookStyle.CarlsDoomsdayScenario.cover, item.artwork)
+    assertEquals(look.toStyle(), book(name = "Project Hail Mary").toItemViewState(look).bookStyle)
   }
 
   @Test
-  fun anyOtherBookHasNoEditionAndKeepsItsOwnCover() {
-    val item = book(name = "Project Hail Mary").toItemViewState()
-
-    assertNull(item.bookStyle)
-    assertNull(item.artwork)
+  fun aBookWhoseLookHasNotLoadedHasNoStyleYet() {
+    assertNull(book(name = "Project Hail Mary").toItemViewState().bookStyle)
   }
 }

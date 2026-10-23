@@ -1,8 +1,6 @@
 package voice.features.playbackScreen.view
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,44 +18,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import voice.core.strips.StripZone
-import voice.core.strips.stripStartAt
 import voice.core.ui.crawl.CrawlPalette
 import kotlin.time.Duration
 
 private val TrackHeight = 4.dp
-private val StripHeight = 10.dp
+private val TouchHeight = 10.dp
 private val ThumbSize = DpSize(4.dp, 18.dp)
 private const val TRACK_ALPHA = 0.2F
 
-/**
- * The chapter's seek bar: a thin track filled in the title color, with each comic strip as one stretch in the Ask AI
- * color. A tap inside a stretch starts its strip, anything else seeks. [onScrub] reports where a drag is, then null.
- */
+/** The chapter's seek bar: a thin track filled in the highlight color. [onScrub] reports where a drag is, then null. */
 @Composable
 internal fun SliderRow(
   duration: Duration,
   playedTime: Duration,
-  stripZones: List<StripZone>,
   palette: CrawlPalette,
   onScrub: (Float?) -> Unit,
-  onStripZoneTap: (Long) -> Unit,
   onSeek: (Duration) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var localValue by remember { mutableFloatStateOf(0F) }
   val interactionSource = remember { MutableInteractionSource() }
   val dragging by interactionSource.collectIsDraggedAsState()
-  val gesture = remember { GestureTracker() }
   Slider(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 20.dp)
-      .trackTapVersusDrag(gesture),
+      .padding(horizontal = 20.dp),
     interactionSource = interactionSource,
     value = if (dragging) {
       localValue
@@ -71,12 +58,7 @@ internal fun SliderRow(
     },
     onValueChangeFinished = {
       onScrub(null)
-      val stripStart = if (gesture.moved) null else stripZones.stripStartAt(localValue)
-      if (stripStart != null) {
-        onStripZoneTap(stripStart)
-      } else {
-        onSeek(duration * localValue.toDouble())
-      }
+      onSeek(duration * localValue.toDouble())
     },
     thumb = {
       SliderDefaults.Thumb(
@@ -86,7 +68,7 @@ internal fun SliderRow(
       )
     },
     track = { sliderState ->
-      PosterTrack(sliderState = sliderState, stripZones = stripZones, palette = palette)
+      PosterTrack(sliderState = sliderState, palette = palette)
     },
   )
 }
@@ -94,13 +76,12 @@ internal fun SliderRow(
 @Composable
 private fun PosterTrack(
   sliderState: SliderState,
-  stripZones: List<StripZone>,
   palette: CrawlPalette,
 ) {
   Canvas(
     modifier = Modifier
       .fillMaxWidth()
-      .height(StripHeight),
+      .height(TouchHeight),
   ) {
     val trackHeight = TrackHeight.toPx()
     val trackTop = (size.height - trackHeight) / 2F
@@ -117,34 +98,5 @@ private fun PosterTrack(
       size = Size(size.width * sliderState.value.coerceIn(0F, 1F), trackHeight),
       cornerRadius = trackCorner,
     )
-    stripZones.forEach { zone ->
-      val left = size.width * zone.startFraction
-      val width = size.width * (zone.endFraction - zone.startFraction)
-      drawRoundRect(
-        color = palette.accent,
-        topLeft = Offset(left, 0F),
-        size = Size(width, size.height),
-        cornerRadius = CornerRadius(minOf(size.height, width) / 2F),
-      )
-    }
-  }
-}
-
-/** Whether the gesture that just ended moved far enough to be a drag rather than a tap. */
-internal class GestureTracker {
-  var moved: Boolean = false
-}
-
-/** Watches every gesture on the slider without consuming it, so a tap can be told from a drag. */
-private fun Modifier.trackTapVersusDrag(tracker: GestureTracker): Modifier = pointerInput(tracker) {
-  awaitEachGesture {
-    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-    tracker.moved = false
-    do {
-      val event = awaitPointerEvent(PointerEventPass.Initial)
-      if (event.changes.any { (it.position - down.position).getDistance() > viewConfiguration.touchSlop }) {
-        tracker.moved = true
-      }
-    } while (event.changes.any { it.pressed })
   }
 }

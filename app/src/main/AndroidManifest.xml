@@ -17,6 +17,8 @@
 
   <application
     android:enableOnBackInvokedCallback="true"
+    android:dataExtractionRules="@xml/data_extraction_rules"
+    android:fullBackupContent="@xml/backup_rules"
     android:largeHeap="true"
     android:name=".di.App"
     android:icon="@drawable/ic_launcher"

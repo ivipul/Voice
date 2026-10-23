@@ -49,27 +49,29 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
-import voice.core.strips.ActiveStripFrame
-import voice.core.strips.AvailableStrip
-import voice.core.strips.StripFrame
-import voice.core.strips.StripManifest
-import voice.core.ui.crawl.BookStyle
-import voice.core.xray.XRayEntityInfo
-import voice.core.xray.XRayManifest
-import voice.core.xray.card.PlayerCardData
-import voice.core.xray.card.PlayerCardEntry
-import voice.core.xray.card.PlayerCardFields
-import voice.core.xray.card.PlayerCardRepository
-import voice.core.xray.card.PlayerCardSet
-import voice.core.xray.card.composeAt
+import voice.core.companion.BookKind
+import voice.core.companion.BookLook
+import voice.core.companion.CompanionStores
+import voice.core.companion.Extra
+import voice.core.companion.ExtraShelf
+import voice.core.companion.LookSource
+import voice.core.companion.SceneCue
+import voice.core.companion.SceneEntry
+import voice.core.companion.SceneIndex
+import voice.core.companion.SceneNote
+import voice.core.companion.StoredPalette
+import voice.core.transcript.BookFiles
+import voice.core.ui.crawl.toStyle
 import voice.core.playback.speech.MessageSpeaker
 import voice.core.playback.speech.SpokenMessage
 import voice.features.playbackScreen.copilot.DictationEvent
+import voice.features.playbackScreen.view.knownNotes
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
 import voice.navigation.Destination
 import voice.navigation.Navigator
 import java.io.File
+import kotlin.io.path.createTempDirectory
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -135,6 +137,8 @@ class BookPlayViewModelTest {
     )
   }
   private val navigator = mockk<Navigator>(relaxed = true)
+  private val filesDir: File = createTempDirectory().toFile()
+  private val stores = CompanionStores(BookFiles(mockk { every { filesDir } returns this@BookPlayViewModelTest.filesDir }))
   private val viewModel = BookPlayViewModel(
     bookRepository = mockk {
       coEvery { get(book.id) } returns book
@@ -162,15 +166,7 @@ class BookPlayViewModelTest {
     copilotPipeline = copilotPipeline,
     speechInputController = speechInputController,
     messageSpeaker = messageSpeaker,
-    xrayRepository = mockk {
-      coEvery { manifestFor(any()) } returns null
-    },
-    playerCardRepository = mockk {
-      coEvery { cardsFor(any()) } returns null
-    },
-    stripRepository = mockk {
-      coEvery { stripsFor(any()) } returns emptyList()
-    },
+    stores = stores,
   )
 
   @Test
@@ -367,120 +363,115 @@ class BookPlayViewModelTest {
     }
   }
 
-  // The book is two 5 minute files; the current mark is "Middle Section" of the second (7:00 to 9:00 of the book).
-  private fun strip(
-    startsMs: List<Long>,
-    holdMs: Long,
-    chapter: Int = 1,
-  ) = AvailableStrip(
-    manifest = StripManifest(
-      schemaVersion = 1,
-      book = 1,
-      bookTitlePrefix = "Dungeon Crawler Carl",
-      chapter = chapter,
-      title = "A strip",
-      summary = "s",
-      lastFrameHoldMs = holdMs,
-      frames = startsMs.mapIndexed { index, start -> StripFrame(index + 1, "f${index + 1}-final.png", start) },
-    ),
-    directory = File("strip$chapter"),
+  // The book is two 5 minute files and sits at 2:30 into the second one: 7:30 of the whole book.
+  private val bookPositionMs = 450_000L
+
+  private fun extra(id: String, unlockAtMs: Long) = Extra(
+    id = id,
+    title = "Extra $id",
+    description = "About $id",
+    html = "<p>$id</p>",
+    createdAtMs = 0L,
+    unlockAtMs = unlockAtMs,
   )
 
-  private fun bookAt(positionInChapterMs: Long): Book = book().let {
-    it.copy(content = it.content.copy(positionInChapter = positionInChapterMs))
-  }
-
   @Test
-  fun `viewState puts a strip on the seek bar as a fraction of the current chapter and shows its frame`() = scope.runTest {
-    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L)
-    val bookAtSevenThirty = bookAt(2.5.minutes.inWholeMilliseconds)
-    val viewModel = viewModel(book = bookAtSevenThirty, strips = listOf(strip))
+  fun `viewState takes the book's colors from its look, and the playback speed`() = scope.runTest {
+    val faster = book.let { it.copy(content = it.content.copy(playbackSpeed = 1.3F)) }
+    val look = BookLook(
+      source = LookSource.Cover,
+      palette = StoredPalette(0xFFE7EEF2.toInt(), 0xFF101820.toInt(), 0xFF2F5D8A.toInt(), -1, 0xFF101820.toInt(), -1, 0xFFB4C4CF.toInt()),
+      displayFont = "classic",
+    )
+    stores.look.set(faster.id, look)
+    val viewModel = viewModel(book = faster)
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
-      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
-      val span = 119_999f
-      val zone = state.stripZones.single()
-      assertEquals((430_000f - 420_000f) / span, zone.startFraction, 0.0001f)
-      assertEquals((490_000f - 420_000f) / span, zone.endFraction, 0.0001f)
-      assertEquals(430_000L, zone.startBookMs)
-      assertEquals(0, state.stripFrame?.frameIndex)
-      cancelAndIgnoreRemainingEvents()
-    }
-  }
-
-  @Test
-  fun `the strip frame follows the position and the cover returns once the strip is done`() = scope.runTest {
-    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L)
-    for ((positionInChapter, expectedFrame) in listOf(3.minutes to 1, 3.8.minutes to null)) {
-      val viewModel = viewModel(book = bookAt(positionInChapter.inWholeMilliseconds), strips = listOf(strip))
-      backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
-        var state = awaitItem()
-        while (state == null || state.stripZones.isEmpty()) state = awaitItem()
-        assertEquals(expectedFrame, state.stripFrame?.frameIndex)
-        cancelAndIgnoreRemainingEvents()
-      }
-    }
-  }
-
-  @Test
-  fun `without strips there are no zones and the cover stays`() = scope.runTest {
-    val viewModel = viewModel()
-    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
-      var state = awaitItem()
-      while (state == null) state = awaitItem()
-      assertEquals(emptyList(), state.stripZones)
-      assertEquals(null, state.stripFrame)
-      cancelAndIgnoreRemainingEvents()
-    }
-  }
-
-  @Test
-  fun `tapping a strip zone seeks to the strip start in the right file`() = scope.runTest {
-    every { player.setPosition(any(), any()) } just Runs
-
-    viewModel.onStripZoneTap(430_000L)
-    yield()
-
-    // 430 s into the book is 130 s into the second 5 minute file.
-    verify { player.setPosition(130_000L, book.chapters[1].id) }
-  }
-
-  @Test
-  fun `tapping the strip frame opens the story on that frame`() = scope.runTest {
-    val strip = strip(startsMs = listOf(430_000L, 460_000L), holdMs = 30_000L, chapter = 3)
-
-    viewModel.onStripFrameClick(ActiveStripFrame(strip, frameIndex = 1))
-
-    verify { navigator.goTo(Destination.StripStory(book.id, chapter = 3, startFrameIndex = 1, linkedToBook = true)) }
-  }
-
-  @Test
-  fun `viewState carries the series book and the playback speed`() = scope.runTest {
-    val doomsday = book(name = "2. Carl's Doomsday Scenario").let {
-      it.copy(content = it.content.copy(playbackSpeed = 1.3F))
-    }
-    val viewModel = viewModel(book = doomsday)
-
-    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
-      var state = awaitItem()
-      while (state == null) state = awaitItem()
-      assertEquals(BookStyle.CarlsDoomsdayScenario, state.bookStyle)
+      while (state?.bookStyle == null) state = awaitItem()
+      assertEquals(look.toStyle(), state.bookStyle)
       assertEquals(1.3F, state.playbackSpeed)
       cancelAndIgnoreRemainingEvents()
     }
   }
 
   @Test
-  fun `a book outside the series has no bookStyle`() = scope.runTest {
+  fun `a book without a look gets the app's cream, red and black`() = scope.runTest {
     val viewModel = viewModel()
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
-      while (state == null) state = awaitItem()
-      assertEquals(null, state.bookStyle)
+      while (state?.bookStyle == null) state = awaitItem()
+      assertEquals(BookLook().toStyle(), state.bookStyle)
       cancelAndIgnoreRemainingEvents()
     }
+  }
+
+  @Test
+  fun `scene chips show who is in the scene at the whole-book position`() = scope.runTest {
+    stores.scene.set(
+      book.id,
+      SceneIndex(
+        kind = BookKind.Fiction,
+        entries = listOf(SceneEntry(id = "anna", name = "Anna"), SceneEntry(id = "boris", name = "Boris")),
+        cues = listOf(
+          SceneCue(entry = "anna", startMs = 400_000L, endMs = 500_000L),
+          SceneCue(entry = "boris", startMs = 100_000L, endMs = 200_000L),
+        ),
+      ),
+    )
+    val viewModel = viewModel()
+
+    backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
+      var state = awaitItem()
+      while (state == null || state.xrayChips.isEmpty()) state = awaitItem()
+      assertEquals(listOf(BookPlayViewState.XRayChipViewState(id = "anna", label = "Anna")), state.xrayChips)
+      cancelAndIgnoreRemainingEvents()
+    }
+  }
+
+  @Test
+  fun `tapping a chip opens its card with the notes and the unlocked Extra of its topic`() = scope.runTest {
+    val notes = listOf(SceneNote(fromMs = 60_000L, text = "Defined."), SceneNote(fromMs = 900_000L, text = "Later point."))
+    stores.scene.set(
+      book.id,
+      SceneIndex(
+        kind = BookKind.NonFiction,
+        entries = listOf(SceneEntry(id = "compounding", name = "Compounding", summary = "Growth on growth.", notes = notes, extraId = "calc")),
+        cues = listOf(SceneCue(entry = "compounding", startMs = 60_000L, endMs = 500_000L)),
+      ),
+    )
+    stores.shelf.set(book.id, ExtraShelf(listOf(extra("calc", unlockAtMs = 60_000L))))
+    val viewModel = viewModel()
+
+    viewModel.onXRayChipClick("compounding")
+    runCurrent()
+
+    val dialog = assertIs<BookPlayDialogViewState.SceneCardDialog>(viewModel.dialogState.value)
+    assertEquals("Compounding", dialog.name)
+    assertEquals(false, dialog.fiction)
+    assertEquals("calc", dialog.extraId)
+    assertEquals(bookPositionMs, dialog.openedAtMs)
+    assertEquals(listOf("Defined."), knownNotes(dialog.notes, dialog.openedAtMs))
+  }
+
+  @Test
+  fun `a topic's Extra still ahead in the book is not offered on its card`() = scope.runTest {
+    stores.scene.set(
+      book.id,
+      SceneIndex(
+        kind = BookKind.NonFiction,
+        entries = listOf(SceneEntry(id = "risk", name = "Risk", extraId = "quiz")),
+        cues = listOf(SceneCue(entry = "risk", startMs = 0L, endMs = 10_000L)),
+      ),
+    )
+    stores.shelf.set(book.id, ExtraShelf(listOf(extra("quiz", unlockAtMs = 600_000L))))
+    val viewModel = viewModel()
+
+    viewModel.onXRayChipClick("risk")
+    runCurrent()
+
+    assertEquals(null, assertIs<BookPlayDialogViewState.SceneCardDialog>(viewModel.dialogState.value).extraId)
   }
 
   @Test
@@ -497,44 +488,37 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `the Inventory card counts the book's snips and the strips reached so far`() = scope.runTest {
+  fun `the Notebook card counts the book's snips and the Extras reached so far`() = scope.runTest {
     val copilotRepository = CoPilotRepository()
     copilotRepository.addMessage(book.id, snipMessage("first"))
     copilotRepository.addMessage(book.id, snipMessage("second"))
     copilotRepository.addMessage(
       book.id,
-      CoPilotMessage(id = "answer", role = CoPilotMessage.Role.CoPilot, text = "Carl is a crawler.", timestampMs = 0L),
+      CoPilotMessage(id = "answer", role = CoPilotMessage.Role.CoPilot, text = "An answer.", timestampMs = 0L),
     )
     copilotRepository.addMessage(BookId("another-book"), snipMessage("elsewhere"))
-    // The book is at 7:30; the first strip started at 1:00 and the second one starts at 8:20.
-    val reached = strip(startsMs = listOf(60_000L), holdMs = 10_000L, chapter = 1)
-    val ahead = strip(startsMs = listOf(500_000L), holdMs = 10_000L, chapter = 2)
-    val viewModel = viewModel(strips = listOf(reached, ahead), copilotRepository = copilotRepository)
+    stores.shelf.set(book.id, ExtraShelf(listOf(extra("reached", unlockAtMs = 60_000L), extra("ahead", unlockAtMs = 500_000L))))
+    val viewModel = viewModel(copilotRepository = copilotRepository)
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
-      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      while (state == null || state.inventoryCount < 3) state = awaitItem()
       assertEquals(3, state.inventoryCount)
       cancelAndIgnoreRemainingEvents()
     }
   }
 
   @Test
-  fun `reaching a new strip toasts once, and strips already reached when the screen opens do not`() = scope.runTest {
-    // The book opens at 7:30; the first strip started at 1:00 and the second one starts at 8:20.
-    val reached = strip(startsMs = listOf(60_000L), holdMs = 10_000L, chapter = 1)
-    val ahead = strip(startsMs = listOf(500_000L), holdMs = 10_000L, chapter = 2)
+  fun `reaching a new Extra toasts once, and Extras already reached when the screen opens do not`() = scope.runTest {
+    // The book opens at 7:30; the first Extra unlocked at 1:00 and the second one unlocks at 8:20.
+    stores.shelf.set(book.id, ExtraShelf(listOf(extra("reached", unlockAtMs = 60_000L), extra("ahead", unlockAtMs = 500_000L))))
     val livePlaybackFlow = MutableStateFlow<LivePlaybackState?>(null)
-    val viewModel = viewModel(
-      experimentalPlaybackPersistence = true,
-      livePlaybackFlow = livePlaybackFlow,
-      strips = listOf(reached, ahead),
-    )
+    val viewModel = viewModel(experimentalPlaybackPersistence = true, livePlaybackFlow = livePlaybackFlow)
     val effects = mutableListOf<BookPlayViewEffect>()
     backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {
       var state = awaitItem()
-      while (state == null || state.stripZones.isEmpty()) state = awaitItem()
+      while (state == null || state.inventoryCount == 0) state = awaitItem()
       runCurrent()
       assertEquals(emptyList<BookPlayViewEffect>(), effects)
 
@@ -555,14 +539,14 @@ class BookPlayViewModelTest {
       playAt(201.seconds)
       awaitItem()
       runCurrent()
-      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.StripUnlocked), effects)
+      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.ExtraUnlocked), effects)
 
       playAt(3.minutes)
       awaitItem()
       playAt(205.seconds)
       awaitItem()
       runCurrent()
-      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.StripUnlocked), effects)
+      assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.ExtraUnlocked), effects)
       cancelAndIgnoreRemainingEvents()
     }
   }
@@ -809,10 +793,10 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.viewEffects.collect { effects += it } }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = true))
     runCurrent()
     assertEquals(listOf<BookPlayViewEffect>(BookPlayViewEffect.SnipSaved), effects)
-    assertEquals(SnipSheetViewState.Loading(drawsFrame = true), viewModel.snipSheet.value)
+    assertEquals(SnipSheetViewState.Loading(drawsPicture = true), viewModel.snipSheet.value)
 
     copilotRepository.emitSnipEvent(SnipEvent.Ready("Carl's blade froze mid-swing.", "m1"))
     runCurrent()
@@ -837,7 +821,7 @@ class BookPlayViewModelTest {
   @Test
   fun `snips captured while nothing is collecting are dropped`() = scope.runTest {
     val effects = mutableListOf<BookPlayViewEffect>()
-    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = true))
     copilotRepository.emitSnipEvent(SnipEvent.Ready("missed", "m0"))
 
     backgroundScope.launch { viewModel.collectSnipEvents() }
@@ -853,9 +837,9 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = true))
     runCurrent()
-    assertEquals(SnipSheetViewState.Loading(drawsFrame = true), viewModel.snipSheet.value)
+    assertEquals(SnipSheetViewState.Loading(drawsPicture = true), viewModel.snipSheet.value)
 
     copilotRepository.emitSnipEvent(SnipEvent.Failed)
     runCurrent()
@@ -867,7 +851,7 @@ class BookPlayViewModelTest {
     backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
 
-    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = true))
     runCurrent()
     viewModel.onSnipSheetDismiss()
     copilotRepository.emitSnipEvent(SnipEvent.Ready("late", "m2"))
@@ -880,7 +864,7 @@ class BookPlayViewModelTest {
   fun `leaving the screen while capturing clears the loading sheet`() = scope.runTest {
     val collector = backgroundScope.launch { viewModel.collectSnipEvents() }
     runCurrent()
-    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsFrame = true))
+    copilotRepository.emitSnipEvent(SnipEvent.Started(drawsPicture = true))
     runCurrent()
 
     collector.cancelAndJoin()
@@ -915,109 +899,7 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `the card files are looked up and their images resolved when the player opens, not on a chip tap`() = scope.runTest {
-    val cards = mockk<PlayerCardSet>(relaxed = true)
-    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = cards)
-
-    backgroundScope.launchMolecule(RecompositionMode.Immediate) {
-      viewModel.viewState()
-    }.test {
-      assertEquals(expected = null, actual = awaitItem())
-      awaitItem()
-      yield()
-      cancelAndIgnoreRemainingEvents()
-    }
-
-    verify(exactly = 1) { cards.resolveAllImages() }
-  }
-
-  @Test
-  fun `tapping a chip with card data opens the holo card composed at the playback position`() = scope.runTest {
-    val viewModel = viewModel(
-      xrayManifest = carlManifest,
-      playerCards = PlayerCardSet(
-        cards = mapOf(
-          "carl" to PlayerCardData(
-            id = "carl",
-            entries = listOf(
-              PlayerCardEntry(ms = 1.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "3"),
-              PlayerCardEntry(ms = 2.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "4"),
-              PlayerCardEntry(ms = 10.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9"),
-            ),
-          ),
-        ),
-        imageFolder = null,
-      ),
-    )
-
-    viewModel.onXRayChipClick("carl")
-    yield()
-
-    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
-    assertEquals(expected = "Carl", actual = dialog.name)
-    assertEquals(expected = 4, actual = dialog.card.level)
-    assertEquals(expected = null, actual = dialog.lookImage)
-  }
-
-  @Test
-  fun `tapping a chip without card data opens a plain card from the X-Ray entity`() = scope.runTest {
-    val viewModel = viewModel(
-      xrayManifest = XRayManifest(
-        entities = listOf(XRayEntityInfo(id = "beatrice", title = "Beatrice", description = "A guide.", image = "book-1/beatrice.jpg")),
-        timeline = emptyList(),
-      ),
-      playerCards = PlayerCardSet(cards = emptyMap(), imageFolder = null),
-    )
-
-    viewModel.onXRayChipClick("beatrice")
-    yield()
-
-    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
-    assertEquals(expected = "Beatrice", actual = dialog.name)
-    assertEquals(expected = "A guide.", actual = dialog.description)
-    assertEquals(expected = "book-1/beatrice.jpg", actual = dialog.portrait)
-    assertEquals(expected = null, actual = dialog.lookImage)
-    assertEquals(expected = true, actual = dialog.plain)
-  }
-
-  @Test
-  fun `tapping a chip opens a card even when the book has no cards file or the entity has no image`() = scope.runTest {
-    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = null)
-
-    viewModel.onXRayChipClick("carl")
-    yield()
-
-    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
-    assertEquals(expected = null, actual = dialog.portrait)
-    assertEquals(expected = emptyList(), actual = dialog.data.entries)
-    assertEquals(expected = true, actual = dialog.plain)
-  }
-
-  @Test
-  fun `a crawler card is not plain even before anything is revealed`() = scope.runTest {
-    val viewModel = viewModel(
-      xrayManifest = carlManifest,
-      playerCards = PlayerCardSet(
-        cards = mapOf(
-          "carl" to PlayerCardData(
-            id = "carl",
-            entries = listOf(PlayerCardEntry(ms = 1.hours.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9")),
-          ),
-        ),
-        imageFolder = null,
-      ),
-    )
-
-    viewModel.onXRayChipClick("carl")
-    yield()
-
-    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
-    assertEquals(expected = false, actual = dialog.plain)
-    assertEquals(expected = null, actual = dialog.card.level)
-  }
-
-  @Test
-  fun `the open card follows the live playback position when it is available`() = scope.runTest {
+  fun `the open card follows the whole-book position, live when it is available`() = scope.runTest {
     val liveFlow = MutableStateFlow<LivePlaybackState?>(null)
     val viewModel = viewModel(experimentalPlaybackPersistence = true, livePlaybackFlow = liveFlow)
 
@@ -1025,7 +907,7 @@ class BookPlayViewModelTest {
       viewModel.cardPositionMs(openedAtMs = 1L)
     }.test {
       assertEquals(expected = 1L, actual = awaitItem())
-      assertEquals(expected = book.content.positionInChapter, actual = awaitItem())
+      assertEquals(expected = bookPositionMs, actual = awaitItem())
 
       liveFlow.value = LivePlaybackState(
         bookId = book.id,
@@ -1038,40 +920,12 @@ class BookPlayViewModelTest {
     }
   }
 
-  @Test
-  fun `the open card dialog keeps the raw card so it can be composed at any position`() = scope.runTest {
-    val data = PlayerCardData(
-      id = "carl",
-      entries = listOf(
-        PlayerCardEntry(ms = 1.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "3"),
-        PlayerCardEntry(ms = 10.minutes.inWholeMilliseconds, field = PlayerCardFields.LEVEL, value = "9"),
-      ),
-    )
-    val viewModel = viewModel(xrayManifest = carlManifest, playerCards = PlayerCardSet(mapOf("carl" to data), imageFolder = null))
-
-    viewModel.onXRayChipClick("carl")
-    yield()
-
-    val dialog = assertIs<BookPlayDialogViewState.XRayCardDialog>(viewModel.dialogState.value)
-    assertEquals(expected = 2.5.minutes.inWholeMilliseconds, actual = dialog.openedAtMs)
-    assertEquals(expected = 3, actual = dialog.card.level)
-    assertEquals(expected = 9, actual = dialog.data.composeAt(11.minutes.inWholeMilliseconds).level)
-  }
-
-  private val carlManifest = XRayManifest(
-    entities = listOf(XRayEntityInfo(id = "carl", title = "Carl", description = "A crawler.")),
-    timeline = emptyList(),
-  )
-
   private fun viewModel(
     book: Book = this.book,
     experimentalPlaybackPersistence: Boolean = false,
     kioskMode: Boolean = false,
     livePlaybackFlow: MutableStateFlow<LivePlaybackState?> = MutableStateFlow(null),
     playStateFlow: MutableStateFlow<PlayStateManager.PlayState> = MutableStateFlow(PlayStateManager.PlayState.Paused),
-    xrayManifest: XRayManifest? = null,
-    playerCards: PlayerCardSet? = null,
-    strips: List<AvailableStrip> = emptyList(),
     copilotRepository: CoPilotRepository = CoPilotRepository(),
   ): BookPlayViewModel {
     return BookPlayViewModel(
@@ -1105,15 +959,7 @@ class BookPlayViewModelTest {
       copilotPipeline = mockk(),
       speechInputController = mockk(),
       messageSpeaker = mockk(relaxed = true),
-      xrayRepository = mockk {
-        coEvery { manifestFor(any()) } returns xrayManifest
-      },
-      playerCardRepository = mockk<PlayerCardRepository> {
-        coEvery { cardsFor(any()) } returns playerCards
-      },
-      stripRepository = mockk {
-        coEvery { stripsFor(any()) } returns strips
-      },
+      stores = stores,
     )
   }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- API keys never leave the phone; transcripts and Extras are big and can be made again. -->
+<full-backup-content>
+  <exclude domain="file" path="datastore/apiKeys" />
+  <exclude domain="file" path="transcripts" />
+  <exclude domain="file" path="books" />
+  <exclude domain="file" path="snip-pictures" />
+</full-backup-content>

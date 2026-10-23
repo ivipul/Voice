@@ -18,8 +18,8 @@ class SnipSheetViewStateTest {
 
   @Test
   fun `while capturing, a frame placeholder shows only when a frame will be drawn`() {
-    assertEquals(SnipFrameViewState.Drawing, SnipSheetViewState.Loading(drawsFrame = true).frameState(emptyList()))
-    assertEquals(SnipFrameViewState.None, SnipSheetViewState.Loading(drawsFrame = false).frameState(emptyList()))
+    assertEquals(SnipFrameViewState.Drawing, SnipSheetViewState.Loading(drawsPicture = true).frameState(emptyList()))
+    assertEquals(SnipFrameViewState.None, SnipSheetViewState.Loading(drawsPicture = false).frameState(emptyList()))
   }
 
   @Test

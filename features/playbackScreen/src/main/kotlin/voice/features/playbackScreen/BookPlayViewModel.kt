@@ -6,7 +6,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Assisted
@@ -20,12 +19,15 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.copilot.CoPilotMessage
 import voice.core.copilot.CoPilotPipeline
 import voice.core.copilot.CoPilotRepository
+import voice.core.companion.BookKind
+import voice.core.companion.CompanionStores
+import voice.core.companion.Extra
+import voice.core.companion.activeAt
 import voice.core.copilot.SnipEvent
 import voice.core.data.Book
 import voice.core.data.BookId
@@ -58,21 +60,8 @@ import voice.core.sleeptimer.SleepTimer
 import voice.core.sleeptimer.SleepTimerMode
 import voice.core.sleeptimer.SleepTimerMode.TimedWithDuration
 import voice.core.sleeptimer.SleepTimerState
-import voice.core.strips.ActiveStripFrame
-import voice.core.strips.AvailableStrip
-import voice.core.strips.StripRepository
-import voice.core.strips.activeFrameAt
-import voice.core.strips.chapterPositionOf
-import voice.core.strips.isUnlockedAt
-import voice.core.strips.zonesWithin
 import voice.core.ui.crawl.toStyle
 import voice.core.ui.formatTime
-import voice.core.xray.XRayEntityInfo
-import voice.core.xray.XRayManifest
-import voice.core.xray.XRayRepository
-import voice.core.xray.activeEntities
-import voice.core.xray.card.PlayerCardData
-import voice.core.xray.card.PlayerCardRepository
 import voice.features.playbackScreen.batteryOptimization.BatteryOptimization
 import voice.features.playbackScreen.copilot.SpeechInputController
 import voice.features.sleepTimer.SleepTimerViewState
@@ -112,16 +101,14 @@ class BookPlayViewModel(
   private val copilotPipeline: CoPilotPipeline,
   private val speechInputController: SpeechInputController,
   private val messageSpeaker: MessageSpeaker,
-  private val xrayRepository: XRayRepository,
-  private val playerCardRepository: PlayerCardRepository,
-  private val stripRepository: StripRepository,
+  private val stores: CompanionStores,
   @Assisted
   private val bookId: BookId,
 ) {
 
   private val scope = MainScope(dispatcherProvider)
 
-  private var knownUnlockedStrips: Set<Int>? = null
+  private var knownUnlockedExtras: Set<String>? = null
 
   internal val viewEffects: Flow<BookPlayViewEffect>
     field = MutableSharedFlow<BookPlayViewEffect>(extraBufferCapacity = 1)
@@ -190,29 +177,17 @@ class BookPlayViewModel(
     val hasMoreThanOneChapter = book.chapters.sumOf { it.chapterMarks.count() } > 1
     val skipBackSeconds by remember { seekTimeStore.data }.collectAsState(initial = 15)
     val skipForwardSeconds by remember { seekForwardTimeStore.data }.collectAsState(initial = 30)
-    val xrayManifest by produceState<XRayManifest?>(initialValue = null, book.currentChapter.id) {
-      value = xrayRepository.manifestFor(book)
-    }
-    // Finding a card's files in the audiobook folder is slow, so it is done now rather than when a chip is tapped.
-    LaunchedEffect(book.currentChapter.id) {
-      withContext(dispatcherProvider.io) {
-        playerCardRepository.cardsFor(book)?.resolveAllImages()
-      }
-    }
-    val strips by produceState<List<AvailableStrip>>(initialValue = emptyList(), book.content.name) {
-      value = stripRepository.stripsFor(book.content.name)
-    }
-    LaunchedEffect(strips, book.position) { announceUnlockedStrips(strips, book.position) }
+    val scene by remember(bookId) { stores.scene.flow(bookId) }.collectAsState(initial = null)
+    val shelf by remember(bookId) { stores.shelf.flow(bookId) }.collectAsState(initial = null)
+    val look by remember(bookId) { stores.look.flow(bookId) }.collectAsState(initial = null)
+    val extras = shelf?.extras.orEmpty()
+    LaunchedEffect(extras, book.position) { announceUnlockedExtras(extras, book.position) }
     val messagesByBook by remember { copilotRepository.allMessagesByBook }.collectAsState()
     val snipCount = messagesByBook[bookId].orEmpty().count { it.isSnip }
-    val markStartBookMs = book.chapters.take(book.content.currentChapterIndex).sumOf { it.duration } + currentMark.startMs
-    val stripZones = remember(strips, markStartBookMs, currentMark.durationMs) {
-      strips.zonesWithin(markStartBookMs, markStartBookMs + currentMark.durationMs)
-    }
-    val xrayChips = xrayManifest?.activeEntities(book.content.positionInChapter)?.map {
-      BookPlayViewState.XRayChipViewState(id = it.id, label = it.title)
+    val sceneChips = scene?.activeAt(book.position)?.map {
+      BookPlayViewState.XRayChipViewState(id = it.id, label = it.name)
     }.orEmpty()
-    val bookStyle = remember(book.content.name) { crawlEditionOf(book.content.name) }
+    val bookStyle = remember(look) { look?.toStyle() }
     return BookPlayViewState(
       sleepTimerState = sleepTime.toViewState(),
       playing = isPlaying,
@@ -225,26 +200,24 @@ class BookPlayViewModel(
       skipSilence = book.content.skipSilence,
       skipBackSeconds = skipBackSeconds,
       skipForwardSeconds = skipForwardSeconds,
-      xrayChips = xrayChips,
-      stripZones = stripZones,
-      stripFrame = strips.activeFrameAt(book.position),
+      xrayChips = sceneChips,
       bookStyle = bookStyle,
       playbackSpeed = book.content.playbackSpeed,
-      inventoryCount = snipCount + strips.count { it.isUnlockedAt(book.position) },
+      inventoryCount = snipCount + extras.count { it.unlockAtMs <= book.position },
     )
   }
 
-  /** The first strips seen are the baseline, so only strips reached after the screen opened get a toast. */
-  private fun announceUnlockedStrips(
-    strips: List<AvailableStrip>,
+  /** The first Extras seen are the baseline, so only Extras reached after the screen opened get a toast. */
+  private fun announceUnlockedExtras(
+    extras: List<Extra>,
     bookMs: Long,
   ) {
-    if (strips.isEmpty()) return
-    val unlocked = strips.filter { it.isUnlockedAt(bookMs) }.map { it.manifest.chapter }.toSet()
-    val known = knownUnlockedStrips
-    knownUnlockedStrips = known.orEmpty() + unlocked
+    if (extras.isEmpty()) return
+    val unlocked = extras.filter { it.unlockAtMs <= bookMs }.map { it.id }.toSet()
+    val known = knownUnlockedExtras
+    knownUnlockedExtras = known.orEmpty() + unlocked + extras.filter { it.unlockAtMs == 0L }.map { it.id }
     if (known != null && !known.containsAll(unlocked)) {
-      viewEffects.tryEmit(BookPlayViewEffect.StripUnlocked)
+      viewEffects.tryEmit(BookPlayViewEffect.ExtraUnlocked)
     }
   }
 
@@ -426,49 +399,30 @@ class BookPlayViewModel(
     )
   }
 
-  /** A tap inside a strip's zone on the seek bar: jump to where that strip starts. */
-  fun onStripZoneTap(startBookMs: Long) {
-    scope.launch {
-      val book = currentBook() ?: return@launch
-      val (chapterId, positionInChapter) = book.chapters.chapterPositionOf(startBookMs) ?: return@launch
-      player.setPosition(positionInChapter, chapterId)
-    }
-  }
-
-  /** A tap on the strip frame that replaces the cover: open the story on that frame. */
-  fun onStripFrameClick(frame: ActiveStripFrame) {
-    navigator.goTo(Destination.StripStory(bookId, frame.strip.manifest.chapter, frame.frameIndex, linkedToBook = true))
-  }
-
   fun onXRayChipClick(id: String) {
     scope.launch {
       val book = currentBook() ?: return@launch
-      val entity = xrayRepository.manifestFor(book)?.entities?.firstOrNull { it.id == id } ?: return@launch
-      dialogState.value = cardDialog(book, entity)
+      val index = stores.scene.get(bookId)
+      val entry = index.entries.firstOrNull { it.id == id } ?: return@launch
+      val extra = entry.extraId?.let { extraId -> stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId } }
+      dialogState.value = BookPlayDialogViewState.SceneCardDialog(
+        name = entry.name,
+        summary = entry.summary,
+        notes = entry.notes,
+        fiction = index.kind == BookKind.Fiction,
+        extraId = extra?.takeIf { it.unlockAtMs <= book.position }?.id,
+        extraTitle = extra?.title,
+        openedAtMs = book.position,
+      )
     }
   }
 
-  private suspend fun cardDialog(
-    book: Book,
-    entity: XRayEntityInfo,
-  ): BookPlayDialogViewState.XRayCardDialog = withContext(dispatcherProvider.io) {
-    val cards = playerCardRepository.cardsFor(book)
-    val data = cards?.card(entity.id) ?: PlayerCardData(id = entity.id, entries = emptyList())
-    BookPlayDialogViewState.XRayCardDialog(
-      name = entity.title,
-      description = entity.description,
-      data = data,
-      imageUris = data.entries
-        .mapNotNull { it.image }
-        .distinct()
-        .mapNotNull { path -> cards?.imageUri(path)?.let { path to it.toString() } }
-        .toMap(),
-      portrait = entity.image,
-      openedAtMs = book.content.positionInChapter,
-    )
+  fun onSceneCardExtraClick(extraId: String) {
+    dialogState.value = null
+    navigator.goTo(Destination.Extra(bookId, extraId))
   }
 
-  /** The playback position the open holo card follows, so stats and looks reveal as the book plays. */
+  /** The whole-book position an open card follows, so its notes reveal as the book plays. */
   @Composable
   fun cardPositionMs(openedAtMs: Long): Long {
     val persisted by remember(bookId) { bookRepository.flow(bookId).filterNotNull() }.collectAsState(initial = null)
@@ -477,7 +431,8 @@ class BookPlayViewModel(
     } else {
       null
     }
-    return live?.positionMs ?: persisted?.content?.positionInChapter ?: openedAtMs
+    val book = persisted ?: return openedAtMs
+    return if (live != null) book.overlay(live).position else book.position
   }
 
   @Composable
@@ -632,7 +587,7 @@ class BookPlayViewModel(
   private fun onSnipEvent(event: SnipEvent) {
     when (event) {
       is SnipEvent.Started -> {
-        snipSheet.value = SnipSheetViewState.Loading(drawsFrame = event.drawsFrame)
+        snipSheet.value = SnipSheetViewState.Loading(drawsPicture = event.drawsPicture)
         viewEffects.tryEmit(BookPlayViewEffect.SnipSaved)
       }
       is SnipEvent.Ready -> if (snipSheet.value is SnipSheetViewState.Loading) {

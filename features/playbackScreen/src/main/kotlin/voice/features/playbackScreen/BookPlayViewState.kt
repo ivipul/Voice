@@ -1,14 +1,9 @@
 package voice.features.playbackScreen
 
 import androidx.compose.runtime.Immutable
+import voice.core.companion.SceneNote
 import voice.core.playback.misc.Decibel
-import voice.core.strips.ActiveStripFrame
-import voice.core.strips.StripZone
 import voice.core.ui.crawl.BookStyle
-import voice.core.xray.card.ComposedPlayerCard
-import voice.core.xray.card.PlayerCardData
-import voice.core.xray.card.composeAt
-import voice.core.xray.card.hasGameStats
 import voice.features.sleepTimer.SleepTimerViewState
 import kotlin.time.Duration
 
@@ -25,15 +20,12 @@ data class BookPlayViewState(
   val skipSilence: Boolean,
   val skipBackSeconds: Int,
   val skipForwardSeconds: Int,
+  /** Who (fiction) or what (non-fiction) is in the scene right now, once the book's scene scan has run. */
   val xrayChips: List<XRayChipViewState>,
-  /** The strips that play within the current chapter, as ranges of the seek bar. */
-  val stripZones: List<StripZone> = emptyList(),
-  /** The strip frame to show in place of the cover while a strip is playing. */
-  val stripFrame: ActiveStripFrame? = null,
-  /** The series book this is, for its cover art, colors and display type; null for any other book. */
+  /** The book's colors and display type. */
   val bookStyle: BookStyle? = null,
   val playbackSpeed: Float = 1F,
-  /** The book's snips plus the strips reached so far: what the Inventory card counts. */
+  /** The book's snips plus the Extras reached so far: what the Notebook card counts. */
   val inventoryCount: Int = 0,
 ) {
 
@@ -83,23 +75,16 @@ internal sealed interface BookPlayDialogViewState {
   value class SleepTimer(val viewState: SleepTimerViewState) : BookPlayDialogViewState
 
   /**
-   * Every X-Ray chip opens one. An entity with card data keeps its raw [data] and every look's resolved
-   * [imageUris] so the card can follow the playback position while it is open; [card] is how it looked when it was
-   * opened. Anything else gets empty [data], shows the X-Ray [description] and, if it has one, the X-Ray [portrait].
+   * A scene chip's card: who or what it is, and the notes the book has given so far, which reveal as playback reaches
+   * them. A topic with an unlocked Extra links to it.
    */
-  data class XRayCardDialog(
+  data class SceneCardDialog(
     val name: String,
-    val description: String,
-    val data: PlayerCardData,
-    val imageUris: Map<String, String>,
-    val portrait: String?,
+    val summary: String,
+    val notes: List<SceneNote>,
+    val fiction: Boolean,
+    val extraId: String?,
+    val extraTitle: String?,
     val openedAtMs: Long,
-  ) : BookPlayDialogViewState {
-
-    val card: ComposedPlayerCard get() = data.composeAt(openedAtMs)
-
-    val plain: Boolean get() = !data.hasGameStats
-
-    val lookImage: String? get() = card.look?.image?.let(imageUris::get)
-  }
+  ) : BookPlayDialogViewState
 }

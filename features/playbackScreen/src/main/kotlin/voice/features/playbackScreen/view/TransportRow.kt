@@ -69,7 +69,7 @@ internal fun TransportRow(
   }
 }
 
-/** The title-colored disc with a hard shadow, in the comic style of the holo cards. */
+/** The title-colored disc with a hard shadow, in the comic style of the cards. */
 @Composable
 private fun PosterPlayButton(
   playing: Boolean,

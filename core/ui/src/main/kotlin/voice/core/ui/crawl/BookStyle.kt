@@ -30,7 +30,7 @@ val DefaultPalette = CrawlPalette(
   shadow = Color(0xFFC2AB98),
 )
 
-val DefaultChapterType = CrawlDisplayType(CrawlFonts.Anton, FontWeight.Normal, 44.sp, uppercase = true)
+val DefaultChapterType = CrawlDisplayType.Default
 
 /** The display faces a book's chapter names can be set in; the research step picks one that suits the book. */
 val ChapterTypes: Map<String, CrawlDisplayType> = mapOf(

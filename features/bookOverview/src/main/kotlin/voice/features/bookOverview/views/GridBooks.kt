@@ -123,7 +123,7 @@ internal fun GridBook(
         AsyncImage(
           modifier = Modifier.fillMaxSize(),
           contentScale = ContentScale.Crop,
-          model = book.artwork ?: book.cover,
+          model = book.cover,
           placeholder = painterResource(id = UiR.drawable.album_art),
           error = painterResource(id = UiR.drawable.album_art),
           contentDescription = null,

@@ -1,6 +1,7 @@
 package voice.features.bookOverview.overview
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.runtime.Composable
@@ -18,17 +19,24 @@ import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import voice.core.common.AppInfoProvider
 import voice.core.common.DispatcherProvider
 import voice.core.common.MainScope
 import voice.core.common.comparator.sortedNaturally
+import voice.core.companion.BookLook
+import voice.core.companion.CompanionStores
 import voice.core.data.Book
 import voice.core.data.BookComparator
 import voice.core.data.BookId
 import voice.core.data.GridMode
 import voice.core.data.KioskModeDemoData
+import voice.core.data.folders.AudiobookFolders
+import voice.core.data.folders.FolderType
 import voice.core.data.repo.BookContentRepo
 import voice.core.data.repo.BookRepository
 import voice.core.data.repo.internals.dao.RecentBookSearchDao
@@ -83,6 +91,8 @@ class BookOverviewViewModel(
   private val experimentalPlaybackPersistenceFeatureFlag: FeatureFlag<Boolean>,
   @KioskModeFeatureFlagQualifier
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
+  private val stores: CompanionStores,
+  private val audiobookFolders: AudiobookFolders,
   dispatcherProvider: DispatcherProvider,
 ) {
 
@@ -117,6 +127,8 @@ class BookOverviewViewModel(
     val gridMode = remember { gridModeStore.data }
       .collectAsState(initial = null).value
       ?: return BookOverviewViewState.Loading
+    val bookIds = books.map { it.id }
+    val looks = remember(bookIds) { looksOf(bookIds) }.collectAsState(initial = emptyMap()).value
 
     val noBooks = !scannerActive && books.isEmpty()
 
@@ -148,6 +160,7 @@ class BookOverviewViewModel(
           .associate { book ->
             book.id to book.itemViewState(
               currentBookId = currentBookId,
+              look = looks[book.id],
               livePlaybackState = { livePlaybackState.value },
             )
           },
@@ -158,7 +171,7 @@ class BookOverviewViewModel(
         BookOverviewViewState.PlayButtonState.Paused
       }.takeIf { currentBookId != null },
       uniformFont = uniformFont,
-      activeBookStyle = books.firstOrNull { it.id == currentBookId }?.let { crawlEditionOf(it.content.name) },
+      activeBookStyle = currentBookId?.let { looks[it] }?.toStyle(),
       showAddBookHint = if (hasStoragePermissionBug) {
         false
       } else {
@@ -256,8 +269,16 @@ class BookOverviewViewModel(
     navigator.goTo(Destination.Settings)
   }
 
-  fun onDeckClick() {
-    navigator.goTo(Destination.Deck)
+  /** A book file picked with the library's add button: it joins the library and its guided setup opens. */
+  fun onAudioFilePicked(uri: Uri) {
+    audiobookFolders.add(uri, FolderType.SingleFile)
+    mediaScanner.scan()
+    navigator.goTo(Destination.BookSetup(BookId(uri), autoStart = true))
+  }
+
+  private fun looksOf(ids: List<BookId>): Flow<Map<BookId, BookLook>> {
+    if (ids.isEmpty()) return flowOf(emptyMap())
+    return combine(ids.map { id -> stores.look.flow(id) }) { looks -> ids.zip(looks).toMap() }
   }
 
   fun onBookClick(id: BookId) {
@@ -324,20 +345,21 @@ private val FolderPickerMigrationInstallTimeCutoff = Instant.parse("2026-06-17T0
 @Composable
 private fun Book.itemViewState(
   currentBookId: BookId?,
+  look: BookLook?,
   livePlaybackState: () -> LivePlaybackState?,
 ): State<BookOverviewItemViewState> {
   if (id != currentBookId) {
-    return rememberUpdatedState(toItemViewState())
+    return rememberUpdatedState(toItemViewState(look))
   }
   val currentPlaybackState by rememberUpdatedState(livePlaybackState)
-  return remember(this, currentBookId) {
+  return remember(this, currentBookId, look) {
     derivedStateOf {
       val livePlayback = currentPlaybackState()
       if (livePlayback != null) {
         overlay(livePlayback)
       } else {
         this
-      }.toItemViewState()
+      }.toItemViewState(look)
     }
   }
 }

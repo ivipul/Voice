@@ -4,11 +4,11 @@ import voice.core.copilot.CoPilotMessage
 import voice.core.ui.FRAME_ASPECT
 
 internal sealed interface SnipSheetViewState {
-  data class Loading(val drawsFrame: Boolean) : SnipSheetViewState
+  data class Loading(val drawsPicture: Boolean) : SnipSheetViewState
   data class Ready(val text: String, val messageId: String) : SnipSheetViewState
 }
 
-/** The comic frame slot of the snip sheet: no slot, a holographic placeholder, or the finished image. */
+/** The picture slot of the snip sheet: no slot, a placeholder while it is drawn, or the finished picture. */
 internal sealed interface SnipFrameViewState {
   data object None : SnipFrameViewState
   data object Drawing : SnipFrameViewState
@@ -16,7 +16,7 @@ internal sealed interface SnipFrameViewState {
 }
 
 internal fun SnipSheetViewState.frameState(messages: List<CoPilotMessage>): SnipFrameViewState = when (this) {
-  is SnipSheetViewState.Loading -> if (drawsFrame) SnipFrameViewState.Drawing else SnipFrameViewState.None
+  is SnipSheetViewState.Loading -> if (drawsPicture) SnipFrameViewState.Drawing else SnipFrameViewState.None
   is SnipSheetViewState.Ready -> {
     val message = messages.firstOrNull { it.id == messageId }
     val path = message?.imagePath

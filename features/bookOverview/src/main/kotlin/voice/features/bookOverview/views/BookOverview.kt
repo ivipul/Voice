@@ -108,6 +108,15 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     },
   )
 
+  val addBookLauncher = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.OpenDocument(),
+    onResult = { uri ->
+      if (uri != null) {
+        bookOverviewViewModel.onAudioFilePicked(uri)
+      }
+    },
+  )
+
   var showBottomSheet by remember { mutableStateOf(false) }
   BookOverview(
     viewState = viewState,
@@ -120,7 +129,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
-    onDeckClick = bookOverviewViewModel::onDeckClick,
+    onAddBookClick = { addBookLauncher.launch(arrayOf("audio/*", "video/mp4")) },
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
@@ -181,7 +190,7 @@ internal fun BookOverview(
   onBookFolderClick: () -> Unit,
   onFolderPickerMovedDialogDismiss: () -> Unit,
   onPlayButtonClick: (playing: Boolean) -> Unit,
-  onDeckClick: () -> Unit,
+  onAddBookClick: () -> Unit,
   onPermissionBugCardClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -241,8 +250,8 @@ internal fun BookOverview(
           )
         }
       }
-      DeckButton(
-        onClick = onDeckClick,
+      AddBookButton(
+        onClick = onAddBookClick,
         containerColor = palette.background,
         contentColor = palette.highlight,
         shadowColor = Color.White,
@@ -308,7 +317,7 @@ fun BookOverviewPreview(
       onBookFolderClick = {},
       onFolderPickerMovedDialogDismiss = {},
       onPlayButtonClick = {},
-      onDeckClick = {},
+      onAddBookClick = {},
       onPermissionBugCardClick = {},
     )
   }

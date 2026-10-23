@@ -27,7 +27,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import voice.core.data.BookId
-import voice.core.strips.ActiveStripFrame
 import voice.core.ui.crawl.CrawlDisplayType
 import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.formatTime
@@ -46,8 +45,6 @@ internal fun BookPlayContent(
   onSkipToNext: () -> Unit,
   onSkipToPrevious: () -> Unit,
   onSeek: (Duration) -> Unit,
-  onStripZoneTap: (Long) -> Unit,
-  onStripFrameClick: (ActiveStripFrame) -> Unit,
   onCurrentChapterClick: () -> Unit,
   onSmartRecapClick: () -> Unit,
   onSpeedClick: () -> Unit,
@@ -56,7 +53,7 @@ internal fun BookPlayContent(
   onXRayChipClick: (String) -> Unit,
 ) {
   val palette = crawlPaletteOf(viewState.bookStyle)
-  val cover: Any? = viewState.bookStyle?.cover ?: viewState.cover
+  val cover: Any? = viewState.cover
   var scrubFraction by remember { mutableStateOf<Float?>(null) }
   val shownTime = scrubFraction?.let { viewState.duration * it.toDouble() } ?: viewState.playedTime
   val controls: @Composable ColumnScope.() -> Unit = {
@@ -76,10 +73,8 @@ internal fun BookPlayContent(
     SliderRow(
       duration = viewState.duration,
       playedTime = viewState.playedTime,
-      stripZones = viewState.stripZones,
       palette = palette,
       onScrub = { scrubFraction = it },
-      onStripZoneTap = onStripZoneTap,
       onSeek = onSeek,
     )
     Spacer(modifier = Modifier.size(8.dp))
@@ -119,11 +114,9 @@ internal fun BookPlayContent(
       CoverStage(
         bookId = bookId,
         cover = cover,
-        stripFrame = viewState.stripFrame,
         sleepTimerState = viewState.sleepTimerState,
         palette = palette,
         onPlayClick = onPlayClick,
-        onStripFrameClick = onStripFrameClick,
         alwaysFadeSides = true,
         modifier = Modifier
           .weight(1F)
@@ -162,11 +155,9 @@ internal fun BookPlayContent(
       CoverStage(
         bookId = bookId,
         cover = cover,
-        stripFrame = viewState.stripFrame,
         sleepTimerState = viewState.sleepTimerState,
         palette = palette,
         onPlayClick = onPlayClick,
-        onStripFrameClick = onStripFrameClick,
         modifier = Modifier
           .weight(1F)
           .fillMaxWidth(),
