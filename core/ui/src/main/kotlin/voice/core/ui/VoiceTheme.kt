@@ -55,7 +55,7 @@ fun VoiceTheme(
         themedContent()
       }
     } else if (themeColorScheme == ThemeColorScheme.VoiceBlue) {
-      // Earwig's own look: cream paper, black ink and a bold red, always light.
+      // Earlobe's own look: periwinkle paper, navy ink and a bold indigo, always light.
       MaterialExpressiveTheme(colorScheme = remember { DefaultPalette.colorScheme() }) {
         themedContent()
       }

@@ -63,14 +63,16 @@ private const val OPAQUE = 0x80
 private const val WHITE = 0xFFFFFFFF.toInt()
 private const val INK = 0xFF17171C.toInt()
 
+private const val NAVY = 0xFF0B0D45.toInt()
+
 private val DEFAULT = StoredPalette(
-  background = 0xFFEDE4CA.toInt(),
-  content = INK,
-  highlight = 0xFFD62828.toInt(),
-  onHighlight = 0xFFFFF4EE.toInt(),
-  accent = INK,
-  onAccent = 0xFFFFF4EE.toInt(),
-  shadow = 0xFFC2AB98.toInt(),
+  background = 0xFFE4E5FC.toInt(),
+  content = NAVY,
+  highlight = 0xFF3238C2.toInt(),
+  onHighlight = 0xFFF4F5FF.toInt(),
+  accent = NAVY,
+  onAccent = 0xFFF4F5FF.toInt(),
+  shadow = 0xFFABAEEC.toInt(),
 )
 
 private fun rgb(r: Int, g: Int, b: Int): Int = (0xFF shl 24) or (r shl 16) or (g shl 8) or b

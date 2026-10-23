@@ -206,7 +206,7 @@ data class BookLook(
 
 @Serializable
 enum class LookSource {
-  /** The app's cream, red and black. */
+  /** The app's periwinkle and navy. */
   Default,
 
   /** Colors picked from the book's own cover. */
