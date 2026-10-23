@@ -1,5 +1,6 @@
 package voice.core.companion.materials
 
+import com.anthropic.models.messages.OutputConfig
 import dev.zacsweers.metro.Inject
 import kotlinx.serialization.Serializable
 import voice.core.ai.ClaudeClient
@@ -15,6 +16,7 @@ import voice.core.companion.firstCueMs
 import voice.core.companion.scene.BookLine
 import voice.core.companion.scene.LineWindow
 import voice.core.companion.scene.bookLines
+import voice.core.companion.scene.splittingWhenCutOff
 import voice.core.companion.scene.windowsOf
 import voice.core.companion.setup.profileText
 import voice.core.data.BookId
@@ -104,18 +106,22 @@ class MaterialStudy(
     val materials = stores.materials.get(bookId)
     if (materials.sections.isEmpty()) return
     val lines = transcriptRepository.bookLines(book)
-    val references = windowsOf(lines).flatMap { window ->
-      val answer = companionJson.decodeFromString(
-        LinkAnswer.serializer(),
-        claude.askJson(
-          system = LINK_SYSTEM,
-          prompt = linkPrompt(materials, window),
-          schema = LINK_SCHEMA,
-          model = ClaudeModels.SCAN,
-          maxTokens = LINK_MAX_TOKENS,
-        ),
-      )
-      answer.references
+    val references = mutableListOf<LinkReference>()
+    windowsOf(lines).forEach { window ->
+      splittingWhenCutOff(window) { part ->
+        val answer = companionJson.decodeFromString(
+          LinkAnswer.serializer(),
+          claude.askJson(
+            system = LINK_SYSTEM,
+            prompt = linkPrompt(materials, part),
+            schema = LINK_SCHEMA,
+            model = ClaudeModels.SCAN,
+            maxTokens = LINK_MAX_TOKENS,
+            effort = OutputConfig.Effort.LOW,
+          ),
+        )
+        references += answer.references
+      }
     }
     val cues = materialCues(references, lines, materials.sections.map { it.id }.toSet())
     val linked = stores.materials.update(bookId) { it.copy(cues = cues, linked = true) }
@@ -128,7 +134,7 @@ class MaterialStudy(
 
   private companion object {
     const val MAX_KEY_TERMS = 8
-    const val LINK_MAX_TOKENS = 2_000L
+    const val LINK_MAX_TOKENS = 8_000L
   }
 }
 

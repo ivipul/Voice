@@ -1,9 +1,11 @@
 package voice.core.companion.scene
 
+import com.anthropic.models.messages.OutputConfig
 import dev.zacsweers.metro.Inject
 import kotlinx.serialization.Serializable
 import voice.core.ai.ClaudeClient
 import voice.core.ai.ClaudeModels
+import voice.core.ai.ReplyCutOffException
 import voice.core.companion.BookKind
 import voice.core.companion.CompanionStores
 import voice.core.companion.SceneCue
@@ -50,16 +52,19 @@ class SceneIndexer(
       check(lines.isNotEmpty()) { "The book has no transcript yet" }
       val builder = SceneIndexBuilder(profile.kind)
       windowsOf(lines).forEach { window ->
-        val answer = companionJson.decodeFromString<WindowAnswer>(
-          claude.askJson(
-            system = sceneSystem(profile.kind),
-            prompt = profileText(profile) + "\n" + windowPrompt(window, builder.known()),
-            schema = WINDOW_SCHEMA,
-            model = ClaudeModels.SCAN,
-            maxTokens = WINDOW_MAX_TOKENS,
-          ),
-        )
-        builder.add(window, answer)
+        splittingWhenCutOff(window) { part ->
+          val answer = companionJson.decodeFromString<WindowAnswer>(
+            claude.askJson(
+              system = sceneSystem(profile.kind),
+              prompt = profileText(profile) + "\n" + windowPrompt(part, builder.known()),
+              schema = WINDOW_SCHEMA,
+              model = ClaudeModels.SCAN,
+              maxTokens = WINDOW_MAX_TOKENS,
+              effort = OutputConfig.Effort.LOW,
+            ),
+          )
+          builder.add(part, answer)
+        }
       }
       val index = builder.build()
       val linked = linkExistingExtras(bookId, index)
@@ -84,7 +89,12 @@ class SceneIndexer(
     if (loose.isEmpty() || index.entries.isEmpty()) return index
     val answer = try {
       companionJson.decodeFromString<LinkAnswer>(
-        claude.askJson(system = LINK_SYSTEM, prompt = linkPrompt(index, loose.map { it.id to "${it.title}: ${it.description}" }), schema = LINK_SCHEMA),
+        claude.askJson(
+          system = LINK_SYSTEM,
+          prompt = linkPrompt(index, loose.map { it.id to "${it.title}: ${it.description}" }),
+          schema = LINK_SCHEMA,
+          effort = OutputConfig.Effort.LOW,
+        ),
       )
     } catch (e: Exception) {
       Logger.w(e, "Linking Extras to topics failed")
@@ -105,7 +115,7 @@ class SceneIndexer(
   }
 
   private companion object {
-    const val WINDOW_MAX_TOKENS = 6_000L
+    const val WINDOW_MAX_TOKENS = 16_000L
   }
 }
 
@@ -137,6 +147,29 @@ internal fun windowsOf(lines: List<BookLine>, windowMs: Long = 45 * 60 * 1000L):
   }
   return windows
 }
+
+/**
+ * Runs [scan] on [window], and when the reply is cut off, on each half of it instead, so a busy stretch of the
+ * book still fits in a reply.
+ */
+internal suspend fun splittingWhenCutOff(window: LineWindow, scan: suspend (LineWindow) -> Unit) {
+  try {
+    scan(window)
+  } catch (e: ReplyCutOffException) {
+    if (window.lines.size < MIN_SPLIT_LINES) throw e
+    window.halves().forEach { splittingWhenCutOff(it, scan) }
+  }
+}
+
+internal fun LineWindow.halves(): List<LineWindow> {
+  val middle = lines.size / 2
+  return listOf(
+    LineWindow(firstIndex = firstIndex, lines = lines.subList(0, middle)),
+    LineWindow(firstIndex = firstIndex + middle, lines = lines.subList(middle, lines.size)),
+  )
+}
+
+private const val MIN_SPLIT_LINES = 40
 
 @Serializable
 internal data class WindowAnswer(val entries: List<WindowEntry>)

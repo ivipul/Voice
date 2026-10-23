@@ -60,6 +60,9 @@ object ClaudeModels {
 /** Thrown when a Claude feature is used before a key was entered in Settings. */
 class MissingApiKeyException(service: String) : IllegalStateException("No $service API key. Add one in Settings.")
 
+/** Thrown when Claude's reply hit its token limit, so it is incomplete. A smaller request may fit. */
+class ReplyCutOffException : IllegalStateException("Claude's answer was too long and got cut off")
+
 /**
  * Every Claude call in the app, through the official Anthropic SDK and the listener's own key from Settings.
  * Each call runs on [Dispatchers.IO]; the SDK retries rate limits and server errors itself.
@@ -229,7 +232,9 @@ class ClaudeClient(
       .addUserMessage(prompt)
       .outputConfig(OutputConfig.builder().effort(effort).format(format).build())
       .build()
-    client().messages().create(params).text()
+    val message = client().messages().create(params)
+    if (message.stopReason().orElse(null) == StopReason.MAX_TOKENS) throw ReplyCutOffException()
+    message.text()
   }
 
   /**
