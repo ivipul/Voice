@@ -10,7 +10,7 @@ import kotlinx.serialization.json.put
  * A small builder for the JSON Schemas Claude's structured output takes. Every property is required and no others
  * are allowed, which is what structured output expects.
  */
-internal object Schema {
+object Schema {
 
   fun obj(vararg properties: Pair<String, JsonObject>): JsonObject = buildJsonObject {
     put("type", "object")

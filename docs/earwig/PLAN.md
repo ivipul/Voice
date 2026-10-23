@@ -35,6 +35,17 @@ there) and `./gradlew voiceUnitTest`.
 5. **Baseline features**, as in The Crawl, all answered from the transcript up to the listener's position:
    Snip, Ask (typed or spoken), Recap the last 30 minutes, "What's happening?" (auto-identify), headset button
    shortcuts. Spoken answers use the phone's text-to-speech only.
+5b. **Ask picks how much of the book to send.** Clear questions are routed on the phone by their wording ("this
+   chapter", "what did he just say", "make me a ..."); the rest go to Haiku 5.5 with only the question, the chapter
+   name and the last 30 seconds, which answers with a route:
+   - recent: the last 2-10 minutes (the router picks how many);
+   - chapter: the chapter heard so far;
+   - book: if everything heard fits in about 120k characters it all goes; otherwise the summaries of the finished
+     chapters (written once by Haiku after transcription) as a cached block, the earlier passages that mention the
+     router's search terms (found on the phone, about 24k characters at most), and the last 10 minutes;
+   - web: the last few minutes plus up to 2 web searches, never for the plot;
+   - build_extra: the Extras-on-request flow below, with no transcript in the answer.
+   If the router fails, Ask answers from the last 30 minutes as before.
 5a. **Extras on request.** While listening, the user can ask for an Extra through Ask (headset or the chat), e.g.
    "make me a map of the places so far". Claude checks it against the book's existing Extras and the extension
    points. New and buildable: "On it", the build starts and the book resumes. Same as or close to an existing

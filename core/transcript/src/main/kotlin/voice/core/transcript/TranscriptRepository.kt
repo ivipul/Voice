@@ -78,6 +78,18 @@ class TranscriptRepository(
     return cues.textForPrecedingWindow(endPositionMs, windowMs).takeUnless { it.isBlank() }
   }
 
+  /** What the listener has heard of the chapter playing now. */
+  suspend fun chapterSoFar(book: Book): String? {
+    val section = book.currentSection()
+    return cuesForCurrentChapter(book)
+      ?.textBetween(section.startMs, book.content.positionInChapter)
+      ?.takeUnless { it.isBlank() }
+  }
+
+  /** The whole text of [section]; only for sections the listener has already finished. */
+  suspend fun sectionText(section: BookSection): String? =
+    cues(section.chapterId)?.textBetween(section.startMs, section.endMs + 1)?.takeUnless { it.isBlank() }
+
   private suspend fun cuesForCurrentChapter(book: Book): List<TranscriptCue>? = cues(book.currentChapter.id)
 
   private val uriCache by lazy { context.getSharedPreferences("transcript_uris", Context.MODE_PRIVATE) }

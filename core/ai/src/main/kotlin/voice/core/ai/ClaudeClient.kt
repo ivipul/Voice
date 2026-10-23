@@ -6,11 +6,13 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.anthropic.core.JsonValue
 import com.anthropic.errors.AnthropicServiceException
 import com.anthropic.errors.UnauthorizedException
+import com.anthropic.models.messages.CacheControlEphemeral
 import com.anthropic.models.messages.JsonOutputFormat
 import com.anthropic.models.messages.Message
 import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.OutputConfig
 import com.anthropic.models.messages.StopReason
+import com.anthropic.models.messages.TextBlockParam
 import com.anthropic.models.messages.WebSearchTool20260209
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
@@ -82,22 +84,21 @@ class ClaudeClient(
     }
   }
 
-  /** One answer to [prompt], as plain text. */
+  /**
+   * One answer to [prompt], as plain text. [cachedPrefix] is a large, rarely changing part of the instructions (like
+   * chapter summaries) that goes first and is cached, so repeated questions read it at a fraction of the price.
+   * [webSearches] above zero lets Claude search the web that many times first.
+   */
   suspend fun ask(
     system: String,
     prompt: String,
     model: String = ClaudeModels.CHAT,
     maxTokens: Long = DEFAULT_MAX_TOKENS,
     effort: OutputConfig.Effort = OutputConfig.Effort.LOW,
+    cachedPrefix: String? = null,
+    webSearches: Long = 0,
   ): String = call {
-    val params = MessageCreateParams.builder()
-      .model(model)
-      .maxTokens(maxTokens)
-      .system(system)
-      .addUserMessage(prompt)
-      .outputConfig(OutputConfig.builder().effort(effort).build())
-      .build()
-    client().messages().create(params).text()
+    client().messages().create(chatParams(system, prompt, model, maxTokens, effort, cachedPrefix, webSearches)).text()
   }
 
   /**
@@ -109,14 +110,10 @@ class ClaudeClient(
     prompt: String,
     model: String = ClaudeModels.CHAT,
     maxTokens: Long = DEFAULT_MAX_TOKENS,
+    cachedPrefix: String? = null,
+    webSearches: Long = 0,
   ): Flow<String> = channelFlow {
-    val params = MessageCreateParams.builder()
-      .model(model)
-      .maxTokens(maxTokens)
-      .system(system)
-      .addUserMessage(prompt)
-      .outputConfig(OutputConfig.builder().effort(OutputConfig.Effort.LOW).build())
-      .build()
+    val params = chatParams(system, prompt, model, maxTokens, OutputConfig.Effort.LOW, cachedPrefix, webSearches)
     val client = client()
     withContext(Dispatchers.IO) {
       client.messages().createStreaming(params).use { response ->
@@ -138,6 +135,34 @@ class ClaudeClient(
         }
       }
     }
+  }
+
+  private fun chatParams(
+    system: String,
+    prompt: String,
+    model: String,
+    maxTokens: Long,
+    effort: OutputConfig.Effort,
+    cachedPrefix: String?,
+    webSearches: Long,
+  ): MessageCreateParams {
+    val builder = MessageCreateParams.builder()
+      .model(model)
+      .maxTokens(maxTokens)
+      .addUserMessage(prompt)
+      .outputConfig(OutputConfig.builder().effort(effort).build())
+    if (cachedPrefix.isNullOrBlank()) {
+      builder.system(system)
+    } else {
+      builder.systemOfTextBlockParams(
+        listOf(
+          TextBlockParam.builder().text(cachedPrefix).cacheControl(CacheControlEphemeral.builder().build()).build(),
+          TextBlockParam.builder().text(system).build(),
+        ),
+      )
+    }
+    if (webSearches > 0) builder.addTool(WebSearchTool20260209.builder().maxUses(webSearches).build())
+    return builder.build()
   }
 
   /**

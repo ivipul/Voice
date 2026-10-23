@@ -32,6 +32,8 @@ class RealCoPilotPipeline(
   private val stores: CompanionStores,
   private val snipPictureRunner: SnipPictureRunner,
   private val extraRequests: ExtraRequests,
+  private val askRouter: AskRouter,
+  private val askContextBuilder: AskContextBuilder,
 ) : CoPilotPipeline {
 
   override suspend fun failureMessage(): String =
@@ -40,17 +42,38 @@ class RealCoPilotPipeline(
   /** What a spoken or typed action needs: either an answer already known, or the prompts to send to Claude. */
   private sealed interface Plan {
     data class Direct(val answer: String) : Plan
-    data class Claude(val systemPrompt: String, val userPrompt: String) : Plan
+    data class Claude(
+      val systemPrompt: String,
+      val userPrompt: String,
+      val cachedPrefix: String? = null,
+      val webSearches: Long = 0,
+    ) : Plan
   }
 
   private suspend fun profileOf(book: Book): BookProfile? = stores.profile.get(book.id).takeIf { it.summary.isNotBlank() }
 
+  /**
+   * A yes or no to our last question settles first. Otherwise the router picks where the answer comes from, and
+   * only that much of the book goes along: a few minutes, the chapter, or summaries plus matching passages.
+   */
   private suspend fun askPlan(bookId: BookId, question: String): Plan {
     val book = bookRepository.get(bookId) ?: return Plan.Direct(FALLBACK_ANSWER)
-    val recent = transcriptRepository.textForPrecedingWindow(book, EXTRA_REQUEST_WINDOW_MS)
-    extraRequests.handle(bookId, question, book.position, recent)?.let { return Plan.Direct(it) }
-    val transcript = transcriptRepository.textForPrecedingWindow(book, ASK_TRANSCRIPT_WINDOW_MS)
-    return Plan.Claude(askSystemPrompt(book, profileOf(book)), userQuestionPrompt(question, transcript))
+    extraRequests.replyToPending(bookId, question)?.let { return Plan.Direct(it) }
+    val profile = profileOf(book)
+    val lastSeconds = transcriptRepository.textForPrecedingWindow(book, ROUTER_RECENT_WINDOW_MS)
+    var decision = askRouter.route(book, profile, question, lastSeconds)
+    if (decision.route == AskRoute.BuildExtra) {
+      val recent = transcriptRepository.textForPrecedingWindow(book, EXTRA_REQUEST_WINDOW_MS)
+      extraRequests.request(bookId, question, book.position, recent)?.let { return Plan.Direct(it) }
+      decision = AskDecision(AskRoute.Recent)
+    }
+    val context = askContextBuilder.contextFor(book, decision)
+    return Plan.Claude(
+      systemPrompt = askSystemPrompt(book, profile, context.webSearch),
+      userPrompt = userQuestionPrompt(question, context.excerpts),
+      cachedPrefix = context.background,
+      webSearches = if (context.webSearch) WEB_SEARCHES else 0,
+    )
   }
 
   private suspend fun autoIdentifyPlan(bookId: BookId): Plan {
@@ -76,7 +99,12 @@ class RealCoPilotPipeline(
   private suspend fun answer(plan: Plan, label: String): String = when (plan) {
     is Plan.Direct -> plan.answer
     is Plan.Claude -> try {
-      claudeClient.ask(plan.systemPrompt, plan.userPrompt)
+      claudeClient.ask(
+        system = plan.systemPrompt,
+        prompt = plan.userPrompt,
+        cachedPrefix = plan.cachedPrefix,
+        webSearches = plan.webSearches,
+      )
     } catch (e: MissingApiKeyException) {
       NO_KEY
     } catch (e: Exception) {
@@ -93,7 +121,14 @@ class RealCoPilotPipeline(
     }
     when (val resolved = plan()) {
       is Plan.Direct -> emit(resolved.answer)
-      is Plan.Claude -> emitAll(claudeClient.askStream(resolved.systemPrompt, resolved.userPrompt))
+      is Plan.Claude -> emitAll(
+        claudeClient.askStream(
+          system = resolved.systemPrompt,
+          prompt = resolved.userPrompt,
+          cachedPrefix = resolved.cachedPrefix,
+          webSearches = resolved.webSearches,
+        ),
+      )
     }
   }
 
@@ -170,7 +205,8 @@ class RealCoPilotPipeline(
     const val STILL_TRANSCRIBING = "This book is still being transcribed. I can answer once that part is done."
     const val GENERIC_FAILURE = "Sorry, something went wrong."
     const val NO_KEY = "Add your Claude API key in Settings first, then try again."
-    val ASK_TRANSCRIPT_WINDOW_MS = 30.minutes.inWholeMilliseconds
+    const val WEB_SEARCHES = 2L
+    val ROUTER_RECENT_WINDOW_MS = 30.seconds.inWholeMilliseconds
     val AUTO_IDENTIFY_RECENT_WINDOW_MS = 60.seconds.inWholeMilliseconds
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds

@@ -19,6 +19,7 @@ import voice.core.companion.extras.ExtraBuilder
 import voice.core.companion.scene.SceneIndexer
 import voice.core.companion.setup.BookResearcher
 import voice.core.companion.setup.BookTranscriber
+import voice.core.companion.setup.ChapterSummarizer
 import voice.core.companion.setup.IdeaGenerator
 import voice.core.data.BookId
 import voice.core.logging.api.Logger
@@ -31,6 +32,7 @@ enum class SetupJob {
   Ideas,
   Build,
   Scene,
+  Summaries,
 }
 
 /**
@@ -48,12 +50,17 @@ class BookSetupRunner(
   private val ideas: IdeaGenerator,
   private val builder: ExtraBuilder,
   private val sceneIndexer: SceneIndexer,
+  private val summarizer: ChapterSummarizer,
 ) {
 
   /** Starts whatever part of the setup hasn't finished yet. Safe to call again; running jobs keep running. */
   suspend fun start(bookId: BookId) {
     val setup = stores.setup.get(bookId)
-    if (setup.transcription.state != StepState.Done) enqueue(SetupJob.Transcribe, bookId)
+    if (setup.transcription.state != StepState.Done) {
+      enqueue(SetupJob.Transcribe, bookId)
+    } else if (setup.summaries != StepState.Done) {
+      enqueue(SetupJob.Summaries, bookId)
+    }
     when {
       setup.research != StepState.Done -> enqueue(SetupJob.Research, bookId)
       setup.ideas != StepState.Done -> enqueue(SetupJob.Ideas, bookId)
@@ -105,6 +112,7 @@ class BookSetupRunner(
       }
       SetupJob.Ideas -> ideas.suggest(bookId)
       SetupJob.Scene -> sceneIndexer.index(bookId)
+      SetupJob.Summaries -> summarizer.summarize(bookId)
       SetupJob.Build -> buildCard(bookId, checkNotNull(cardId) { "Build needs a card" })
     }
   }
@@ -149,6 +157,7 @@ class BookSetupRunner(
   }
 
   private suspend fun afterTranscription(bookId: BookId) {
+    enqueue(SetupJob.Summaries, bookId, policy = ExistingWorkPolicy.REPLACE)
     stores.ideas.get(bookId).cards
       .filter { it.point == ExtensionPoint.SceneChips && it.status == IdeaStatus.Building }
       .forEach { enqueue(SetupJob.Build, bookId, cardId = it.id) }

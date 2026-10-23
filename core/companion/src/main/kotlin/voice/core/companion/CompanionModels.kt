@@ -43,6 +43,8 @@ data class BookSetup(
   val ideasError: String? = null,
   val scene: StepState = StepState.NotStarted,
   val sceneError: String? = null,
+  /** Short summaries of each chapter, which let Ask answer questions about the whole book cheaply. */
+  val summaries: StepState = StepState.NotStarted,
   /** The listener closed the setup screen once; the library then stops pointing at it. */
   val dismissed: Boolean = false,
 )
@@ -216,4 +218,10 @@ data class StoredPalette(
   val accent: Int,
   val onAccent: Int,
   val shadow: Int,
+)
+
+/** A few sentences per chapter, keyed by [voice.core.transcript.BookSection.key]. */
+@Serializable
+data class ChapterSummaries(
+  val byKey: Map<String, String> = emptyMap(),
 )

@@ -31,9 +31,16 @@ internal const val SPOKEN_RULES = "Answer in two to four short sentences that so
   "only: no markdown, no lists, no headings, no emoji. Base the answer on the excerpt; if the excerpt doesn't " +
   "cover the question, say so briefly and answer from what is generally known about the book up to this point."
 
-internal fun askSystemPrompt(book: Book, profile: BookProfile?): String =
-  "You are a friendly companion who knows the audiobook the listener is hearing and answers their questions " +
-    "about it. ${bookContext(book, profile)} $SPOKEN_RULES"
+internal fun askSystemPrompt(book: Book, profile: BookProfile?, webSearch: Boolean = false): String {
+  val web = if (webSearch) {
+    " This question reaches beyond the book, so search the web if it helps, but never look up or reveal the " +
+      "book's plot. Don't say that you searched; just answer."
+  } else {
+    ""
+  }
+  return "You are a friendly companion who knows the audiobook the listener is hearing and answers their " +
+    "questions about it. ${bookContext(book, profile)}$web $SPOKEN_RULES"
+}
 
 internal fun autoIdentifySystemPrompt(book: Book, profile: BookProfile?): String {
   val task = if (profile?.kind == BookKind.NonFiction) {
@@ -71,12 +78,13 @@ internal fun snipSystemPrompt(book: Book, profile: BookProfile?): String {
     "No bullet points, no preamble, no markdown."
 }
 
-fun userQuestionPrompt(question: String, transcriptWindow: String?): String =
-  if (transcriptWindow != null) {
-    "Recent excerpt from the book (the last 30 minutes):\n\"\"\"\n$transcriptWindow\n\"\"\"\n\nQuestion: $question"
-  } else {
-    "There is no transcript yet, so answer from what is generally known about the book.\n\nQuestion: $question"
+fun userQuestionPrompt(question: String, excerpts: List<AskContext.Excerpt>): String = buildString {
+  if (excerpts.isEmpty()) {
+    append("There is no transcript for this part yet, so answer from what is generally known about the book.\n\n")
   }
+  excerpts.forEach { append("${it.label}:\n\"\"\"\n${it.text}\n\"\"\"\n\n") }
+  append("Question: $question")
+}
 
 fun transcriptOnlyPrompt(transcriptWindow: String): String =
   "Excerpt from the book:\n\"\"\"\n$transcriptWindow\n\"\"\""

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Extras asked for in the middle of listening, through Ask. A request that fits the extension points is built right
  * away; one that repeats or overlaps an Extra the book already has, or that can only be built as a nearby
- * alternative, waits for the listener's yes. Everything else is an ordinary question and gets [handle] null.
+ * alternative, waits for the listener's yes. Whether an utterance is a request at all is decided before, in Ask.
  */
 @SingleIn(AppScope::class)
 @Inject
@@ -39,27 +39,32 @@ class ExtraRequests(
   fun awaitingReply(bookId: BookId): Boolean = pendingFor(bookId) != null
 
   /**
-   * The spoken or typed reply to [utterance] when it is about an on-demand Extra, or null for any other question.
+   * The reply when [utterance] answers a yes-or-no question of ours: yes starts the build, no drops it. Anything
+   * else drops the question too and returns null, so the utterance is handled as a new question.
+   */
+  suspend fun replyToPending(bookId: BookId, utterance: String): String? {
+    val waiting = pendingFor(bookId) ?: return null
+    pending.remove(bookId)
+    return when {
+      isAffirmative(utterance) -> {
+        start(bookId, waiting.card)
+        startedReply(waiting.card)
+      }
+      isNegative(utterance) -> DECLINED_REPLY
+      else -> null
+    }
+  }
+
+  /**
+   * The reply to a request for an Extra, or null when Claude reads [utterance] as an ordinary question after all.
    * [recentTranscript] is what was playing when the listener asked, so the Extra is about that.
    */
-  suspend fun handle(
+  suspend fun request(
     bookId: BookId,
     utterance: String,
     positionMs: Long,
     recentTranscript: String?,
   ): String? {
-    val waiting = pendingFor(bookId)
-    if (waiting != null) {
-      pending.remove(bookId)
-      when {
-        isAffirmative(utterance) -> {
-          start(bookId, waiting.card)
-          return startedReply(waiting.card)
-        }
-        isNegative(utterance) -> return DECLINED_REPLY
-      }
-    }
-    if (!looksLikeExtraRequest(utterance)) return null
     val plan = try {
       plan(bookId, utterance, recentTranscript)
     } catch (e: Exception) {
@@ -237,11 +242,8 @@ private val EXTRA_NOUN = Regex(
   RegexOption.IGNORE_CASE,
 )
 
-/**
- * A cheap first look so ordinary questions don't pay for a second Claude call: a request names something to make
- * and something to make it with.
- */
-internal fun looksLikeExtraRequest(utterance: String): Boolean =
+/** A request names something to make and what to make; Ask uses this to skip asking Claude for the obvious ones. */
+fun looksLikeExtraRequest(utterance: String): Boolean =
   MAKE_VERB.containsMatchIn(utterance) && EXTRA_NOUN.containsMatchIn(utterance)
 
 internal fun requestBrief(utterance: String, recentTranscript: String?): String = buildString {
