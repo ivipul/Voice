@@ -147,7 +147,7 @@ class MigrationTests {
   fun `defaults are used when SharedPreferences empty`() = runTest {
     sharedPreferences.edit { clear() }
 
-    assertEquals(expected = 20, actual = testGraph.seekTimeStore.data.first())
+    assertEquals(expected = 15, actual = testGraph.seekTimeStore.data.first())
     assertEquals(expected = 2, actual = testGraph.autoRewindAmountStore.data.first())
     assertEquals(expected = ThemeMode.FollowSystem, actual = testGraph.themeModeStore.data.first())
     assertEquals(expected = ThemeColorScheme.VoiceBlue, actual = testGraph.themeColorSchemeStore.data.first())
@@ -160,7 +160,7 @@ class MigrationTests {
       putInt("OTHER_KEY", 50)
     }
 
-    assertEquals(expected = 20, actual = testGraph.seekTimeStore.data.first())
+    assertEquals(expected = 15, actual = testGraph.seekTimeStore.data.first())
     assertEquals(expected = true, actual = sharedPreferences.contains("OTHER_KEY"))
   }
 
