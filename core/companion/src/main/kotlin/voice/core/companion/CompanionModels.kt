@@ -127,6 +127,8 @@ data class IdeaCard(
   val features: List<IdeaFeature> = emptyList(),
   /** The section of the book's PDF material this Extra brings to life, if any. */
   val materialSectionId: String? = null,
+  /** What the listener typed on the card to add to or change the idea. */
+  val listenerNote: String = "",
 ) {
 
   val includedFeatures: List<String> get() = features.filter { it.included }.map { it.label }

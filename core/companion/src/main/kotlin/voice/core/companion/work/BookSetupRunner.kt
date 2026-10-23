@@ -87,8 +87,10 @@ class BookSetupRunner(
     val _ = WorkManager.getInstance(context).cancelUniqueWork(workName(SetupJob.Transcribe, bookId, cardId = null))
   }
 
-  suspend fun build(bookId: BookId, cardId: String) {
-    updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Building, error = null) }
+  suspend fun build(bookId: BookId, cardId: String, note: String? = null) {
+    updateCard(bookId, cardId) { card ->
+      card.copy(status = IdeaStatus.Building, error = null, listenerNote = note?.trim() ?: card.listenerNote)
+    }
     enqueue(SetupJob.Build, bookId, cardId = cardId)
   }
 

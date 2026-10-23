@@ -85,7 +85,7 @@ internal fun IdeasSection(
     IdeaDeck(
       deck = viewState.deck,
       palette = palette,
-      onBuild = viewModel::onBuild,
+      onBuild = { card, note -> viewModel.onBuild(card, note) },
       onSkip = viewModel::onSkip,
       onToggleFeature = viewModel::onToggleFeature,
     )
@@ -139,7 +139,7 @@ private val ExtensionPoint.labelRes: Int
 private fun IdeaDeck(
   deck: IdeaDeckViewState,
   palette: CrawlPalette,
-  onBuild: (IdeaCard) -> Unit,
+  onBuild: (IdeaCard, String) -> Unit,
   onSkip: (IdeaCard) -> Unit,
   onToggleFeature: (IdeaCard, Int) -> Unit,
 ) {
@@ -160,7 +160,7 @@ private fun IdeaDeck(
         number = deck.position + 1,
         total = deck.total,
         palette = palette,
-        onBuild = { onBuild(card) },
+        onBuild = { note -> onBuild(card, note) },
         onSkip = { onSkip(card) },
         onToggleFeature = { onToggleFeature(card, it) },
       )
@@ -188,10 +188,11 @@ private fun IdeaDeckCard(
   number: Int,
   total: Int,
   palette: CrawlPalette,
-  onBuild: () -> Unit,
+  onBuild: (note: String) -> Unit,
   onSkip: () -> Unit,
   onToggleFeature: (Int) -> Unit,
 ) {
+  var note by rememberSaveable(card.id) { mutableStateOf(card.listenerNote) }
   SetupCard(palette) {
     DeckProgress(done = number, total = total, palette = palette)
     Spacer(modifier = Modifier.height(4.dp))
@@ -229,6 +230,15 @@ private fun IdeaDeckCard(
         FeatureRow(feature = feature, palette = palette, onToggle = { onToggleFeature(index) })
       }
     }
+    OutlinedTextField(
+      value = note,
+      onValueChange = { note = it },
+      placeholder = { Text(text = stringResource(StringsR.string.setup_idea_note_placeholder)) },
+      textStyle = MaterialTheme.typography.bodyMedium,
+      maxLines = 4,
+      shape = RoundedCornerShape(12.dp),
+      modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+    )
     Spacer(modifier = Modifier.height(8.dp))
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -239,7 +249,7 @@ private fun IdeaDeckCard(
         Text(text = stringResource(StringsR.string.setup_idea_skip), color = palette.content.copy(alpha = 0.7F))
       }
       Button(
-        onClick = onBuild,
+        onClick = { onBuild(note) },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = palette.content, contentColor = palette.background),
         contentPadding = PaddingValues(horizontal = 28.dp, vertical = 12.dp),

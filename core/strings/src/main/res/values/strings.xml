@@ -579,4 +579,6 @@
     <string name="setup.idea.from_pdf">From the PDF</string>
     <!-- Button on the book setup screen to add a transcript file or the PDF that came with the book. -->
     <string name="setup.add_files">Add transcript or PDF</string>
+    <!-- Placeholder in the text box at the bottom of an idea card, where the listener suggests additions to the idea. -->
+    <string name="setup.idea.note_placeholder">Add or change something…</string>
 </resources>

@@ -143,8 +143,8 @@ class BookSetupViewModel(
     runner.moreIdeas(bookId)
   }
 
-  fun onBuild(card: IdeaCard) {
-    scope.launch { runner.build(bookId, card.id) }
+  fun onBuild(card: IdeaCard, note: String? = null) {
+    scope.launch { runner.build(bookId, card.id, note) }
   }
 
   fun onSkip(card: IdeaCard) {

@@ -195,6 +195,7 @@ internal fun materialBrief(section: MaterialSection): String =
 internal fun IdeaCard.featureText(): String = buildString {
   if (includedFeatures.isNotEmpty()) append("\nInclude: ${includedFeatures.joinToString("; ")}")
   if (leftOutFeatures.isNotEmpty()) append("\nLeave out: ${leftOutFeatures.joinToString("; ")}")
+  if (listenerNote.isNotBlank()) append("\nThe listener adds (follow this): ${listenerNote.trim()}")
 }
 
 internal val STYLE_SCHEMA = Schema.obj(

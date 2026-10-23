@@ -36,4 +36,18 @@ class IdeaFeaturesTest {
 
     assertEquals("", card.featureText())
   }
+
+  @Test
+  fun theListenersNoteGoesIntoTheBuildBrief() {
+    val card = IdeaCard(
+      id = "a",
+      title = "Chapter quiz",
+      description = "",
+      point = ExtensionPoint.Shelf,
+      features = listOf(IdeaFeature("Hints")),
+      listenerNote = "  Make it multiple choice ",
+    )
+
+    assertEquals("\nInclude: Hints\nThe listener adds (follow this): Make it multiple choice", card.featureText())
+  }
 }
