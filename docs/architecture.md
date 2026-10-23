@@ -2,7 +2,7 @@
 
 ## Overview
 
-Voice is built on a **modular, layered architecture**. The design separates infrastructure, shared domain logic, and user-facing features.
+Earwig (a fork of Voice) is built on a **modular, layered architecture**. The design separates infrastructure, shared domain logic, and user-facing features.
 This modularization improves build times, testability, and maintainability, while keeping feature ownership clear.
 
 At a high level:
@@ -39,12 +39,17 @@ Core modules provide the underlying services and abstractions:
 
   * `:core:playback` – Audio playback logic using ExoPlayer
   * `:core:sleeptimer:api` & `:core:sleeptimer:impl` – Sleep timer contracts and implementation
-  * `:core:transcript` – Local transcript JSON parsing and time-window lookups
-  * `:core:copilot` – Jev/Gemini routing pipeline behind every AI co-pilot action, shared by
-    the Bluetooth-triggered modes (`:core:playback`) and the Feed's typed/spoken interactions
-    (`:features:playbackScreen`). Answers are written in the Dungeon Crawler Carl System AI's voice
-    unless the user turns "Use System AI voice" off in Co-Pilot settings; "Keep it clean" (off by default)
-    then forbids swearing and sexual lines
+  * `:core:transcript` – Transcript JSON parsing, the per-book files folder, and time-window lookups
+  * `:core:ai` – Clients for the listener's own API keys: Claude (answers, research, Extras), Deepgram
+    (transcription) and Ideogram (pictures and covers). Keys are typed into Settings and kept on the device
+  * `:core:companion` – A book's guided setup and everything it produces, stored as JSON per book: Deepgram
+    transcription in resumable parts, online research, idea cards and the listener's own idea check, shelf
+    Extras (sandboxed HTML pages and the bridge they call), scene chips, and the book's look (cover colors or a
+    generated cover). Setup jobs run in WorkManager so they outlive the screen
+  * `:core:copilot` – The pipeline behind every AI action (Ask, What's happening now, Recap, Snip), shared by
+    the headset buttons (`:core:playback`) and the book chat (`:features:playbackScreen`). Answers come from
+    Claude, grounded in the transcript up to the listener's position, and are read out with the phone's
+    text-to-speech
 
 * **Utility Modules**
 
@@ -63,14 +68,16 @@ Core modules provide the underlying services and abstractions:
 Feature modules are screen- or flow-based. Each module owns its UI (Compose) and presentation logic, while delegating to `:core` modules for
 data and services:
 
-* `:features:playbackScreen` – Main playback interface, the holo cards and The Deck (every crawler's card in one gallery, opened from the library)
-* `:features:bookOverview` – Library / book list
+* `:features:playbackScreen` – Main playback interface, scene chips and their cards, the book chat
+* `:features:bookOverview` – Library / book list, and the add-a-book button that starts a book's setup
 * `:features:sleepTimer` – Sleep timer control UI
 * `:features:settings` – App settings
 * `:features:folderPicker` – Folder selection flow
 * `:features:cover` – Cover art management
 * `:features:onboarding` – First-time user flow
-* `:features:bookmark` – The Inventory: snips and comic strips
+* `:features:bookmark` – The Notebook: snips and the Extras shelf
+* `:features:bookSetup` – A book's guided setup: transcription progress, research, idea cards, own ideas, look
+* `:features:extras` – The viewer for one shelf Extra, a sandboxed WebView backed by `:core:companion`
 * `:features:widget` – Homescreen widget support
 * `:features:review:play` & `:features:review:noop` – App review prompts
 
