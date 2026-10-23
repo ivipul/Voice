@@ -178,6 +178,7 @@ class BookPlayViewModel(
     val skipBackSeconds by remember { seekTimeStore.data }.collectAsState(initial = 15)
     val skipForwardSeconds by remember { seekForwardTimeStore.data }.collectAsState(initial = 30)
     val scene by remember(bookId) { stores.scene.flow(bookId) }.collectAsState(initial = null)
+    val materials by remember(bookId) { stores.materials.flow(bookId) }.collectAsState(initial = null)
     val shelf by remember(bookId) { stores.shelf.flow(bookId) }.collectAsState(initial = null)
     val look by remember(bookId) { stores.look.flow(bookId) }.collectAsState(initial = null)
     val extras = shelf?.extras.orEmpty()
@@ -186,6 +187,9 @@ class BookPlayViewModel(
     val snipCount = messagesByBook[bookId].orEmpty().count { it.isSnip }
     val sceneChips = scene?.activeAt(book.position)?.map {
       BookPlayViewState.XRayChipViewState(id = it.id, label = it.name)
+    }.orEmpty()
+    val materialChips = materials?.activeAt(book.position)?.map {
+      BookPlayViewState.XRayChipViewState(id = MATERIAL_CHIP_PREFIX + it.id, label = it.title)
     }.orEmpty()
     val bookStyle = remember(look) { look?.toStyle() }
     return BookPlayViewState(
@@ -200,7 +204,7 @@ class BookPlayViewModel(
       skipSilence = book.content.skipSilence,
       skipBackSeconds = skipBackSeconds,
       skipForwardSeconds = skipForwardSeconds,
-      xrayChips = sceneChips,
+      xrayChips = materialChips + sceneChips,
       bookStyle = bookStyle,
       playbackSpeed = book.content.playbackSpeed,
       inventoryCount = snipCount + extras.count { it.unlockAtMs <= book.position },
@@ -404,6 +408,10 @@ class BookPlayViewModel(
   }
 
   fun onXRayChipClick(id: String) {
+    if (id.startsWith(MATERIAL_CHIP_PREFIX)) {
+      onMaterialChipClick(id.removePrefix(MATERIAL_CHIP_PREFIX))
+      return
+    }
     scope.launch {
       val book = currentBook() ?: return@launch
       val index = stores.scene.get(bookId)
@@ -414,6 +422,27 @@ class BookPlayViewModel(
         summary = entry.summary,
         notes = entry.notes,
         fiction = index.kind == BookKind.Fiction,
+        extraId = extra?.takeIf { it.unlockAtMs <= book.position }?.id,
+        extraTitle = extra?.title,
+        openedAtMs = book.position,
+      )
+    }
+  }
+
+  /** A chip for a section of the book's PDF: what the section holds, and the Extra built from it once unlocked. */
+  private fun onMaterialChipClick(sectionId: String) {
+    scope.launch {
+      val book = currentBook() ?: return@launch
+      val materials = stores.materials.get(bookId)
+      val section = materials.sections.firstOrNull { it.id == sectionId } ?: return@launch
+      val file = materials.files.firstOrNull { it.id == section.fileId }
+      val extra = section.extraId?.let { extraId -> stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId } }
+      val source = listOfNotNull(file?.name, section.pages.takeIf { it.isNotBlank() }?.let { "pages $it" }).joinToString(", ")
+      dialogState.value = BookPlayDialogViewState.SceneCardDialog(
+        name = section.title,
+        summary = listOf(section.summary, source).filter { it.isNotBlank() }.joinToString("\n"),
+        notes = emptyList(),
+        fiction = false,
         extraId = extra?.takeIf { it.unlockAtMs <= book.position }?.id,
         extraTitle = extra?.title,
         openedAtMs = book.position,
@@ -703,3 +732,6 @@ private fun SleepTimerState.toViewState(): BookPlayViewState.SleepTimerViewState
   is SleepTimerState.Enabled.WithDuration -> BookPlayViewState.SleepTimerViewState.Enabled.WithDuration(this.leftDuration)
   SleepTimerState.Enabled.WithEndOfChapter -> BookPlayViewState.SleepTimerViewState.Enabled.WithEndOfChapter
 }
+
+/** Chips for sections of the book's PDF share the X-Ray row with scene chips; this keeps their ids apart. */
+private const val MATERIAL_CHIP_PREFIX = "pdf:"

@@ -274,23 +274,24 @@ class BookOverviewViewModel(
   }
 
   /** A book file picked with the library's add button: it joins the library and its guided setup opens. */
-  /** Audio files, each optionally picked with its transcript `.json`, which then skips cloud transcription. */
+  /**
+   * Audio files, each optionally picked with its transcript (which then skips cloud transcription) and companion
+   * PDFs (which Claude studies for Extras).
+   */
   fun onFilesPicked(uris: List<Uri>) {
     scope.launch {
       val picked = transcriptImporter.sort(uris)
       if (picked.isEmpty()) return@launch
-      picked.forEach { (audio, transcript) ->
-        audiobookFolders.add(audio, FolderType.SingleFile)
-        if (transcript != null) {
-          val _ = transcriptImporter.import(audio, transcript)
-        }
+      picked.forEach { book ->
+        audiobookFolders.add(book.audio, FolderType.SingleFile)
+        transcriptImporter.import(book)
       }
-      navigator.goTo(Destination.BookSetup(BookId(picked.first().first), autoStart = true))
+      navigator.goTo(Destination.BookSetup(BookId(picked.first().audio), autoStart = true))
       // The folder list is saved in the background, so the scan waits until it holds the new files.
       val _ = withTimeoutOrNull(5.seconds) {
         audiobookFolders.all().first { folders ->
           val saved = folders.values.flatten().map { it.uri }.toSet()
-          picked.all { (audio, _) -> audio in saved }
+          picked.all { it.audio in saved }
         }
       }
       mediaScanner.scan(restartIfScanning = true)

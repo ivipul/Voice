@@ -16,6 +16,7 @@ import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaStatus
 import voice.core.companion.StepState
 import voice.core.companion.extras.ExtraBuilder
+import voice.core.companion.materials.MaterialStudy
 import voice.core.companion.scene.SceneIndexer
 import voice.core.companion.setup.BookResearcher
 import voice.core.companion.setup.BookTranscriber
@@ -33,6 +34,7 @@ enum class SetupJob {
   Build,
   Scene,
   Summaries,
+  Materials,
 }
 
 /**
@@ -51,6 +53,7 @@ class BookSetupRunner(
   private val builder: ExtraBuilder,
   private val sceneIndexer: SceneIndexer,
   private val summarizer: ChapterSummarizer,
+  private val materials: MaterialStudy,
 ) {
 
   /** Starts whatever part of the setup hasn't finished yet. Safe to call again; running jobs keep running. */
@@ -64,6 +67,9 @@ class BookSetupRunner(
     when {
       setup.research != StepState.Done -> enqueue(SetupJob.Research, bookId)
       setup.ideas != StepState.Done -> enqueue(SetupJob.Ideas, bookId)
+    }
+    if (setup.research == StepState.Done && setup.materials != StepState.Done && stores.materials.get(bookId).files.isNotEmpty()) {
+      enqueue(SetupJob.Materials, bookId)
     }
   }
 
@@ -108,11 +114,14 @@ class BookSetupRunner(
       }
       SetupJob.Research -> {
         researcher.research(bookId)
+        // Ideas draw on the PDFs, so they are read first; a PDF that can't be read still leaves ideas to suggest.
+        val _ = runCatching { materials.run(bookId) }
         ideas.suggest(bookId)
       }
       SetupJob.Ideas -> ideas.suggest(bookId)
       SetupJob.Scene -> sceneIndexer.index(bookId)
       SetupJob.Summaries -> summarizer.summarize(bookId)
+      SetupJob.Materials -> materials.run(bookId)
       SetupJob.Build -> buildCard(bookId, checkNotNull(cardId) { "Build needs a card" })
     }
   }
@@ -158,6 +167,7 @@ class BookSetupRunner(
 
   private suspend fun afterTranscription(bookId: BookId) {
     enqueue(SetupJob.Summaries, bookId, policy = ExistingWorkPolicy.REPLACE)
+    if (stores.materials.get(bookId).files.isNotEmpty()) enqueue(SetupJob.Materials, bookId, policy = ExistingWorkPolicy.REPLACE)
     stores.ideas.get(bookId).cards
       .filter { it.point == ExtensionPoint.SceneChips && it.status == IdeaStatus.Building }
       .forEach { enqueue(SetupJob.Build, bookId, cardId = it.id) }

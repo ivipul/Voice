@@ -67,7 +67,7 @@ class RealCoPilotPipeline(
       extraRequests.request(bookId, question, book.position, recent)?.let { return Plan.Direct(it) }
       decision = AskDecision(AskRoute.Recent)
     }
-    val context = askContextBuilder.contextFor(book, decision)
+    val context = askContextBuilder.contextFor(book, decision, question)
     return Plan.Claude(
       systemPrompt = askSystemPrompt(book, profile, context.webSearch),
       userPrompt = userQuestionPrompt(question, context.excerpts),

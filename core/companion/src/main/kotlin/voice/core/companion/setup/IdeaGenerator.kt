@@ -11,6 +11,7 @@ import voice.core.companion.FeasibilityVerdict
 import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaFeature
 import voice.core.companion.IdeaStatus
+import voice.core.companion.MaterialSection
 import voice.core.companion.Schema
 import voice.core.companion.StepState
 import voice.core.companion.companionJson
@@ -35,10 +36,13 @@ class IdeaGenerator(
     return try {
       val profile = stores.profile.get(bookId)
       val existing = stores.ideas.get(bookId).cards
+      val sections = stores.materials.get(bookId).sections
       val answer = companionJson.decodeFromString<IdeaAnswer>(
-        claude.askJson(system = IDEAS_SYSTEM, prompt = ideasPrompt(profile, existing), schema = IDEAS_SCHEMA),
+        claude.askJson(system = IDEAS_SYSTEM, prompt = ideasPrompt(profile, existing, sections), schema = IDEAS_SCHEMA),
       )
+      val sectionIds = sections.map { it.id }.toSet()
       val cards = answer.ideas.mapNotNull { it.toCard(fromListener = false) }
+        .map { card -> card.copy(materialSectionId = card.materialSectionId?.takeIf { it in sectionIds }) }
       stores.ideas.update(bookId) { board ->
         board.copy(cards = board.cards.filter { it.status != IdeaStatus.Suggested } + cards)
       }
@@ -94,6 +98,7 @@ internal data class IdeaItem(
   val point: String,
   val kind: String,
   val features: List<String> = emptyList(),
+  val materialSection: String? = null,
 ) {
   fun toCard(fromListener: Boolean): IdeaCard? {
     val extensionPoint = extensionPointOf(point) ?: return null
@@ -106,6 +111,7 @@ internal data class IdeaItem(
       kind = kind,
       fromListener = fromListener,
       features = featuresOf(features),
+      materialSectionId = materialSection?.takeIf { extensionPoint == ExtensionPoint.Shelf },
     )
   }
 }
@@ -163,13 +169,26 @@ internal const val IDEAS_SYSTEM = "You design companion Extras for an audiobook 
   "leave features empty for scene_chips. Why is one sentence on why it suits this book. Kind is one word for shelf Extras (calculator, explainer, quiz, timeline, glossary, map, " +
   "tracker, flashcards) and empty otherwise.\n\n$EXTENSION_POINTS"
 
-internal fun ideasPrompt(profile: BookProfile, existing: List<IdeaCard>): String = buildString {
+internal fun ideasPrompt(
+  profile: BookProfile,
+  existing: List<IdeaCard>,
+  sections: List<MaterialSection> = emptyList(),
+): String = buildString {
   append(profileText(profile))
+  if (sections.isNotEmpty()) {
+    append("\nThe book comes with a PDF the narrator refers to. Its sections:\n")
+    sections.forEach { append("- ${it.id}: ${it.title} (${it.contentType}, pages ${it.pages}). ${it.summary}\n") }
+    append(
+      "Lean on the PDF: make at least half of the shelf ideas turn one of its sections into something interactive " +
+        "or visual (a checklist that remembers, a calculator, an infographic, a tracker, a quiz) and set " +
+        "materialSection to that section's id. Ideas that don't use it have materialSection null.\n",
+    )
+  }
   if (existing.isNotEmpty()) {
     append("\nAlready on the board (don't repeat these):\n")
     existing.forEach { append("- ${it.title} (${it.point.name}, ${it.status.name})\n") }
   }
-  append("\nSuggest 4 ideas: one snip_picture style, ")
+  append("\nSuggest ${if (sections.isEmpty()) 4 else 5} ideas: one snip_picture style, ")
   val chips = if (profile.kind == BookKind.Fiction) "characters" else "topics"
   append("one scene_chips for $chips if the book would benefit, and the rest shelf Extras.")
 }
@@ -206,6 +225,7 @@ internal val IDEAS_SCHEMA = Schema.obj(
       "point" to Schema.enum(POINTS),
       "kind" to Schema.string(),
       "features" to Schema.array(Schema.string()),
+      "materialSection" to Schema.nullableString("The id of the PDF section it brings to life, or null."),
     ),
   ),
 )

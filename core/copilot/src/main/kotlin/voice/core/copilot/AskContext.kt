@@ -1,7 +1,10 @@
 package voice.core.copilot
 
 import dev.zacsweers.metro.Inject
+import voice.core.companion.BookMaterials
 import voice.core.companion.CompanionStores
+import voice.core.companion.MaterialSection
+import voice.core.companion.activeAt
 import voice.core.data.Book
 import voice.core.transcript.BookSection
 import voice.core.transcript.TranscriptCue
@@ -32,11 +35,16 @@ class AskContextBuilder(
   private val stores: CompanionStores,
 ) {
 
-  suspend fun contextFor(book: Book, decision: AskDecision): AskContext = when (decision.route) {
-    AskRoute.Recent, AskRoute.BuildExtra -> AskContext(listOfNotNull(recent(book, decision.recentMinutes)))
-    AskRoute.Web -> AskContext(listOfNotNull(recent(book, decision.recentMinutes)), webSearch = true)
-    AskRoute.Chapter -> AskContext(listOfNotNull(chapter(book) ?: recent(book, BOOK_RECENT_MINUTES)))
-    AskRoute.Book -> bookContext(book, decision.searchTerms)
+  suspend fun contextFor(book: Book, decision: AskDecision, question: String = ""): AskContext {
+    val context = when (decision.route) {
+      AskRoute.Recent, AskRoute.BuildExtra -> AskContext(listOfNotNull(recent(book, decision.recentMinutes)))
+      AskRoute.Web -> AskContext(listOfNotNull(recent(book, decision.recentMinutes)), webSearch = true)
+      AskRoute.Chapter -> AskContext(listOfNotNull(chapter(book) ?: recent(book, BOOK_RECENT_MINUTES)))
+      AskRoute.Book -> bookContext(book, decision.searchTerms)
+    }
+    val material = relevantSections(stores.materials.get(book.id), book.position, question + " " + decision.searchTerms.joinToString(" "))
+      .map { AskContext.Excerpt("From the PDF that comes with the book, \"${it.title}\" (pages ${it.pages})", it.extract) }
+    return context.copy(excerpts = material + context.excerpts)
   }
 
   private suspend fun recent(book: Book, minutes: Int): AskContext.Excerpt? =
@@ -83,6 +91,23 @@ class AskContextBuilder(
 
 private fun List<TranscriptCue>.within(section: BookSection): List<TranscriptCue> =
   filter { it.timestampStartMs >= section.startMs && it.timestampStartMs <= section.endMs }
+
+/**
+ * The PDF sections an answer can use: the ones the narration is referring to right now, then the ones the question
+ * names by title or key term. At most [max], so the PDF never crowds out the book.
+ */
+internal fun relevantSections(
+  materials: BookMaterials,
+  positionMs: Long,
+  question: String,
+  max: Int = 2,
+): List<MaterialSection> {
+  val words = question.lowercase()
+  val named = materials.sections.filter { section ->
+    (listOf(section.title) + section.keyTerms).any { term -> term.length >= 4 && term.lowercase() in words }
+  }
+  return (materials.activeAt(positionMs) + named).distinctBy { it.id }.filter { it.extract.isNotBlank() }.take(max)
+}
 
 /** The summaries of [finished] chapters, in order, or null when none are written yet. */
 internal fun summariesBlock(

@@ -200,8 +200,9 @@ private fun IdeaDeckCard(
     } else {
       stringResource(StringsR.string.setup_idea_number, number, total)
     }
+    val source = if (card.materialSectionId != null) " · ${stringResource(StringsR.string.setup_idea_from_pdf).uppercase()}" else ""
     Text(
-      text = "${label.uppercase()} · ${stringResource(card.point.labelRes).uppercase()}",
+      text = "${label.uppercase()} · ${stringResource(card.point.labelRes).uppercase()}$source",
       style = CrawlType.label,
       color = palette.content.copy(alpha = 0.6F),
     )

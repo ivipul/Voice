@@ -46,6 +46,16 @@ there) and `./gradlew voiceUnitTest`.
    - web: the last few minutes plus up to 2 web searches, never for the plot;
    - build_extra: the Extras-on-request flow below, with no transcript in the answer.
    If the router fails, Ask answers from the last 30 minutes as before.
+5c. **Companion PDFs and transcripts picked with the book.** Android gives a picked file no access to its folder,
+   so Add book takes several files: the audiobook plus, optionally, its transcript (`Book.json`, `Book.m4b.json`,
+   `Book.srt`; the app's format, whisper.cpp JSON as OpenAudible exports it, openai-whisper JSON, or SubRip) and
+   any PDFs named after it (with one audiobook picked, every transcript and PDF picked belongs to it). A readable
+   transcript skips Deepgram. Each PDF is read once by Claude (Sonnet, PDF input) into sections with a faithful
+   plain-text extract, key terms and content type; once transcribed, Haiku finds where the narration refers to
+   each section (model picks lines, code sets times, 4 minute chips). Idea cards lean on the PDF (at least half of
+   the shelf ideas, tagged "From the PDF"), Extras are built from the section extract and unlock at the first
+   reference, the player shows a chip per referenced section, and Ask adds the relevant section extract. Books in
+   added folders also find `Book.m4b.json` and `.srt` transcripts beside the audio.
 5a. **Extras on request.** While listening, the user can ask for an Extra through Ask (headset or the chat), e.g.
    "make me a map of the places so far". Claude checks it against the book's existing Extras and the extension
    points. New and buildable: "On it", the build starts and the book resumes. Same as or close to an existing

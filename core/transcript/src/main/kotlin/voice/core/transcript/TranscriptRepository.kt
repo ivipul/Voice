@@ -16,7 +16,6 @@ import voice.core.data.ChapterId
 import voice.core.data.folders.AudiobookFolders
 import voice.core.data.toUri
 import voice.core.documentfile.CachedDocumentFileFactory
-import voice.core.documentfile.nameWithoutExtension
 import voice.core.documentfile.walk
 import voice.core.logging.api.Logger
 import java.io.FileNotFoundException
@@ -114,7 +113,7 @@ class TranscriptRepository(
           return@withContext cues
         }
       }
-      siblingJson(chapterUri)?.let { sibling ->
+      siblingTranscripts(chapterUri).forEach { sibling ->
         parse(sibling)?.let { cues ->
           Logger.d("Transcript loaded from the sibling file in ${System.currentTimeMillis() - startedAt} ms (${cues.size} cues)")
           return@withContext cues
@@ -126,13 +125,12 @@ class TranscriptRepository(
           return@withContext cues
         }
       }
-      val audioFile = documentFileFactory.create(chapterUri)
-      val targetBaseName = audioFile.nameWithoutExtension()
+      val audioName = documentFileFactory.create(chapterUri).name ?: return@withContext null
 
       val folders = audiobookFolders.all().first().values.flatten()
       for (folder in folders) {
         val match = folder.documentFile.walk().firstOrNull {
-          it.isFile && it.name?.endsWith(".json", ignoreCase = true) == true && it.nameWithoutExtension() == targetBaseName
+          it.isFile && isTranscriptFor(it.name.orEmpty(), audioName)
         }
         if (match != null) {
           val foundAt = System.currentTimeMillis()
@@ -152,21 +150,30 @@ class TranscriptRepository(
     }
   }
 
-  /** `<same folder>/<same name>.json` for providers whose document ids are paths (local storage). */
-  private fun siblingJson(chapterUri: Uri): Uri? = try {
+  /**
+   * `<same folder>/<same name>.json` (or `.srt`, or with the audio extension kept, like `Book.m4b.json`) for providers
+   * whose document ids are paths (local storage).
+   */
+  private fun siblingTranscripts(chapterUri: Uri): List<Uri> = try {
     val documentId = DocumentsContract.getDocumentId(chapterUri)
-    if (documentId.substringAfterLast('/').contains('.')) {
-      DocumentsContract.buildDocumentUriUsingTree(chapterUri, documentId.substringBeforeLast('.') + ".json")
-    } else {
-      null
+    val folder = documentId.substringBeforeLast('/', missingDelimiterValue = "")
+    val name = documentId.substringAfterLast('/')
+    transcriptNamesFor(name).map { candidate ->
+      DocumentsContract.buildDocumentUriUsingTree(chapterUri, if (folder.isEmpty()) candidate else "$folder/$candidate")
     }
   } catch (e: IllegalArgumentException) {
-    null
+    emptyList()
   }
 
   /** Parses straight from the stream, so the 2-4 MB file is never held in memory as one string. */
   private fun parse(uri: Uri): List<TranscriptCue>? = try {
-    context.contentResolver.openInputStream(uri)?.use { TranscriptParser.parse(it) }
+    context.contentResolver.openInputStream(uri)?.use { stream ->
+      if (uri.toString().endsWith(".srt", ignoreCase = true)) {
+        SrtParser.parse(stream.bufferedReader().readText())
+      } else {
+        TranscriptParser.parse(stream)
+      }
+    }?.takeIf { it.isNotEmpty() }
   } catch (e: Exception) {
     // The sibling guess simply not existing is expected; anything else is worth a line.
     if (e !is FileNotFoundException) Logger.w(e, "Could not load transcript at $uri")

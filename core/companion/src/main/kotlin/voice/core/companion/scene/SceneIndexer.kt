@@ -15,6 +15,7 @@ import voice.core.companion.StepState
 import voice.core.companion.companionJson
 import voice.core.companion.firstCueMs
 import voice.core.companion.setup.profileText
+import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
 import voice.core.logging.api.Logger
@@ -74,14 +75,7 @@ class SceneIndexer(
 
   private suspend fun bookLines(bookId: BookId): List<BookLine> {
     val book = checkNotNull(bookRepository.get(bookId)) { "Book $bookId is not in the library" }
-    var offset = 0L
-    return book.chapters.flatMap { chapter ->
-      val start = offset
-      offset += chapter.duration
-      transcriptRepository.cues(chapter.id).orEmpty().map {
-        BookLine(start + it.timestampStartMs, start + it.timestampEndMs, it.text)
-      }
-    }
+    return transcriptRepository.bookLines(book)
   }
 
   /** Extras built before the scan get tied to their topic now, and unlock when it first comes up. */
@@ -112,6 +106,16 @@ class SceneIndexer(
 
   private companion object {
     const val WINDOW_MAX_TOKENS = 6_000L
+  }
+}
+
+/** Every transcript line of [book], with times in the whole book. */
+internal suspend fun TranscriptRepository.bookLines(book: Book): List<BookLine> {
+  var offset = 0L
+  return book.chapters.flatMap { chapter ->
+    val start = offset
+    offset += chapter.duration
+    cues(chapter.id).orEmpty().map { BookLine(start + it.timestampStartMs, start + it.timestampEndMs, it.text) }
   }
 }
 

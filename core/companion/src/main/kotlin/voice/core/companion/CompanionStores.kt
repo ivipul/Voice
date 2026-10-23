@@ -16,5 +16,6 @@ class CompanionStores(bookFiles: BookFiles) {
   val shelf = BookJsonStore(bookFiles::bookDir, "extras.json", ExtraShelf.serializer()) { ExtraShelf() }
   val look = BookJsonStore(bookFiles::bookDir, "look.json", BookLook.serializer()) { BookLook() }
   val scene = BookJsonStore(bookFiles::bookDir, "scene.json", SceneIndex.serializer()) { SceneIndex() }
+  val materials = BookJsonStore(bookFiles::bookDir, "materials.json", BookMaterials.serializer()) { BookMaterials() }
   val summaries = BookJsonStore(bookFiles::bookDir, "summaries.json", ChapterSummaries.serializer()) { ChapterSummaries() }
 }

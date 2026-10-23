@@ -45,6 +45,9 @@ data class BookSetup(
   val sceneError: String? = null,
   /** Short summaries of each chapter, which let Ask answer questions about the whole book cheaply. */
   val summaries: StepState = StepState.NotStarted,
+  /** Reading the PDFs that came with the book, then finding where the narration refers to them. */
+  val materials: StepState = StepState.NotStarted,
+  val materialsError: String? = null,
   /** The listener closed the setup screen once; the library then stops pointing at it. */
   val dismissed: Boolean = false,
 )
@@ -122,6 +125,8 @@ data class IdeaCard(
   val requestedAtMs: Long? = null,
   /** The parts the Extra would have, each one ticked until the listener unticks it. */
   val features: List<IdeaFeature> = emptyList(),
+  /** The section of the book's PDF material this Extra brings to life, if any. */
+  val materialSectionId: String? = null,
 ) {
 
   val includedFeatures: List<String> get() = features.filter { it.included }.map { it.label }
@@ -225,3 +230,50 @@ data class StoredPalette(
 data class ChapterSummaries(
   val byKey: Map<String, String> = emptyMap(),
 )
+
+/** Material that came with the audiobook, like a companion PDF, and what Claude found in it. */
+@Serializable
+data class BookMaterials(
+  val files: List<MaterialFile> = emptyList(),
+  val sections: List<MaterialSection> = emptyList(),
+  /** Where the narration refers to each section, as whole-book positions; [SceneCue.entry] is the section id. */
+  val cues: List<SceneCue> = emptyList(),
+  val linked: Boolean = false,
+)
+
+@Serializable
+data class MaterialFile(
+  val id: String,
+  /** The name the listener's file had. */
+  val name: String,
+  /** The copy in the book's folder, relative to it. */
+  val path: String,
+  val studied: Boolean = false,
+  val error: String? = null,
+)
+
+@Serializable
+data class MaterialSection(
+  val id: String,
+  val fileId: String,
+  val title: String,
+  val pages: String = "",
+  /** One or two sentences on what the section is for. */
+  val summary: String = "",
+  /** What kind of content it holds: checklist, table, framework, exercise, diagram, list, reference. */
+  val contentType: String = "",
+  /** The section's information in plain text, faithful to the PDF, which Extras and answers are built from. */
+  val extract: String = "",
+  val keyTerms: List<String> = emptyList(),
+  /** The Extra built from this section, once there is one. */
+  val extraId: String? = null,
+)
+
+/** The sections the narration refers to around [positionMs]. */
+fun BookMaterials.activeAt(positionMs: Long): List<MaterialSection> {
+  val ids = cues.filter { positionMs in it.startMs..it.endMs }.mapTo(mutableSetOf()) { it.entry }
+  return sections.filter { it.id in ids }
+}
+
+/** The first time the narration refers to [sectionId], or null if it never does. */
+fun BookMaterials.firstCueMs(sectionId: String): Long? = cues.filter { it.entry == sectionId }.minOfOrNull { it.startMs }

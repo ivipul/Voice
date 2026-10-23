@@ -7,6 +7,8 @@ import com.anthropic.core.JsonValue
 import com.anthropic.errors.AnthropicServiceException
 import com.anthropic.errors.UnauthorizedException
 import com.anthropic.models.messages.CacheControlEphemeral
+import com.anthropic.models.messages.ContentBlockParam
+import com.anthropic.models.messages.DocumentBlockParam
 import com.anthropic.models.messages.JsonOutputFormat
 import com.anthropic.models.messages.Message
 import com.anthropic.models.messages.MessageCreateParams
@@ -38,7 +40,9 @@ import kotlinx.serialization.json.longOrNull
 import voice.core.data.ApiKeys
 import voice.core.data.store.ApiKeysStore
 import voice.core.logging.api.Logger
+import java.io.File
 import java.time.Duration
+import java.util.Base64
 
 /** The Claude models Earwig uses, one per kind of job. */
 object ClaudeModels {
@@ -229,6 +233,55 @@ class ClaudeClient(
   }
 
   /**
+   * An answer about a PDF (Claude reads its text and its pages as images), constrained to [schema] and returned as
+   * raw JSON. Streamed under the hood, since reading a long document can take minutes.
+   */
+  suspend fun askJsonAboutPdf(
+    system: String,
+    prompt: String,
+    pdf: File,
+    schema: JsonObject,
+    model: String = ClaudeModels.CHAT,
+    maxTokens: Long = PDF_MAX_TOKENS,
+  ): String = call {
+    check(pdf.length() <= MAX_PDF_BYTES) { "The PDF is too big for Claude to read (${pdf.length() / 1_000_000} MB)" }
+    val data = Base64.getEncoder().encodeToString(pdf.readBytes())
+    val format = JsonOutputFormat.builder()
+      .schema(
+        JsonOutputFormat.Schema.builder()
+          .putAllAdditionalProperties(schema.mapValues { (_, value) -> value.toJsonValue() })
+          .build(),
+      )
+      .build()
+    val params = MessageCreateParams.builder()
+      .model(model)
+      .maxTokens(maxTokens)
+      .system(system)
+      .addUserMessageOfContentBlockParams(
+        listOf(
+          ContentBlockParam.ofDocument(DocumentBlockParam.builder().base64Source(data).build()),
+          ContentBlockParam.ofText(prompt),
+        ),
+      )
+      .outputConfig(OutputConfig.builder().effort(OutputConfig.Effort.MEDIUM).format(format).build())
+      .build()
+    val text = StringBuilder()
+    var stopReason: StopReason? = null
+    client().messages().createStreaming(params).use { response ->
+      response.stream().forEach { event ->
+        event.contentBlockDelta().flatMap { it.delta().text() }.ifPresent { text.append(it.text()) }
+        event.messageDelta().flatMap { it.delta().stopReason() }.ifPresent { stopReason = it }
+      }
+    }
+    when (stopReason) {
+      StopReason.MAX_TOKENS -> throw IllegalStateException("Claude's notes on the PDF were too long and got cut off")
+      StopReason.REFUSAL -> throw IllegalStateException("Claude declined to read this PDF")
+      else -> Unit
+    }
+    text.toString().trim().also { check(it.isNotEmpty()) { "Claude returned no text" } }
+  }
+
+  /**
    * An answer that may use Claude's web search first, for looking a book up online. Returns Claude's final text
    * (citations dropped). Long searches pause the turn; those are continued a few times.
    */
@@ -281,6 +334,8 @@ class ClaudeClient(
     const val WRITE_MAX_TOKENS = 32_000L
     const val RESEARCH_MAX_TOKENS = 8_000L
     const val MAX_CONTINUATIONS = 3
+    const val PDF_MAX_TOKENS = 32_000L
+    const val MAX_PDF_BYTES = 30_000_000L
   }
 }
 

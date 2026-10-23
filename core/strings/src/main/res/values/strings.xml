@@ -575,4 +575,6 @@
     <string name="setup.ideas.decided">Your Extras</string>
     <!-- Shown in place of the idea deck once every card is built or skipped. -->
     <string name="setup.ideas.all_decided">That\'s every idea for now.</string>
+    <!-- Small label on an idea card built from the PDF that came with the book. -->
+    <string name="setup.idea.from_pdf">From the PDF</string>
 </resources>

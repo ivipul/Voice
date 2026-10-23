@@ -9,6 +9,7 @@ import voice.core.companion.CompanionStores
 import voice.core.companion.Extra
 import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaStatus
+import voice.core.companion.MaterialSection
 import voice.core.companion.SceneIndex
 import voice.core.companion.Schema
 import voice.core.companion.SnipPictureStyle
@@ -32,7 +33,9 @@ class ExtraBuilder(
   suspend fun buildShelfExtra(bookId: BookId, card: IdeaCard): Extra {
     val profile = stores.profile.get(bookId)
     val scene = stores.scene.get(bookId)
-    val brief = briefOf(card)
+    val materials = stores.materials.get(bookId)
+    val section = card.materialSectionId?.let { id -> materials.sections.firstOrNull { it.id == id } }
+    val brief = briefOf(card) + section?.let(::materialBrief).orEmpty()
     val html = validated(claude.write(system = BUILDER_SYSTEM, prompt = buildPrompt(profile, scene, brief)))
     val topicId = topicOf(html)?.takeIf { id -> scene.entries.any { it.id == id } }
     val extra = Extra(
@@ -43,11 +46,20 @@ class ExtraBuilder(
       html = html,
       createdAtMs = System.currentTimeMillis(),
       // Asked for on the spot, so it is about what the listener already heard: open it at once.
-      unlockAtMs = if (card.requestedAtMs != null) 0L else topicId?.let(scene::firstCueMs) ?: 0L,
+      unlockAtMs = when {
+        card.requestedAtMs != null -> 0L
+        section != null -> materials.firstCueMs(section.id) ?: 0L
+        else -> topicId?.let(scene::firstCueMs) ?: 0L
+      },
       topicId = topicId,
       brief = brief,
     )
     stores.shelf.update(bookId) { it.copy(extras = it.extras + extra) }
+    if (section != null) {
+      stores.materials.update(bookId) { current ->
+        current.copy(sections = current.sections.map { if (it.id == section.id) it.copy(extraId = extra.id) else it })
+      }
+    }
     if (topicId != null) {
       stores.scene.update(bookId) { index ->
         index.copy(entries = index.entries.map { if (it.id == topicId && it.extraId == null) it.copy(extraId = extra.id) else it })
@@ -77,6 +89,9 @@ class ExtraBuilder(
     stores.shelf.update(bookId) { shelf -> shelf.copy(extras = shelf.extras.filterNot { it.id == extraId }) }
     stores.scene.update(bookId) { index ->
       index.copy(entries = index.entries.map { if (it.extraId == extraId) it.copy(extraId = null) else it })
+    }
+    stores.materials.update(bookId) { materials ->
+      materials.copy(sections = materials.sections.map { if (it.extraId == extraId) it.copy(extraId = null) else it })
     }
     stores.ideas.update(bookId) { board ->
       board.copy(cards = board.cards.map { if (it.extraId == extraId) it.copy(extraId = null, status = IdeaStatus.Suggested) else it })
@@ -169,6 +184,12 @@ internal const val STYLE_SYSTEM = "You write art direction for the pictures an a
 internal fun stylePrompt(profile: BookProfile, card: IdeaCard): String =
   profileText(profile) + "\nLook of the book: ${profile.visualStyle}\n\nStyle idea: ${card.title}: ${card.description}" +
     card.featureText()
+
+/** The PDF section an Extra brings to life: the builder works from it closely, but may add from the book. */
+internal fun materialBrief(section: MaterialSection): String =
+  "\n\nBuild it mainly from this section of the PDF that comes with the book, \"${section.title}\" " +
+    "(pages ${section.pages}, ${section.contentType}). Present its information faithfully and make it interactive; " +
+    "you can add context from the book itself.\n\"\"\"\n${section.extract}\n\"\"\""
 
 /** The parts the listener kept ticked on the card, and the ones they unticked. */
 internal fun IdeaCard.featureText(): String = buildString {

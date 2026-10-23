@@ -129,7 +129,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
-    onAddBookClick = { addBookLauncher.launch(arrayOf("audio/*", "video/mp4", "application/json", "application/octet-stream")) },
+    onAddBookClick = { addBookLauncher.launch(BOOK_FILE_TYPES) },
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
@@ -373,3 +373,14 @@ internal class BookOverviewPreviewParameterProvider : PreviewParameterProvider<B
     ),
   )
 }
+
+/** Audiobooks, and the transcripts (`.json`, `.srt`) and PDFs that come with them. */
+private val BOOK_FILE_TYPES = arrayOf(
+  "audio/*",
+  "video/mp4",
+  "application/json",
+  "application/pdf",
+  "application/x-subrip",
+  "text/*",
+  "application/octet-stream",
+)
