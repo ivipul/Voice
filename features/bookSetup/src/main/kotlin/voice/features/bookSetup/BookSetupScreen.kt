@@ -58,6 +58,7 @@ import voice.core.companion.BookKind
 import voice.core.companion.BookProfile
 import voice.core.companion.StepState
 import voice.core.data.BookId
+import voice.core.ui.ResetBookDialog
 import voice.core.ui.crawl.BookStyle
 import voice.core.ui.crawl.CrawlPalette
 import voice.core.ui.crawl.CrawlTheme
@@ -152,6 +153,13 @@ private fun BookSetupScreen(
             Icon(imageVector = VoiceIcons.Close, contentDescription = stringResource(StringsR.string.common_action_close))
           }
         },
+        actions = {
+          if (!viewState.notStarted) {
+            TextButton(onClick = viewModel::onResetClick) {
+              Text(text = stringResource(StringsR.string.book_reset_setup), color = palette.content)
+            }
+          }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
           containerColor = palette.background,
           titleContentColor = palette.content,
@@ -194,6 +202,14 @@ private fun BookSetupScreen(
           viewModel = viewModel,
         )
       }
+      OwnIdeaCard(
+        state = viewState.ownIdea,
+        palette = palette,
+        enabled = MissingKey.Claude !in viewState.missingKeys,
+        onChange = viewModel::onOwnIdeaChange,
+        onSubmit = viewModel::onOwnIdeaSubmit,
+        onUseAlternative = viewModel::onUseAlternative,
+      )
       LookSection(
         look = viewState.look,
         canDrawCovers = viewState.canDrawCovers,
@@ -212,6 +228,15 @@ private fun BookSetupScreen(
       }
       Spacer(modifier = Modifier.size(16.dp))
     }
+  }
+  viewState.reset?.let { reset ->
+    ResetBookDialog(
+      removeFromLibrary = false,
+      keepFiles = reset.keepFiles,
+      onDismiss = viewModel::onResetDismiss,
+      onConfirm = viewModel::onResetConfirm,
+      onKeepFilesChange = viewModel::onResetKeepFilesChange,
+    )
   }
 }
 

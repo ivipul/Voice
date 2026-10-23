@@ -21,6 +21,7 @@ import voice.core.companion.StepState
 import voice.core.companion.look.LookMaker
 import voice.core.companion.setup.IdeaGenerator
 import voice.core.companion.setup.TranscriptImporter
+import voice.core.companion.work.BookReset
 import voice.core.companion.work.BookSetupRunner
 import voice.core.companion.work.SetupJob
 import voice.core.data.ApiKeys
@@ -46,6 +47,7 @@ class BookSetupViewModel(
   private val ideaGenerator: IdeaGenerator,
   private val lookMaker: LookMaker,
   private val transcriptImporter: TranscriptImporter,
+  private val bookReset: BookReset,
   private val navigator: Navigator,
   @ApiKeysStore
   private val keysStore: DataStore<ApiKeys>,
@@ -59,7 +61,8 @@ class BookSetupViewModel(
   private var ownIdea by mutableStateOf(OwnIdeaViewState())
   private var lookWorking by mutableStateOf(false)
   private var lookError by mutableStateOf<String?>(null)
-  private var autoStarted = false
+  private var startWhenReady by mutableStateOf(autoStart)
+  private var reset by mutableStateOf<ResetViewState?>(null)
 
   @Composable
   fun viewState(): BookSetupViewState? {
@@ -78,10 +81,12 @@ class BookSetupViewModel(
       if (keys.claude.isBlank()) add(MissingKey.Claude)
       if (keys.deepgram.isBlank() && setup.transcription.state != StepState.Done) add(MissingKey.Deepgram)
     }
-    val notStarted = setup.transcription.state == StepState.NotStarted && setup.research == StepState.NotStarted
-    LaunchedEffect(notStarted, missingKeys) {
-      if (autoStart && !autoStarted && notStarted && missingKeys.isEmpty()) {
-        autoStarted = true
+    // A transcript that came with the book finishes transcription before anything runs, so research decides.
+    val notStarted = setup.research == StepState.NotStarted &&
+      (setup.transcription.state == StepState.NotStarted || setup.transcription.state == StepState.Done)
+    LaunchedEffect(startWhenReady, notStarted, missingKeys) {
+      if (startWhenReady && notStarted && missingKeys.isEmpty()) {
+        startWhenReady = false
         runner.start(bookId)
       }
     }
@@ -102,6 +107,7 @@ class BookSetupViewModel(
       deck = cards.ideaDeck(),
       skippedCards = cards.skippedCards(),
       ownIdea = ownIdea,
+      reset = reset,
       look = LookViewState(
         source = look.source,
         extraPrompt = look.extraCoverPrompt,
@@ -115,6 +121,29 @@ class BookSetupViewModel(
 
   fun onStart() {
     scope.launch { runner.start(bookId) }
+  }
+
+  fun onResetClick() {
+    reset = ResetViewState()
+  }
+
+  fun onResetKeepFilesChange(keep: Boolean) {
+    reset = reset?.copy(keepFiles = keep)
+  }
+
+  fun onResetDismiss() {
+    reset = null
+  }
+
+  /** Clears the setup and starts it again, the way it starts for a newly added book. */
+  fun onResetConfirm() {
+    val state = reset ?: return
+    reset = null
+    ownIdea = OwnIdeaViewState()
+    scope.launch {
+      bookReset.reset(bookId, keepFiles = state.keepFiles)
+      startWhenReady = true
+    }
   }
 
   fun onRetryTranscription() {

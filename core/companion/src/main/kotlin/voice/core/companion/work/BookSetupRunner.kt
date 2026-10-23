@@ -87,6 +87,14 @@ class BookSetupRunner(
     val _ = WorkManager.getInstance(context).cancelUniqueWork(workName(SetupJob.Transcribe, bookId, cardId = null))
   }
 
+  /** Stops every setup job of [bookId], running or waiting. */
+  fun cancelAll(bookId: BookId) {
+    val workManager = WorkManager.getInstance(context)
+    val _ = workManager.cancelAllWorkByTag(bookTag(bookId))
+    // Jobs queued before the book tag existed only have their names.
+    SetupJob.entries.forEach { job -> val _ = workManager.cancelUniqueWork(workName(job, bookId, cardId = null)) }
+  }
+
   suspend fun build(bookId: BookId, cardId: String, note: String? = null) {
     updateCard(bookId, cardId) { card ->
       card.copy(status = IdeaStatus.Building, error = null, listenerNote = note?.trim() ?: card.listenerNote)
@@ -203,9 +211,12 @@ class BookSetupRunner(
       .setInputData(input)
       .setConstraints(WorkConstraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
       .addTag(CompanionWorker.TAG)
+      .addTag(bookTag(bookId))
       .build()
     val _ = WorkManager.getInstance(context).enqueueUniqueWork(workName(job, bookId, cardId), policy, request)
   }
+
+  private fun bookTag(bookId: BookId) = "earwig:book:${bookId.value}"
 
   private fun workName(job: SetupJob, bookId: BookId, cardId: String?) =
     listOfNotNull("earwig", job.name, bookId.value, cardId).joinToString(":")

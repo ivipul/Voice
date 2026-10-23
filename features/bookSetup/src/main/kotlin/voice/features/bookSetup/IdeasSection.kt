@@ -116,14 +116,6 @@ internal fun IdeasSection(
     if (viewState.skippedCards.isNotEmpty()) {
       SkippedCards(cards = viewState.skippedCards, onRestore = viewModel::onRestore)
     }
-    OwnIdeaCard(
-      state = viewState.ownIdea,
-      palette = palette,
-      enabled = viewState.research.state == StepState.Done,
-      onChange = viewModel::onOwnIdeaChange,
-      onSubmit = viewModel::onOwnIdeaSubmit,
-      onUseAlternative = viewModel::onUseAlternative,
-    )
   }
 }
 
@@ -399,7 +391,7 @@ private fun SkippedCards(
 }
 
 @Composable
-private fun OwnIdeaCard(
+internal fun OwnIdeaCard(
   state: OwnIdeaViewState,
   palette: CrawlPalette,
   enabled: Boolean,

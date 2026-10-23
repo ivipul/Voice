@@ -62,6 +62,12 @@ class BookJsonStore<T : Any>(
   @IgnorableReturnValue
   suspend fun set(bookId: BookId, value: T): T = update(bookId) { value }
 
+  /** Deletes the saved file, so the book is back to the default value. */
+  suspend fun clear(bookId: BookId) = lock.withLock {
+    val _ = withContext(Dispatchers.IO) { File(dirFor(bookId), fileName).delete() }
+    values.update { it + (bookId to default()) }
+  }
+
   private suspend fun ensureLoaded(bookId: BookId) {
     if (bookId in values.value) return
     lock.withLock {

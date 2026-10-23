@@ -52,6 +52,7 @@ import voice.core.ui.crawl.crawlPaletteOf
 import voice.core.ui.playButtonSharedBoundsModifier
 import voice.features.bookOverview.bottomSheet.BottomSheetContent
 import voice.features.bookOverview.bottomSheet.BottomSheetItem
+import voice.core.ui.ResetBookDialog
 import voice.features.bookOverview.deleteBook.DeleteBookDialog
 import voice.features.bookOverview.di.BookOverviewGraph
 import voice.features.bookOverview.editTitle.EditBookTitleDialog
@@ -91,6 +92,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
   val bottomSheetViewModel = bookGraph.bottomSheetViewModel
   val deleteBookViewModel = bookGraph.deleteBookViewModel
   val fileCoverViewModel = bookGraph.fileCoverViewModel
+  val resetBookViewModel = bookGraph.resetBookViewModel
 
   LaunchedEffect(Unit) {
     bookOverviewViewModel.attach()
@@ -139,6 +141,16 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
       onDismiss = deleteBookViewModel::onDismiss,
       onConfirmDeletion = deleteBookViewModel::onConfirmDeletion,
       onDeleteCheckBoxCheck = deleteBookViewModel::onDeleteCheckBoxCheck,
+    )
+  }
+  val resetBookViewState = resetBookViewModel.state.value
+  if (resetBookViewState != null) {
+    ResetBookDialog(
+      removeFromLibrary = resetBookViewState.removeFromLibrary,
+      keepFiles = resetBookViewState.keepFiles,
+      onDismiss = resetBookViewModel::onDismiss,
+      onConfirm = resetBookViewModel::onConfirm,
+      onKeepFilesChange = resetBookViewModel::onKeepFilesChange,
     )
   }
   val editBookTitleState = editBookTitleViewModel.state.value

@@ -581,4 +581,22 @@
     <string name="setup.add_files">Add transcript or PDF</string>
     <!-- Placeholder in the text box at the bottom of an idea card, where the listener suggests additions to the idea. -->
     <string name="setup.idea.note_placeholder">Add or change something…</string>
+    <!-- Long-press menu item that clears a book's Earwig setup -->
+    <string name="book.reset_setup">Reset setup</string>
+    <!-- Long-press menu item that takes a single-file book off the library without deleting the file -->
+    <string name="book.remove_from_library">Remove from library</string>
+    <!-- Title of the dialog confirming a setup reset -->
+    <string name="book.reset_dialog.title">Reset setup?</string>
+    <!-- Body of the reset dialog -->
+    <string name="book.reset_dialog.message">This clears what Earwig made for this book: research, idea cards, Extras, scene chips, PDF notes and its look. The audio file and your place in the book stay.</string>
+    <!-- Title of the dialog confirming removal from the library -->
+    <string name="book.remove_dialog.title">Remove from library?</string>
+    <!-- Body of the remove dialog -->
+    <string name="book.remove_dialog.message">The book leaves your library and everything Earwig made for it is cleared. The audio file stays on your phone.</string>
+    <!-- Checkbox; kept files mean the next setup skips transcription and studies the PDFs again -->
+    <string name="book.reset_dialog.keep_files">Keep the transcript and added PDFs</string>
+    <!-- Confirm button of the reset dialog -->
+    <string name="book.reset_dialog.reset">Reset</string>
+    <!-- Confirm button of the remove dialog -->
+    <string name="book.remove_dialog.remove">Remove</string>
 </resources>

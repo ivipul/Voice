@@ -31,7 +31,12 @@ data class BookSetupViewState(
   val skippedCards: List<IdeaCard>,
   val ownIdea: OwnIdeaViewState,
   val look: LookViewState,
+  /** The reset confirmation while it's open; it asks whether to keep the transcript and added PDFs. */
+  val reset: ResetViewState? = null,
 )
+
+@Immutable
+data class ResetViewState(val keepFiles: Boolean = true)
 
 enum class MissingKey {
   Claude,

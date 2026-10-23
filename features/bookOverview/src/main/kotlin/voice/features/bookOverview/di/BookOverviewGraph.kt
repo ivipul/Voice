@@ -8,6 +8,7 @@ import voice.features.bookOverview.deleteBook.DeleteBookViewModel
 import voice.features.bookOverview.editTitle.EditBookTitleViewModel
 import voice.features.bookOverview.fileCover.FileCoverViewModel
 import voice.features.bookOverview.overview.BookOverviewViewModel
+import voice.features.bookOverview.resetBook.ResetBookViewModel
 
 abstract class BookOverviewScope private constructor()
 
@@ -18,6 +19,7 @@ interface BookOverviewGraph {
   val bottomSheetViewModel: BottomSheetViewModel
   val deleteBookViewModel: DeleteBookViewModel
   val fileCoverViewModel: FileCoverViewModel
+  val resetBookViewModel: ResetBookViewModel
 
   @GraphExtension.Factory
   @ContributesTo(AppScope::class)
