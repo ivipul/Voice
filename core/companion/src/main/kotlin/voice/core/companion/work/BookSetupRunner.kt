@@ -170,6 +170,10 @@ class BookSetupRunner(
           updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Built, extraId = extra.id) }
         }
         ExtensionPoint.SceneChips -> {
+          // The PDF chips come from the same kind of transcript scan, so a retry here also retries a failed one.
+          if (stores.setup.get(bookId).materials == StepState.Failed) {
+            enqueue(SetupJob.Materials, bookId, policy = ExistingWorkPolicy.REPLACE)
+          }
           // The scan needs the whole transcript; until then the card waits and transcription picks it up.
           if (stores.setup.get(bookId).transcription.state == StepState.Done) {
             sceneIndexer.index(bookId)
