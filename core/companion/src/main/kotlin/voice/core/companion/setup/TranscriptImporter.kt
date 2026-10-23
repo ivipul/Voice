@@ -53,9 +53,23 @@ class TranscriptImporter(
     }
   }
 
+  /**
+   * Transcripts and PDFs added to a book already in the library, from its setup screen. A transcript only fits a book
+   * made of one audio file, [audio].
+   */
+  suspend fun addTo(bookId: BookId, audio: Uri?, uris: List<Uri>): PickedBook {
+    val names = withContext(Dispatchers.IO) { uris.associateWith { displayName(it).orEmpty() } }
+    val book = PickedBook(
+      audio = audio ?: Uri.EMPTY,
+      transcripts = if (audio == null) emptyList() else uris.filter { names.getValue(it).isTranscriptFile() },
+      pdfs = uris.filter { names.getValue(it).endsWith(".pdf", ignoreCase = true) },
+    )
+    import(book, bookId)
+    return book
+  }
+
   /** Copies in what came with [book]: the first readable transcript, and every PDF. */
-  suspend fun import(book: PickedBook) {
-    val bookId = BookId(book.audio)
+  suspend fun import(book: PickedBook, bookId: BookId = BookId(book.audio)) {
     val transcribed = book.transcripts.any { importTranscript(book.audio, it) }
     if (transcribed) {
       stores.setup.update(bookId) { it.copy(transcription = it.transcription.copy(state = StepState.Done, error = null)) }
@@ -115,6 +129,8 @@ class TranscriptImporter(
   }.getOrNull()
 }
 
+private fun String.isTranscriptFile() = endsWith(".json", ignoreCase = true) || endsWith(".srt", ignoreCase = true)
+
 internal data class PickedNames(
   val audio: String,
   val transcripts: List<String> = emptyList(),
@@ -127,7 +143,7 @@ internal data class PickedNames(
  * transcript and PDF picked belongs to it, whatever their names.
  */
 internal fun sortPicked(names: List<String>): List<PickedNames> {
-  val transcripts = names.filter { it.endsWith(".json", ignoreCase = true) || it.endsWith(".srt", ignoreCase = true) }
+  val transcripts = names.filter { it.isTranscriptFile() }
   val pdfs = names.filter { it.endsWith(".pdf", ignoreCase = true) }
   val audio = names - transcripts.toSet() - pdfs.toSet()
   if (audio.size == 1) return listOf(PickedNames(audio.single(), transcripts.sortedByDescending { isTranscriptFor(it, audio.single()) }, pdfs))

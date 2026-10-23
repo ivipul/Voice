@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.net.Uri
 import androidx.datastore.core.DataStore
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -19,10 +20,12 @@ import voice.core.companion.LookSource
 import voice.core.companion.StepState
 import voice.core.companion.look.LookMaker
 import voice.core.companion.setup.IdeaGenerator
+import voice.core.companion.setup.TranscriptImporter
 import voice.core.companion.work.BookSetupRunner
 import voice.core.companion.work.SetupJob
 import voice.core.data.ApiKeys
 import voice.core.data.BookId
+import voice.core.data.toUri
 import voice.core.data.repo.BookRepository
 import voice.core.data.store.ApiKeysStore
 import voice.core.logging.api.Logger
@@ -42,6 +45,7 @@ class BookSetupViewModel(
   private val runner: BookSetupRunner,
   private val ideaGenerator: IdeaGenerator,
   private val lookMaker: LookMaker,
+  private val transcriptImporter: TranscriptImporter,
   private val navigator: Navigator,
   @ApiKeysStore
   private val keysStore: DataStore<ApiKeys>,
@@ -115,6 +119,20 @@ class BookSetupViewModel(
 
   fun onRetryTranscription() {
     runner.retry(bookId, SetupJob.Transcribe)
+  }
+
+  /** A transcript (`.json`, `.srt`) or PDFs added after the book: a transcript stops cloud transcription. */
+  fun onFilesAdded(uris: List<Uri>) {
+    if (uris.isEmpty()) return
+    scope.launch {
+      val book = repo.get(bookId) ?: return@launch
+      val singleFile = book.chapters.singleOrNull()?.id?.toUri()
+      val added = transcriptImporter.addTo(bookId, singleFile, uris)
+      if (added.transcripts.isNotEmpty() && stores.setup.get(bookId).transcription.state == StepState.Done) {
+        runner.cancelTranscription(bookId)
+      }
+      runner.start(bookId)
+    }
   }
 
   fun onRetryResearch() {

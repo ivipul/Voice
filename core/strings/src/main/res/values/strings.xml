@@ -577,4 +577,6 @@
     <string name="setup.ideas.all_decided">That\'s every idea for now.</string>
     <!-- Small label on an idea card built from the PDF that came with the book. -->
     <string name="setup.idea.from_pdf">From the PDF</string>
+    <!-- Button on the book setup screen to add a transcript file or the PDF that came with the book. -->
+    <string name="setup.add_files">Add transcript or PDF</string>
 </resources>

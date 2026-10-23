@@ -98,17 +98,47 @@ class AudioChunker(private val context: Context) {
   }
 
   private fun <T> withExtractor(uri: Uri, block: (MediaExtractor, MediaFormat) -> T): T {
-    val extractor = MediaExtractor()
-    try {
-      extractor.setDataSource(context, uri, null)
-      val track = (0 until extractor.trackCount).firstOrNull { index ->
-        extractor.getTrackFormat(index).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
-      } ?: error("No audio track in $uri")
-      extractor.selectTrack(track)
-      return block(extractor, extractor.getTrackFormat(track))
-    } catch (e: Exception) {
-      extractor.release()
-      throw e
+    // Reading through a file descriptor finds the tracks of some m4b files (moov after a large mdat) that reading
+    // through the URI misses, so it goes first and the URI is the fallback.
+    val sources = listOf<(MediaExtractor) -> Unit>(
+      { extractor -> fromFileDescriptor(extractor, uri) },
+      { extractor -> extractor.setDataSource(context, uri, null) },
+    )
+    var lastError: Exception? = null
+    for (source in sources) {
+      val extractor = MediaExtractor()
+      val track = try {
+        source(extractor)
+        (0 until extractor.trackCount).firstOrNull { index ->
+          extractor.getTrackFormat(index).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
+        }
+      } catch (e: Exception) {
+        lastError = e
+        null
+      }
+      if (track == null) {
+        extractor.release()
+        continue
+      }
+      try {
+        extractor.selectTrack(track)
+        return block(extractor, extractor.getTrackFormat(track))
+      } catch (e: Exception) {
+        extractor.release()
+        throw e
+      }
+    }
+    throw IllegalStateException("No audio track in $uri", lastError)
+  }
+
+  private fun fromFileDescriptor(extractor: MediaExtractor, uri: Uri) {
+    val descriptor = checkNotNull(context.contentResolver.openAssetFileDescriptor(uri, "r")) { "Could not open $uri" }
+    descriptor.use {
+      if (it.declaredLength < 0) {
+        extractor.setDataSource(it.fileDescriptor)
+      } else {
+        extractor.setDataSource(it.fileDescriptor, it.startOffset, it.declaredLength)
+      }
     }
   }
 

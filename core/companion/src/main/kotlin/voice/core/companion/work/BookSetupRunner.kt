@@ -82,6 +82,11 @@ class BookSetupRunner(
     enqueue(SetupJob.Ideas, bookId, policy = ExistingWorkPolicy.REPLACE)
   }
 
+  /** Stops a cloud transcription, when a transcript file was added after all. */
+  fun cancelTranscription(bookId: BookId) {
+    val _ = WorkManager.getInstance(context).cancelUniqueWork(workName(SetupJob.Transcribe, bookId, cardId = null))
+  }
+
   suspend fun build(bookId: BookId, cardId: String) {
     updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Building, error = null) }
     enqueue(SetupJob.Build, bookId, cardId = cardId)
@@ -121,7 +126,11 @@ class BookSetupRunner(
       SetupJob.Ideas -> ideas.suggest(bookId)
       SetupJob.Scene -> sceneIndexer.index(bookId)
       SetupJob.Summaries -> summarizer.summarize(bookId)
-      SetupJob.Materials -> materials.run(bookId)
+      SetupJob.Materials -> {
+        val studiedNew = materials.run(bookId)
+        // A PDF added after the ideas were suggested gets ideas of its own.
+        if (studiedNew && stores.setup.get(bookId).ideas == StepState.Done) ideas.suggest(bookId)
+      }
       SetupJob.Build -> buildCard(bookId, checkNotNull(cardId) { "Build needs a card" })
     }
   }
@@ -193,7 +202,9 @@ class BookSetupRunner(
       .setConstraints(WorkConstraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
       .addTag(CompanionWorker.TAG)
       .build()
-    val name = listOfNotNull("earwig", job.name, bookId.value, cardId).joinToString(":")
-    val _ = WorkManager.getInstance(context).enqueueUniqueWork(name, policy, request)
+    val _ = WorkManager.getInstance(context).enqueueUniqueWork(workName(job, bookId, cardId), policy, request)
   }
+
+  private fun workName(job: SetupJob, bookId: BookId, cardId: String?) =
+    listOfNotNull("earwig", job.name, bookId.value, cardId).joinToString(":")
 }

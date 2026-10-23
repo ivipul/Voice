@@ -1,5 +1,8 @@
 package voice.features.bookSetup
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -177,7 +181,12 @@ private fun BookSetupScreen(
           onStart = viewModel::onStart,
         )
       } else {
-        TranscriptionCard(viewState.transcription, palette, onRetry = viewModel::onRetryTranscription)
+        TranscriptionCard(
+          transcription = viewState.transcription,
+          palette = palette,
+          onRetry = viewModel::onRetryTranscription,
+          onFilesAdded = viewModel::onFilesAdded,
+        )
         ResearchCard(viewState.research, viewState.profile, palette, onRetry = viewModel::onRetryResearch)
         IdeasSection(
           viewState = viewState,
@@ -343,7 +352,9 @@ private fun TranscriptionCard(
   transcription: TranscriptionViewState,
   palette: CrawlPalette,
   onRetry: () -> Unit,
+  onFilesAdded: (List<Uri>) -> Unit,
 ) {
+  val addFiles = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments(), onFilesAdded)
   SetupCard(palette) {
     SectionLabel(stringResource(StringsR.string.setup_transcript_label), palette)
     when (transcription.state) {
@@ -372,8 +383,14 @@ private fun TranscriptionCard(
         OutlinedButton(onClick = onRetry) { Text(text = stringResource(StringsR.string.setup_retry)) }
       }
     }
+    TextButton(onClick = { addFiles.launch(ADDED_FILE_TYPES) }) {
+      Text(text = stringResource(StringsR.string.setup_add_files))
+    }
   }
 }
+
+/** Transcripts (`.json`, `.srt`) and PDFs that came with the book. */
+private val ADDED_FILE_TYPES = arrayOf("application/json", "application/pdf", "application/x-subrip", "text/*", "application/octet-stream")
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

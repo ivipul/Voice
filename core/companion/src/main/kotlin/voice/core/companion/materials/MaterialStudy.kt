@@ -39,17 +39,23 @@ class MaterialStudy(
   private val bookFiles: BookFiles,
 ) {
 
-  /** Studies the PDFs not read yet, then links them to the transcript when it is ready. Does nothing without PDFs. */
-  suspend fun run(bookId: BookId) {
+  /**
+   * Studies the PDFs not read yet, then links them to the transcript when it is ready. Does nothing without PDFs.
+   * Returns whether a PDF was read for the first time.
+   */
+  @IgnorableReturnValue
+  suspend fun run(bookId: BookId): Boolean {
     val materials = stores.materials.get(bookId)
-    if (materials.files.isEmpty()) return
+    if (materials.files.isEmpty()) return false
     val transcribed = stores.setup.get(bookId).transcription.state == StepState.Done
-    if (materials.files.all { it.studied } && (materials.linked || !transcribed)) return
+    if (materials.files.all { it.studied } && (materials.linked || !transcribed)) return false
     stores.setup.update(bookId) { it.copy(materials = StepState.Running, materialsError = null) }
     try {
+      val studiedNew = materials.files.any { !it.studied }
       study(bookId)
       if (transcribed) link(bookId)
       stores.setup.update(bookId) { it.copy(materials = StepState.Done) }
+      return studiedNew
     } catch (e: Exception) {
       Logger.w(e, "Studying the PDFs failed for $bookId")
       stores.setup.update(bookId) { it.copy(materials = StepState.Failed, materialsError = e.message ?: e.javaClass.simpleName) }
