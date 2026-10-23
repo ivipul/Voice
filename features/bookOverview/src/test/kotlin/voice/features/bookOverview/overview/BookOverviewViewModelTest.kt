@@ -98,6 +98,7 @@ class BookOverviewViewModelTest {
       kioskModeFeatureFlag = MemoryFeatureFlag(false),
       stores = stores,
       audiobookFolders = mockk(relaxed = true),
+      transcriptImporter = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
 
@@ -166,6 +167,7 @@ class BookOverviewViewModelTest {
       kioskModeFeatureFlag = MemoryFeatureFlag(true),
       stores = stores,
       audiobookFolders = mockk(relaxed = true),
+      transcriptImporter = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
 
@@ -414,6 +416,7 @@ class BookOverviewViewModelTest {
       kioskModeFeatureFlag = MemoryFeatureFlag(false),
       stores = stores,
       audiobookFolders = mockk(relaxed = true),
+      transcriptImporter = mockk(relaxed = true),
       dispatcherProvider = dispatcherProvider,
     )
   }

@@ -32,6 +32,7 @@ import voice.core.common.MainScope
 import voice.core.common.comparator.sortedNaturally
 import voice.core.companion.BookLook
 import voice.core.companion.CompanionStores
+import voice.core.companion.setup.TranscriptImporter
 import voice.core.data.Book
 import voice.core.data.BookComparator
 import voice.core.data.BookId
@@ -95,6 +96,7 @@ class BookOverviewViewModel(
   private val kioskModeFeatureFlag: FeatureFlag<Boolean>,
   private val stores: CompanionStores,
   private val audiobookFolders: AudiobookFolders,
+  private val transcriptImporter: TranscriptImporter,
   dispatcherProvider: DispatcherProvider,
 ) {
 
@@ -272,13 +274,24 @@ class BookOverviewViewModel(
   }
 
   /** A book file picked with the library's add button: it joins the library and its guided setup opens. */
-  fun onAudioFilePicked(uri: Uri) {
-    audiobookFolders.add(uri, FolderType.SingleFile)
-    navigator.goTo(Destination.BookSetup(BookId(uri), autoStart = true))
+  /** Audio files, each optionally picked with its transcript `.json`, which then skips cloud transcription. */
+  fun onFilesPicked(uris: List<Uri>) {
     scope.launch {
-      // The folder list is saved in the background, so the scan waits until it holds the new file.
+      val picked = transcriptImporter.sort(uris)
+      if (picked.isEmpty()) return@launch
+      picked.forEach { (audio, transcript) ->
+        audiobookFolders.add(audio, FolderType.SingleFile)
+        if (transcript != null) {
+          val _ = transcriptImporter.import(audio, transcript)
+        }
+      }
+      navigator.goTo(Destination.BookSetup(BookId(picked.first().first), autoStart = true))
+      // The folder list is saved in the background, so the scan waits until it holds the new files.
       val _ = withTimeoutOrNull(5.seconds) {
-        audiobookFolders.all().first { folders -> folders.values.flatten().any { it.uri == uri } }
+        audiobookFolders.all().first { folders ->
+          val saved = folders.values.flatten().map { it.uri }.toSet()
+          picked.all { (audio, _) -> audio in saved }
+        }
       }
       mediaScanner.scan(restartIfScanning = true)
     }

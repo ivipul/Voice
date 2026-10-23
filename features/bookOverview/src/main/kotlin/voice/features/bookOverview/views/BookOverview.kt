@@ -109,10 +109,10 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
   )
 
   val addBookLauncher = rememberLauncherForActivityResult(
-    contract = ActivityResultContracts.OpenDocument(),
-    onResult = { uri ->
-      if (uri != null) {
-        bookOverviewViewModel.onAudioFilePicked(uri)
+    contract = ActivityResultContracts.OpenMultipleDocuments(),
+    onResult = { uris ->
+      if (uris.isNotEmpty()) {
+        bookOverviewViewModel.onFilesPicked(uris)
       }
     },
   )
@@ -129,7 +129,7 @@ fun BookOverviewScreen(modifier: Modifier = Modifier) {
     onBookFolderClick = bookOverviewViewModel::onBookFolderClick,
     onFolderPickerMovedDialogDismiss = bookOverviewViewModel::onFolderPickerMovedDialogDismiss,
     onPlayButtonClick = bookOverviewViewModel::onPlayButtonClick,
-    onAddBookClick = { addBookLauncher.launch(arrayOf("audio/*", "video/mp4")) },
+    onAddBookClick = { addBookLauncher.launch(arrayOf("audio/*", "video/mp4", "application/json", "application/octet-stream")) },
     onPermissionBugCardClick = bookOverviewViewModel::onPermissionBugCardClick,
   )
   val deleteBookViewState = deleteBookViewModel.state.value
