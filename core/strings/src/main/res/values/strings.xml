@@ -599,4 +599,10 @@
     <string name="book.reset_dialog.reset">Reset</string>
     <!-- Confirm button of the remove dialog -->
     <string name="book.remove_dialog.remove">Remove</string>
+    <!-- Headline of the empty library -->
+    <string name="library.empty.title">Add your first audiobook</string>
+    <!-- Button on the empty library that opens the file picker -->
+    <string name="library.empty.add">Add a book</string>
+    <!-- One line under the empty library headline -->
+    <string name="library.empty.body">Pick an m4b or mp3 file. If you have its transcript or PDFs, select them too.</string>
 </resources>

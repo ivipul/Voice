@@ -16,6 +16,8 @@ data class BookOverviewViewState(
   /** Set all text on the library in the one header font instead of each book's own. */
   val uniformFont: Boolean = false,
   val showAddBookHint: Boolean,
+  /** No books yet and nothing scanning: the library explains Earwig and offers one big Add button. */
+  val showEmptyLibrary: Boolean = false,
   val showSearchIcon: Boolean,
   val isLoading: Boolean,
   val searchActive: Boolean,

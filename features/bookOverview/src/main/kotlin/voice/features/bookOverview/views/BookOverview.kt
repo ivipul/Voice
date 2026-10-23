@@ -3,6 +3,7 @@ package voice.features.bookOverview.views
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -237,9 +238,14 @@ internal fun BookOverview(
   ) { contentPadding ->
     Box(
       Modifier
+        .fillMaxSize()
         .padding(contentPadding)
         .consumeWindowInsets(contentPadding),
     ) {
+      if (viewState.showEmptyLibrary) {
+        EmptyLibrary(onAddBookClick = onAddBookClick)
+        return@Box
+      }
       when (viewState.layoutMode) {
         BookOverviewLayoutMode.List -> {
           CompositionLocalProvider(LocalUniformFont provides viewState.uniformFont) {

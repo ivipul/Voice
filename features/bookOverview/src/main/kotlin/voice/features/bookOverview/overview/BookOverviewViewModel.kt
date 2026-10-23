@@ -173,7 +173,7 @@ class BookOverviewViewModel(
         BookOverviewViewState.PlayButtonState.Playing
       } else {
         BookOverviewViewState.PlayButtonState.Paused
-      }.takeIf { currentBookId != null },
+      }.takeIf { currentBookId != null && books.isNotEmpty() },
       uniformFont = uniformFont,
       activeBookStyle = currentBookId?.let { looks[it] }?.toStyle(),
       showAddBookHint = if (hasStoragePermissionBug) {
@@ -181,6 +181,7 @@ class BookOverviewViewModel(
       } else {
         noBooks
       },
+      showEmptyLibrary = noBooks && !hasStoragePermissionBug,
       showSearchIcon = books.isNotEmpty(),
       isLoading = scannerActive,
       searchActive = searchActive,
