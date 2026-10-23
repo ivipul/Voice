@@ -199,6 +199,8 @@ data class BookLook(
   val generatedCover: String? = null,
   /** What the listener added to the base cover prompt. */
   val extraCoverPrompt: String = "",
+  /** The layout of the last generated cover, so the next one tries another. */
+  val coverComposition: String = "",
   /** The display face for chapter names, one of the app's named faces ("anton", "serif", ...). */
   val displayFont: String = "anton",
   val snipStyle: SnipPictureStyle? = null,
@@ -212,7 +214,7 @@ enum class LookSource {
   /** Colors picked from the book's own cover. */
   Cover,
 
-  /** A cover Earwig generated, and colors picked from it. */
+  /** A cover Earlobe generated, and colors picked from it. */
   Generated,
 }
 
