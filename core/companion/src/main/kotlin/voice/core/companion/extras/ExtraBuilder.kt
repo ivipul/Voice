@@ -42,7 +42,8 @@ class ExtraBuilder(
       kind = card.kind,
       html = html,
       createdAtMs = System.currentTimeMillis(),
-      unlockAtMs = topicId?.let(scene::firstCueMs) ?: 0L,
+      // Asked for on the spot, so it is about what the listener already heard: open it at once.
+      unlockAtMs = if (card.requestedAtMs != null) 0L else topicId?.let(scene::firstCueMs) ?: 0L,
       topicId = topicId,
       brief = brief,
     )
@@ -98,6 +99,7 @@ class ExtraBuilder(
     append("${card.title}: ${card.description}")
     if (card.kind.isNotBlank()) append(" (a ${card.kind})")
     if (card.why.isNotBlank()) append("\nWhy: ${card.why}")
+    append(card.featureText())
   }
 }
 
@@ -165,7 +167,14 @@ internal const val STYLE_SYSTEM = "You write art direction for the pictures an a
   "labels). Never name the book, its author or its characters."
 
 internal fun stylePrompt(profile: BookProfile, card: IdeaCard): String =
-  profileText(profile) + "\nLook of the book: ${profile.visualStyle}\n\nStyle idea: ${card.title}: ${card.description}"
+  profileText(profile) + "\nLook of the book: ${profile.visualStyle}\n\nStyle idea: ${card.title}: ${card.description}" +
+    card.featureText()
+
+/** The parts the listener kept ticked on the card, and the ones they unticked. */
+internal fun IdeaCard.featureText(): String = buildString {
+  if (includedFeatures.isNotEmpty()) append("\nInclude: ${includedFeatures.joinToString("; ")}")
+  if (leftOutFeatures.isNotEmpty()) append("\nLeave out: ${leftOutFeatures.joinToString("; ")}")
+}
 
 internal val STYLE_SCHEMA = Schema.obj(
   "name" to Schema.string(),

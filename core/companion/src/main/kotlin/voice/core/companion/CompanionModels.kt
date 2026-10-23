@@ -116,6 +116,20 @@ data class IdeaCard(
   val error: String? = null,
   /** The built Extra, once there is one. */
   val extraId: String? = null,
+  /** For an Extra asked for through Ask: where in the whole book the listener was. */
+  val requestedAtMs: Long? = null,
+  /** The parts the Extra would have, each one ticked until the listener unticks it. */
+  val features: List<IdeaFeature> = emptyList(),
+) {
+
+  val includedFeatures: List<String> get() = features.filter { it.included }.map { it.label }
+  val leftOutFeatures: List<String> get() = features.filterNot { it.included }.map { it.label }
+}
+
+@Serializable
+data class IdeaFeature(
+  val label: String,
+  val included: Boolean = true,
 )
 
 @Serializable

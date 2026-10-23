@@ -25,6 +25,32 @@ class BookSetupViewStateTest {
   }
 
   @Test
+  fun theDeckDealsTheListenersOwnIdeasFirstThenTheRestInOrder() {
+    val cards = listOf(
+      card("first", IdeaStatus.Built),
+      card("second", IdeaStatus.Suggested),
+      card("third", IdeaStatus.Skipped),
+      card("fourth", IdeaStatus.Suggested),
+    )
+
+    val deck = cards.ideaDeck()
+    assertEquals("second", deck.current?.id)
+    assertEquals(2, deck.position)
+    assertEquals(4, deck.total)
+
+    val withOwn = (cards + card("own", IdeaStatus.Suggested).copy(fromListener = true)).ideaDeck()
+    assertEquals("own", withOwn.current?.id)
+  }
+
+  @Test
+  fun theDeckIsEmptyOnceEveryCardIsDecided() {
+    val deck = listOf(card("a", IdeaStatus.Built), card("b", IdeaStatus.Skipped)).ideaDeck()
+
+    assertEquals(null, deck.current)
+    assertEquals(2, deck.position)
+  }
+
+  @Test
   fun transcriptionCostIsEstimatedFromTheWholeBook() {
     val state = TranscriptionState(state = StepState.Running, partsDone = 3, partsTotal = 12)
       .toViewState(durationMs = 10 * 60 * 60_000L + 30_000L)

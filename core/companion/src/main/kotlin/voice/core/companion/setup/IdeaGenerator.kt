@@ -9,6 +9,7 @@ import voice.core.companion.CompanionStores
 import voice.core.companion.ExtensionPoint
 import voice.core.companion.FeasibilityVerdict
 import voice.core.companion.IdeaCard
+import voice.core.companion.IdeaFeature
 import voice.core.companion.IdeaStatus
 import voice.core.companion.Schema
 import voice.core.companion.StepState
@@ -74,6 +75,7 @@ class IdeaGenerator(
         point = point,
         kind = answer.kind,
         fromListener = true,
+        features = featuresOf(answer.features),
       )
       stores.ideas.update(bookId) { it.copy(cards = it.cards + card) }
     }
@@ -91,6 +93,7 @@ internal data class IdeaItem(
   val why: String,
   val point: String,
   val kind: String,
+  val features: List<String> = emptyList(),
 ) {
   fun toCard(fromListener: Boolean): IdeaCard? {
     val extensionPoint = extensionPointOf(point) ?: return null
@@ -102,9 +105,19 @@ internal data class IdeaItem(
       point = extensionPoint,
       kind = kind,
       fromListener = fromListener,
+      features = featuresOf(features),
     )
   }
 }
+
+internal fun featuresOf(labels: List<String>): List<IdeaFeature> = labels
+  .map { it.trim().trimEnd('.') }
+  .filter { it.isNotBlank() }
+  .distinct()
+  .take(MAX_FEATURES)
+  .map(::IdeaFeature)
+
+private const val MAX_FEATURES = 4
 
 @Serializable
 internal data class VerdictAnswer(
@@ -115,6 +128,7 @@ internal data class VerdictAnswer(
   val description: String,
   val reason: String,
   val alternative: String,
+  val features: List<String> = emptyList(),
 )
 
 internal fun extensionPointOf(value: String): ExtensionPoint? = when (value) {
@@ -143,8 +157,10 @@ internal const val EXTENSION_POINTS = """The app can build exactly three kinds o
 internal const val IDEAS_SYSTEM = "You design companion Extras for an audiobook app. Suggest ideas that make this " +
   "particular book easier to follow, remember or put to use, and that are fun. Be specific to the book: name the " +
   "concept a calculator works out, the period a timeline covers, the skill a quiz drills. Never spoil the story. " +
-  "Titles are 2 to 5 words. Descriptions are one sentence on what the listener gets. Why is one sentence on why it " +
-  "suits this book. Kind is one word for shelf Extras (calculator, explainer, quiz, timeline, glossary, map, " +
+  "The listener decides from a small card at a glance, so keep it short. Titles are 2 to 5 words. Descriptions " +
+  "are one plain line of at most 12 words on what the listener gets. Features are 2 to 4 parts the Extra will " +
+  "have, 2 to 5 words each (\"Quiz after each chapter\", \"Hand-lettered labels\"), which the listener can untick; " +
+  "leave features empty for scene_chips. Why is one sentence on why it suits this book. Kind is one word for shelf Extras (calculator, explainer, quiz, timeline, glossary, map, " +
   "tracker, flashcards) and empty otherwise.\n\n$EXTENSION_POINTS"
 
 internal fun ideasPrompt(profile: BookProfile, existing: List<IdeaCard>): String = buildString {
@@ -153,7 +169,7 @@ internal fun ideasPrompt(profile: BookProfile, existing: List<IdeaCard>): String
     append("\nAlready on the board (don't repeat these):\n")
     existing.forEach { append("- ${it.title} (${it.point.name}, ${it.status.name})\n") }
   }
-  append("\nSuggest 5 ideas: one snip_picture style, ")
+  append("\nSuggest 4 ideas: one snip_picture style, ")
   val chips = if (profile.kind == BookKind.Fiction) "characters" else "topics"
   append("one scene_chips for $chips if the book would benefit, and the rest shelf Extras.")
 }
@@ -162,7 +178,8 @@ internal const val FEASIBILITY_SYSTEM = "You check whether an Extra a listener a
   "audiobook companion app, and if so, shape it into a card. feasible is true only if it fits one of the three " +
   "kinds below; point is that kind, or null when it fits none. If it can't be built as asked, explain why in one " +
   "plain sentence and give the nearest thing that can, as alternative. Title is 2 to 5 words, description one " +
-  "sentence, kind one word for shelf Extras or empty.\n\n$EXTENSION_POINTS"
+  "line of at most 12 words, features 2 to 4 parts it will have in 2 to 5 words each (empty for scene_chips), " +
+  "kind one word for shelf Extras or empty.\n\n$EXTENSION_POINTS"
 
 internal fun feasibilityPrompt(profile: BookProfile, idea: String): String =
   profileText(profile) + "\nThe listener's idea:\n\"\"\"\n$idea\n\"\"\""
@@ -188,6 +205,7 @@ internal val IDEAS_SCHEMA = Schema.obj(
       "why" to Schema.string(),
       "point" to Schema.enum(POINTS),
       "kind" to Schema.string(),
+      "features" to Schema.array(Schema.string()),
     ),
   ),
 )
@@ -200,4 +218,5 @@ internal val VERDICT_SCHEMA = Schema.obj(
   "description" to Schema.string(),
   "reason" to Schema.string(),
   "alternative" to Schema.string(),
+  "features" to Schema.array(Schema.string()),
 )

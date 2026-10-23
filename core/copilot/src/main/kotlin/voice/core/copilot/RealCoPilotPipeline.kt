@@ -12,6 +12,7 @@ import voice.core.ai.MissingApiKeyException
 import voice.core.companion.BookProfile
 import voice.core.companion.CompanionStores
 import voice.core.companion.StepState
+import voice.core.companion.request.ExtraRequests
 import voice.core.data.Book
 import voice.core.data.BookId
 import voice.core.data.repo.BookRepository
@@ -30,6 +31,7 @@ class RealCoPilotPipeline(
   private val coPilotRepository: CoPilotRepository,
   private val stores: CompanionStores,
   private val snipPictureRunner: SnipPictureRunner,
+  private val extraRequests: ExtraRequests,
 ) : CoPilotPipeline {
 
   override suspend fun failureMessage(): String =
@@ -45,6 +47,8 @@ class RealCoPilotPipeline(
 
   private suspend fun askPlan(bookId: BookId, question: String): Plan {
     val book = bookRepository.get(bookId) ?: return Plan.Direct(FALLBACK_ANSWER)
+    val recent = transcriptRepository.textForPrecedingWindow(book, EXTRA_REQUEST_WINDOW_MS)
+    extraRequests.handle(bookId, question, book.position, recent)?.let { return Plan.Direct(it) }
     val transcript = transcriptRepository.textForPrecedingWindow(book, ASK_TRANSCRIPT_WINDOW_MS)
     return Plan.Claude(askSystemPrompt(book, profileOf(book)), userQuestionPrompt(question, transcript))
   }
@@ -92,6 +96,8 @@ class RealCoPilotPipeline(
       is Plan.Claude -> emitAll(claudeClient.askStream(resolved.systemPrompt, resolved.userPrompt))
     }
   }
+
+  override fun awaitingReply(bookId: BookId): Boolean = extraRequests.awaitingReply(bookId)
 
   override suspend fun warmUp(bookId: BookId) {
     // At app start the library may not have the book yet, so give it a few tries.
@@ -169,6 +175,7 @@ class RealCoPilotPipeline(
     val AUTO_IDENTIFY_CONTEXT_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val CATCH_UP_WINDOW_MS = 30.minutes.inWholeMilliseconds
     val SNIP_BEFORE_MS = 3.minutes.inWholeMilliseconds
+    val EXTRA_REQUEST_WINDOW_MS = 3.minutes.inWholeMilliseconds
     val SNIP_AFTER_MS = 30.seconds.inWholeMilliseconds
   }
 }

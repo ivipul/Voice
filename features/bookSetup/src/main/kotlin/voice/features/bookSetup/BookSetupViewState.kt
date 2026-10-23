@@ -27,6 +27,7 @@ data class BookSetupViewState(
   val profile: BookProfile?,
   val ideas: StepViewState,
   val cards: List<IdeaCard>,
+  val deck: IdeaDeckViewState,
   val skippedCards: List<IdeaCard>,
   val ownIdea: OwnIdeaViewState,
   val look: LookViewState,
@@ -47,6 +48,15 @@ data class TranscriptionViewState(
   val durationMinutes: Int,
   /** What Deepgram will bill for the whole book, in US dollars. */
   val estimatedCostUsd: Double,
+)
+
+/** Claude's idea cards dealt one at a time, each waiting for Build or Skip. */
+@Immutable
+data class IdeaDeckViewState(
+  val current: IdeaCard?,
+  /** Where [current] sits in the deck, counted from 0; cards before it are decided. */
+  val position: Int,
+  val total: Int,
 )
 
 @Immutable
@@ -102,3 +112,11 @@ internal fun List<IdeaCard>.activeCards(): List<IdeaCard> = filter { it.status !
   }
 
 internal fun List<IdeaCard>.skippedCards(): List<IdeaCard> = filter { it.status == IdeaStatus.Skipped }
+
+/** The listener's own ideas come first, then Claude's in the order they were suggested. */
+internal fun List<IdeaCard>.ideaDeck(): IdeaDeckViewState {
+  val ordered = sortedByDescending { it.fromListener }
+  val decided = ordered.filter { it.status != IdeaStatus.Suggested }
+  val waiting = ordered.filter { it.status == IdeaStatus.Suggested }
+  return IdeaDeckViewState(current = waiting.firstOrNull(), position = decided.size, total = ordered.size)
+}

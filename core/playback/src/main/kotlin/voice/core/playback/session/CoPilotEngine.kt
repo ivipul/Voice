@@ -230,12 +230,20 @@ class CoPilotEngine(
               finish(onFinished)
               return@launch
             }
-            startWaiting(onFinished)
-            speakAnswer(
-              deltas = copilotPipeline.askStream(bookId, heard),
-              nonStreaming = { copilotPipeline.ask(bookId, heard) },
-              onAnswer = { recordAnswer(bookId, it) },
-            )
+            var question: String = heard
+            var round = 0
+            while (true) {
+              startWaiting(onFinished)
+              val asked = question
+              speakAnswer(
+                deltas = copilotPipeline.askStream(bookId, asked),
+                nonStreaming = { copilotPipeline.ask(bookId, asked) },
+                onAnswer = { recordAnswer(bookId, it) },
+              )
+              // The answer asked something back (a requested Extra that repeats one, or an alternative): hear the reply.
+              if (++round > MAX_FOLLOW_UPS || !copilotPipeline.awaitingReply(bookId)) break
+              question = listenForQuestion(bookId) ?: break
+            }
           }
           CoPilotMode.AutoIdentify -> speakAnswer(
             deltas = copilotPipeline.autoIdentifyStream(bookId),
@@ -539,5 +547,6 @@ class CoPilotEngine(
     const val RESPONSE_END_PAUSE_MS = 500L
     const val NO_SPEECH_TIMEOUT_MS = 5_000L
     const val NO_AUDIO_TIMEOUT_MS = 30_000L
+    const val MAX_FOLLOW_UPS = 2
   }
 }

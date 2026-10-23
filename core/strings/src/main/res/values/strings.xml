@@ -466,7 +466,7 @@
     <!-- Header of the idea cards on the setup screen. -->
     <string name="setup.ideas.title">Extras</string>
     <!-- Explains the idea cards. -->
-    <string name="setup.ideas.body">Ideas made for this book. Build the ones you like and skip the rest; built Extras appear in the Notebook and on the player.</string>
+    <string name="setup.ideas.body">Build the ones you like, skip the rest.</string>
     <!-- Shown before ideas are generated. -->
     <string name="setup.ideas.waiting">Ideas come once the book is looked up…</string>
     <!-- Shown while ideas are generated. -->
@@ -567,4 +567,12 @@
     <string name="playback.option.book_setup">Book setup &amp; Extras</string>
     <!-- Shown while a picked audiobook file is scanned. -->
     <string name="setup.adding">Adding the book to your library…</string>
+    <!-- Small label on an idea card: which card of the deck this is. -->
+    <string name="setup.idea.number">Idea %1$d of %2$d</string>
+    <!-- Label above the parts of an idea the listener can untick. -->
+    <string name="setup.idea.includes">Includes</string>
+    <!-- Header above the ideas the listener chose to build. -->
+    <string name="setup.ideas.decided">Your Extras</string>
+    <!-- Shown in place of the idea deck once every card is built or skipped. -->
+    <string name="setup.ideas.all_decided">That\'s every idea for now.</string>
 </resources>

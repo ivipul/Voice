@@ -117,7 +117,9 @@ class BookPlayViewModelTest {
     coEvery { book(book.id) } returns book
   }
   private val copilotRepository = CoPilotRepository()
-  private val copilotPipeline = mockk<CoPilotPipeline>()
+  private val copilotPipeline = mockk<CoPilotPipeline> {
+    every { awaitingReply(any()) } returns false
+  }
   private val speechInputController = mockk<SpeechInputController>()
   private val spokenMessage = MutableStateFlow<SpokenMessage?>(null)
   private val messageSpeaker = mockk<MessageSpeaker> {
@@ -589,6 +591,23 @@ class BookPlayViewModelTest {
     assertEquals("who is Carl?", messages[0].text)
     assertEquals(CoPilotMessage.Role.CoPilot, messages[1].role)
     assertEquals("Carl is the protagonist.", messages[1].text)
+  }
+
+  @Test
+  fun `when the answer asks whether to build a requested Extra, the chat listens for the reply`() = scope.runTest {
+    val heard = MutableSharedFlow<DictationEvent>()
+    every { speechInputController.dictate() } returns heard
+    coEvery { copilotPipeline.ask(book.id, "make me a quiz") } returns "There's already a quiz. Make a new one?"
+    every { copilotPipeline.awaitingReply(book.id) } returns true
+
+    viewModel.onAskClick()
+    runCurrent()
+    viewModel.onChatInputChange("make me a quiz")
+    viewModel.onChatSend()
+    runCurrent()
+
+    assertEquals(true, viewModel.chatInput.value.isListening)
+    viewModel.onFeedDismiss()
   }
 
   @Test

@@ -12,7 +12,7 @@ Android build (Google Maven is blocked there), so what was checked is:
   compile with warnings as errors, and their unit tests pass.
 - Every changed screen module (`:features:bookSetup`, `:features:extras`, `:features:bookmark`,
   `:features:playbackScreen`, `:features:bookOverview`, the settings screen, `:core:ui`) and the headset
-  `CoPilotEngine` compile against desktop Compose with stand-ins for Android-only APIs, and 82 of their 83 unit
+  `CoPilotEngine` compile against desktop Compose with stand-ins for Android-only APIs, and 85 of their 86 unit
   tests pass there (the one left needs `android.os.Build`).
 
 Still to do on the Mac: `./gradlew :app:assembleFreeDebug` (Metro wiring and Android resources are only checked
@@ -27,12 +27,20 @@ there) and `./gradlew voiceUnitTest`.
 3. **While that runs, Claude researches the book online** (Claude's web search tool): fiction or non-fiction, what it
    is about, key themes, and for fiction whether it has a large cast. The result is a **Book profile**.
 4. **From the profile, Claude proposes Extras**: 3-5 idea cards, each tied to one of the extension points below.
-   The user taps **Build** or **Skip** on each. A text box lets the user describe their own idea; Claude checks it
+   The cards are dealt one at a time on a small stack, with progress dashes on top. Each card is a glance, not a
+   read: a 2-5 word title, one line of at most 12 words, and 2-4 parts it will include, all ticked, which the user
+   can untick before tapping **Build** or **Skip**. Unticked parts are left out of what Claude builds. A text box lets the user describe their own idea; Claude checks it
    against what the app can actually do and answers "can build" (with the extension point it would use) or "can't,
    because ..." with a nearby alternative.
 5. **Baseline features**, as in The Crawl, all answered from the transcript up to the listener's position:
    Snip, Ask (typed or spoken), Recap the last 30 minutes, "What's happening?" (auto-identify), headset button
    shortcuts. Spoken answers use the phone's text-to-speech only.
+5a. **Extras on request.** While listening, the user can ask for an Extra through Ask (headset or the chat), e.g.
+   "make me a map of the places so far". Claude checks it against the book's existing Extras and the extension
+   points. New and buildable: "On it", the build starts and the book resumes. Same as or close to an existing
+   Extra: "There's already X, which does Y. Do you still want me to make a new one?" and the app listens for the
+   yes or no. Not buildable: Claude says why and offers the closest Extra that fits, again waiting for a yes. A
+   requested Extra is built around the part of the book that was playing and unlocks right away.
 6. **Look**: a cream, red and black default theme (The Crawl's Book 8 palette). Each book can instead take its
    colors from its cover, or the user can generate a custom cover with Ideogram from a base prompt plus their own
    extra prompt, and regenerate it.
@@ -140,7 +148,7 @@ API keys, transcripts and book folders are excluded from cloud backup.
 
 ## Not in this build
 
-- On-device transcription.
+- On-device transcription (Vipul chose to keep Deepgram in the cloud, 2026-10-23).
 - Sharing Extras between users.
 - Android Auto changes beyond renaming.
 
@@ -158,6 +166,9 @@ API keys, transcripts and book folders are excluded from cloud backup.
 - The book's original cover is kept and comes back when the look is switched away from a generated cover.
 - Library and settings sit on white, so the cream book cards stand out.
 - Book setup is reachable from the player's menu and the library's long-press sheet, not only when adding a book.
+- A requested Extra waits up to 3 minutes for the yes or no; the headset listens for up to two follow-up replies.
+- Ask only spends a second Claude call on "is this a request?" when the words look like one (a make verb plus an
+  Extra noun), so ordinary questions stay as fast as before.
 
 ## Assumptions made without asking
 

@@ -26,6 +26,12 @@ interface CoPilotPipeline {
   /** Snip: silently summarizes what is being discussed around the current moment into the chat and Notebook. */
   suspend fun snip(bookId: BookId)
 
+  /**
+   * True when the last answer to [ask] ended in a yes-or-no question (an Extra the listener asked for overlaps one
+   * the book has, or only an alternative can be built), so a spoken flow should listen for the reply.
+   */
+  fun awaitingReply(bookId: BookId): Boolean = false
+
   /** Loads the current book's transcript into memory ahead of the first co-pilot action. */
   suspend fun warmUp(bookId: BookId) = Unit
 

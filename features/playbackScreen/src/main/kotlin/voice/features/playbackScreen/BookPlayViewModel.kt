@@ -517,7 +517,13 @@ class BookPlayViewModel(
     stopDictation()
     cancelAutoSend()
     chatInput.value = ChatInputViewState()
-    runCoPilotExchange(userText = question) { copilotPipeline.ask(bookId, question) }
+    runCoPilotExchange(
+      userText = question,
+      onAnswered = {
+        // The answer asked a yes-or-no question about a requested Extra: listen for the reply.
+        if (feedVisible.value && copilotPipeline.awaitingReply(bookId)) startDictation()
+      },
+    ) { copilotPipeline.ask(bookId, question) }
   }
 
   private fun startDictation() {
@@ -617,6 +623,7 @@ class BookPlayViewModel(
 
   private fun runCoPilotExchange(
     userText: String,
+    onAnswered: () -> Unit = {},
     answer: suspend () -> String,
   ) {
     scope.launch {
@@ -641,6 +648,7 @@ class BookPlayViewModel(
           timestampMs = System.currentTimeMillis(),
         ),
       )
+      onAnswered()
     }
   }
 

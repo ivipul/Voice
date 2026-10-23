@@ -78,6 +78,16 @@ class BookSetupRunner(
     updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Skipped) }
   }
 
+  suspend fun toggleFeature(bookId: BookId, cardId: String, index: Int) {
+    updateCard(bookId, cardId) { card ->
+      card.copy(
+        features = card.features.mapIndexed { i, feature ->
+          if (i == index) feature.copy(included = !feature.included) else feature
+        },
+      )
+    }
+  }
+
   suspend fun restore(bookId: BookId, cardId: String) {
     updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Suggested, error = null) }
   }

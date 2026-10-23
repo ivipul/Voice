@@ -95,6 +95,7 @@ class BookSetupViewModel(
       profile = profile?.takeIf { setup.research == StepState.Done },
       ideas = StepViewState(setup.ideas, setup.ideasError),
       cards = cards.activeCards(),
+      deck = cards.ideaDeck(),
       skippedCards = cards.skippedCards(),
       ownIdea = ownIdea,
       look = LookViewState(
@@ -130,6 +131,10 @@ class BookSetupViewModel(
 
   fun onSkip(card: IdeaCard) {
     scope.launch { runner.skip(bookId, card.id) }
+  }
+
+  fun onToggleFeature(card: IdeaCard, index: Int) {
+    scope.launch { runner.toggleFeature(bookId, card.id, index) }
   }
 
   fun onRestore(card: IdeaCard) {
