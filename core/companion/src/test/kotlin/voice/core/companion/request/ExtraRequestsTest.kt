@@ -120,6 +120,25 @@ class ExtraRequestsTest {
     assertFalse(brief.endsWith("x".repeat(4_001)))
   }
 
+  @Test
+  fun aShelfRequestKeepsThePdfSectionItIsBuiltFrom() {
+    val outcome = outcomeOf(plan(materialSection = "pdf2"), brief = "brief", positionMs = 0L, existing = emptyList())
+
+    assertEquals("pdf2", assertIs<RequestOutcome.Build>(outcome).card.materialSectionId)
+  }
+
+  @Test
+  fun onlyShelfRequestsUseAPdfSection() {
+    val outcome = outcomeOf(
+      plan(point = "snip_picture", materialSection = "pdf2"),
+      brief = "brief",
+      positionMs = 0L,
+      existing = emptyList(),
+    )
+
+    assertEquals(null, assertIs<RequestOutcome.Build>(outcome).card.materialSectionId)
+  }
+
   private fun plan(
     feasible: Boolean = true,
     point: String? = "shelf",
@@ -130,6 +149,7 @@ class ExtraRequestsTest {
     alternativePoint: String? = null,
     alternativeTitle: String = "",
     alternativeDescription: String = "",
+    materialSection: String? = null,
   ) = RequestPlan(
     isRequest = true,
     feasible = feasible,
@@ -143,5 +163,6 @@ class ExtraRequestsTest {
     alternativePoint = alternativePoint,
     alternativeTitle = alternativeTitle,
     alternativeDescription = alternativeDescription,
+    materialSection = materialSection,
   )
 }

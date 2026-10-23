@@ -3,6 +3,7 @@ package voice.core.companion.setup
 import voice.core.companion.ExtensionPoint
 import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaFeature
+import voice.core.companion.MaterialSection
 import voice.core.companion.extras.featureText
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,5 +50,22 @@ class IdeaFeaturesTest {
     )
 
     assertEquals("\nInclude: Hints\nThe listener adds (follow this): Make it multiple choice", card.featureText())
+  }
+
+  @Test
+  fun anOwnIdeaKeepsAPdfSectionOnlyForAShelfExtraTheBookHas() {
+    val sections = listOf(MaterialSection(id = "pdf1", fileId = "f", title = "Morning checklist"))
+
+    assertEquals("pdf1", materialSectionOf("pdf1", ExtensionPoint.Shelf, sections))
+    assertEquals(null, materialSectionOf("pdf9", ExtensionPoint.Shelf, sections))
+    assertEquals(null, materialSectionOf("pdf1", ExtensionPoint.SnipPicture, sections))
+  }
+
+  @Test
+  fun theIdeaPromptListsPdfSectionsOnlyWhenThereAreSome() {
+    val sections = listOf(MaterialSection(id = "pdf1", fileId = "f", title = "Morning checklist", pages = "3-4"))
+
+    assertEquals("", pdfSectionsText(emptyList()))
+    kotlin.test.assertTrue(pdfSectionsText(sections).contains("- pdf1: Morning checklist"))
   }
 }

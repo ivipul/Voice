@@ -9,10 +9,12 @@ import voice.core.companion.CompanionStores
 import voice.core.companion.ExtensionPoint
 import voice.core.companion.IdeaCard
 import voice.core.companion.IdeaStatus
+import voice.core.companion.MaterialSection
 import voice.core.companion.Schema
 import voice.core.companion.companionJson
 import voice.core.companion.setup.EXTENSION_POINTS
 import voice.core.companion.setup.extensionPointOf
+import voice.core.companion.setup.pdfSectionsText
 import voice.core.companion.setup.profileText
 import voice.core.companion.work.BookSetupRunner
 import voice.core.data.BookId
@@ -105,8 +107,10 @@ class ExtraRequests(
 
   private suspend fun plan(bookId: BookId, utterance: String, recentTranscript: String?): RequestPlan {
     val profile = stores.profile.get(bookId)
-    val prompt = requestPrompt(profileText(profile), utterance, recentTranscript, existing(bookId))
-    return companionJson.decodeFromString(RequestPlan.serializer(), claude.askJson(REQUEST_SYSTEM, prompt, REQUEST_SCHEMA))
+    val sections = stores.materials.get(bookId).sections
+    val prompt = requestPrompt(profileText(profile), utterance, recentTranscript, existing(bookId), sections)
+    val plan = companionJson.decodeFromString(RequestPlan.serializer(), claude.askJson(REQUEST_SYSTEM, prompt, REQUEST_SCHEMA))
+    return plan.copy(materialSection = plan.materialSection?.takeIf { id -> sections.any { it.id == id } })
   }
 
   private suspend fun start(bookId: BookId, card: IdeaCard) {
@@ -156,6 +160,7 @@ internal data class RequestPlan(
   val alternativePoint: String?,
   val alternativeTitle: String,
   val alternativeDescription: String,
+  val materialSection: String? = null,
 )
 
 /** Turns Claude's reading of a request into what happens next; no Claude calls, so it is easy to test. */
@@ -172,14 +177,14 @@ internal fun outcomeOf(
     if (alternative == null || plan.alternativeTitle.isBlank()) {
       return RequestOutcome.Refuse("$reason. Ask me for a quiz, explainer, timeline, map or calculator instead.")
     }
-    val card = requestedCard(plan.alternativeTitle, plan.alternativeDescription, alternative, plan.kind, brief, positionMs)
+    val card = requestedCard(plan.alternativeTitle, plan.alternativeDescription, alternative, plan.kind, brief, positionMs, plan.materialSection)
     return RequestOutcome.Confirm(
       card = card,
       question = "I can't build that exactly: $reason. The closest I can make is “${card.title}”, " +
         "${plan.alternativeDescription.lowercaseFirst().trimEnd('.')}. Want me to build that?",
     )
   }
-  val card = requestedCard(plan.title, plan.description, point, plan.kind, brief, positionMs)
+  val card = requestedCard(plan.title, plan.description, point, plan.kind, brief, positionMs, plan.materialSection)
   val duplicate = existing.firstOrNull { it.id == plan.existingId }
   if (duplicate != null) {
     val what = plan.existingSummary.ifBlank { duplicate.description }.lowercaseFirst().trimEnd('.')
@@ -198,6 +203,7 @@ private fun requestedCard(
   kind: String,
   brief: String,
   positionMs: Long,
+  materialSection: String?,
 ) = IdeaCard(
   id = UUID.randomUUID().toString(),
   title = title.ifBlank { "Requested Extra" },
@@ -207,6 +213,7 @@ private fun requestedCard(
   kind = if (point == ExtensionPoint.Shelf) kind else "",
   fromListener = true,
   requestedAtMs = positionMs,
+  materialSectionId = materialSection?.takeIf { point == ExtensionPoint.Shelf },
 )
 
 internal fun startedReply(card: IdeaCard): String = when (card.point) {
@@ -276,8 +283,10 @@ internal fun requestPrompt(
   utterance: String,
   recentTranscript: String?,
   existing: List<ExistingExtra>,
+  sections: List<MaterialSection> = emptyList(),
 ): String = buildString {
   append(profile)
+  append(pdfSectionsText(sections))
   append("\nExtras the book already has:\n")
   if (existing.isEmpty()) append("(none)\n")
   existing.forEach { append("- id ${it.id}: ${it.title}. ${it.description}\n") }
@@ -302,4 +311,5 @@ internal val REQUEST_SCHEMA = Schema.obj(
   "alternativePoint" to Schema.nullableString(POINTS_OR_NULL),
   "alternativeTitle" to Schema.string(),
   "alternativeDescription" to Schema.string(),
+  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Extra is built from, or null."),
 )

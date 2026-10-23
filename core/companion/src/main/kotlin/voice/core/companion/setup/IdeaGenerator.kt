@@ -58,8 +58,9 @@ class IdeaGenerator(
   /** Checks the listener's own idea. A feasible one goes on the board as a card ready to build. */
   suspend fun check(bookId: BookId, idea: String): FeasibilityVerdict {
     val profile = stores.profile.get(bookId)
+    val sections = stores.materials.get(bookId).sections
     val answer = companionJson.decodeFromString<VerdictAnswer>(
-      claude.askJson(system = FEASIBILITY_SYSTEM, prompt = feasibilityPrompt(profile, idea), schema = VERDICT_SCHEMA),
+      claude.askJson(system = FEASIBILITY_SYSTEM, prompt = feasibilityPrompt(profile, idea, sections), schema = VERDICT_SCHEMA),
     )
     val point = answer.point?.let(::extensionPointOf)
     val verdict = FeasibilityVerdict(
@@ -80,6 +81,7 @@ class IdeaGenerator(
         kind = answer.kind,
         fromListener = true,
         features = featuresOf(answer.features),
+        materialSectionId = materialSectionOf(answer.materialSection, point, sections),
       )
       stores.ideas.update(bookId) { it.copy(cards = it.cards + card) }
     }
@@ -135,6 +137,7 @@ internal data class VerdictAnswer(
   val reason: String,
   val alternative: String,
   val features: List<String> = emptyList(),
+  val materialSection: String? = null,
 )
 
 internal fun extensionPointOf(value: String): ExtensionPoint? = when (value) {
@@ -200,8 +203,24 @@ internal const val FEASIBILITY_SYSTEM = "You check whether an Extra a listener a
   "line of at most 12 words, features 2 to 4 parts it will have in 2 to 5 words each (empty for scene_chips), " +
   "kind one word for shelf Extras or empty.\n\n$EXTENSION_POINTS"
 
-internal fun feasibilityPrompt(profile: BookProfile, idea: String): String =
-  profileText(profile) + "\nThe listener's idea:\n\"\"\"\n$idea\n\"\"\""
+internal fun feasibilityPrompt(profile: BookProfile, idea: String, sections: List<MaterialSection> = emptyList()): String =
+  profileText(profile) + pdfSectionsText(sections) + "\nThe listener's idea:\n\"\"\"\n$idea\n\"\"\""
+
+/** The book's PDF sections, for a prompt that turns one idea into an Extra; empty when there's no PDF. */
+internal fun pdfSectionsText(sections: List<MaterialSection>): String = if (sections.isEmpty()) {
+  ""
+} else {
+  buildString {
+    append("\nThe book comes with a PDF. Its sections:\n")
+    sections.forEach { append("- ${it.id}: ${it.title} (${it.contentType}, pages ${it.pages}). ${it.summary}\n") }
+    append("If a shelf Extra would draw on one of these sections, set materialSection to its id so it is built from ")
+    append("the PDF's content; otherwise materialSection is null.\n")
+  }
+}
+
+/** A PDF section id Claude picked, kept only for a shelf Extra and only when the book has that section. */
+internal fun materialSectionOf(id: String?, point: ExtensionPoint?, sections: List<MaterialSection>): String? =
+  id?.takeIf { point == ExtensionPoint.Shelf && sections.any { section -> section.id == it } }
 
 internal fun profileText(profile: BookProfile): String = buildString {
   append("Book: \"${profile.title}\"")
@@ -239,4 +258,5 @@ internal val VERDICT_SCHEMA = Schema.obj(
   "reason" to Schema.string(),
   "alternative" to Schema.string(),
   "features" to Schema.array(Schema.string()),
+  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Extra is built from, or null."),
 )
