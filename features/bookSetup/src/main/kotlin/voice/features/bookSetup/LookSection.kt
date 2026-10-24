@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -75,6 +76,9 @@ internal fun LookSection(
           label = { Text(text = stringResource(source.labelRes)) },
         )
       }
+    }
+    if (look.source == LookSource.Generated) {
+      CoverPreview(look = look, palette = palette)
     }
     if (look.covers.isNotEmpty() || look.drawing) {
       DrawnCovers(look = look, palette = palette, onCoverClick = onCoverClick)
@@ -161,6 +165,33 @@ private fun DrawnCovers(
           )
           .clickable(enabled = !look.working) { onCoverClick(path) },
       )
+    }
+  }
+}
+
+/** The drawn cover in use, large, or a spinner in its place while the first one is drawn. */
+@Composable
+private fun CoverPreview(
+  look: LookViewState,
+  palette: CrawlPalette,
+) {
+  val shape = RoundedCornerShape(16.dp)
+  val modifier = Modifier
+    .fillMaxWidth()
+    .aspectRatio(1F)
+    .clip(shape)
+    .border(width = 2.dp, color = palette.content, shape = shape)
+  val cover = look.currentCover
+  if (cover != null) {
+    AsyncImage(
+      model = File(cover),
+      contentDescription = stringResource(StringsR.string.setup_look_drawn_cover),
+      contentScale = ContentScale.Crop,
+      modifier = modifier,
+    )
+  } else if (look.drawing || look.working) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier) {
+      CircularProgressIndicator(color = palette.highlight)
     }
   }
 }
