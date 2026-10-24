@@ -100,7 +100,6 @@ internal val DISPLAY_FONTS = mapOf(
   "anton" to "tall bold condensed sans, loud and punchy (thrillers, sci-fi, action, business bestsellers)",
   "serif" to "elegant light serif (literary fiction, memoir, history, essays)",
   "condensed" to "industrial condensed sans (tech, science, economics, true crime)",
-  "rounded" to "chunky rounded display (humor, cozy, children's and young adult)",
   "classic" to "bold classic serif (classics, fantasy, romance, philosophy)",
 )
 

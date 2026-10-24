@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -108,11 +110,11 @@ internal fun LookSection(
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       ChapterTypes.forEach { (key, type) ->
         val selected = key == look.displayFont
-        Text(
-          text = if (type.uppercase) "AA" else "Aa",
-          style = TextStyle(fontFamily = type.fontFamily, fontWeight = type.fontWeight, fontSize = 26.sp),
-          color = if (selected) palette.onHighlight else palette.content,
+        Box(
+          contentAlignment = Alignment.Center,
           modifier = Modifier
+            .height(FONT_CHIP_HEIGHT)
+            .widthIn(min = FONT_CHIP_HEIGHT)
             .border(width = 2.dp, color = palette.content, shape = RoundedCornerShape(12.dp))
             .then(
               if (selected) {
@@ -122,8 +124,14 @@ internal fun LookSection(
               },
             )
             .clickable { onFontClick(key) }
-            .padding(horizontal = 14.dp, vertical = 6.dp),
-        )
+            .padding(horizontal = 14.dp),
+        ) {
+          Text(
+            text = if (type.uppercase) "AA" else "Aa",
+            style = TextStyle(fontFamily = type.fontFamily, fontWeight = type.fontWeight, fontSize = 26.sp),
+            color = if (selected) palette.onHighlight else palette.content,
+          )
+        }
       }
     }
   }
@@ -195,3 +203,6 @@ private fun CoverPreview(
     }
   }
 }
+
+/** Every face chip is this tall, whatever the face's own line height. */
+private val FONT_CHIP_HEIGHT = 52.dp

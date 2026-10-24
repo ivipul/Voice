@@ -220,7 +220,6 @@ internal fun CrawlPalette.toExtraTheme(displayFont: String): ExtraTheme = ExtraT
 internal fun cssDisplayFont(key: String): String = when (key) {
   "serif" -> "'Noto Serif',Georgia,serif"
   "classic" -> "'Noto Serif',Georgia,serif"
-  "rounded" -> "system-ui,Roboto,sans-serif"
   "condensed" -> "'Roboto Condensed','Arial Narrow',sans-serif-condensed,sans-serif"
   else -> "Impact,'Roboto Condensed','Arial Narrow',sans-serif"
 }

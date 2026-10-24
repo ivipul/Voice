@@ -22,7 +22,7 @@ class ExtraThemeTest {
 
   @Test
   fun everyDisplayFaceMapsToAPlainFontList() {
-    listOf("anton", "serif", "condensed", "rounded", "classic", "unknown").forEach { key ->
+    listOf("anton", "serif", "condensed", "classic", "unknown").forEach { key ->
       assertFalse(cssDisplayFont(key).contains(';'), key)
     }
   }

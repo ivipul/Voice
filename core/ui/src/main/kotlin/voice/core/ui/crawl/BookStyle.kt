@@ -37,7 +37,6 @@ val ChapterTypes: Map<String, CrawlDisplayType> = mapOf(
   "anton" to DefaultChapterType,
   "serif" to CrawlDisplayType(CrawlFonts.InstrumentSerif, FontWeight.Normal, 46.sp),
   "condensed" to CrawlDisplayType(CrawlFonts.BigShouldersDisplay, FontWeight.SemiBold, 44.sp, uppercase = true),
-  "rounded" to CrawlDisplayType(CrawlFonts.BagelFatOne, FontWeight.Normal, 40.sp),
   "classic" to CrawlDisplayType(CrawlFonts.PlayfairDisplay, FontWeight.Bold, 40.sp),
 )
 
