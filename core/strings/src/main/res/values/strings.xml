@@ -292,7 +292,7 @@
     <!-- Description for Android dynamic color. -->
     <string name="settings.appearance.color_scheme.dynamic.summary">Uses colors from your wallpaper and system theme.</string>
     <!-- Label for selecting Voice blue as app color scheme. -->
-    <string name="settings.appearance.color_scheme.voice_blue">Periwinkle and navy</string>
+    <string name="settings.appearance.color_scheme.voice_blue">Cream and red</string>
     <!-- Label for forcing dark mode. -->
     <string name="settings.appearance.theme.dark">Dark</string>
     <!-- Label for following the system light or dark setting. -->
@@ -521,7 +521,7 @@
     <string name="setup.own.use_alternative">Use this instead</string>
     <!-- Label of the colors and cover card. -->
     <string name="setup.look.label">Look</string>
-    <!-- Look option: the app's periwinkle and navy. -->
+    <!-- Look option: the app's cream, red and black. -->
     <string name="setup.look.default">App colors</string>
     <!-- Look option: colors from the book cover. -->
     <string name="setup.look.cover">Cover colors</string>

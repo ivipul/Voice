@@ -10,8 +10,8 @@ import voice.core.companion.LookSource
 import voice.core.companion.StoredPalette
 
 /**
- * How a book's screens look: its colors and how its chapter names are set. Every book starts in the app's periwinkle and
- * navy. A generated cover replaces the book's own cover file, so it needs nothing here.
+ * How a book's screens look: its colors and how its chapter names are set. Every book starts in the app's cream, red
+ * and black. A generated cover replaces the book's own cover file, so it needs nothing here.
  */
 @Immutable
 data class BookStyle(
@@ -19,15 +19,15 @@ data class BookStyle(
   val chapterType: CrawlDisplayType = DefaultChapterType,
 )
 
-/** The app's own colors, from its icon: periwinkle paper, navy ink and a bold indigo. */
+/** The app's own colors, from its icon: cream paper, black ink and a bold red. */
 val DefaultPalette = CrawlPalette(
-  background = Color(0xFFE4E5FC),
-  content = Color(0xFF0B0D45),
-  highlight = Color(0xFF3238C2),
-  onHighlight = Color(0xFFF4F5FF),
-  accent = Color(0xFF0B0D45),
-  onAccent = Color(0xFFF4F5FF),
-  shadow = Color(0xFFABAEEC),
+  background = Color(0xFFEDE4CA),
+  content = Color(0xFF17171C),
+  highlight = Color(0xFFD62828),
+  onHighlight = Color(0xFFFFF4EE),
+  accent = Color(0xFF17171C),
+  onAccent = Color(0xFFFFF4EE),
+  shadow = Color(0xFFC2AB98),
 )
 
 val DefaultChapterType = CrawlDisplayType.Default

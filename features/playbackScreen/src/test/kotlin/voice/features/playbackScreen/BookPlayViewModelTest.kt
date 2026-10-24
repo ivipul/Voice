@@ -398,7 +398,7 @@ class BookPlayViewModelTest {
   }
 
   @Test
-  fun `a book without a look gets the app's periwinkle and navy`() = scope.runTest {
+  fun `a book without a look gets the app's cream, red and black`() = scope.runTest {
     val viewModel = viewModel()
 
     backgroundScope.launchMolecule(RecompositionMode.Immediate) { viewModel.viewState() }.test {

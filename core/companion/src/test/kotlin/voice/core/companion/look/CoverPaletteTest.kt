@@ -60,6 +60,6 @@ class CoverPaletteTest {
 
   @Test
   fun anEmptyCoverFallsBackToTheAppColors() {
-    assertEquals(0xFFE4E5FC.toInt(), paletteFromPixels(IntArray(0), width = 0).background)
+    assertEquals(0xFFEDE4CA.toInt(), paletteFromPixels(IntArray(0), width = 0).background)
   }
 }

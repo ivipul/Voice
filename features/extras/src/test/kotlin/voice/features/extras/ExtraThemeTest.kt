@@ -17,7 +17,7 @@ class ExtraThemeTest {
     assertEquals(DefaultPalette.content.toArgb(), theme.ink)
     assertEquals(DefaultPalette.highlight.toArgb(), theme.accent)
     assertEquals(DefaultPalette.onHighlight.toArgb(), theme.accentInk)
-    assertTrue(theme.css().contains("--bg:#E4E5FC"))
+    assertTrue(theme.css().contains("--bg:#EDE4CA"))
   }
 
   @Test

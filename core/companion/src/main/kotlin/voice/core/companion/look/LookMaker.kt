@@ -24,7 +24,7 @@ import voice.core.transcript.BookFiles
 import java.io.File
 
 /**
- * A book's look: the app's periwinkle and navy, colors picked from its cover, or a cover Earwig draws with Ideogram
+ * A book's look: the app's cream, red and black, colors picked from its cover, or a cover Earwig draws with Ideogram
  * (with the listener's own words added to the prompt) and colors picked from that. The book's original cover is kept
  * so it can always come back.
  */

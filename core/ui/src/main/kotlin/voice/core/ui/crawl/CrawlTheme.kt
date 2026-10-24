@@ -43,7 +43,7 @@ fun CrawlTheme(
 
 /**
  * The library and settings on white: the app's light colors whatever the phone's dark mode, with dark system bar
- * icons. White keeps the periwinkle cards of books in the default look standing out.
+ * icons. White keeps the cream cards of books in the default look standing out.
  */
 @Composable
 fun CrawlLibraryTheme(content: @Composable () -> Unit) {
