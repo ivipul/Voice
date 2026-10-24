@@ -222,7 +222,7 @@ data class BookLook(
 
 private const val DRAWING_TIMEOUT_MS = 5 * 60 * 1000L
 
-/** A cover Earlobe drew, with the layout, chapter-name face and curated palette it was planned with. */
+/** A cover Earmigo drew, with the layout, chapter-name face and curated palette it was planned with. */
 @Serializable
 data class GeneratedCover(
   val path: String,
@@ -239,7 +239,7 @@ enum class LookSource {
   /** Colors picked from the book's own cover. */
   Cover,
 
-  /** A cover Earlobe generated, and colors picked from it. */
+  /** A cover Earmigo generated, and colors picked from it. */
   Generated,
 }
 
