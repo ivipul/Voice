@@ -31,7 +31,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
- * A book's look: the app's cream, red and black, the curated palette closest to its cover, or a cover Earmigo draws
+ * A book's look: the app's cream, red and black, the curated palette closest to its cover, or a cover Tandem draws
  * with Ideogram in such a palette (with the listener's own words added to the prompt). The book's original cover is kept
  * so it can always come back.
  */

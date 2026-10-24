@@ -55,7 +55,7 @@ fun VoiceTheme(
         themedContent()
       }
     } else if (themeColorScheme == ThemeColorScheme.VoiceBlue) {
-      // Earmigo's own look: cream paper, black ink and a bold red, always light.
+      // Tandem's own look: cream paper, black ink and a bold red, always light.
       MaterialExpressiveTheme(colorScheme = remember { DefaultPalette.colorScheme() }) {
         themedContent()
       }
