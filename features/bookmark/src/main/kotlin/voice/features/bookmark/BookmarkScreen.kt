@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,10 +69,8 @@ private fun Inventory(
         onClose()
       },
       onSnipDelete = viewModel::onSnipDelete,
-      onExtraClick = {
-        viewModel.onExtraClick(it)
-        if (!it.locked) onClose()
-      },
+      // The sheet stays open, so closing the Explorable comes back to this tab.
+      onExtraClick = viewModel::onExtraClick,
       onMoreExtrasClick = {
         viewModel.onMoreExtrasClick()
         onClose()
@@ -90,7 +89,7 @@ internal fun Inventory(
   onMoreExtrasClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  var selectedTab by remember { mutableStateOf(InventoryTab.Snips) }
+  var selectedTab by rememberSaveable { mutableStateOf(InventoryTab.Snips) }
   var viewedFrame by remember { mutableStateOf<SnipCardViewState?>(null) }
   val palette = crawlPaletteOf(viewState.bookStyle)
 
