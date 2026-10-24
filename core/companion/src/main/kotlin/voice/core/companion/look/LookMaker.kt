@@ -112,8 +112,9 @@ class LookMaker(
   }
 
   /**
-   * Draws a cover and adds it to the book's history without using it. The book's own cover goes along as the image
-   * to restyle, in the curated palette closest to its colors, so the new one keeps its drawing and feel.
+   * Draws a cover and adds it to the book's history without using it. Claude looks at the book's own cover and
+   * describes it in the prompt, and Ideogram gets it as the reference, so the new one is an adaptation of it in the
+   * curated palette closest to its colors.
    */
   private suspend fun draw(bookId: BookId, extraPrompt: String): GeneratedCover {
     val book = checkNotNull(bookRepository.get(bookId)) { "Book $bookId is not in the library" }
@@ -137,6 +138,7 @@ class LookMaker(
           schema = COVER_SCHEMA,
           maxTokens = 2_000,
           effort = OutputConfig.Effort.LOW,
+          image = reference?.let { it.scale(CLAUDE_REFERENCE_SIZE, it.height * CLAUDE_REFERENCE_SIZE / it.width).png() },
         ),
       )
       val bytes = ideogram.generate(plan.prompt.trim(), ImageShape.Square, source = reference?.png())
@@ -201,6 +203,9 @@ class LookMaker(
   private companion object {
     const val SAMPLE_SIZE = 64
     const val REFERENCE_SIZE = 1024
+
+    // Enough for Claude to see the cover's subject and layout at about a quarter of the image tokens.
+    const val CLAUDE_REFERENCE_SIZE = 512
     const val MAX_KEPT_COVERS = 12
   }
 }
@@ -249,7 +254,10 @@ internal val COVER_PROMPT_SYSTEM = buildString {
   append("- Restraint: lots of empty background, one hot ink doing the work, nothing glowing, no 3D, no ")
   append("photographic detail.\n")
   append("Fiction shows its main character as an expressive figure described by how they look; non-fiction shows ")
-  append("one bold symbol, object or scene of its idea. Never name real people, brands or logos.\n\nCompositions:\n")
+  append("one bold symbol, object or scene of its idea. Never name real people, brands or logos.\n")
+  append("When you are shown the book's own cover, the new cover is an adaptation of it and the original wins over ")
+  append("these rules: the same subject, pose, arrangement and layout, with its scene simplified into flat shapes ")
+  append("rather than replaced. Only the rendering, the colors and the lettering change.\n\nCompositions:\n")
   COVER_COMPOSITIONS.forEach { (id, text) -> append("- $id: $text\n") }
   append("\nTitle faces (the app sets chapter names in the same face):\n")
   COVER_FONTS.forEach { (id, text) -> append("- $id: $text\n") }
@@ -291,11 +299,15 @@ internal fun coverPromptRequest(
   append(book)
   if (visualStyle.isNotBlank()) append("Look of the book: $visualStyle\n")
   if (hasReference) {
-    append("\nThe image model gets the book's current cover and edits it. Write the prompt as an instruction to ")
-    append("restyle that cover: keep its essence (its main subject, the feel of its scene and its key objects) and ")
-    append("redraw it boldly and creatively in the screen-printed poster style, free to recompose it into the chosen ")
-    append("composition. Keep only the title and the author's name as text, and tell the image model to remove every ")
-    append("other word on the old cover.\n")
+    append("\nThe attached image is the book's current cover, and the image model gets it too as its reference. The new ")
+    append("cover is a stylized adaptation of it: anyone who knows the original must recognize it at a glance. Keep its ")
+    append("main subject, the pose and arrangement of its figures, its key objects and its overall layout, and change ")
+    append("only the rendering into the screen-printed poster style and the colors into the palette. The image model ")
+    append("follows words more than the picture, so start the prompt with \"A screen-printed poster adaptation of the ")
+    append("reference cover:\" and then describe what is on the original concretely: who or what the subject is, how ")
+    append("they stand or face, what they hold or wear, where each element sits on the canvas, and where the title is. ")
+    append("Pick the composition closest to the original's layout. Keep only the title and the author's name as text, ")
+    append("and tell the image model to remove every other word on the old cover.\n")
   }
   if (palette != null) {
     append("\nUse the ${palette.name} palette (${palette.inks()}): recolor the cover into it, its main color becoming ")
@@ -303,7 +315,7 @@ internal fun coverPromptRequest(
     append("other colors, pick the palette that fits their words instead.\n")
   }
   if (extraPrompt.isNotBlank()) append("\nThe listener wants: $extraPrompt\n")
-  if (lastComposition.isNotBlank()) {
+  if (lastComposition.isNotBlank() && !hasReference) {
     append("\nThe last cover used the $lastComposition composition; pick a different one if the cover still reads ")
     append("as the same book.\n")
   }

@@ -6,6 +6,7 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.anthropic.core.JsonValue
 import com.anthropic.errors.AnthropicServiceException
 import com.anthropic.errors.UnauthorizedException
+import com.anthropic.models.messages.Base64ImageSource
 import com.anthropic.models.messages.CacheControlEphemeral
 import com.anthropic.models.messages.ContentBlockParam
 import com.anthropic.models.messages.DocumentBlockParam
@@ -208,7 +209,7 @@ class ClaudeClient(
 
   /**
    * An answer constrained to [schema] (a JSON Schema object), returned as the raw JSON text. Callers decode it with
-   * kotlinx.serialization.
+   * kotlinx.serialization. An [image] (PNG or JPEG bytes) goes before the prompt for Claude to look at.
    */
   suspend fun askJson(
     system: String,
@@ -217,6 +218,7 @@ class ClaudeClient(
     model: String = ClaudeModels.CHAT,
     maxTokens: Long = JSON_MAX_TOKENS,
     effort: OutputConfig.Effort = OutputConfig.Effort.MEDIUM,
+    image: ByteArray? = null,
   ): String = call {
     val format = JsonOutputFormat.builder()
       .schema(
@@ -229,12 +231,20 @@ class ClaudeClient(
       .model(model)
       .maxTokens(maxTokens)
       .system(system)
-      .addUserMessage(prompt)
+      .let { if (image == null) it.addUserMessage(prompt) else it.addUserMessageOfContentBlockParams(imageAndText(image, prompt)) }
       .outputConfig(OutputConfig.builder().effort(effort).format(format).build())
       .build()
     val message = client().messages().create(params)
     if (message.stopReason().orElse(null) == StopReason.MAX_TOKENS) throw ReplyCutOffException()
     message.text()
+  }
+
+  private fun imageAndText(image: ByteArray, prompt: String): List<ContentBlockParam> {
+    val source = Base64ImageSource.builder()
+      .data(Base64.getEncoder().encodeToString(image))
+      .mediaType(Base64ImageSource.MediaType.of(image.imageMimeType()))
+      .build()
+    return listOf(ContentBlockParam.ofImage(source), ContentBlockParam.ofText(prompt))
   }
 
   /**

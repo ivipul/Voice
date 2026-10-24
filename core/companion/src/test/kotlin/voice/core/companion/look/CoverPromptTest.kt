@@ -24,8 +24,16 @@ class CoverPromptTest {
 
     assertFalse("last cover" in request)
     assertTrue("The listener wants: more green" in request)
-    assertTrue("restyle that cover" in request)
+    assertTrue("A screen-printed poster adaptation of the reference cover:" in request)
     assertTrue("remove every other word" in request)
+  }
+
+  @Test
+  fun anAdaptationKeepsTheOriginalLayoutInsteadOfAvoidingTheLastComposition() {
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "stacked", hasReference = true)
+
+    assertFalse("last cover" in request)
+    assertTrue("closest to the original's layout" in request)
   }
 
   @Test
