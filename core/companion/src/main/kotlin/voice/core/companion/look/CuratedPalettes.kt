@@ -13,8 +13,8 @@ internal data class CuratedPalette(
 )
 
 /**
- * The listener's shortlisted palettes. A book never shows raw cover colors: they snap to the closest of these, and a
- * drawn cover is painted in one of them, so every player stays readable and in the same family.
+ * The listener's 20 palettes, the only ones the app uses. A book never shows raw cover colors: they snap to the
+ * closest of these, and a drawn cover is painted in one of them, so every player stays readable and in one family.
  */
 internal val CURATED_PALETTES = listOf(
   curated("Coral & Cream", background = 0xFC6C44, content = 0x0B0809, highlight = 0xF4F1C2, onHighlight = 0x0B0809, accent = 0x2E2427, onAccent = 0xFC6C44),
@@ -36,6 +36,7 @@ internal val CURATED_PALETTES = listOf(
   curated("Sea Glass & Peach", background = 0x638C89, content = 0x0E1615, highlight = 0xFFE4CE, onHighlight = 0x0E1615, accent = 0x1E2B3A, onAccent = 0xFFFFFF),
   curated("Straw & Leaf", background = 0xE8E09A, content = 0x1A1A12, highlight = 0x3E6B35, onHighlight = 0xE8E09A, accent = 0xB8541E, onAccent = 0xFFFFFF),
   curated("Dusty Rose & Navy", background = 0xD9837A, content = 0x120E10, highlight = 0x1B2848, onHighlight = 0xD9837A, accent = 0xFFF0E6, onAccent = 0x120E10),
+  curated("Taupe & Terracotta", background = 0xA99B8B, content = 0x1B1712, highlight = 0x3F4228, onHighlight = 0xEFE7DA, accent = 0xA9532F, onAccent = 0xF6F0E6),
 )
 
 internal fun curatedPalette(name: String): CuratedPalette? = CURATED_PALETTES.firstOrNull { it.name == name }

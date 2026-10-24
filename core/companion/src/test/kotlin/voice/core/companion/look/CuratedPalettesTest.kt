@@ -39,6 +39,11 @@ class CuratedPalettesTest {
   }
 
   @Test
+  fun theAppHasTwentyDistinctPalettes() {
+    assertEquals(20, CURATED_PALETTES.map { it.name }.toSet().size)
+  }
+
+  @Test
   fun everyCuratedPaletteReads() {
     CURATED_PALETTES.forEach { (name, palette) ->
       assertTrue(contrast(palette.content, palette.background) >= 4.5, "$name text")
