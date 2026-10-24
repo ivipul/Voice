@@ -9,6 +9,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,8 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -143,7 +145,7 @@ private fun ExtraActions(
 ) {
   var menuOpen by remember { mutableStateOf(false) }
   var confirmDelete by remember { mutableStateOf(false) }
-  Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+  Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
     Box {
       RoundIconButton(palette = palette, onClick = { menuOpen = true }) {
         Icon(imageVector = VoiceIcons.MoreVert, contentDescription = stringResource(StringsR.string.extra_menu))
@@ -237,14 +239,18 @@ private fun RoundIconButton(
   onClick: () -> Unit,
   content: @Composable () -> Unit,
 ) {
-  IconButton(
-    onClick = onClick,
-    colors = IconButtonDefaults.iconButtonColors(containerColor = palette.background, contentColor = palette.content),
+  // A plain box, not an IconButton: its 48dp touch target drew the border wider than the 40dp circle, so neighbors overlapped.
+  Box(
+    contentAlignment = Alignment.Center,
     modifier = Modifier
       .size(40.dp)
-      .border(width = 2.dp, color = palette.content, shape = CircleShape),
-    content = content,
-  )
+      .clip(CircleShape)
+      .background(palette.background)
+      .border(width = 2.dp, color = palette.content, shape = CircleShape)
+      .clickable(onClick = onClick),
+  ) {
+    CompositionLocalProvider(LocalContentColor provides palette.content, content = content)
+  }
 }
 
 @Composable
