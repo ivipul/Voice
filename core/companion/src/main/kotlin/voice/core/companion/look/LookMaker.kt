@@ -210,9 +210,9 @@ internal val COVER_COMPOSITIONS = mapOf(
   "stacked" to "Stacked title: two or three lines of huge title lettering in two inks, each line running the full " +
     "width, with the main figure standing in front of the letters and covering part of them.",
   "wall" to "Tall condensed wall: one ultra-condensed title word filling almost the full height behind the figure, " +
-    "a tiny header row of widely spaced microtype above it, like a poster series label.",
-  "giant" to "Giant letterform: one enormous number or letter as the backdrop, the figure in front of it, and a " +
-    "small label in a corner.",
+    "with the author's name in a thin, widely spaced row above it.",
+  "giant" to "Giant letterform: one enormous letter or number from the title as the backdrop, the figure in front " +
+    "of it, and the rest of the title small in a corner.",
   "serif" to "Tone-on-tone serif: a tall, high-contrast serif title in a darker or lighter shade of the background, " +
     "partly hidden by large figures in front.",
   "disc" to "Sun disc: the figure in profile or three-quarter view in front of one huge flat disc in the hot ink, the " +
@@ -220,9 +220,8 @@ internal val COVER_COMPOSITIONS = mapOf(
   "split" to "Diagonal split: one hard diagonal cuts the upper part of the canvas into the background color and a " +
     "block of ink or the hot ink; the figure sits on the seam, half lit, half in shadow, with a short, widely " +
     "spaced title in the lower third.",
-  "card" to "Card: laid out like a playing card or a ticket, with big corner letters or numbers, one bold flat " +
-    "symbol or the figure, the title set vertically up one side or as one serif line, and a thin rule with a tiny " +
-    "block of text.",
+  "card" to "Card: laid out like a playing card or a ticket, with the title's first letter in two corners, one " +
+    "bold flat symbol or the figure, the title set vertically up one side or as one serif line, and a thin rule.",
 )
 
 /** The app's chapter name faces, and how a cover letters its title to match each one. */
@@ -244,7 +243,9 @@ internal val COVER_PROMPT_SYSTEM = buildString {
   append("- Background: one flat palette color fills the canvas to every edge, with no scenery, gradient or photo, ")
   append("and the bottom edge stays plain so the cover melts into the player page of the same color.\n")
   append("- Type: the huge title lettering is the main graphic and stays readable, with the figure in front of the ")
-  append("letters, covering part of them. The author's name goes in tiny, widely spaced capitals, editorial style.\n")
+  append("letters, covering part of them. The author's name goes in tiny, widely spaced capitals, editorial style. ")
+  append("The title and the author's name are the only words on the cover: no tagline, series line, quote, award or ")
+  append("narrator credit, unless the book can't be told apart without it, like the number of a book in a series.\n")
   append("- Restraint: lots of empty background, one hot ink doing the work, nothing glowing, no 3D, no ")
   append("photographic detail.\n")
   append("Fiction shows its main character as an expressive figure described by how they look; non-fiction shows ")
@@ -291,10 +292,10 @@ internal fun coverPromptRequest(
   if (visualStyle.isNotBlank()) append("Look of the book: $visualStyle\n")
   if (hasReference) {
     append("\nThe image model gets the book's current cover and edits it. Write the prompt as an instruction to ")
-    append("restyle that same cover, not to invent a new one: keep its illustration (the same subject, pose, framing ")
-    append("and main objects) and its title text, and redraw them in the screen-printed poster style. Small tweaks are ")
-    append("fine, like simpler detail or the title moved into the composition, but the original must stay ")
-    append("recognizable. Pick the composition closest to the cover's own layout.\n")
+    append("restyle that cover: keep its essence (its main subject, the feel of its scene and its key objects) and ")
+    append("redraw it boldly and creatively in the screen-printed poster style, free to recompose it into the chosen ")
+    append("composition. Keep only the title and the author's name as text, and tell the image model to remove every ")
+    append("other word on the old cover.\n")
   }
   if (palette != null) {
     append("\nUse the ${palette.name} palette (${palette.inks()}): recolor the cover into it, its main color becoming ")

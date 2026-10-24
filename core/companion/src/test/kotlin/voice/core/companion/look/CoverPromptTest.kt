@@ -24,7 +24,8 @@ class CoverPromptTest {
 
     assertFalse("last cover" in request)
     assertTrue("The listener wants: more green" in request)
-    assertTrue("restyle that same cover" in request)
+    assertTrue("restyle that cover" in request)
+    assertTrue("remove every other word" in request)
   }
 
   @Test
