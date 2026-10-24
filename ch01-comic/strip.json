@@ -1,0 +1,43 @@
+{
+ "schema_version": 1,
+ "book": 1,
+ "book_title_prefix": "Dungeon Crawler Carl",
+ "chapter": 1,
+ "title": "The vanishing",
+ "summary": "Carl climbs down to rescue his ex-girlfriend's cat from a tree in sub-zero cold. Mid-rescue, every building in Seattle -- people included -- instantly collapses into the ground, silently, right in front of him, killing his elderly neighbor Mrs. Parsons mid-sentence.",
+ "hero_frames": [],
+ "last_frame_hold_ms": 20000,
+ "frames": [
+  {
+   "frame": 1,
+   "image": "f1-final.png",
+   "start_ms": 509000
+  },
+  {
+   "frame": 2,
+   "image": "f2-final.png",
+   "start_ms": 550200
+  },
+  {
+   "frame": 3,
+   "image": "f3-final.png",
+   "start_ms": 599600
+  },
+  {
+   "frame": 4,
+   "image": "f4-final.png",
+   "start_ms": 603700
+  },
+  {
+   "frame": 5,
+   "image": "f5-final.png",
+   "start_ms": 679500
+  },
+  {
+   "frame": 6,
+   "image": "f6-final.png",
+   "start_ms": 724400
+  }
+ ],
+ "strip_image": "ch01-strip.png"
+}

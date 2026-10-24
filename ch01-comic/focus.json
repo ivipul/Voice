@@ -1,0 +1,9 @@
+{
+  "_readme": "Protected regions per frame, as fractions 0..1 of the frame (x0,y0,x1,y1). 'subject' = faces / characters / key props that must not be cropped. Text boxes (bubbles, captions, SFX) are auto-detected unless a 'text' list is given. Written by eye for ch1 as a worked example; a vision-model pass can generate these for other chapters.",
+  "f1-final.png": {"subject": [[0.38, 0.26, 0.70, 0.72]]},
+  "f2-final.png": {"subject": [[0.10, 0.30, 0.58, 0.84]]},
+  "f3-final.png": {"subject": [[0.22, 0.50, 0.75, 0.80]]},
+  "f4-final.png": {"subject": [[0.20, 0.40, 0.80, 0.93]]},
+  "f5-final.png": {"subject": [[0.35, 0.12, 0.88, 0.86]]},
+  "f6-final.png": {"subject": [[0.30, 0.10, 0.66, 0.45], [0.10, 0.45, 0.68, 0.94]]}
+}
