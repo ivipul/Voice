@@ -24,8 +24,8 @@
     <string name="book.edit.title">Edit book</string>
     <!-- Tab label for the snip cards inside the Inventory. -->
     <string name="bookmark.tab.snips">Snips</string>
-    <!-- Tab label for the shelf of Extras inside the Notebook. -->
-    <string name="bookmark.tab.extras">Extras</string>
+    <!-- Tab label for the shelf of Explorables inside the Notebook. -->
+    <string name="bookmark.tab.extras">Explorables</string>
     <!-- Generic add action and content description. -->
     <string name="common.action.add">Add</string>
     <!-- Generic content description for closing the current screen or dialog. -->
@@ -173,7 +173,7 @@
     <string name="inventory.snip.more">More options for this snip</string>
     <!-- Empty-state message on the Inventory's Snips tab. -->
     <string name="inventory.snips.empty">No snips yet. Tap Snip while you listen and the moment lands here.</string>
-    <!-- Title of the sheet with a book's snips and Extras, and of the card on the player that opens it. -->
+    <!-- Title of the sheet with a book's snips and Explorables, and of the card on the player that opens it. -->
     <string name="inventory.title">Notebook</string>
     <!-- Settings switch: set all text on the library in one font instead of each book's own. -->
     <string name="settings.library.uniform_font.title">One font for the library</string>
@@ -361,19 +361,19 @@
     <string name="sleep_timer.dialog.title">Sweet dreams! 🌙</string>
     <!-- Sleep timer option and playback status for stopping at the end of a chapter. -->
     <string name="sleep_timer.end_of_chapter">End of Chapter</string>
-    <!-- Empty-state message on the Notebook\'s Extras tab. -->
-    <string name="inventory.extras.empty">No Extras yet. Open the book\'s setup to pick some, or describe your own.</string>
-    <!-- An Extra the listener has not reached yet. %1$s is a book position like 2 h 14 min. -->
+    <!-- Empty-state message on the Notebook\'s Explorables tab. -->
+    <string name="inventory.extras.empty">No Explorables yet. Open the book\'s setup to pick some, or describe your own.</string>
+    <!-- An Explorable the listener has not reached yet. %1$s is a book position like 2 h 14 min. -->
     <string name="inventory.extra.locked">Unlocks at %1$s</string>
-    <!-- Button at the end of the Extras shelf that opens the book\'s setup screen with idea cards. -->
-    <string name="inventory.extras.more">Get more Extras</string>
-    <!-- Label over the bar that shows how many of the book\'s Extras have been reached. -->
-    <string name="inventory.extras.collected">Extras unlocked</string>
-    <!-- Toast shown when playback reaches the point where an Extra unlocks. -->
-    <string name="extra.unlocked.snackbar">New Extra on your shelf</string>
+    <!-- Button at the end of the Explorables shelf that opens the book\'s setup screen with idea cards. -->
+    <string name="inventory.extras.more">Get more Explorables</string>
+    <!-- Label over the bar that shows how many of the book\'s Explorables have been reached. -->
+    <string name="inventory.extras.collected">Explorables unlocked</string>
+    <!-- Toast shown when playback reaches the point where an Explorable unlocks. -->
+    <string name="extra.unlocked.snackbar">New Explorable on your shelf</string>
     <!-- Name of the notification channel for transcription and other book setup work. -->
     <string name="setup.notification_channel">Book setup</string>
-    <!-- Ongoing notification while Tandem transcribes a book or builds its Extras. -->
+    <!-- Ongoing notification while Tandem transcribes a book or builds its Explorables. -->
     <string name="setup.notification_title">Setting up your book…</string>
     <!-- Tag on the card of a character chip on the player. -->
     <string name="scene.card.character">Character</string>
@@ -381,7 +381,7 @@
     <string name="scene.card.topic">Topic</string>
     <!-- Header over what the book has said so far about a character or topic, on its card. -->
     <string name="scene.card.so_far">So far</string>
-    <!-- Button on a topic card that opens the Extra tied to it. %1$s is the Extra\'s title. -->
+    <!-- Button on a topic card that opens the Explorable tied to it. %1$s is the Explorable\'s title. -->
     <string name="scene.card.open_extra">Open %1$s</string>
     <!-- Content description of the library button that picks an audiobook file and opens its guided setup. -->
     <string name="library.add_book">Add a book</string>
@@ -392,7 +392,7 @@
     <!-- API key row title for Claude. -->
     <string name="copilot.settings.keys.claude">Claude</string>
     <!-- What the Claude key is for and where to get it. -->
-    <string name="copilot.settings.keys.claude.hint">Answers, snips, recaps, book research and Extras. Get a key at console.anthropic.com.</string>
+    <string name="copilot.settings.keys.claude.hint">Answers, snips, recaps, book research and Explorables. Get a key at console.anthropic.com.</string>
     <!-- API key row title for Deepgram. -->
     <string name="copilot.settings.keys.deepgram">Deepgram</string>
     <!-- What the Deepgram key is for and where to get it. -->
@@ -424,7 +424,7 @@
     <!-- Label of the card that asks for missing API keys. -->
     <string name="setup.keys.label">Keys needed</string>
     <!-- Shown when the Claude API key is missing. -->
-    <string name="setup.keys.claude">Add your Claude key to research the book, suggest Extras and answer questions.</string>
+    <string name="setup.keys.claude">Add your Claude key to research the book, suggest Explorables and answer questions.</string>
     <!-- Shown when the Deepgram API key is missing. -->
     <string name="setup.keys.deepgram">Add your Deepgram key to transcribe the book.</string>
     <!-- Button that opens the API key settings. -->
@@ -432,7 +432,7 @@
     <!-- Label of the card that starts the setup. -->
     <string name="setup.start.label">Get started</string>
     <!-- Explains what starting the setup does. -->
-    <string name="setup.start.body">Tandem transcribes the book in the background and looks it up online, then suggests Extras made for it.</string>
+    <string name="setup.start.body">Tandem transcribes the book in the background and looks it up online, then suggests Explorables made for it.</string>
     <!-- Duration of the book and the estimated transcription cost. -->
     <string name="setup.start.cost">About %1$s of audio, roughly %2$s with Deepgram.</string>
     <!-- Button that starts transcription and research. -->
@@ -464,7 +464,7 @@
     <!-- Book kind label. -->
     <string name="setup.research.nonfiction">Non-fiction</string>
     <!-- Header of the idea cards on the setup screen. -->
-    <string name="setup.ideas.title">Extras</string>
+    <string name="setup.ideas.title">Explorables</string>
     <!-- Explains the idea cards. -->
     <string name="setup.ideas.body">Build the ones you like, skip the rest.</string>
     <!-- Shown before ideas are generated. -->
@@ -479,8 +479,8 @@
     <string name="setup.ideas.skipped">Skipped (%1$d)</string>
     <!-- Idea card label: changes the picture drawn for each snip. -->
     <string name="setup.point.snip_picture">Snip picture</string>
-    <!-- Idea card label: an interactive page on the Notebook's Extras shelf. -->
-    <string name="setup.point.shelf">Notebook Extra</string>
+    <!-- Idea card label: an interactive page on the Notebook's Explorables shelf. -->
+    <string name="setup.point.shelf">Notebook Explorable</string>
     <!-- Idea card label: character or topic chips on the player. -->
     <string name="setup.point.scene_chips">Scene chips</string>
     <!-- Tag on an idea card the listener typed in. -->
@@ -497,14 +497,14 @@
     <string name="setup.idea.waiting_for_transcript">Starts when the transcript is ready…</string>
     <!-- Shown on a built idea card. -->
     <string name="setup.idea.built">BUILT</string>
-    <!-- Button that opens a built Extra. -->
+    <!-- Button that opens a built Explorable. -->
     <string name="setup.idea.open">Open</string>
     <!-- Building an idea failed, with the reason. -->
     <string name="setup.idea.failed">Building failed: %1$s</string>
     <!-- Label of the card where the listener types an idea. -->
     <string name="setup.own.label">Your own idea</string>
     <!-- Explains the own-idea card. -->
-    <string name="setup.own.body">Describe an Extra you\'d like. Claude checks whether Tandem can build it.</string>
+    <string name="setup.own.body">Describe an Explorable you\'d like. Claude checks whether Tandem can build it.</string>
     <!-- Placeholder of the own-idea field. -->
     <string name="setup.own.placeholder">A map of the places so far, a glossary, a quiz…</string>
     <!-- Button that sends the idea for a feasibility check. -->
@@ -543,23 +543,23 @@
     <string name="setup.look.failed">Couldn\'t change the look: %1$s</string>
     <!-- Header of the display font choices. -->
     <string name="setup.look.font">Chapter name face</string>
-    <!-- Content description of the Extra page menu button. -->
+    <!-- Content description of the Explorable page menu button. -->
     <string name="extra.menu">More</string>
-    <!-- Shown while Claude repairs an Extra page. -->
+    <!-- Shown while Claude repairs an Explorable page. -->
     <string name="extra.fixing">Updating the page…</string>
-    <!-- Repairing an Extra failed, with the reason. -->
+    <!-- Repairing an Explorable failed, with the reason. -->
     <string name="extra.fix_failed">Couldn\'t update it: %1$s</string>
-    <!-- Shown when an Extra page reported an error. -->
+    <!-- Shown when an Explorable page reported an error. -->
     <string name="extra.error">Something on this page went wrong.</string>
-    <!-- Dismisses the error banner of an Extra page. -->
+    <!-- Dismisses the error banner of an Explorable page. -->
     <string name="extra.error_dismiss">Ignore</string>
-    <!-- Deletes an Extra. -->
+    <!-- Deletes an Explorable. -->
     <string name="extra.delete">Delete</string>
-    <!-- Title of the delete confirmation for an Extra. -->
-    <string name="extra.delete_title">Delete this Extra?</string>
-    <!-- Body of the delete confirmation for an Extra. -->
+    <!-- Title of the delete confirmation for an Explorable. -->
+    <string name="extra.delete_title">Delete this Explorable?</string>
+    <!-- Body of the delete confirmation for an Explorable. -->
     <string name="extra.delete_body">It leaves the Notebook, along with anything you saved in it. You can build it again from Book setup.</string>
-    <!-- Cancels deleting an Extra. -->
+    <!-- Cancels deleting an Explorable. -->
     <string name="extra.keep">Keep</string>
     <!-- Player menu item that opens the book setup screen. -->
     <string name="playback.option.book_setup">Edit book setup</string>
@@ -570,7 +570,7 @@
     <!-- Label above the parts of an idea the listener can untick. -->
     <string name="setup.idea.includes">Includes</string>
     <!-- Header above the ideas the listener chose to build. -->
-    <string name="setup.ideas.decided">Your Extras</string>
+    <string name="setup.ideas.decided">Your Explorables</string>
     <!-- Shown in place of the idea deck once every card is built or skipped. -->
     <string name="setup.ideas.all_decided">That\'s every idea for now.</string>
     <!-- Small label on an idea card built from the PDF that came with the book. -->
@@ -586,7 +586,7 @@
     <!-- Title of the dialog confirming a setup reset -->
     <string name="book.reset_dialog.title">Reset setup?</string>
     <!-- Body of the reset dialog -->
-    <string name="book.reset_dialog.message">This clears what Tandem made for this book: research, idea cards, Extras, scene chips, PDF notes and its look. The audio file and your place in the book stay.</string>
+    <string name="book.reset_dialog.message">This clears what Tandem made for this book: research, idea cards, Explorables, scene chips, PDF notes and its look. The audio file and your place in the book stay.</string>
     <!-- Title of the dialog confirming removal from the library -->
     <string name="book.remove_dialog.title">Remove from library?</string>
     <!-- Body of the remove dialog -->
@@ -603,7 +603,7 @@
     <string name="library.empty.add">Add a book</string>
     <!-- One line under the empty library headline -->
     <string name="library.empty.body">Pick an m4b or mp3 file. If you have its transcript or PDFs, select them too.</string>
-    <!-- Opens a box to describe changes to an Extra page, or fixes for it. -->
+    <!-- Opens a box to describe changes to an Explorable page, or fixes for it. -->
     <string name="extra.ask_changes">Ask for changes</string>
     <!-- Placeholder of the Ask for changes box. -->
     <string name="extra.ask_changes_hint">What should change? For example: bigger text, add a search box, or the totals are wrong.</string>

@@ -71,7 +71,7 @@ class ExtraBuilder(
   /** Sends the page and the error the viewer saw back to Claude, and saves the fixed page in its place. */
   @IgnorableReturnValue
   suspend fun change(bookId: BookId, extraId: String, request: String, error: String?): Extra {
-    val extra = checkNotNull(stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }) { "No Extra $extraId" }
+    val extra = checkNotNull(stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }) { "No Explorable $extraId" }
     val fixed = validated(claude.write(system = BUILDER_SYSTEM, prompt = changePrompt(extra, request, error)))
     val repaired = extra.copy(html = fixed, lastError = null)
     stores.shelf.update(bookId) { shelf -> shelf.copy(extras = shelf.extras.map { if (it.id == extraId) repaired else it }) }
@@ -144,7 +144,7 @@ internal fun topicOf(html: String): String? = Regex(
 
 private const val MAX_PAGE_CHARS = 400_000
 
-internal val BUILDER_SYSTEM = "You build small, polished, interactive companion pages (Extras) for an audiobook " +
+internal val BUILDER_SYSTEM = "You build small, polished, interactive companion pages (Explorables) for an audiobook " +
   "app. Each page does one thing well for this particular book, looks designed rather than generated, and works " +
   "the first time. Write the complete page in one ```html block and nothing else around it. Never reveal story " +
   "events beyond what the listener has heard: anything about the plot comes from earwig.transcript() or " +
@@ -153,7 +153,7 @@ internal val BUILDER_SYSTEM = "You build small, polished, interactive companion 
 internal fun buildPrompt(profile: BookProfile, scene: SceneIndex, brief: String): String = buildString {
   append(profileText(profile))
   if (profile.visualStyle.isNotBlank()) append("Look of the book: ${profile.visualStyle}\n")
-  append("\nBuild this Extra:\n$brief\n")
+  append("\nBuild this Explorable:\n$brief\n")
   if (scene.entries.isNotEmpty()) {
     val label = if (scene.kind == BookKind.Fiction) "characters" else "topics"
     append("\nThe book's $label, by id. If the page is about one of them, add ")
@@ -164,7 +164,7 @@ internal fun buildPrompt(profile: BookProfile, scene: SceneIndex, brief: String)
 
 /** Asks for [extra] changed the way the listener describes in [request], and fixed if it last hit [error]. */
 internal fun changePrompt(extra: Extra, request: String, error: String?): String = buildString {
-  append("The listener wants changes to this Extra page. Make them, keep everything else that works, and return the ")
+  append("The listener wants changes to this Explorable page. Make them, keep everything else that works, and return the ")
   append("whole updated page.\n\n")
   append("What it is for: ${extra.brief.ifBlank { extra.title + ": " + extra.description }}\n\n")
   if (request.isNotBlank()) append("The listener asks: ${request.trim()}\n\n")

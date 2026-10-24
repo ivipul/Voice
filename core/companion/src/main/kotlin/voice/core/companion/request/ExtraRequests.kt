@@ -70,7 +70,7 @@ class ExtraRequests(
     val plan = try {
       plan(bookId, utterance, recentTranscript)
     } catch (e: Exception) {
-      Logger.w(e, "Planning the requested Extra failed")
+      Logger.w(e, "Planning the requested Explorable failed")
       return null
     }
     if (!plan.isRequest) return null
@@ -206,7 +206,7 @@ private fun requestedCard(
   materialSection: String?,
 ) = IdeaCard(
   id = UUID.randomUUID().toString(),
-  title = title.ifBlank { "Requested Extra" },
+  title = title.ifBlank { "Requested Explorable" },
   description = description,
   why = brief,
   point = point,
@@ -266,16 +266,16 @@ private const val BRIEF_TRANSCRIPT_CHARS = 4_000
 private fun String.lowercaseFirst(): String = replaceFirstChar { it.lowercase() }
 
 internal const val REQUEST_SYSTEM = "You sit behind the Ask button of an audiobook companion app. Decide whether " +
-  "the listener is asking the app to make something for them (an Extra) rather than asking a question about the " +
+  "the listener is asking the app to make something for them (an Explorable) rather than asking a question about the " +
   "book. isRequest is false for questions, even ones that mention maps or characters (\"where is the castle?\" is " +
-  "a question; \"make me a map of the places so far\" is a request). For a request, shape it into an Extra of one " +
+  "a question; \"make me a map of the places so far\" is a request). For a request, shape it into an Explorable of one " +
   "of the three kinds below, about the part of the book that was playing when they asked. feasible is true only " +
   "if it fits a kind; point is that kind, else null. Title is 2 to 5 words, description one sentence on what the " +
-  "listener gets, kind one word for shelf Extras (quiz, map, timeline, calculator, explainer, glossary, tracker, " +
-  "flashcards) else empty. existingId is the id of an Extra the book already has that does the same thing or " +
+  "listener gets, kind one word for shelf Explorables (quiz, map, timeline, calculator, explainer, glossary, tracker, " +
+  "flashcards) else empty. existingId is the id of an Explorable the book already has that does the same thing or " +
   "something closely related, else null; existingSummary then says in a few words what it does, starting with a " +
   "verb (\"quizzes you on chapters 1 to 4\"). When it isn't feasible, reason is one plain sentence on why, without " +
-  "a trailing period, and alternative* describe the closest Extra that can be built (alternativePoint null if " +
+  "a trailing period, and alternative* describe the closest Explorable that can be built (alternativePoint null if " +
   "nothing comes close). Never spoil the story beyond what was playing.\n\n$EXTENSION_POINTS"
 
 internal fun requestPrompt(
@@ -311,5 +311,5 @@ internal val REQUEST_SCHEMA = Schema.obj(
   "alternativePoint" to Schema.nullableString(POINTS_OR_NULL),
   "alternativeTitle" to Schema.string(),
   "alternativeDescription" to Schema.string(),
-  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Extra is built from, or null."),
+  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Explorable is built from, or null."),
 )

@@ -86,13 +86,13 @@ class ExtraHost(
 
   suspend fun saveValue(bookId: BookId, extraId: String, key: String, value: String) {
     if (key.length > MAX_KEY_CHARS || value.length > MAX_VALUE_CHARS) {
-      Logger.w("Extra $extraId tried to save a value that is too big")
+      Logger.w("Explorable $extraId tried to save a value that is too big")
       return
     }
     valuesLock.withLock {
       val values = readValues(bookId, extraId)
       if (key !in values && values.size >= MAX_KEYS) {
-        Logger.w("Extra $extraId has too many saved values")
+        Logger.w("Explorable $extraId has too many saved values")
         return
       }
       writeValues(bookId, extraId, values + (key to value))

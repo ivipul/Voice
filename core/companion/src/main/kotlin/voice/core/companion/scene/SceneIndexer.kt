@@ -97,7 +97,7 @@ class SceneIndexer(
         ),
       )
     } catch (e: Exception) {
-      Logger.w(e, "Linking Extras to topics failed")
+      Logger.w(e, "Linking Explorables to topics failed")
       return index
     }
     val links = answer.links.filter { link -> index.entries.any { it.id == link.topicId } && loose.any { it.id == link.extraId } }
@@ -342,8 +342,8 @@ internal data class Link(
   val topicId: String,
 )
 
-internal const val LINK_SYSTEM = "Match companion Extras of an audiobook to the topic or character each is " +
-  "mainly about. Leave out Extras that are about the whole book. Use only the ids given."
+internal const val LINK_SYSTEM = "Match companion Explorables of an audiobook to the topic or character each is " +
+  "mainly about. Leave out Explorables that are about the whole book. Use only the ids given."
 
 internal fun linkPrompt(index: SceneIndex, extras: List<Pair<String, String>>): String = buildString {
   append("Topics:\n")

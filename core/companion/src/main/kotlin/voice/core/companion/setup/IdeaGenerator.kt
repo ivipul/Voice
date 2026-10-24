@@ -163,13 +163,13 @@ internal const val EXTENSION_POINTS = """The app can build exactly three kinds o
   topics and ideas, each with a card, and shelf Extras tied to a topic unlock when its chip first appears. One per
   book."""
 
-internal const val IDEAS_SYSTEM = "You design companion Extras for an audiobook app. Suggest ideas that make this " +
+internal const val IDEAS_SYSTEM = "You design companion Explorables for an audiobook app. Suggest ideas that make this " +
   "particular book easier to follow, remember or put to use, and that are fun. Be specific to the book: name the " +
   "concept a calculator works out, the period a timeline covers, the skill a quiz drills. Never spoil the story. " +
   "The listener decides from a small card at a glance, so keep it short. Titles are 2 to 5 words. Descriptions " +
-  "are one plain line of at most 12 words on what the listener gets. Features are 2 to 4 parts the Extra will " +
+  "are one plain line of at most 12 words on what the listener gets. Features are 2 to 4 parts the Explorable will " +
   "have, 2 to 5 words each (\"Quiz after each chapter\", \"Hand-lettered labels\"), which the listener can untick; " +
-  "leave features empty for scene_chips. Why is one sentence on why it suits this book. Kind is one word for shelf Extras (calculator, explainer, quiz, timeline, glossary, map, " +
+  "leave features empty for scene_chips. Why is one sentence on why it suits this book. Kind is one word for shelf Explorables (calculator, explainer, quiz, timeline, glossary, map, " +
   "tracker, flashcards) and empty otherwise.\n\n$EXTENSION_POINTS"
 
 internal fun ideasPrompt(
@@ -193,15 +193,15 @@ internal fun ideasPrompt(
   }
   append("\nSuggest ${if (sections.isEmpty()) 4 else 5} ideas: one snip_picture style, ")
   val chips = if (profile.kind == BookKind.Fiction) "characters" else "topics"
-  append("one scene_chips for $chips if the book would benefit, and the rest shelf Extras.")
+  append("one scene_chips for $chips if the book would benefit, and the rest shelf Explorables.")
 }
 
-internal const val FEASIBILITY_SYSTEM = "You check whether an Extra a listener asked for can be built in an " +
+internal const val FEASIBILITY_SYSTEM = "You check whether an Explorable a listener asked for can be built in an " +
   "audiobook companion app, and if so, shape it into a card. feasible is true only if it fits one of the three " +
   "kinds below; point is that kind, or null when it fits none. If it can't be built as asked, explain why in one " +
   "plain sentence and give the nearest thing that can, as alternative. Title is 2 to 5 words, description one " +
   "line of at most 12 words, features 2 to 4 parts it will have in 2 to 5 words each (empty for scene_chips), " +
-  "kind one word for shelf Extras or empty.\n\n$EXTENSION_POINTS"
+  "kind one word for shelf Explorables or empty.\n\n$EXTENSION_POINTS"
 
 internal fun feasibilityPrompt(profile: BookProfile, idea: String, sections: List<MaterialSection> = emptyList()): String =
   profileText(profile) + pdfSectionsText(sections) + "\nThe listener's idea:\n\"\"\"\n$idea\n\"\"\""
@@ -213,7 +213,7 @@ internal fun pdfSectionsText(sections: List<MaterialSection>): String = if (sect
   buildString {
     append("\nThe book comes with a PDF. Its sections:\n")
     sections.forEach { append("- ${it.id}: ${it.title} (${it.contentType}, pages ${it.pages}). ${it.summary}\n") }
-    append("If a shelf Extra would draw on one of these sections, set materialSection to its id so it is built from ")
+    append("If a shelf Explorable would draw on one of these sections, set materialSection to its id so it is built from ")
     append("the PDF's content; otherwise materialSection is null.\n")
   }
 }
@@ -258,5 +258,5 @@ internal val VERDICT_SCHEMA = Schema.obj(
   "reason" to Schema.string(),
   "alternative" to Schema.string(),
   "features" to Schema.array(Schema.string()),
-  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Extra is built from, or null."),
+  "materialSection" to Schema.nullableString("The id of the PDF section a shelf Explorable is built from, or null."),
 )

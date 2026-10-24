@@ -137,7 +137,7 @@ class ExtraViewModel(
   }
 
   fun onPageError(error: String) {
-    Logger.w("Extra $extraId: $error")
+    Logger.w("Explorable $extraId: $error")
     scope.launch { builder.reportError(bookId, extraId, error.take(MAX_ERROR_CHARS)) }
   }
 
@@ -164,7 +164,7 @@ class ExtraViewModel(
         val error = stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }?.lastError
         withContext(Dispatchers.Default) { builder.change(bookId, extraId, request.take(MAX_REQUEST_CHARS), error) }
       } catch (e: Exception) {
-        Logger.w(e, "Fixing Extra $extraId failed")
+        Logger.w(e, "Fixing Explorable $extraId failed")
         fixError = e.message ?: e.javaClass.simpleName
       } finally {
         fixing = false
