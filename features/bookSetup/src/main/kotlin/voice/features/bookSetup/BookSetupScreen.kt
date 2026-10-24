@@ -216,6 +216,7 @@ private fun BookSetupScreen(
         palette = palette,
         onSourceClick = viewModel::onLookSourceClick,
         onGenerate = viewModel::onGenerateCover,
+        onCoverClick = viewModel::onGeneratedCoverClick,
         onFontClick = viewModel::onDisplayFontClick,
       )
       Button(

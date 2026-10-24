@@ -14,6 +14,16 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import java.io.File
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +55,7 @@ internal fun LookSection(
   palette: CrawlPalette,
   onSourceClick: (LookSource) -> Unit,
   onGenerate: (String) -> Unit,
+  onCoverClick: (String) -> Unit,
   onFontClick: (String) -> Unit,
 ) {
   var prompt by rememberSaveable(look.extraPrompt) { mutableStateOf(look.extraPrompt) }
@@ -55,7 +66,7 @@ internal fun LookSection(
         val available = when (source) {
           LookSource.Default -> true
           LookSource.Cover -> look.hasCover
-          LookSource.Generated -> canDrawCovers
+          LookSource.Generated -> canDrawCovers || look.covers.isNotEmpty()
         }
         FilterChip(
           selected = look.source == source,
@@ -64,6 +75,9 @@ internal fun LookSection(
           label = { Text(text = stringResource(source.labelRes)) },
         )
       }
+    }
+    if (look.covers.isNotEmpty() || look.drawing) {
+      DrawnCovers(look = look, palette = palette, onCoverClick = onCoverClick)
     }
     if (!canDrawCovers) {
       Text(text = stringResource(StringsR.string.setup_look_needs_ideogram), style = MaterialTheme.typography.bodySmall)
@@ -76,10 +90,10 @@ internal fun LookSection(
         placeholder = { Text(text = stringResource(StringsR.string.setup_look_prompt_placeholder)) },
         modifier = Modifier.fillMaxWidth(),
       )
-      Button(onClick = { onGenerate(prompt) }, enabled = !look.working) {
+      Button(onClick = { onGenerate(prompt) }, enabled = !look.working && !look.drawing) {
         Text(
           text = stringResource(
-            if (look.source == LookSource.Generated) StringsR.string.setup_look_regenerate else StringsR.string.setup_look_generate,
+            if (look.covers.isNotEmpty()) StringsR.string.setup_look_regenerate else StringsR.string.setup_look_generate,
           ),
         )
       }
@@ -107,6 +121,46 @@ internal fun LookSection(
             .padding(horizontal = 14.dp, vertical = 6.dp),
         )
       }
+    }
+  }
+}
+
+/** Every cover drawn for the book, newest first; tapping one makes it the cover. A tile spins while one is drawn. */
+@Composable
+private fun DrawnCovers(
+  look: LookViewState,
+  palette: CrawlPalette,
+  onCoverClick: (String) -> Unit,
+) {
+  LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    if (look.drawing) {
+      item(key = "drawing") {
+        Box(
+          contentAlignment = Alignment.Center,
+          modifier = Modifier
+            .size(72.dp)
+            .border(width = 2.dp, color = palette.content.copy(alpha = 0.3F), shape = RoundedCornerShape(12.dp)),
+        ) {
+          CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp, color = palette.highlight)
+        }
+      }
+    }
+    items(look.covers, key = { it }) { path ->
+      val selected = path == look.currentCover
+      AsyncImage(
+        model = File(path),
+        contentDescription = stringResource(StringsR.string.setup_look_drawn_cover),
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+          .size(72.dp)
+          .clip(RoundedCornerShape(12.dp))
+          .border(
+            width = if (selected) 3.dp else 1.dp,
+            color = if (selected) palette.highlight else palette.content.copy(alpha = 0.3F),
+            shape = RoundedCornerShape(12.dp),
+          )
+          .clickable(enabled = !look.working) { onCoverClick(path) },
+      )
     }
   }
 }

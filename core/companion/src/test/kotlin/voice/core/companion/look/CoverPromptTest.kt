@@ -13,16 +13,17 @@ class CoverPromptTest {
 
   @Test
   fun aNewCoverAvoidsTheLastComposition() {
-    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "editorial")
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "editorial", hasReference = false)
 
     assertTrue("The last cover used the editorial composition" in request)
   }
 
   @Test
   fun aFirstCoverHasNoCompositionToAvoid() {
-    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "more green", lastComposition = "")
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "more green", lastComposition = "", hasReference = true)
 
     assertFalse("last cover" in request)
     assertTrue("The listener wants: more green" in request)
+    assertTrue("retheme that cover" in request)
   }
 }

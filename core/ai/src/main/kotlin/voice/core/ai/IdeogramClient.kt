@@ -11,9 +11,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import voice.core.data.ApiKeys
 import voice.core.data.store.ApiKeysStore
 import voice.core.logging.api.Logger
@@ -45,12 +47,15 @@ class IdeogramClient(
 
   suspend fun isConfigured(): Boolean = apiKeys.data.first().ideogram.isNotBlank()
 
-  /** The picture as PNG or JPEG bytes. Throws when there is no key or the request fails. */
-  suspend fun generate(prompt: String, shape: ImageShape = ImageShape.Square): ByteArray {
+  /**
+   * The picture as PNG or JPEG bytes. With a [source] image, the prompt is an instruction for changing that image.
+   * Throws when there is no key or the request fails.
+   */
+  suspend fun generate(prompt: String, shape: ImageShape = ImageShape.Square, source: ByteArray? = null): ByteArray {
     val key = apiKeys.data.first().ideogram.trim()
     if (key.isEmpty()) throw MissingApiKeyException("Ideogram")
     return withContext(Dispatchers.IO) {
-      download(callForImageUrl(key, generateBody(prompt, shape)))
+      download(callForImageUrl(key, generateBody(prompt, shape, source)))
     }
   }
 
@@ -97,11 +102,17 @@ class IdeogramClient(
     private const val BROWSER_USER_AGENT =
       "Mozilla/5.0 (Linux; Android 14; Pixel) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36"
 
-    fun generateBody(prompt: String, shape: ImageShape): MultipartBody =
+    fun generateBody(prompt: String, shape: ImageShape, source: ByteArray? = null): MultipartBody =
       MultipartBody.Builder().setType(MultipartBody.FORM)
         .addFormDataPart("prompt", prompt)
         .addFormDataPart("size", shape.size)
         .addFormDataPart("quality", QUALITY)
+        .apply {
+          if (source != null) {
+            val type = source.imageMimeType()
+            addFormDataPart("images", "source.${type.substringAfter('/')}", source.toRequestBody(type.toMediaType()))
+          }
+        }
         .build()
 
     fun parseImageUrl(json: String): String =

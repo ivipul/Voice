@@ -536,7 +536,7 @@
     <!-- Button that generates a cover. -->
     <string name="setup.look.generate">Draw a cover</string>
     <!-- Button that regenerates the cover. -->
-    <string name="setup.look.regenerate">Draw again</string>
+    <string name="setup.look.regenerate">Redraw</string>
     <!-- Shown while colors or the cover change. -->
     <string name="setup.look.working">Updating the look…</string>
     <!-- Changing the look failed, with the reason. -->
@@ -619,4 +619,6 @@
     <string name="setup.edit.parts">Parts</string>
     <!-- Placeholder of the box to describe changes to a built idea. -->
     <string name="setup.edit.hint">What should change?</string>
+    <!-- Content description of a drawn cover in the cover history. -->
+    <string name="setup.look.drawn_cover">A cover drawn for this book</string>
 </resources>

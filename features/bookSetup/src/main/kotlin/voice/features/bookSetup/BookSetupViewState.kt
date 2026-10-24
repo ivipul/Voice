@@ -99,6 +99,12 @@ data class LookViewState(
   val working: Boolean = false,
   val error: String? = null,
   val hasCover: Boolean,
+  /** Covers drawn for the book, newest first, as files. */
+  val covers: List<String> = emptyList(),
+  /** The drawn cover in use, if the book uses one. */
+  val currentCover: String? = null,
+  /** A cover is being drawn, maybe ahead of time. */
+  val drawing: Boolean = false,
 )
 
 /** Deepgram Nova-3 pre-recorded audio, pay as you go. */

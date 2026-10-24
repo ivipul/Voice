@@ -39,6 +39,7 @@ enum class SetupJob {
   Summaries,
   Materials,
   Change,
+  Cover,
 }
 
 /**
@@ -80,6 +81,12 @@ class BookSetupRunner(
     if (setup.research == StepState.Done && setup.materials != StepState.Done && stores.materials.get(bookId).files.isNotEmpty()) {
       enqueue(SetupJob.Materials, bookId)
     }
+  }
+
+  /** Once the book is researched, draws a first cover in the background so the New cover option is ready. */
+  suspend fun prepareCover(bookId: BookId) {
+    if (stores.setup.get(bookId).research != StepState.Done || stores.look.get(bookId).coverHistory.isNotEmpty()) return
+    enqueue(SetupJob.Cover, bookId)
   }
 
   fun retry(bookId: BookId, job: SetupJob) {
@@ -156,8 +163,10 @@ class BookSetupRunner(
         // Ideas draw on the PDFs, so they are read first; a PDF that can't be read still leaves ideas to suggest.
         val _ = runCatching { materials.run(bookId) }
         ideas.suggest(bookId)
+        prepareCover(bookId)
       }
       SetupJob.Ideas -> ideas.suggest(bookId)
+      SetupJob.Cover -> lookMaker.prepareCover(bookId)
       SetupJob.Scene -> sceneIndexer.index(bookId)
       SetupJob.Summaries -> summarizer.summarize(bookId)
       SetupJob.Materials -> {

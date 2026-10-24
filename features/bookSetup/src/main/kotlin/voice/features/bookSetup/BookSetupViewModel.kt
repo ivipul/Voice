@@ -92,6 +92,9 @@ class BookSetupViewModel(
         runner.start(bookId)
       }
     }
+    LaunchedEffect(setup.research, keys.ideogram) {
+      if (keys.ideogram.isNotBlank()) runner.prepareCover(bookId)
+    }
     val cards = board?.cards.orEmpty()
     return BookSetupViewState(
       title = book.content.name,
@@ -118,6 +121,9 @@ class BookSetupViewModel(
         working = lookWorking,
         error = lookError,
         hasCover = book.content.cover != null,
+        covers = look.coverHistory.map { it.path },
+        currentCover = look.generatedCover.takeIf { look.source == LookSource.Generated },
+        drawing = look.isDrawing(System.currentTimeMillis()),
       ),
     )
   }
@@ -264,13 +270,20 @@ class BookSetupViewModel(
       when (source) {
         LookSource.Default -> lookMaker.useDefault(bookId)
         LookSource.Cover -> check(lookMaker.useCoverColors(bookId)) { "This book has no cover to take colors from" }
-        LookSource.Generated -> lookMaker.generateCover(bookId, stores.look.get(bookId).extraCoverPrompt)
+        LookSource.Generated -> lookMaker.useLatestGenerated(bookId)
       }
     }
   }
 
   fun onGenerateCover(extraPrompt: String) {
     runLookJob { lookMaker.generateCover(bookId, extraPrompt.trim()) }
+  }
+
+  fun onGeneratedCoverClick(path: String) {
+    runLookJob {
+      val cover = stores.look.get(bookId).coverHistory.first { it.path == path }
+      lookMaker.useGenerated(bookId, cover)
+    }
   }
 
   fun onDisplayFontClick(font: String) {

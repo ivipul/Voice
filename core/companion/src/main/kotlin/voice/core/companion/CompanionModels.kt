@@ -197,8 +197,12 @@ data class BookLook(
   val source: LookSource = LookSource.Default,
   /** Colors taken from the cover (or a generated cover), as ARGB ints. */
   val palette: StoredPalette? = null,
-  /** The last generated cover, as a file in the book's folder. */
+  /** The generated cover in use, or last in use, as a file in the book's folder. */
   val generatedCover: String? = null,
+  /** Every cover drawn for the book that is kept, newest first. */
+  val generatedCovers: List<GeneratedCover> = emptyList(),
+  /** When the cover being drawn right now started, if one is. */
+  val drawingSinceMs: Long? = null,
   /** What the listener added to the base cover prompt. */
   val extraCoverPrompt: String = "",
   /** The layout of the last generated cover, so the next one tries another. */
@@ -206,6 +210,24 @@ data class BookLook(
   /** The display face for chapter names, one of the app's named faces ("anton", "serif", ...). */
   val displayFont: String = "anton",
   val snipStyle: SnipPictureStyle? = null,
+) {
+
+  /** The drawn covers to choose from, including one drawn before the history was kept. */
+  val coverHistory: List<GeneratedCover>
+    get() = generatedCovers.ifEmpty { listOfNotNull(generatedCover).map { GeneratedCover(path = it) } }
+
+  /** Whether a cover is being drawn; a draw cut off by the app closing stops counting after a few minutes. */
+  fun isDrawing(nowMs: Long): Boolean = drawingSinceMs != null && nowMs - drawingSinceMs < DRAWING_TIMEOUT_MS
+}
+
+private const val DRAWING_TIMEOUT_MS = 5 * 60 * 1000L
+
+/** A cover Earlobe drew, with the layout and chapter-name face it was planned with. */
+@Serializable
+data class GeneratedCover(
+  val path: String,
+  val composition: String = "",
+  val font: String = "",
 )
 
 @Serializable
