@@ -157,6 +157,7 @@ internal fun StackBooks(
       tilt.animateTo(target, TiltSpring)
     }
   }
+  val lastBookId = books.values.lastOrNull { it.isNotEmpty() }?.keys?.last()
   LazyColumn(
     state = listState,
     modifier = Modifier.nestedScroll(scrollTilt),
@@ -175,9 +176,10 @@ internal fun StackBooks(
         items = categoryBooks.toList(),
         key = { (bookId, _) -> bookId.value },
         contentType = { "book" },
-      ) { (_, bookState) ->
+      ) { (bookId, bookState) ->
         StackBookCard(
           book = bookState.value,
+          tucked = bookId != lastBookId,
           onBookClick = onBookClick,
           onBookLongClick = onBookLongClick,
           modifier = Modifier.graphicsLayer {
@@ -190,7 +192,7 @@ internal fun StackBooks(
     }
     item {
       Column {
-        Spacer(Modifier.height(TuckedHeight + PlayButtonClearance))
+        Spacer(Modifier.height(PlayButtonClearance))
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
       }
     }
@@ -199,8 +201,8 @@ internal fun StackBooks(
 
 /**
  * A book as a card in its own colors: the cover on the left; the author, the title in the book's display face, the time
- * left and how far in on the right. Only the top of the card takes up room in the list, so the next card covers the
- * rest. A tap grows the card into the book's player.
+ * left and how far in on the right. A [tucked] card runs on under the next one, which covers that part; the last card
+ * has nothing below it, so it ends with its content. A tap grows the card into the book's player.
  */
 @Composable
 internal fun StackBookCard(
@@ -208,13 +210,15 @@ internal fun StackBookCard(
   onBookClick: (BookId) -> Unit,
   onBookLongClick: (BookId) -> Unit,
   modifier: Modifier = Modifier,
+  tucked: Boolean = true,
 ) {
   val palette = cardPaletteOf(book.bookStyle)
+  val tuckedHeight = if (tucked) TuckedHeight else 0.dp
   Box(
     modifier = modifier
       .fillMaxWidth()
-      .tuckedUnderNext(TuckedHeight)
-      .height(ShowingHeight + TuckedHeight)
+      .tuckedUnderNext(tuckedHeight)
+      .height(ShowingHeight + tuckedHeight)
       .shadow(elevation = 6.dp, shape = CardShape)
       .background(palette.background),
   ) {
