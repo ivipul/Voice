@@ -121,7 +121,8 @@ class LookMaker(
     stores.look.update(bookId) { it.copy(drawingSinceMs = System.currentTimeMillis(), extraCoverPrompt = extraPrompt) }
     try {
       val reference = referenceCover(bookId)
-      val closest = reference?.let { closestCuratedPalette(it.scale(SAMPLE_SIZE, SAMPLE_SIZE).colors()) }
+      val recent = stores.look.get(bookId).coverHistory.take(RECENT_PALETTES).map { it.palette }.filter { it.isNotEmpty() }.toSet()
+      val choices = coverPaletteChoices(reference?.scale(SAMPLE_SIZE, SAMPLE_SIZE)?.colors(), recent)
       val profile = stores.profile.get(bookId)
       val plan = companionJson.decodeFromString(
         CoverPlan.serializer(),
@@ -133,9 +134,9 @@ class LookMaker(
             extraPrompt = extraPrompt,
             lastComposition = stores.look.get(bookId).coverComposition,
             hasReference = reference != null,
-            palette = closest,
+            palettes = choices,
           ),
-          schema = COVER_SCHEMA,
+          schema = coverSchema(if (extraPrompt.isBlank()) choices else CURATED_PALETTES),
           maxTokens = 2_000,
           effort = OutputConfig.Effort.LOW,
           image = reference?.let { it.scale(CLAUDE_REFERENCE_SIZE, it.height * CLAUDE_REFERENCE_SIZE / it.width).png() },
@@ -145,8 +146,8 @@ class LookMaker(
       val file = withContext(Dispatchers.IO) {
         File(bookFiles.bookDir(bookId), "generated-cover-${System.currentTimeMillis()}.png").apply { writeBytes(bytes) }
       }
-      val palette = curatedPalette(plan.palette) ?: closest
-      val cover = GeneratedCover(path = file.absolutePath, composition = plan.composition, font = plan.font, palette = palette?.name.orEmpty())
+      val palette = curatedPalette(plan.palette) ?: choices.first()
+      val cover = GeneratedCover(path = file.absolutePath, composition = plan.composition, font = plan.font, palette = palette.name)
       val look = stores.look.update(bookId) {
         it.copy(coverComposition = plan.composition, generatedCovers = listOf(cover) + it.coverHistory)
       }
@@ -207,6 +208,9 @@ class LookMaker(
     // Enough for Claude to see the cover's subject and layout at about a quarter of the image tokens.
     const val CLAUDE_REFERENCE_SIZE = 512
     const val MAX_KEPT_COVERS = 12
+
+    // A redraw avoids the palettes of the cover in use and the one before it.
+    const val RECENT_PALETTES = 2
   }
 }
 
@@ -269,10 +273,11 @@ internal val COVER_PROMPT_SYSTEM = buildString {
   append("letters it exactly.")
 }
 
-internal val COVER_SCHEMA = Schema.obj(
+/** The cover plan, with the palette limited to [palettes]. */
+internal fun coverSchema(palettes: List<CuratedPalette>) = Schema.obj(
   "composition" to Schema.enum(COVER_COMPOSITIONS.keys.toList()),
   "font" to Schema.enum(COVER_FONTS.keys.toList()),
-  "palette" to Schema.enum(CURATED_PALETTES.map { it.name }),
+  "palette" to Schema.enum(palettes.map { it.name }),
   "prompt" to Schema.string(),
 )
 
@@ -294,7 +299,7 @@ internal fun coverPromptRequest(
   extraPrompt: String,
   lastComposition: String,
   hasReference: Boolean,
-  palette: CuratedPalette? = null,
+  palettes: List<CuratedPalette> = emptyList(),
 ): String = buildString {
   append(book)
   if (visualStyle.isNotBlank()) append("Look of the book: $visualStyle\n")
@@ -309,11 +314,16 @@ internal fun coverPromptRequest(
     append("Pick the composition closest to the original's layout. Keep only the title and the author's name as text, ")
     append("and tell the image model to remove every other word on the old cover.\n")
   }
+  val palette = palettes.singleOrNull()
   if (palette != null) {
     append("\nUse the ${palette.name} palette (${palette.inks()}): recolor the cover into it, its main color becoming ")
-    append("the background, its darks the ink and its brightest color the hot ink. Only if the listener asks for ")
-    append("other colors, pick the palette that fits their words instead.\n")
+    append("the background, its darks the ink and its brightest color the hot ink.")
+  } else if (palettes.isNotEmpty()) {
+    append("\nUse whichever of these palettes suits the book${if (hasReference) " and its cover" else ""} best, ")
+    append("and paint the cover in it:\n")
+    palettes.forEach { append("- ${it.name}: ${it.inks()}\n") }
   }
+  if (palettes.isNotEmpty()) append(" Only if the listener asks for other colors, pick the palette that fits their words instead.\n")
   if (extraPrompt.isNotBlank()) append("\nThe listener wants: $extraPrompt\n")
   if (lastComposition.isNotBlank() && !hasReference) {
     append("\nThe last cover used the $lastComposition composition; pick a different one if the cover still reads ")

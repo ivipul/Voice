@@ -1,6 +1,7 @@
 package voice.core.companion.look
 
 import voice.core.companion.StoredPalette
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -55,5 +56,33 @@ class CuratedPalettesTest {
   @Test
   fun everyPaletteIsOfferedToTheCoverPlanner() {
     CURATED_PALETTES.forEach { assertTrue("- ${it.name}: ${it.inks()}" in COVER_PROMPT_SYSTEM, it.name) }
+  }
+
+  @Test
+  fun aFirstCoverTakesTheClosestPalette() {
+    val cover = curatedPalette("Forest & Gold")!!.palette
+
+    assertEquals(listOf("Forest & Gold"), coverPaletteChoices(cover, recent = emptySet()).map { it.name })
+  }
+
+  @Test
+  fun aRedrawNeverRepeatsARecentPaletteAndVaries() {
+    val cover = curatedPalette("Forest & Gold")!!.palette
+    val recent = setOf("Forest & Gold", "Deep Teal & Salmon")
+
+    val picks = (0 until 30).map { seed -> coverPaletteChoices(cover, recent, Random(seed)).map { it.name } }
+
+    picks.forEach { choices ->
+      assertEquals(3, choices.size)
+      assertTrue(choices.none { it in recent })
+    }
+    assertTrue(picks.flatten().toSet().size > 3)
+  }
+
+  @Test
+  fun withoutACoverAnyPaletteCanComeUp() {
+    val picks = (0 until 60).flatMap { seed -> coverPaletteChoices(null, emptySet(), Random(seed)) }.map { it.name }.toSet()
+
+    assertTrue(picks.size > 10)
   }
 }

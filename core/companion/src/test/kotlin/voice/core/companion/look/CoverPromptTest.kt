@@ -40,8 +40,18 @@ class CoverPromptTest {
   fun aRestyledCoverIsToldItsClosestPalette() {
     val palette = CURATED_PALETTES.first { it.name == "Forest & Gold" }
 
-    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "", hasReference = true, palette = palette)
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "", hasReference = true, palettes = listOf(palette))
 
     assertTrue("Use the Forest & Gold palette (#2F4B3A / #F5ECD6 / #E3B34A / #D97B5A)" in request)
+  }
+
+  @Test
+  fun aRedrawOffersSeveralPalettesToChooseFrom() {
+    val palettes = CURATED_PALETTES.take(3)
+
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "", hasReference = true, palettes = palettes)
+
+    assertTrue("whichever of these palettes suits the book and its cover best" in request)
+    palettes.forEach { assertTrue("- ${it.name}: ${it.inks()}" in request) }
   }
 }

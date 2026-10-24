@@ -5,6 +5,7 @@ import kotlin.math.cbrt
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 /** A palette the listener picked by eye, with every color pair already checked for readability. */
 internal data class CuratedPalette(
@@ -45,11 +46,28 @@ internal fun curatedPalette(name: String): CuratedPalette? = CURATED_PALETTES.fi
  * The curated palette that looks most like [colors] picked from a cover. The background weighs double, since it is
  * the surface the cover and the player share; the highlight and accent count whichever way round matches better.
  */
-internal fun closestCuratedPalette(colors: StoredPalette): CuratedPalette = CURATED_PALETTES.minBy { curated ->
+internal fun closestCuratedPalette(colors: StoredPalette): CuratedPalette = CURATED_PALETTES.minBy { paletteDistance(colors, it) }
+
+/**
+ * The palettes a new cover may be painted in, for Claude to pick the one that suits the book. A book's first cover
+ * takes the palette closest to its own [cover] colors; a redraw gets a random few of the closest ones (any, without a
+ * cover) except those its recent covers used, so redrawing always changes the colors.
+ */
+internal fun coverPaletteChoices(cover: StoredPalette?, recent: Set<String>, random: Random = Random.Default): List<CuratedPalette> {
+  if (cover != null && recent.isEmpty()) return listOf(closestCuratedPalette(cover))
+  val pool = CURATED_PALETTES.filter { it.name !in recent }
+  val near = if (cover == null) pool else pool.sortedBy { paletteDistance(cover, it) }.take(NEAR_PALETTES)
+  return near.shuffled(random).take(PALETTE_CHOICES)
+}
+
+private const val NEAR_PALETTES = 7
+private const val PALETTE_CHOICES = 3
+
+private fun paletteDistance(colors: StoredPalette, curated: CuratedPalette): Double {
   val target = curated.palette
   val straight = colorDistance(colors.highlight, target.highlight) + colorDistance(colors.accent, target.accent)
   val swapped = colorDistance(colors.highlight, target.accent) + colorDistance(colors.accent, target.highlight)
-  2 * colorDistance(colors.background, target.background) + min(straight, swapped) / 2
+  return 2 * colorDistance(colors.background, target.background) + min(straight, swapped) / 2
 }
 
 /** How different two colors look, as the distance between them in CIELAB. */
