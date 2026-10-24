@@ -13,6 +13,7 @@ import dev.zacsweers.metro.SingleIn
 import voice.core.companion.CompanionStores
 import voice.core.companion.ExtensionPoint
 import voice.core.companion.IdeaCard
+import voice.core.companion.IdeaFeature
 import voice.core.companion.IdeaStatus
 import voice.core.companion.StepState
 import voice.core.companion.LookSource
@@ -37,6 +38,7 @@ enum class SetupJob {
   Scene,
   Summaries,
   Materials,
+  Change,
 }
 
 /**
@@ -109,6 +111,21 @@ class BookSetupRunner(
     enqueue(SetupJob.Build, bookId, cardId = cardId)
   }
 
+  /**
+   * Changes a built idea: [features] become its parts and [request] says what to change. A shelf Extra keeps its
+   * page and gets edited; a snip picture style is drawn again with the request as the listener's note.
+   */
+  suspend fun change(bookId: BookId, cardId: String, features: List<IdeaFeature>, request: String) {
+    val card = stores.ideas.get(bookId).cards.firstOrNull { it.id == cardId } ?: return
+    if (card.point == ExtensionPoint.Shelf && card.extraId != null) {
+      updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Building, error = null, features = features, pendingChange = request) }
+      enqueue(SetupJob.Change, bookId, cardId = cardId, policy = ExistingWorkPolicy.REPLACE)
+    } else {
+      updateCard(bookId, cardId) { it.copy(features = features) }
+      build(bookId, cardId, note = request)
+    }
+  }
+
   suspend fun skip(bookId: BookId, cardId: String) {
     updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Skipped) }
   }
@@ -149,6 +166,7 @@ class BookSetupRunner(
         if (studiedNew && stores.setup.get(bookId).ideas == StepState.Done) ideas.suggest(bookId)
       }
       SetupJob.Build -> buildCard(bookId, checkNotNull(cardId) { "Build needs a card" })
+      SetupJob.Change -> changeCard(bookId, checkNotNull(cardId) { "Change needs a card" })
     }
   }
 
@@ -190,6 +208,20 @@ class BookSetupRunner(
       }
     } catch (e: Exception) {
       Logger.w(e, "Building ${card.title} failed")
+      updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Failed, error = e.message ?: e.javaClass.simpleName) }
+      throw e
+    }
+  }
+
+  private suspend fun changeCard(bookId: BookId, cardId: String) {
+    val card = stores.ideas.get(bookId).cards.firstOrNull { it.id == cardId } ?: return
+    val extraId = card.extraId ?: return
+    try {
+      val error = stores.shelf.get(bookId).extras.firstOrNull { it.id == extraId }?.lastError
+      builder.change(bookId, extraId, card.pendingChange, error)
+      updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Built, pendingChange = "") }
+    } catch (e: Exception) {
+      Logger.w(e, "Changing ${card.title} failed")
       updateCard(bookId, cardId) { it.copy(status = IdeaStatus.Failed, error = e.message ?: e.javaClass.simpleName) }
       throw e
     }

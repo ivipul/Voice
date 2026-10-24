@@ -238,6 +238,15 @@ private fun BookSetupScreen(
       onKeepFilesChange = viewModel::onResetKeepFilesChange,
     )
   }
+  viewState.edit?.let { edit ->
+    EditIdeaDialog(
+      state = edit,
+      onToggleFeature = viewModel::onEditToggleFeature,
+      onRequestChange = viewModel::onEditRequestChange,
+      onDismiss = viewModel::onEditDismiss,
+      onSend = viewModel::onEditSend,
+    )
+  }
 }
 
 @Composable

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import voice.core.companion.BookProfile
 import voice.core.companion.FeasibilityVerdict
 import voice.core.companion.IdeaCard
+import voice.core.companion.IdeaFeature
 import voice.core.companion.IdeaStatus
 import voice.core.companion.LookSource
 import voice.core.companion.StepState
@@ -33,7 +34,19 @@ data class BookSetupViewState(
   val look: LookViewState,
   /** The reset confirmation while it's open; it asks whether to keep the transcript and added PDFs. */
   val reset: ResetViewState? = null,
+  /** The edit box of a built idea while it's open. */
+  val edit: EditIdeaViewState? = null,
 )
+
+/** Editing a built idea: its parts to tick or untick, and what else should change. */
+@Immutable
+data class EditIdeaViewState(
+  val card: IdeaCard,
+  val features: List<IdeaFeature>,
+  val request: String = "",
+) {
+  val canSend: Boolean get() = request.isNotBlank() || features != card.features
+}
 
 @Immutable
 data class ResetViewState(val keepFiles: Boolean = true)

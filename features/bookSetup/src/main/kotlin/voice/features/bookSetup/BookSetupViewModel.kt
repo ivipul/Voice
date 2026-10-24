@@ -24,6 +24,7 @@ import voice.core.companion.setup.TranscriptImporter
 import voice.core.companion.work.BookReset
 import voice.core.companion.work.BookSetupRunner
 import voice.core.companion.work.SetupJob
+import voice.core.companion.setup.changeRequest
 import voice.core.data.ApiKeys
 import voice.core.data.BookId
 import voice.core.data.toUri
@@ -63,6 +64,7 @@ class BookSetupViewModel(
   private var lookError by mutableStateOf<String?>(null)
   private var startWhenReady by mutableStateOf(autoStart)
   private var reset by mutableStateOf<ResetViewState?>(null)
+  private var edit by mutableStateOf<EditIdeaViewState?>(null)
 
   @Composable
   fun viewState(): BookSetupViewState? {
@@ -108,6 +110,7 @@ class BookSetupViewModel(
       skippedCards = cards.skippedCards(),
       ownIdea = ownIdea,
       reset = reset,
+      edit = edit,
       look = LookViewState(
         source = look.source,
         extraPrompt = look.extraCoverPrompt,
@@ -174,6 +177,40 @@ class BookSetupViewModel(
 
   fun onBuild(card: IdeaCard, note: String? = null) {
     scope.launch { runner.build(bookId, card.id, note) }
+  }
+
+  /** A failed change is tried again as that change; anything else that failed is built again. */
+  fun onRetry(card: IdeaCard) {
+    if (card.pendingChange.isNotBlank()) {
+      scope.launch { runner.change(bookId, card.id, card.features, card.pendingChange) }
+    } else {
+      onBuild(card)
+    }
+  }
+
+  fun onEdit(card: IdeaCard) {
+    edit = EditIdeaViewState(card = card, features = card.features)
+  }
+
+  fun onEditToggleFeature(index: Int) {
+    edit = edit?.let { state ->
+      state.copy(features = state.features.mapIndexed { i, feature -> if (i == index) feature.copy(included = !feature.included) else feature })
+    }
+  }
+
+  fun onEditRequestChange(text: String) {
+    edit = edit?.copy(request = text)
+  }
+
+  fun onEditDismiss() {
+    edit = null
+  }
+
+  fun onEditSend() {
+    val state = edit?.takeIf { it.canSend } ?: return
+    edit = null
+    val request = changeRequest(before = state.card.features, after = state.features, typed = state.request)
+    scope.launch { runner.change(bookId, state.card.id, state.features, request) }
   }
 
   fun onSkip(card: IdeaCard) {

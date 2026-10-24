@@ -129,6 +129,8 @@ data class IdeaCard(
   val materialSectionId: String? = null,
   /** What the listener typed on the card to add to or change the idea. */
   val listenerNote: String = "",
+  /** Changes the listener asked for on the built Extra, while they are being made or after they failed. */
+  val pendingChange: String = "",
 ) {
 
   val includedFeatures: List<String> get() = features.filter { it.included }.map { it.label }

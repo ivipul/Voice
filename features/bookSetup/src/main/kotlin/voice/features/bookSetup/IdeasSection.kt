@@ -35,6 +35,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -107,9 +109,10 @@ internal fun IdeasSection(
           card = card,
           palette = palette,
           transcriptReady = viewState.transcription.state == StepState.Done,
-          onRetry = { viewModel.onBuild(card) },
+          onRetry = { viewModel.onRetry(card) },
           onSkip = { viewModel.onSkip(card) },
           onOpen = { viewModel.onOpen(card) },
+          onEdit = { viewModel.onEdit(card) },
         )
       }
     }
@@ -329,6 +332,7 @@ private fun ChosenIdeaRow(
   onRetry: () -> Unit,
   onSkip: () -> Unit,
   onOpen: () -> Unit,
+  onEdit: () -> Unit,
 ) {
   Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -341,10 +345,15 @@ private fun ChosenIdeaRow(
       )
       when (card.status) {
         IdeaStatus.Building -> CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-        IdeaStatus.Built -> if (card.point == ExtensionPoint.Shelf) {
-          TextButton(onClick = onOpen) { Text(text = stringResource(StringsR.string.setup_idea_open)) }
-        } else {
-          Text(text = stringResource(StringsR.string.setup_idea_built), style = CrawlType.label, color = palette.highlight)
+        IdeaStatus.Built -> {
+          if (card.point != ExtensionPoint.SceneChips) {
+            TextButton(onClick = onEdit) { Text(text = stringResource(StringsR.string.setup_idea_edit)) }
+          }
+          if (card.point == ExtensionPoint.Shelf) {
+            TextButton(onClick = onOpen) { Text(text = stringResource(StringsR.string.setup_idea_open)) }
+          } else {
+            Text(text = stringResource(StringsR.string.setup_idea_built), style = CrawlType.label, color = palette.highlight)
+          }
         }
         IdeaStatus.Failed -> {
           TextButton(onClick = onRetry) { Text(text = stringResource(StringsR.string.setup_retry)) }
@@ -358,6 +367,8 @@ private fun ChosenIdeaRow(
         text = stringResource(
           if (card.point == ExtensionPoint.SceneChips && !transcriptReady) {
             StringsR.string.setup_idea_waiting_for_transcript
+          } else if (card.pendingChange.isNotBlank()) {
+            StringsR.string.setup_idea_updating
           } else {
             StringsR.string.setup_idea_building
           },
@@ -369,6 +380,54 @@ private fun ChosenIdeaRow(
       else -> Unit
     }
   }
+}
+
+/** The edit box of a built idea: its parts to tick or untick, if it has any, and what else should change. */
+@Composable
+internal fun EditIdeaDialog(
+  state: EditIdeaViewState,
+  onToggleFeature: (Int) -> Unit,
+  onRequestChange: (String) -> Unit,
+  onDismiss: () -> Unit,
+  onSend: () -> Unit,
+) {
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(text = stringResource(StringsR.string.setup_edit_title, state.card.title)) },
+    text = {
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (state.features.isNotEmpty()) {
+          Text(text = stringResource(StringsR.string.setup_edit_parts), style = MaterialTheme.typography.labelLarge)
+          state.features.forEachIndexed { index, feature ->
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier
+                .fillMaxWidth()
+                .toggleable(value = feature.included, role = Role.Checkbox, onValueChange = { onToggleFeature(index) }),
+            ) {
+              Checkbox(checked = feature.included, onCheckedChange = null)
+              Text(text = feature.label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 8.dp))
+            }
+          }
+        }
+        OutlinedTextField(
+          value = state.request,
+          onValueChange = onRequestChange,
+          placeholder = { Text(text = stringResource(StringsR.string.setup_edit_hint)) },
+          minLines = 3,
+          modifier = Modifier.fillMaxWidth(),
+        )
+      }
+    },
+    confirmButton = {
+      TextButton(onClick = onSend, enabled = state.canSend) {
+        Text(text = stringResource(StringsR.string.extra_ask_changes))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) { Text(text = stringResource(StringsR.string.common_dialog_cancel)) }
+    },
+  )
 }
 
 @Composable

@@ -562,7 +562,7 @@
     <!-- Cancels deleting an Extra. -->
     <string name="extra.keep">Keep</string>
     <!-- Player menu item that opens the book setup screen. -->
-    <string name="playback.option.book_setup">Book setup &amp; Extras</string>
+    <string name="playback.option.book_setup">Edit book setup</string>
     <!-- Shown while a picked audiobook file is scanned. -->
     <string name="setup.adding">Adding the book to your library…</string>
     <!-- Small label on an idea card: which card of the deck this is. -->
@@ -609,4 +609,14 @@
     <string name="extra.ask_changes_hint">What should change? For example: bigger text, add a search box, or the totals are wrong.</string>
     <!-- Sends the requested changes to Claude. -->
     <string name="extra.ask_changes_send">Send</string>
+    <!-- Opens the edit box of a built idea. -->
+    <string name="setup.idea.edit">Edit</string>
+    <!-- Shown while Claude changes a built idea. -->
+    <string name="setup.idea.updating">Making your changes…</string>
+    <!-- Title of the edit box of a built idea, with its name. -->
+    <string name="setup.edit.title">Edit “%1$s”</string>
+    <!-- Header of the parts a built idea has, to tick or untick. -->
+    <string name="setup.edit.parts">Parts</string>
+    <!-- Placeholder of the box to describe changes to a built idea. -->
+    <string name="setup.edit.hint">What should change?</string>
 </resources>
