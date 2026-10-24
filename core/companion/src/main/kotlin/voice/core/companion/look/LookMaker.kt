@@ -20,6 +20,7 @@ import voice.core.companion.CompanionStores
 import voice.core.companion.GeneratedCover
 import voice.core.companion.LookSource
 import voice.core.companion.Schema
+import voice.core.companion.StoredPalette
 import voice.core.companion.companionJson
 import voice.core.companion.setup.profileText
 import voice.core.data.BookId
@@ -30,8 +31,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
- * A book's look: the app's cream, red and black, colors picked from its cover, or a cover Earwig draws with Ideogram
- * (with the listener's own words added to the prompt) and colors picked from that. The book's original cover is kept
+ * A book's look: the app's cream, red and black, the curated palette closest to its cover, or a cover Earlobe draws
+ * with Ideogram in such a palette (with the listener's own words added to the prompt). The book's original cover is kept
  * so it can always come back.
  */
 @SingleIn(AppScope::class)
@@ -52,13 +53,13 @@ class LookMaker(
     stores.look.update(bookId) { it.copy(source = LookSource.Default) }
   }
 
-  /** Colors from the book's own cover. Returns false when the book has no cover to pick from. */
+  /** The curated palette closest to the book's own cover. Returns false when the book has no cover to pick from. */
   @IgnorableReturnValue
   suspend fun useCoverColors(bookId: BookId): Boolean {
     restoreOriginalCover(bookId)
     val cover = bookRepository.get(bookId)?.content?.cover?.takeIf { it.isFile } ?: return false
-    val palette = withContext(Dispatchers.Default) { decodeSmall(cover)?.let { paletteFromPixels(it.pixels(), it.width) } } ?: return false
-    stores.look.update(bookId) { it.copy(source = LookSource.Cover, palette = palette) }
+    val palette = withContext(Dispatchers.IO) { decodeSmall(cover)?.let { closestCuratedPalette(it.colors()) } } ?: return false
+    stores.look.update(bookId) { it.copy(source = LookSource.Cover, palette = palette.palette) }
     return true
   }
 
@@ -90,12 +91,16 @@ class LookMaker(
     }
   }
 
-  /** Makes [cover], drawn earlier, the book's cover, with its colors and chapter-name face. */
+  /**
+   * Makes [cover], drawn earlier, the book's cover, with the palette it was drawn in (colors picked from it for
+   * covers drawn before palettes were curated) and its chapter-name face.
+   */
   suspend fun useGenerated(bookId: BookId, cover: GeneratedCover) {
     keepOriginalCover(bookId)
     val bitmap = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(cover.path) } ?: error("That cover is gone")
     coverSaver.save(bookId, bitmap)
-    val palette = withContext(Dispatchers.Default) { bitmap.scale(SAMPLE_SIZE, SAMPLE_SIZE).let { paletteFromPixels(it.pixels(), it.width) } }
+    val palette = curatedPalette(cover.palette)?.palette
+      ?: withContext(Dispatchers.Default) { closestCuratedPalette(bitmap.scale(SAMPLE_SIZE, SAMPLE_SIZE).colors()).palette }
     stores.look.update(bookId) {
       it.copy(
         source = LookSource.Generated,
@@ -108,13 +113,14 @@ class LookMaker(
 
   /**
    * Draws a cover and adds it to the book's history without using it. The book's own cover goes along as the image
-   * to retheme, so the new one keeps its essence.
+   * to restyle, in the curated palette closest to its colors, so the new one keeps its drawing and feel.
    */
   private suspend fun draw(bookId: BookId, extraPrompt: String): GeneratedCover {
     val book = checkNotNull(bookRepository.get(bookId)) { "Book $bookId is not in the library" }
     stores.look.update(bookId) { it.copy(drawingSinceMs = System.currentTimeMillis(), extraCoverPrompt = extraPrompt) }
     try {
       val reference = referenceCover(bookId)
+      val closest = reference?.let { closestCuratedPalette(it.scale(SAMPLE_SIZE, SAMPLE_SIZE).colors()) }
       val profile = stores.profile.get(bookId)
       val plan = companionJson.decodeFromString(
         CoverPlan.serializer(),
@@ -126,17 +132,19 @@ class LookMaker(
             extraPrompt = extraPrompt,
             lastComposition = stores.look.get(bookId).coverComposition,
             hasReference = reference != null,
+            palette = closest,
           ),
           schema = COVER_SCHEMA,
           maxTokens = 2_000,
           effort = OutputConfig.Effort.LOW,
         ),
       )
-      val bytes = ideogram.generate(plan.prompt.trim(), ImageShape.Square, source = reference)
+      val bytes = ideogram.generate(plan.prompt.trim(), ImageShape.Square, source = reference?.png())
       val file = withContext(Dispatchers.IO) {
         File(bookFiles.bookDir(bookId), "generated-cover-${System.currentTimeMillis()}.png").apply { writeBytes(bytes) }
       }
-      val cover = GeneratedCover(path = file.absolutePath, composition = plan.composition, font = plan.font)
+      val palette = curatedPalette(plan.palette) ?: closest
+      val cover = GeneratedCover(path = file.absolutePath, composition = plan.composition, font = plan.font, palette = palette?.name.orEmpty())
       val look = stores.look.update(bookId) {
         it.copy(coverComposition = plan.composition, generatedCovers = listOf(cover) + it.coverHistory)
       }
@@ -155,14 +163,17 @@ class LookMaker(
     withContext(Dispatchers.IO) { dropped.forEach { File(it.path).delete() } }
   }
 
-  /** The book's own cover as PNG bytes for Ideogram to retheme, at most 1024 pixels wide. Null without a cover. */
-  private suspend fun referenceCover(bookId: BookId): ByteArray? = withContext(Dispatchers.IO) {
+  /** The book's own cover for Ideogram to restyle, at most 1024 pixels wide. Null without a cover. */
+  private suspend fun referenceCover(bookId: BookId): Bitmap? = withContext(Dispatchers.IO) {
     val original = originalCoverFile(bookId).takeIf { it.isFile }
       ?: bookRepository.get(bookId)?.content?.cover?.takeIf { it.isFile && stores.look.get(bookId).source != LookSource.Generated }
       ?: return@withContext null
     val bitmap = BitmapFactory.decodeFile(original.path) ?: return@withContext null
-    val scaled = if (bitmap.width > REFERENCE_SIZE) bitmap.scale(REFERENCE_SIZE, bitmap.height * REFERENCE_SIZE / bitmap.width) else bitmap
-    ByteArrayOutputStream().also { val _ = scaled.compress(Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
+    if (bitmap.width > REFERENCE_SIZE) bitmap.scale(REFERENCE_SIZE, bitmap.height * REFERENCE_SIZE / bitmap.width) else bitmap
+  }
+
+  private suspend fun Bitmap.png(): ByteArray = withContext(Dispatchers.IO) {
+    ByteArrayOutputStream().also { val _ = compress(Bitmap.CompressFormat.PNG, 100, it) }.toByteArray()
   }
 
   private suspend fun keepOriginalCover(bookId: BookId) = withContext(Dispatchers.IO) {
@@ -182,7 +193,10 @@ class LookMaker(
 
   private fun decodeSmall(file: File): Bitmap? = BitmapFactory.decodeFile(file.path)?.scale(SAMPLE_SIZE, SAMPLE_SIZE)
 
-  private fun Bitmap.pixels(): IntArray = IntArray(width * height).also { getPixels(it, 0, width, 0, 0, width, height) }
+  private fun Bitmap.colors(): StoredPalette {
+    val pixels = IntArray(width * height).also { getPixels(it, 0, width, 0, 0, width, height) }
+    return paletteFromPixels(pixels, width)
+  }
 
   private companion object {
     const val SAMPLE_SIZE = 64
@@ -191,20 +205,24 @@ class LookMaker(
   }
 }
 
-/** The layouts a generated cover can take, all in the same poster style. */
+/** The layouts a generated cover can take, all in the same screen-printed poster style. */
 internal val COVER_COMPOSITIONS = mapOf(
-  "stacked" to "Stacked title: two or three lines of huge title lettering in two colors, each line running the full " +
+  "stacked" to "Stacked title: two or three lines of huge title lettering in two inks, each line running the full " +
     "width, with the main figure standing in front of the letters and covering part of them.",
-  "wall" to "Tall condensed wall: one ultra-condensed title word filling almost the full height, a tiny kicker line " +
-    "above it and a widely spaced sub-label under it, with the figure in front.",
-  "rounded" to "Fat rounded title: very fat, rounded lettering centered across the top, a small widely spaced kicker " +
-    "above it, and the figures with their soft cast shadows below.",
-  "giant" to "Giant letterform: one enormous number or letter as the backdrop, the figure bursting through it, and a " +
+  "wall" to "Tall condensed wall: one ultra-condensed title word filling almost the full height behind the figure, " +
+    "a tiny header row of widely spaced microtype above it, like a poster series label.",
+  "giant" to "Giant letterform: one enormous number or letter as the backdrop, the figure in front of it, and a " +
     "small label in a corner.",
   "serif" to "Tone-on-tone serif: a tall, high-contrast serif title in a darker or lighter shade of the background, " +
     "partly hidden by large figures in front.",
-  "editorial" to "Editorial poster: a bold two-color sans title across the top over one flat illustrated symbol of the " +
-    "book's idea, with a soft glow behind it.",
+  "disc" to "Sun disc: the figure in profile or three-quarter view in front of one huge flat disc in the hot ink, the " +
+    "title in one tall line above or beside it, and thin rules in the top corners.",
+  "split" to "Diagonal split: one hard diagonal cuts the upper part of the canvas into the background color and a " +
+    "block of ink or the hot ink; the figure sits on the seam, half lit, half in shadow, with a short, widely " +
+    "spaced title in the lower third.",
+  "card" to "Card: laid out like a playing card or a ticket, with big corner letters or numbers, one bold flat " +
+    "symbol or the figure, the title set vertically up one side or as one serif line, and a thin rule with a tiny " +
+    "block of text.",
 )
 
 /** The app's chapter name faces, and how a cover letters its title to match each one. */
@@ -213,30 +231,39 @@ internal val COVER_FONTS = mapOf(
   "condensed" to "ultra-condensed tall sans serif, like Big Shoulders Display",
   "serif" to "tall elegant high-contrast serif, like Instrument Serif",
   "classic" to "bold high-contrast didone serif, like Playfair Display",
-  "rounded" to "fat rounded retro display letters, like Bagel Fat One",
 )
 
 internal val COVER_PROMPT_SYSTEM = buildString {
-  append("You plan a square audiobook cover and write the prompt an image model draws it from. The covers share one ")
-  append("poster style: flat vector illustration with simple cel shading, crisp shapes and a soft hard-edged cast ")
-  append("shadow, with a touch of paper grain. One flat, saturated background color fills the whole canvas to every ")
-  append("edge, with no scenery, gradient or photo behind, and the bottom edge stays mostly that plain color so the ")
-  append("cover fades into the player page of the same color; deep jewel tones are fine, never black. Use two or three ")
-  append("more colors and one bright accent, chosen for the book's mood. The huge title lettering is the main ")
-  append("graphic and stays readable; add the author's name as small, widely spaced capitals. Fiction shows its ")
-  append("main character as an expressive, dynamic figure described by how they look; non-fiction shows a bold ")
-  append("symbol, object or scene of its idea. Never name real people, brands or logos.\n\nCompositions:\n")
+  append("You plan a square audiobook cover and write the prompt an image model draws it from. Every cover shares ")
+  append("one style, a screen-printed graphic poster:\n")
+  append("- Inks: three or four flat inks from the given palette and nothing else, with no gradients, like a screen ")
+  append("print or risograph; a fine paper grain over everything and slightly rough ink edges.\n")
+  append("- Drawing: bold graphic-novel illustration. Forms are carved by hard-edged blocks of near-black shadow, ")
+  append("never soft shading, with confident ink lines or loose dry-brush hatching for texture. Cream or white is ")
+  append("kept for small, sharp highlights such as eyes, jewelry, cuffs and lettering.\n")
+  append("- Background: one flat palette color fills the canvas to every edge, with no scenery, gradient or photo, ")
+  append("and the bottom edge stays plain so the cover melts into the player page of the same color.\n")
+  append("- Type: the huge title lettering is the main graphic and stays readable, with the figure in front of the ")
+  append("letters, covering part of them. The author's name goes in tiny, widely spaced capitals, editorial style.\n")
+  append("- Restraint: lots of empty background, one hot ink doing the work, nothing glowing, no 3D, no ")
+  append("photographic detail.\n")
+  append("Fiction shows its main character as an expressive figure described by how they look; non-fiction shows ")
+  append("one bold symbol, object or scene of its idea. Never name real people, brands or logos.\n\nCompositions:\n")
   COVER_COMPOSITIONS.forEach { (id, text) -> append("- $id: $text\n") }
   append("\nTitle faces (the app sets chapter names in the same face):\n")
   COVER_FONTS.forEach { (id, text) -> append("- $id: $text\n") }
-  append("\nPick the composition and face that suit the book. The prompt is one paragraph of at most 110 words: ")
-  append("composition, lettering in the chosen face, figure or symbol, background color and palette, and style. Put ")
-  append("every piece of cover text in quotes so the image model letters it exactly.")
+  append("\nPalettes (background / ink / hot ink / second ink):\n")
+  CURATED_PALETTES.forEach { append("- ${it.name}: ${it.inks()}\n") }
+  append("\nPick the composition, face and palette that suit the book, unless they are given. The prompt is one ")
+  append("paragraph of at most 120 words: composition, lettering in the chosen face, figure or symbol, which ink ")
+  append("goes where with its hex code, and style. Put every piece of cover text in quotes so the image model ")
+  append("letters it exactly.")
 }
 
 internal val COVER_SCHEMA = Schema.obj(
   "composition" to Schema.enum(COVER_COMPOSITIONS.keys.toList()),
   "font" to Schema.enum(COVER_FONTS.keys.toList()),
+  "palette" to Schema.enum(CURATED_PALETTES.map { it.name }),
   "prompt" to Schema.string(),
 )
 
@@ -244,24 +271,45 @@ internal val COVER_SCHEMA = Schema.obj(
 internal data class CoverPlan(
   val composition: String,
   val font: String,
+  val palette: String = "",
   val prompt: String,
 )
 
+/**
+ * What Claude gets to plan a cover from. With a [reference] cover, the new one is that cover restyled in [palette],
+ * the curated palette closest to its colors, so the drawing and the feel of its colors survive.
+ */
 internal fun coverPromptRequest(
   book: String,
   visualStyle: String,
   extraPrompt: String,
   lastComposition: String,
   hasReference: Boolean,
+  palette: CuratedPalette? = null,
 ): String = buildString {
   append(book)
   if (visualStyle.isNotBlank()) append("Look of the book: $visualStyle\n")
   if (hasReference) {
     append("\nThe image model gets the book's current cover and edits it. Write the prompt as an instruction to ")
-    append("retheme that cover into the poster style: keep its title text, its main subject or symbol and the feel of ")
-    append("its colors, and redraw everything in flat vector on one flat background color.\n")
+    append("restyle that same cover, not to invent a new one: keep its illustration (the same subject, pose, framing ")
+    append("and main objects) and its title text, and redraw them in the screen-printed poster style. Small tweaks are ")
+    append("fine, like simpler detail or the title moved into the composition, but the original must stay ")
+    append("recognizable. Pick the composition closest to the cover's own layout.\n")
+  }
+  if (palette != null) {
+    append("\nUse the ${palette.name} palette (${palette.inks()}): recolor the cover into it, its main color becoming ")
+    append("the background, its darks the ink and its brightest color the hot ink. Only if the listener asks for ")
+    append("other colors, pick the palette that fits their words instead.\n")
   }
   if (extraPrompt.isNotBlank()) append("\nThe listener wants: $extraPrompt\n")
-  if (lastComposition.isNotBlank()) append("\nThe last cover used the $lastComposition composition; pick a different one.\n")
+  if (lastComposition.isNotBlank()) {
+    append("\nThe last cover used the $lastComposition composition; pick a different one if the cover still reads ")
+    append("as the same book.\n")
+  }
   append("\nPlan the cover.")
+}
+
+/** The palette's four inks as hex codes, in the order the cover prompt names them. */
+internal fun CuratedPalette.inks(): String = with(palette) {
+  listOf(background, content, highlight, accent).joinToString(" / ") { "#%06X".format(it and 0xFFFFFF) }
 }

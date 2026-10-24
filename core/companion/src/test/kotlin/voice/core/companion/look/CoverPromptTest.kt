@@ -24,6 +24,15 @@ class CoverPromptTest {
 
     assertFalse("last cover" in request)
     assertTrue("The listener wants: more green" in request)
-    assertTrue("retheme that cover" in request)
+    assertTrue("restyle that same cover" in request)
+  }
+
+  @Test
+  fun aRestyledCoverIsToldItsClosestPalette() {
+    val palette = CURATED_PALETTES.first { it.name == "Forest & Gold" }
+
+    val request = coverPromptRequest(book = "Book: \"Good Energy\"", visualStyle = "", extraPrompt = "", lastComposition = "", hasReference = true, palette = palette)
+
+    assertTrue("Use the Forest & Gold palette (#2F4B3A / #F5ECD6 / #E3B34A / #D97B5A)" in request)
   }
 }

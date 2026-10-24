@@ -222,12 +222,13 @@ data class BookLook(
 
 private const val DRAWING_TIMEOUT_MS = 5 * 60 * 1000L
 
-/** A cover Earlobe drew, with the layout and chapter-name face it was planned with. */
+/** A cover Earlobe drew, with the layout, chapter-name face and curated palette it was planned with. */
 @Serializable
 data class GeneratedCover(
   val path: String,
   val composition: String = "",
   val font: String = "",
+  val palette: String = "",
 )
 
 @Serializable
