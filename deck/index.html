@@ -271,6 +271,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .pick b { position: absolute; left: 6px; bottom: 4px; font: 400 16px/1 var(--f-serif); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
 .pick.on { opacity: 1; transform: translateY(-6px); box-shadow: 5px 5px 0 var(--sh); }
 .pick:hover { opacity: .9; }
+/* poster slides: a deeper shade of the book colour, so the cover plates and the player stand off the background */
+.s-poster, .s-posters { background: color-mix(in srgb, var(--bg) 78%, var(--fg) 22%); }
+.s-poster .inner { min-height: 100vh; justify-content: center; padding-block: 3vh 12vh; }
+.s-poster .picks { position: absolute; left: 0; right: 0; bottom: 4vh; gap: 6px; }
+.s-poster .pick { width: clamp(28px, 3vw, 48px); border-radius: 6px; }
+.s-poster .pick b { font-size: 11px; left: 4px; bottom: 3px; }
+.s-poster .pick.on { transform: translateY(-4px); box-shadow: 3px 3px 0 var(--sh); }
 
 /* phone frame: centre stage on demo slides */
 #phone { position: fixed; z-index: 30; left: 50%; top: 50%; width: var(--ph-w); height: var(--ph-h); margin: calc(var(--ph-h) / -2) 0 0 calc(var(--ph-w) / -2);
