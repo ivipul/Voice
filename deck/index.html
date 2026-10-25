@@ -330,6 +330,7 @@ html.demo #bar .pseek .track { background: rgba(255,255,255,.2); }
 .ov dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
 .ov dt { font: 600 13px/1.5 var(--f-mono); color: #FFD24A; }
 .ov dd { margin: 0; }
+.ov .build { margin: 10px 0 0; font: 500 11px/1.4 var(--f-mono); opacity: .5; }
 .ov code { font: 500 12px/1.5 var(--f-mono); display: block; margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: #2C2920; white-space: pre-wrap; word-break: break-word; }
 /* talking points: a card bottom left, hidden until N */
 #notes { position: fixed; z-index: 45; left: max(16px, env(safe-area-inset-left, 0px), 3vw); bottom: calc(52px + env(safe-area-inset-bottom, 0px));
@@ -550,8 +551,9 @@ I never broke stride. My run stayed a run. Thank you.">
 <aside id="beats" hidden><header><h3>Beat timing</h3><span class="now"></span><button class="copy" type="button">Copy</button></header><table><thead><tr><th>#</th><th>Beat and slides</th><th>Plan</th><th>You</th><th>&plusmn;</th><th>Drift</th><th>Last run</th></tr></thead><tbody></tbody><tfoot></tfoot></table><p class="foot"></p></aside>
 <div id="help" class="ov" hidden>
   <h3>Keys</h3>
-  <dl><dt>S</dt><dd>Start the 8:00 clock</dd><dt>Space → ↓ click</dt><dd>Next slide, clock untouched</dd><dt>← ↑</dt><dd>Previous slide</dd><dt>[ ]</dt><dd>Cards slide: previous or next look change</dd><dt>1 to 8</dt><dd>Panel layers: layer 1 to 8. Posters A: book 1 to 8. Posters B: stage 1 to 3</dd><dt>Bar</dt><dd>Hover a segment for the slide name, click to jump</dd><dt>P</dt><dd>Phone frame: auto, always on, off</dd><dt>F</dt><dd>Frame shape: folded, unfolded</dd><dt>T / R</dt><dd>Pause or resume the clock / reset it</dd><dt>N</dt><dd>Talking points for this slide</dd><dt>B or click the clock</dt><dd>Beat timing: time per script beat against the plan, with drift and the last run</dd><dt>?</dt><dd>This panel</dd></dl>
+  <dl><dt>S</dt><dd>Start the 8:00 clock</dd><dt>Space → ↓ click</dt><dd>Next slide, clock untouched</dd><dt>← ↑</dt><dd>Previous slide</dd><dt>[ ]</dt><dd>Cards slide: previous or next look change</dd><dt>1 to 8</dt><dd>Panel layers: layer 1 to 8. Posters A: book 1 to 8. Posters B: stage 1 to 3</dd><dt>Bar</dt><dd>Hover a segment for the slide name, click to jump</dd><dt>P</dt><dd>Phone frame: auto, always on, off</dd><dt>F</dt><dd>Frame shape: folded, unfolded</dd><dt>T</dt><dd>Pause or resume the clock</dd><dt>R</dt><dd>End this run: clock to 0:00, back to slide 1; S starts a new run</dd><dt>N</dt><dd>Talking points for this slide</dd><dt>W or click the clock</dt><dd>Beat timing panel (pauses the clock): time per script beat against the plan, drift, last run</dd><dt>B</dt><dd>Hide the beat panel and resume the clock</dd><dt>?</dt><dd>This panel</dd></dl>
   <code id="geo"></code>
+  <p class="build">Deck build 2026-10-25 04:36 UTC</p>
 </div>
 <script>const NAMES = ["Carl", "Princess Donut", "Katia Grim", "Mongo", "Mordecai", "Lucia Marr", "Chris Andrews", "Zev", "Hekla", "Zorina Signet", "Juicebox", "Agatha", "Loida", "Imani", "Frank Hugh", "Princess Denodia", "Miriam Dom", "The Sledge", "Florin", "Eva", "Skarn", "Louis", "Ruby", "Henrik", "Bonnie", "Kwon", "Cece", "Odette", "Tally", "Jack", "Maggie Mai", "Yolanda Martinez", "Lexus", "Maestro", "Burgundy", "Gum Gum", "Manasa", "Bea", "Daniel Bautista", "Kravyad", "Bopka", "Wendida", "Prepotente", "Quan Ch", "Puka", "Mantaar", "Oren", "Fraz", "Samantha", "Win", "Elle McGibbons", "Grull", "Apito", "Prince Stalwart", "Tsarina Signet", "Emberus", "Bomo", "Amayon", "Borant", "Signet", "Katya Grimm", "Hecla", "Batista", "Faraz", "Dimitri Popov", "Maxim Popov"];
 const BOOKS = [{"n": 1, "durationMs": 48558000}, {"n": 2, "durationMs": 41013000}, {"n": 3, "durationMs": 60430000}, {"n": 4, "durationMs": 64527000}, {"n": 5, "durationMs": 84224000}, {"n": 6, "durationMs": 96309000}, {"n": 7, "durationMs": 103121000}, {"n": 8, "durationMs": 73189000}];
@@ -656,10 +658,10 @@ const PALETTES = {"1": {"title": "Dungeon Crawler Carl", "bg": "#FDD463", "fg": 
     try { localStorage.setItem(BEAT_KEY, JSON.stringify({ current: sum(beatT) > 0 ? { at: beatAt, t: beatT.map(Math.round) } : null, runs: beatRuns })); } catch (e) {} }
   function archiveBeats() { if (sum(beatT) > 5) beatRuns.unshift({ at: beatAt, t: beatT.map(Math.round) }); beatRuns = beatRuns.slice(0, 5); beatT = ACTS.map(() => 0); beatAt = null; saveBeats(); }
   function beatRows() { // per act: plan, actual, the act's own +/-, and the running drift against the plan
-    const ca = ACT_OF[cur], started = beatAt !== null, live = running(); let drift = 0;
+    const ca = ACT_OF[cur], started = beatAt !== null; let drift = 0;
     return ACTS.map((a, k) => { const t = beatT[k], reached = started && (k <= ca || t > 0), isNow = started && k === ca;
-      const own = isNow && live && t < a.plan ? null : t - a.plan;
-      if (reached) drift += isNow && live ? Math.max(0, t - a.plan) : t - a.plan;
+      const own = isNow && t < a.plan ? null : t - a.plan; // the beat on screen is still in progress, even while paused
+      if (reached) drift += isNow ? Math.max(0, t - a.plan) : t - a.plan;
       return { a, k, t, reached, isNow, own, drift: reached ? drift : null }; });
   }
   function renderBeats() {
@@ -680,7 +682,7 @@ const PALETTES = {"1": {"title": "Dungeon Crawler Carl", "bg": "#FDD463", "fg": 
       : `Beat ${ca + 1} of ${ACTS.length}: ${fmt(now.t)} of ${fmt(now.a.plan)} · ` + (d > 0 ? fmt(d) + ' behind plan' : d < 0 ? fmt(-d) + ' ahead of plan' : 'on plan') + (running() ? '' : ' · paused');
     beatsEl.querySelector('.foot').textContent = 'Drift = how far ahead or behind the script you are by the end of each beat. '
       + 'Cut order from the script: beat 7, then the pipeline line in beat 6, then The Deck in beat 4. '
-      + (beatRuns.length ? `Last run: ${when(last.at)}. ` : '') + 'R files this run and starts a new one.';
+      + (beatRuns.length ? `Last run: ${when(last.at)}. ` : '') + 'B closes this and resumes the clock. R ends the run and goes back to slide 1.';
   }
   function beatsText() {
     const lines = [`The Crawl talk timing, ${when(beatAt) || 'no run yet'}: total ${fmt(sum(beatT))} (plan ${fmt(PLAN_TOTAL)} + ${fmt(BUFFER)} buffer, slot ${fmt(SLOT)})`];
@@ -693,8 +695,18 @@ const PALETTES = {"1": {"title": "Dungeon Crawler Carl", "bg": "#FDD463", "fg": 
     try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) {}
     if (!ok) { const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); }
     copyBtn.textContent = ok ? 'Copied' : 'Copy failed'; copyBtn.blur(); setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500); });
-  function toggleBeats() { beatsEl.hidden = !beatsEl.hidden; renderBeats(); }
-  clock.addEventListener('click', e => { e.stopPropagation(); toggleBeats(); });
+  function showBeats() { beatsEl.hidden = false; if (running()) toggleTimer(); renderBeats(); }
+  function hideBeats() { beatsEl.hidden = true; if (!running() && beatAt !== null) toggleTimer(); }
+  clock.addEventListener('click', e => { e.stopPropagation(); beatsEl.hidden ? showBeats() : hideBeats(); });
+  // R: file the run, clock to 0:00, every slide back to its first state, back to slide 1; S starts a new run
+  function restartDeck() {
+    resetTimer();
+    slides.forEach(s => { if ((s.classList.contains('s-built') || s.classList.contains('s-tname')) && s.classList.contains('demo')) {
+      s.classList.remove('demo'); s.dataset.phone = 'later'; s.querySelectorAll('.fl, .w1, .w2').forEach(e => { e.style.transition = ''; e.style.transform = ''; e.style.opacity = ''; }); } });
+    if (mk) setStage(0); if (pz) setPz(0); if (creep) creep.dataset.stage = '0'; if (pw) setBook(1);
+    if (closex) { closex.dataset.stage = '0'; const k = closex.querySelector('.key'); if (k) { k.style.transition = ''; k.style.transform = ''; } }
+    slides[0].scrollIntoView({ behavior: 'auto', block: 'start' }); setCurrent(0); renderBeats();
+  }
   saveBeats();
 
   function tick() { const t = timerAcc + (running() ? (Date.now() - timerStart) / 1000 : 0);
@@ -825,11 +837,12 @@ const PALETTES = {"1": {"title": "Dungeon Crawler Carl", "bg": "#FDD463", "fg": 
       case 'p': case 'P': phoneMode = phoneMode === 'auto' ? 'on' : phoneMode === 'on' ? 'off' : 'auto'; applyPhone(); break;
       case 'f': case 'F': root.classList.toggle('unfolded'); setTimeout(geometry, 450); break;
       case 't': case 'T': toggleTimer(); break;
-      case 'r': case 'R': resetTimer(); break;
+      case 'r': case 'R': restartDeck(); break;
       case 'n': case 'N': notes.hidden = !notes.hidden; break;
-      case 'b': case 'B': toggleBeats(); break;
+      case 'w': case 'W': beatsEl.hidden ? showBeats() : hideBeats(); break;
+      case 'b': case 'B': hideBeats(); break;
       case '?': case 'h': case 'H': help.hidden = !help.hidden; geometry(); break;
-      case 'Escape': help.hidden = true; notes.hidden = true; beatsEl.hidden = true; break;
+      case 'Escape': help.hidden = true; notes.hidden = true; if (!beatsEl.hidden) hideBeats(); break;
     }
   });
   // a click on the page advances; clicks inside an interactive demo (.ix) or an overlay do not
