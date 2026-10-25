@@ -334,11 +334,13 @@ html.demo #bar .pseek .track { background: rgba(255,255,255,.2); }
 .ov code { font: 500 12px/1.5 var(--f-mono); display: block; margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: #2C2920; white-space: pre-wrap; word-break: break-word; }
 /* talking points: a card bottom left, hidden until N */
 #notes { position: fixed; z-index: 45; left: max(16px, env(safe-area-inset-left, 0px), 3vw); bottom: calc(52px + env(safe-area-inset-bottom, 0px));
-  width: min(440px, calc(100vw - 32px)); max-height: 60vh; overflow: auto; padding: 18px 22px 16px; border-radius: 18px;
+  width: min(500px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow: auto; padding: 18px 22px 16px; border-radius: 18px;
   background: var(--paper); color: #1D1B16; box-shadow: 8px 8px 0 var(--sh); font: 400 19px/1.35 var(--f-serif); }
 #notes[hidden] { display: none; }
 #notes h3 { margin: 0 0 10px; font: 400 13px/1 var(--f-serif); letter-spacing: .2em; text-transform: uppercase; opacity: .6; }
-#notes ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 8px; }
+#notes ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+#notes .sc { font: 600 12px/1.6 var(--f-chak); font-style: normal; letter-spacing: .04em; text-transform: uppercase; color: #6B4A16;
+  background: #1D1B1610; padding: 1px 7px; border-radius: 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 #notes ul:empty { display: none; }
 #beats { position: fixed; z-index: 46; right: max(16px, env(safe-area-inset-right, 0px), 3vw); bottom: calc(52px + env(safe-area-inset-bottom, 0px));
   width: min(660px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto; padding: 16px 18px 14px; border-radius: 16px;
@@ -390,19 +392,14 @@ html.demo #bar .pseek .track { background: rgba(255,255,255,.2); }
   <img class="icon cover" src="assets/icon.png" alt="The Crawl app icon: a cat in headphones">
 </div>
 </section>
-<section class="slide s-run bk5" data-phone="off" data-short="The run" data-notes="Tell the run while the names pile up. End on the sidewalk, phone out, buried in Reddit." data-talk="It&#x27;s seven in the morning, I&#x27;m out for a run, Dungeon Crawler Carl in my ears.
-An old plot line comes back, something from two books ago, and I cannot remember what it was about.
-A few minutes later, my run has turned into a crawl. I&#x27;m standing on the sidewalk, phone out, buried in Reddit, catching up.">
+<section class="slide s-run bk5" data-phone="off" data-short="The run" data-notes="Tell the run while the names pile up. End on the crawl: dragging your feet, head in the phone, buried in Reddit." data-talk="It&#x27;s 6:30 in the morning, I&#x27;m out for a run. I am listening to Dungeon Crawler Carl in my ears. When an old character comes up, something from two books ago, and I just cannot remember. A few minutes later, my run has turned into a crawl. I&#x27;m dragging my feet, head in my phone, buried in Reddit, catching up.">
 <div class="inner center">
-  <p class="kicker">7:00 am, out for a run</p>
+  <p class="kicker">6:30 am, out for a run</p>
   <h2 class="big">Who was <span class="foil">that?</span></h2>
 </div>
 <div class="cloud" aria-hidden="true"></div>
 </section>
-<section class="slide s-series bk4" data-phone="off" data-short="The numbers" data-notes="Hands up. Then the premise in one breath, the numbers, and why audio loses you." data-talk="Earth turns into a dungeon game show. Eight books, 159 hours of audio, more than 220 named characters.
-I listened on every run, every commute, and at bedtime lying next to my daughter until she fell asleep.
-And I kept getting lost. In the car, I couldn&#x27;t even pull out my phone.
-Audio gives you no faces and no map, and these worlds are wild.">
+<section class="slide s-series bk4" data-phone="off" data-short="The numbers" data-notes="Hands up. Then the premise in one breath, the numbers, and why audio loses you." data-talk="[Next slide] Hands up if you&#x27;ve heard of Dungeon Crawler Carl. [Pause] Well in this book, Earth is destroyed, and survivors are part of a dungeon game show. Eight books, 159 hours of audio, more than 220 characters. For months, I listened on every run, every commute, and at bedtime lying next to my daughter until she fell asleep. And I&#x27;d often get lost. In the car, I couldn&#x27;t even pull out my phone. Also, Audio gives you no faces and no map, and these worlds are wild.">
 <div class="inner center">
   <p class="kicker">Hands up if you have heard of</p>
   <h2 class="big">Dungeon Crawler Carl</h2>
@@ -414,29 +411,26 @@ Audio gives you no faces and no map, and these worlds are wild.">
   </ul>
 </div>
 </section>
-<section class="slide s-built bk1" data-phone="later" data-short="I built an app" data-notes="Say the techie line on the bright slide. Next once more: the words part, the lights go down, the phone comes in. Bring the mirror over the frame (Ctrl-Option-Z)." data-talk="If it isn&#x27;t obvious yet, I was hooked. So I did what any self-respecting techie does these days: I built an app.
-I took an open source audiobook player, handed it to Claude and started building.
-Everything from here runs live on my phone.">
+<section class="slide s-built bk1" data-phone="later" data-short="I built an app" data-notes="Say the techie line on the bright slide. Next once more: the words part, the lights go down, the phone comes in. Bring the mirror over the frame (Ctrl-Option-Z)." data-talk="If it isn&#x27;t obvious yet, I was obsessed with this book. So I did what any self-respecting techie would do to solve a problem: I built an app. I took an open source audiobook player, handed it to Claude and started building. Everything from here runs live on my phone.">
 <div class="inner words">
   <h2 class="big split"><span class="w1">I built</span><span class="w2">an <span class="foil">app.</span></span></h2>
 </div>
 </section>
-<section class="slide s-ask bk6 demo" data-phone="on" data-short="Just ask" data-notes="DEMO 1. Tap forward once on the headphones, ask &quot;Who is Mordecai?&quot;, let the answer play through the Mac." data-talk="The one thing I wanted most was a co-pilot listening with me. When I&#x27;m running or driving, I don&#x27;t want to touch my phone.
-So I hijacked my headphone buttons: one tap forward, and instead of skipping, the app opens a mic.
-That voice is the System AI, the snarky game AI that guides the characters through the dungeon. Now it guides me too.">
+<section class="slide s-ask bk6 demo" data-phone="on" data-short="Just ask" data-notes="DEMO 1. Tap forward once on the headphones, ask &quot;Who is Mordecai?&quot;, let the answer play through the Mac." data-talk="The one thing I wanted most was a co-pilot listening with me. When I&#x27;m running or driving, I don&#x27;t want to touch my phone. So I hijacked my headphone buttons: one tap forward, and instead of skipping, the app opens a mic.
+[Tap forward, ask &quot;Who is Mordecai?&quot;, let the answer play]
+That voice is the System AI, the snarky game AI that guides the characters through the dungeon. Now it guides me too.
+(Optional, one line) Two taps snips the moment and draws it, so I can see the scene later.">
 <div class="inner words">
   <h2 class="big split"><span class="w1">A co-pilot that listens with you.</span><span class="w2">Just <span class="foil">ask.</span></span></h2>
 </div>
 </section>
-<section class="slide s-xray bk3 demo" data-phone="on" data-short="X-Ray chips" data-notes="DEMO 2. Point at the chips. Tap Donut, tilt the card. Open The Deck from the library and scroll once." data-talk="Second problem: who is actually in this scene? Claude went through the transcripts of all eight books and timestamped every character.
-So, like X-Ray on a streaming app, these chips show who&#x27;s in the room right now.
-And since nobody can picture a cat in a tiara, tap one. Everyone I&#x27;ve met so far lives in The Deck.">
+<section class="slide s-xray bk3 demo" data-phone="on" data-short="X-Ray chips" data-notes="DEMO 2. Point at the chips. Tap Donut, tilt the card. Open The Deck from the library and scroll once." data-talk="Second problem: who is actually in this scene? Claude went through the transcripts of all eight books and timestamped every character. So, like X-Ray on a streaming app, these chips show who&#x27;s in the room right now. [Point at the chips]
+And since nobody can picture a cat in a tiara, tap one. [Tap Donut, tilt the card] Everyone I&#x27;ve met so far lives in The Deck. [Open The Deck, scroll once]">
 <div class="inner words">
   <div class="split"><h2 class="big w1">Who is in the <span class="foil">room?</span></h2><div class="w2 chips" aria-hidden="true"><span class="chip"><i><img src="assets/carl.jpg" alt=""></i><b>Carl</b></span><span class="chip"><i><img src="assets/princess-donut.jpg" alt=""></i><b>Donut</b></span><span class="chip"><i><img src="assets/mongo.jpg" alt=""></i><b>Mongo</b></span><span class="chip"><i><img src="assets/mordecai.jpg" alt=""></i><b>Mordecai</b></span></div></div>
 </div>
 </section>
-<section class="slide s-cards bk5" data-phone="off" data-short="Holo cards" data-notes="INTERACTIVE. Drag the timeline (or press [ and ]) and stay quiet for a few seconds while the four cards change." data-talk="Characters in this series change, a lot.
-So the cards keep up: looks, stats and levels, as of where I am in the book.">
+<section class="slide s-cards bk5" data-phone="off" data-short="Holo cards" data-notes="INTERACTIVE. Drag the timeline (or press [ and ]) and stay quiet for a few seconds while the four cards change." data-talk="Characters in this series change, a lot. So the cards keep up: looks, stats and levels, as of where I am in the book. [Drag the slider. Carl, Katia, Donut and Mordecai transform. Stay quiet for a few seconds.]">
 <div class="inner wide">
   <h2 class="big small">They change. The cards <span class="foil">keep up.</span></h2>
   <div class="lks"><figure class="holo" data-key="carl">
@@ -470,15 +464,12 @@ So the cards keep up: looks, stats and levels, as of where I am in the book.">
   </div>
 </div>
 </section>
-<section class="slide s-strips bk7 demo" data-phone="on" data-short="Key moments" data-notes="DEMO 3. Open a strip (from Inventory if it has not popped up). Tap through two frames with the audio following." data-talk="Some moments deserve more than a voice. Each book has ten comic strips that unlock as I reach the scene.
-Tap in, and it plays like a story, synced to the audio.">
+<section class="slide s-strips bk7 demo" data-phone="on" data-short="Key moments" data-notes="DEMO 3. Open a strip (from Inventory if it has not popped up). Tap through two frames with the audio following." data-talk="Some moments deserve more than a voice. Each book has ten comic strips that unlock as I reach the scene. Tap in, and it plays like a story, synced to the audio. [Open a strip, tap through two frames]">
 <div class="inner words">
   <h2 class="big split"><span class="w1">Key moments</span><span class="w2"><span class="foil">deserve more.</span></span></h2>
 </div>
 </section>
-<section class="slide s-panels bk3" data-phone="off" data-short="Panel layers" data-notes="INTERACTIVE. Click or press right: add a layer (plate, Carl&#x27;s mask, Carl, Donut&#x27;s mask, Donut, lettering; the row slides left as it grows), then fade to the six frames, then the strip. 1 to 8 jump." data-talk="Every panel is built in layers. A base plate. A mask where Carl goes, and Carl is painted in.
-Then Donut the same way, and the lettering goes on top.
-Six frames, one strip. All automated, about two dollars a strip.">
+<section class="slide s-panels bk3" data-phone="off" data-short="Panel layers" data-notes="INTERACTIVE. Click or press right: add a layer (plate, Carl&#x27;s mask, Carl, Donut&#x27;s mask, Donut, lettering; the row slides left as it grows), then fade to the six frames, then the strip. 1 to 8 jump." data-talk="Every panel is built in layers: a location, then a character, then a second one masked in, then the lettering. Seven panels per strip, all automated.">
 <div class="inner wide">
   <h2 class="big small">Every panel is built in <span class="foil">layers.</span></h2>
   <div class="mk" id="mk" data-stage="0">
@@ -488,7 +479,7 @@ Six frames, one strip. All automated, about two dollars a strip.">
   <p class="mkcap"><span data-st="0">The base plate</span><span data-st="1">A mask where Carl goes</span><span data-st="2">Carl, painted in</span><span data-st="3">A mask for Donut</span><span data-st="4">Donut, painted in</span><span data-st="5">The lettering on top</span><span data-st="6"></span><span data-st="7"></span></p>
 </div>
 </section>
-<section class="slide s-poster bk8" data-phone="off" data-short="Posters A" data-notes="INTERACTIVE. Click a book (or press 1 to 8): original cover, the redrawn cover, the player wearing it." data-talk="And every book got its own look. I redrew each cover, and the player wears it.">
+<section class="slide s-poster bk8" data-phone="off" data-short="Posters A" data-notes="INTERACTIVE. Click a book (or press 1 to 8): original cover, the redrawn cover, the player wearing it." data-talk="And every book got its own look. I redrew each cover, and the player wears it. [Scroll the library, open a second book]">
 <div class="inner wide">
   <h2 class="big small">Every book is its own <span class="foil">visual experience.</span></h2>
   <div class="pw ix" id="pw">
@@ -505,8 +496,7 @@ Six frames, one strip. All automated, about two dollars a strip.">
   </div>
 </div>
 </section>
-<section class="slide s-posters bk8" data-phone="off" data-short="Posters B" data-notes="VARIANT B. The eight originals lift by themselves two seconds in to reveal the redrawn covers; click or press right to scroll up to each cover&#x27;s player." data-talk="And every book got its own look.
-I redrew each cover, and the player wears it.">
+<section class="slide s-posters bk8" data-phone="off" data-short="Posters B" data-notes="VARIANT B. The eight originals lift by themselves two seconds in to reveal the redrawn covers; click or press right to scroll up to each cover&#x27;s player." data-talk="And every book got its own look. I redrew each cover, and the player wears it. [Scroll the library, open a second book]">
 <div class="inner wide">
   <h2 class="big small">Every book is its own <span class="foil">visual experience.</span></h2>
   <div class="pzwin"><div class="pz" id="pz" data-stage="0">
@@ -516,30 +506,25 @@ I redrew each cover, and the player wears it.">
   </div></div>
 </div>
 </section>
-<section class="slide s-creep bk2" data-phone="off" data-short="Scope creep" data-notes="Say the line. Then next: the sentence is struck through and sliced, and SCOPE CREEP slams in." data-talk="That was going to be the whole talk.
-Then last weekend, while I was building this deck, the scope crept.">
+<section class="slide s-creep bk2" data-phone="off" data-short="Scope creep" data-notes="Say the line. Then next: the sentence is struck through and sliced, and SCOPE CREEP slams in." data-talk="That was going to be the whole talk. Then last weekend, while I was building this deck, the scope crept.">
 <div class="inner creep" id="creep" data-stage="0">
   <p class="whole"><span class="t">This was going to be the whole talk.</span><span class="half a" aria-hidden="true">This was going to be the whole talk.</span><span class="half b" aria-hidden="true">This was going to be the whole talk.</span></p>
   <h2 class="creepw"><span class="g">Scope</span> <span class="g">creep.</span></h2>
 </div>
 </section>
-<section class="slide s-tname bk0" data-phone="later" data-short="Tandem" data-notes="Say the name. Next parts the words and dims the room. DEMO 4: Tandem with The Happiness Project; Explorables unlocking by month, then the chips." data-talk="I was listening to The Happiness Project, and I thought: why only Dungeon Crawler Carl? Why not every book I listen to?
-Thirty minutes of prompting before bed. By morning I had a second app: Tandem.
-Tandem takes any audiobook, works out what kind of book it is, and suggests things it could build for me, inside the app.
-In The Happiness Project each month&#x27;s section unlocks as I get to it. I decide what goes in the chips. From the car I can just ask: build me a tracker for this.">
+<section class="slide s-tname bk0" data-phone="later" data-short="Tandem" data-notes="Say the name. Next parts the words and dims the room. DEMO 4: Tandem with The Happiness Project; Explorables unlocking by month, then the chips." data-talk="I was listening to The Happiness Project, a non-fiction book, and I thought: why only Dungeon Crawler Carl? Why not every book I listen to? So I spent thirty minutes prompting Claude before bed, and by morning I had a second app. It&#x27;s called Tandem. [Switch to Tandem]
+Tandem takes any audiobook. It works out what kind of book it is and suggests things it could build for me, right inside the app. In The Happiness Project the author takes on one theme a month, so each month&#x27;s section unlocks as I get to it. [Show the Happiness Project Explorables] I decide what goes in the X-Ray chips. And from the car I can just ask: build me a tracker for this.">
 <div class="inner words"><div class="split tsplit">
   <h2 class="w1 giant"><img class="appicon fl" src="assets/tandem-q.webp" alt=""><span class="g fl">Tandem.</span></h2>
   <p class="w2 subline fl">A co-pilot experience for every audiobook.</p>
 </div></div>
 </section>
-<section class="slide s-close bk1" data-phone="off" data-short="Personal software" data-notes="Close on the thesis. Next: the two gradient words shrink into the whole line." data-talk="We&#x27;re entering an age of personal software.
-A book you&#x27;ll spend ten, twenty or a hundred and fifty-nine hours with deserves its own software too.">
+<section class="slide s-close bk1" data-phone="off" data-short="Personal software" data-notes="Close on the thesis. Next: the two gradient words shrink into the whole line." data-talk="We&#x27;re entering an age of personal software. A book you&#x27;ll spend ten, twenty or a hundred and fifty-nine hours with deserves its own software too.">
 <div class="inner center closex" id="closex" data-stage="0">
   <h2 class="line"><span class="pre">Every book deserves its own </span><span class="key foil">Personal software</span><span class="post"> too.</span><span class="dot foil">.</span></h2>
 </div>
 </section>
-<section class="slide s-thanks bk1 dark" data-phone="off" data-short="Thank you" data-notes="Lights down. The callback, then thank you: same run, same route, tapped the headphones, never broke stride." data-talk="This morning, same run, same route. An old plot line came back. I tapped my headphones, asked, and the System caught me up, with a little attitude.
-I never broke stride. My run stayed a run. Thank you.">
+<section class="slide s-thanks bk1 dark" data-phone="off" data-short="Thank you" data-notes="Lights down. The callback, then thank you: same run, same route, tapped the headphones, never broke stride." data-talk="[Beat] This morning, same run, same route. An old plot line came back. I tapped my headphones, asked, and the System AI caught me up. I never broke stride. My run stayed a run. Thank you.">
 <div class="inner words"><div class="split thanks">
   <span class="w1">Thank</span><img class="icon" src="assets/icon.png" alt="The Crawl app icon: a cat in headphones"><span class="w2">you.</span>
 </div></div>
@@ -553,7 +538,7 @@ I never broke stride. My run stayed a run. Thank you.">
   <h3>Keys</h3>
   <dl><dt>S</dt><dd>Start the 8:00 clock</dd><dt>Space → ↓ click</dt><dd>Next slide, clock untouched</dd><dt>← ↑</dt><dd>Previous slide</dd><dt>[ ]</dt><dd>Cards slide: previous or next look change</dd><dt>1 to 8</dt><dd>Panel layers: layer 1 to 8. Posters A: book 1 to 8. Posters B: stage 1 to 3</dd><dt>Bar</dt><dd>Hover a segment for the slide name, click to jump</dd><dt>P</dt><dd>Phone frame: auto, always on, off</dd><dt>F</dt><dd>Frame shape: folded, unfolded</dd><dt>T</dt><dd>Pause or resume the clock</dd><dt>R</dt><dd>End this run: clock to 0:00, back to slide 1; S starts a new run</dd><dt>N</dt><dd>Talking points for this slide</dd><dt>W or click the clock</dt><dd>Beat timing panel (pauses the clock): time per script beat against the plan, drift, last run</dd><dt>B</dt><dd>Hide the beat panel and resume the clock</dd><dt>?</dt><dd>This panel</dd></dl>
   <code id="geo"></code>
-  <p class="build">Deck build 2026-10-25 04:43 UTC</p>
+  <p class="build">Deck build 2026-10-25 05:01 UTC</p>
 </div>
 <script>const NAMES = ["Carl", "Princess Donut", "Katia Grim", "Mongo", "Mordecai", "Lucia Marr", "Chris Andrews", "Zev", "Hekla", "Zorina Signet", "Juicebox", "Agatha", "Loida", "Imani", "Frank Hugh", "Princess Denodia", "Miriam Dom", "The Sledge", "Florin", "Eva", "Skarn", "Louis", "Ruby", "Henrik", "Bonnie", "Kwon", "Cece", "Odette", "Tally", "Jack", "Maggie Mai", "Yolanda Martinez", "Lexus", "Maestro", "Burgundy", "Gum Gum", "Manasa", "Bea", "Daniel Bautista", "Kravyad", "Bopka", "Wendida", "Prepotente", "Quan Ch", "Puka", "Mantaar", "Oren", "Fraz", "Samantha", "Win", "Elle McGibbons", "Grull", "Apito", "Prince Stalwart", "Tsarina Signet", "Emberus", "Bomo", "Amayon", "Borant", "Signet", "Katya Grimm", "Hecla", "Batista", "Faraz", "Dimitri Popov", "Maxim Popov"];
 const BOOKS = [{"n": 1, "durationMs": 48558000}, {"n": 2, "durationMs": 41013000}, {"n": 3, "durationMs": 60430000}, {"n": 4, "durationMs": 64527000}, {"n": 5, "durationMs": 84224000}, {"n": 6, "durationMs": 96309000}, {"n": 7, "durationMs": 103121000}, {"n": 8, "durationMs": 73189000}];
@@ -598,7 +583,9 @@ const PALETTES = {"1": {"title": "Dungeon Crawler Carl", "bg": "#FDD463", "fg": 
     // the fixed bar and overlays take the live slide's palette
     for (const v of ['--bg', '--fg', '--hi', '--ac', '--sh']) root.style.setProperty(v, getComputedStyle(s).getPropertyValue(v));
     const ul = notes.querySelector('ul'); ul.replaceChildren();
-    (s.dataset.talk || '').split('\n').filter(Boolean).forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+    (s.dataset.talk || '').split('\n').filter(Boolean).forEach(t => { const li = document.createElement('li'); // [stage cues] and (Optional ...) as small pills
+      t.split(/(\[[^\]]*\]|\(Optional[^)]*\))/).forEach(part => { if (!part) return; if (/^[[(]/.test(part)) { const c = document.createElement('i'); c.className = 'sc'; c.textContent = part.replace(/^[[(]|[\])]$/g, ''); li.append(c); } else li.append(part); });
+      ul.appendChild(li); });
     notes.querySelector('.cue').textContent = s.dataset.notes || '';
     applyPhone(); if (changed) { pzArrive(s.classList.contains('s-posters')); if (creep) creep.dataset.stage = '0'; }
     try { history.replaceState(null, '', '#s' + i); } catch (e) {}
