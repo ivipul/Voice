@@ -1,0 +1,10 @@
+{
+  "_readme": "Protected subject boxes (faces/characters) per frame, fractions 0..1 of the frame (x0,y0,x1,y1). Lettering is auto-detected. Marked by eye from final/ch03-strip.png.",
+  "f1-final.png": {"subject": [[0.28, 0.28, 0.72, 0.66], [0.03, 0.50, 0.25, 0.73]]},
+  "f2-final.png": {"subject": [[0.15, 0.00, 0.78, 0.60]]},
+  "f3-final.png": {"subject": [[0.12, 0.30, 0.82, 0.94]]},
+  "f4-final.png": {"subject": [[0.15, 0.26, 0.82, 0.68]]},
+  "f5-final.png": {"subject": [[0.00, 0.20, 0.45, 0.60], [0.28, 0.50, 0.70, 0.99]]},
+  "f6-final.png": {"subject": [[0.36, 0.16, 0.76, 0.92]]},
+  "f7-final.png": {"subject": [[0.58, 0.42, 0.90, 0.95], [0.04, 0.64, 0.70, 0.98]]}
+}

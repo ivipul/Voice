@@ -1,0 +1,48 @@
+{
+ "schema_version": 1,
+ "book": 1,
+ "book_title_prefix": "Dungeon Crawler Carl",
+ "chapter": 3,
+ "title": "Storming the dozer",
+ "summary": "With the goblins' backs turned, Carl climbs the now-driverless murder-dozer, throws one goblin into its spinning blade, beats the Goblin Engineer with his own pot helmet, then sprints back to the guild hall door with twelve seconds before the abandoned machine's boiler explodes.",
+ "hero_frames": [],
+ "last_frame_hold_ms": 20000,
+ "frames": [
+  {
+   "frame": 1,
+   "image": "f1-final.png",
+   "start_ms": 2940000
+  },
+  {
+   "frame": 2,
+   "image": "f2-final.png",
+   "start_ms": 3039700
+  },
+  {
+   "frame": 3,
+   "image": "f3-final.png",
+   "start_ms": 3066900
+  },
+  {
+   "frame": 4,
+   "image": "f4-final.png",
+   "start_ms": 3128200
+  },
+  {
+   "frame": 5,
+   "image": "f5-final.png",
+   "start_ms": 3170000
+  },
+  {
+   "frame": 6,
+   "image": "f6-final.png",
+   "start_ms": 3328700
+  },
+  {
+   "frame": 7,
+   "image": "f7-final.png",
+   "start_ms": 3338900
+  }
+ ],
+ "strip_image": "ch03-strip.png"
+}

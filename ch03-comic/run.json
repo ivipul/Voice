@@ -1,0 +1,1500 @@
+[
+ {
+  "out": "plate-guild-hall-door.png",
+  "lineage": "plate:guild-hall-door",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 26.9,
+  "note": "base plate, 3 style refs",
+  "fields": [
+   [
+    "prompt",
+    "Comic-book panel. Full-bleed illustration, no border. Empty establishing wide shot of a warm, firelit guild hall interior: a crackling stone fireplace along one wall, shelves cluttered with odd objects and a few framed oval photographs of bird-like creatures, a well-worn oval gray carpet in the center of the room with mismatched classroom-style chairs scattered loosely around it, a plain wooden desk off to one side, and a heavy wooden door in the back wall. Mood: cozy but strange, firelight flickering across worn furniture. The camera is at eye level on the far side of the room, looking toward the heavy wooden door in the back wall: the door stands in the middle background, the stone fireplace glows on the left wall, the shelves with the framed photographs line the right wall, and the oval gray carpet fills the foreground. Leave a wide empty stretch of carpet in the foreground and an open spot beside the fireplace. The attached images are style references only: copy their comic-book ink linework, colour palette and lighting mood, but do not copy any of their subjects, objects or layouts. No people or characters in the image. No text, lettering or signs with writing anywhere."
+   ],
+   [
+    "size",
+    "736x1312"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "reference-images/style/style 1.png"
+   ],
+   [
+    "images",
+    "reference-images/style/style 2.jpeg"
+   ],
+   [
+    "images",
+    "reference-images/style/style 3.jpeg"
+   ]
+  ],
+  "seed": 1871671979,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Create a full-bleed comic-book illustration of an empty, warm firelit guild hall interior in the ink-and-wash graphic novel style of image 2 and image 3.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"general_edits\",\n        \"desc\": \"Construct an interior view of a cozy, eccentric guild hall viewed at eye level. Place a heavy, dark timber door at the center of the back wall. Build a rugged stone fireplace with a crackling bright orange fire along the left wall, leaving an open floor area adjacent to it. Line the right wall with tall wooden bookshelves filled with clutter, trinkets, and several small oval-framed portrait photographs depicting bird-like creatures. Position a simple brown wooden desk along the center-right against the wall.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Spread a large, worn oval gray carpet across the center and foreground floor, leaving a clear wide open patch of carpet in the immediate foreground. Scatter several mismatched vintage classroom-style wooden and metal chairs loosely around the perimeter of the carpet.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The graphic novel comic illustration style with bold black ink outlines, hatching, and deep black contrast shadows from image 2 and image 3.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The dramatic lighting and color scheme featuring intense warm orange and amber firelight cast against deep charcoal and cool muted wall tones from image 1, image 2, and image 3.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-tunnel-rear-wide.png",
+  "lineage": "plate:tunnel-rear-wide",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 27.9,
+  "note": "base plate, 3 style refs",
+  "fields": [
+   [
+    "prompt",
+    "Comic-book panel. Full-bleed illustration, no border. Empty establishing wide shot of a dungeon tunnel section where a tractor-sized, scrap-metal vehicle with a huge spiked front wheel sits idling and driverless, smoke drifting from its pipes, a crude ladder made of bones lashed with rope hanging off its back end. The tunnel ceiling is low and rough-hewn stone, the walls are streaked with dark brick and a faint green lichen glow. Mood: tense lull, a weapon left unattended. The camera is at eye level, wide shot, from a three-quarter rear angle: the scrap-metal vehicle fills the right side of the frame with its back end and the bone-and-rope ladder hanging toward the camera, and the tunnel stretches away on the left into the dark distance. Leave an open stretch of tunnel floor in the far left distance and clear space beside the ladder. The attached images are style references only: copy their comic-book ink linework, colour palette and lighting mood, but do not copy any of their subjects, objects or layouts. No people or characters in the image. No text, lettering or signs with writing anywhere."
+   ],
+   [
+    "size",
+    "736x1312"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "reference-images/style/style 1.png"
+   ],
+   [
+    "images",
+    "reference-images/style/style 2.jpeg"
+   ],
+   [
+    "images",
+    "reference-images/style/style 3.jpeg"
+   ]
+  ],
+  "seed": 1746835819,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Create a full-bleed comic-book panel illustration of an idling scrap-metal war vehicle inside a subterranean dungeon tunnel, matching the inking style, atmosphere, and color palette from image 1, image 2, and image 3.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"general_edits\",\n        \"desc\": \"Render an empty establishing wide shot of a rough subterranean dungeon tunnel from an eye-level, three-quarter rear perspective, with the tunnel stretching away on the left into shadowy distance and open floor space.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Add a large, tractor-sized scrap-metal vehicle positioned on the center-right and bottom-right of the frame, featuring dark riveted metal plating, a huge steel spiked wheel at the front, exhaust pipes releasing light grey smoke plumes, and a crude ladder made of off-white bones lashed with frayed brown rope hanging from the rear bumper towards the bottom-center.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Add rough-hewn stone ceiling textures across the top, dark weathered brick masonry on the left tunnel wall with subtle glowing green lichen patches, and a cracked dirt and stone floor across the bottom-left and foreground.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [],\n    \"style_change_instructions\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"Apply the graphic comic-book illustration aesthetic seen in image 2 and image 3, characterized by bold black ink outlines, heavy shadow pooling, and fine hatching details across textures.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"Adopt a moody color palette combining the deep navy and charcoal shadows from image 1 and image 3 with the eerie green wall glows and warm ambient highlights inspired by image 2.\"\n      }\n    ],\n    \"style_that_stay_the_same\": []\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-deck-front-back.png",
+  "lineage": "plate:deck-front-back",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 12.6,
+  "note": "camera variant from tunnel-rear-wide",
+  "fields": [
+   [
+    "prompt",
+    "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now at the front of the open top deck at head height, looking back toward the rear: the control levers and a boiler with blank dials and pipes stand in the foreground with steam and smoke drifting around them, the fur-lined bench seating is in the middle ground, and the top of the bone-and-rope ladder shows at the back edge of the deck with the dark tunnel beyond. Leave an empty stretch of open deck in the middle. No people or characters. No text, lettering or signs with writing."
+   ],
+   [
+    "size",
+    "source"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ]
+  ],
+  "seed": 920983876,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Shift the camera perspective to an onboard view from the front top deck looking rearward across the scrap-metal vehicle from image 1 inside the same underground tunnel.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"perspective_shift\",\n        \"desc\": \"Change the viewpoint from the low front three-quarter exterior angle in image 1 to a head-height camera position situated at the front of the vehicle's open top deck, facing toward the rear. In the foreground, depict scrap-metal control levers and an iron boiler fitted with blank circular dials and venting pipes emitting pale grey steam and smoke. In the midground, show an empty rusted steel deck floor bordered by a wooden bench seat lined with matted brown fur. At the far rear edge of the deck, display the top rungs of the bone-and-rope ladder from image 1, framed against the low arched brick tunnel extending into pitch-black darkness behind the vehicle.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The scrap-metal material, welded iron plating, chimney pipes, and knotted bone-and-rope ladder construction from the vehicle in image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dungeon tunnel environment from image 1, featuring dark grey rough-hewn stone ceiling, weathered brick wall construction, and patches of vivid green lichen.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, characterized by heavy black ink outlines, textured crosshatching, flat cel shading, and a muted palette of dark charcoal, stone-grey, murky lichen-green, and warm rusty orange tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-wheel-closeup.png",
+  "lineage": "plate:wheel-closeup",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 11.3,
+  "note": "camera variant from tunnel-rear-wide",
+  "fields": [
+   [
+    "prompt",
+    "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Extreme close-up, low and straight-on at the front of the vehicle: the enormous spiked wheel fills the frame, its curved spikes and scuffed metal rim catching a dull orange glow, with dark tunnel stone blurred and out of focus around it. Nothing else of the tunnel is visible. No people or characters. No text, lettering or signs with writing."
+   ],
+   [
+    "size",
+    "source"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ]
+  ],
+  "seed": 494346324,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Shift the camera to an extreme low-angle close-up focused directly on the large spiked front wheel of the scrap-metal vehicle from image 1 in the dungeon tunnel.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"perspective_shift\",\n        \"desc\": \"Shift the camera viewpoint from the medium three-quarters view of image 1 to an extreme low-angle close-up centered on the front spiked wheel of the scrap-metal vehicle. The massive dark iron wheel with its sharp conical spikes and scuffed rim dominates the center and foreground of the frame, with the background dungeon tunnel stone textures blurred softly in shallow depth of field.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The scrap-metal vehicle design from image 1, specifically the heavy dark iron wheel studded with triangular spikes and rusted steel plating.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The stone dungeon cavern environment from image 1 featuring dark rough-hewn stone and mossy undertones.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book ink illustration style from image 1, featuring heavy black contour linework, hatching shadows, and flat cel shading.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The dark, murky color palette from image 1 composed of slate greys, lichen greens, rusted browns, and subtle warm orange rim highlights.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-boiler-closeup.png",
+  "lineage": "plate:boiler-closeup",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 12.7,
+  "note": "camera variant from tunnel-rear-wide",
+  "fields": [
+   [
+    "prompt",
+    "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Tight close-up at head height on the vehicle's boiler and control levers: round gauges with blank dials, riveted pipes, a soot-stained iron panel and a curl of steam fill the frame, with the dim tunnel blurred behind. Leave clear dark space in the middle of the frame. No people or characters. No text, lettering or signs with writing."
+   ],
+   [
+    "size",
+    "source"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ]
+  ],
+  "seed": 545710662,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Shift the camera to a tight head-height close-up focusing on the boiler, control levers, and gauges of the scrap-metal vehicle from image 1 inside the same dungeon tunnel, rendered in the same comic-book illustration style.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"perspective_shift\",\n        \"desc\": \"Shift camera to an intimate, head-height close-up view focused directly on the upper mechanical section of the scrap-metal vehicle from image 1. Frame round metallic gauges with blank dials, thick riveted iron pipes, soot-stained industrial panels, control levers, and rising curls of white steam, while leaving a clear dark shadow area across the center of the frame and blurring the dim dungeon tunnel in the background.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty scrap-metal texture, riveted iron construction, and mechanical piping of the vehicle from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dungeon tunnel environment from image 1 featuring rough-hewn stone masonry and murky lichen-streaked brick textures.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic-book ink illustration style from image 1, characterized by bold black linework, graphic cross-hatching, and flat cel shading.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The atmospheric dungeon color palette from image 1, featuring cold stone-grey, murky lichen-green, dark rust-brown iron tones, and warm orange and amber firelight highlights.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-tunnel-door-low.png",
+  "lineage": "plate:tunnel-door-low",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 13.4,
+  "note": "camera variant from tunnel-rear-wide",
+  "fields": [
+   [
+    "prompt",
+    "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now low at floor level at the end of the tunnel, looking back along it: a heavy wooden door with iron bands stands close to the camera in the right-hand wall, and the tunnel runs away to the far distance where the vehicle sits, now glowing hot orange from inside its machinery with smoke pouring faster from its pipes and orange light spilling across the stone floor. Leave an open stretch of tunnel floor in the foreground. No people or characters. No text, lettering or signs with writing."
+   ],
+   [
+    "size",
+    "source"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ]
+  ],
+  "seed": 1358406379,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Shift the camera perspective to a low floor-level angle looking down the dungeon tunnel toward the scrap-metal vehicle from image 1 in the distance, adding a reinforced wooden door in the foreground right wall.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"perspective_shift\",\n        \"desc\": \"Change the camera viewpoint to a low-angle shot positioned at floor level looking straight down the corridor of the dungeon tunnel toward the far background.\"\n      },\n      {\n        \"type\": \"object_reference:object_move\",\n        \"desc\": \"Move the scrap-metal vehicle from image 1 from the foreground to the center-rear of the tunnel in the distant background, depicted smaller in scale with thick grey smoke pouring from its smokestacks and a bright orange furnace glow emitting from inside its chassis onto the stone floor.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Add a tall dark-stained heavy wooden door framed with black iron bands and rivets into the brick wall along the center-right to bottom-right foreground.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The scrap-metal vehicle's design from image 1, including its spiked metal wheels, bolted dark brown body panels, and bone-and-rope ladder tied to the front grille.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dungeon tunnel setting from image 1, including the rough-hewn grey rock ceiling, stone flag floor, and lichen-streaked brick side walls.\"\n      }\n    ],\n    \"style_change_instructions\": [\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"Shift the lighting from the cool, dim ambient shadow of image 1 to include a vibrant fiery orange glow emanating from the distant vehicle machinery and illuminating the tunnel corridor.\"\n      }\n    ],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, featuring bold black ink outlines, detailed crosshatching, and flat cel shading with a dark palette of slate-grey, charcoal, and moss-green tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "plate-deck-side-on.png",
+  "lineage": "plate:deck-side-on",
+  "endpoint": "/v2/image/generate/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 13.8,
+  "note": "camera variant from tunnel-rear-wide",
+  "fields": [
+   [
+    "prompt",
+    "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now standing on the vehicle's open top deck at deck height, looking side-on ACROSS the deck: the fur-lined recessed bench seating and the control levers sit in the middle ground, smoke curls from the pipes, and the huge spiked wheel stands at the far right end of the deck. The tunnel walls form the background behind the deck. Leave an empty stretch of open deck in the middle. No people or characters. No text, lettering or signs with writing."
+   ],
+   [
+    "size",
+    "source"
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "images",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ]
+  ],
+  "seed": 2077394954,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Shift perspective to a deck-level side-on view across the top deck of the scrap-metal vehicle from image 1 inside the same stone dungeon tunnel.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"perspective_shift\",\n        \"desc\": \"Shift the camera viewpoint from the ground-level front view in image 1 to a side-on view at deck height standing directly on the open top deck of the scrap-metal vehicle, looking across the deck surface with the dark stone dungeon tunnel wall filling the background across the upper half of the frame.\"\n      },\n      {\n        \"type\": \"object_reference:object_modify\",\n        \"desc\": \"Show the upper deck of the scrap-metal vehicle from image 1, featuring an empty open deck expanse across the bottom-center and center, a recessed seating bench lined with coarse fur and metal control levers in the center-left middle ground, dark iron exhaust pipes venting white smoke plumes near the top-center, and the upper section of the large metal tire with triangular conical spikes standing at the far bottom-right.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dungeon tunnel setting from image 1, including the rough-hewn dark grey stone ceiling, dark masonry brick walls, and patches of murky green lichen.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, characterized by heavy black ink outlines, textured crosshatching, flat cel shading, and a color palette dominated by dim stone-grey, murky lichen-green, rusty brown metal, and warm amber light accents.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f1-carl.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 17.2,
+  "note": "vision-refined mask [0.27, 0.4, 0.7, 0.88] (stored [0.46, 0.3, 0.92, 0.82])",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the crude bone-and-rope ladder at the back end of the vehicle, climbing up it. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He stands in the middle ground, filling a little under half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet on the ladder rungs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He climbs slowly, one hand gripping a rung above him and one foot on a lower rung, body low and tense, every movement careful and deliberate. His head is turned over his shoulder to the left toward the two goblins far back along the tunnel, so his face is visible in profile, looking at them, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 901072941,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the man from image 3 and image 4 climbing the bone-and-rope ladder on the vehicle in the stone tunnel from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 climbing the bone-and-rope ladder on the vehicle in the center of image 1. Render him with his short reddish-brown hair, open black leather jacket, light grey boxer shorts, bare legs, and bare feet from image 3. Position his body tense and low against the ladder, with one hand gripping an upper bone rung and his feet placed on lower bone rungs. Turn his head over his left shoulder in profile, looking back toward the dark tunnel opening on the center-left.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The armored, spiked tractor vehicle with twin exhaust stacks emitting white smoke and the bone-and-rope ladder attached to its front frame from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark underground stone tunnel, including the brick wall on the left, mossy green patches, rough rock ceiling, and dirt ground from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, featuring bold black contour line work, cel shading, and a dim stone-grey and muted earth-tone color palette.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f1-carl-s7.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.5,
+  "note": "retry: seed 7, taller mask [0.24, 0.36, 0.7, 0.9]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the crude bone-and-rope ladder at the back end of the vehicle, climbing up it. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He stands in the middle ground, filling a little under half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet on the ladder rungs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He climbs slowly, one hand gripping a rung above him and one foot on a lower rung, body low and tense, every movement careful and deliberate. His head is turned over his shoulder to the left toward the two goblins far back along the tunnel, so his face is visible in profile, looking at them, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "7"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 7,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 climbing the bone-and-rope ladder attached to the spiked vehicle in image 1, looking back over his shoulder down the cavern tunnel.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 climbing the crude bone-and-rope ladder at the front of the vehicle from image 1 in the center-to-lower-center of the frame. He has the short reddish-brown hair, sharp facial features, and muscular build from image 3, wearing the unzipped black leather jacket and light grey boxer shorts from image 3 with a bare chest, bare legs, and bare feet. Position his body in a tense climbing stance with his hands gripping the bone rungs and both feet resting on lower rungs, with his entire body fully visible and uncropped. Turn his head over his left shoulder to look backward toward the dark arched tunnel opening on the center-left.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty armored tractor vehicle from image 1, including its massive spiked metal wheels on the center-right and bottom-right, the exhaust chimneys emitting plumes of white smoke, and the spiked headlight cowls.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The underground cavern environment from image 1, consisting of the brick-lined wall on the center-left, the green moss patches, the dark tunnel entryway in the center-left background, the rocky ceiling above, and the uneven dirt ground.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book graphic novel illustration style from image 1, characterized by bold black linework, deep shadow crosshatching, muted stone-grey and mossy green palette, and cel-shaded rendering.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f1-carl-s21.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 23.8,
+  "note": "retry: seed 21, taller mask [0.24, 0.36, 0.7, 0.9]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the crude bone-and-rope ladder at the back end of the vehicle, climbing up it. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He stands in the middle ground, filling a little under half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet on the ladder rungs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He climbs slowly, one hand gripping a rung above him and one foot on a lower rung, body low and tense, every movement careful and deliberate. His head is turned over his shoulder to the left toward the two goblins far back along the tunnel, so his face is visible in profile, looking at them, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "21"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-rear-wide.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 21,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the man from image 3 and image 4 climbing the bone ladder on the spiked vehicle in the dungeon tunnel from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 climbing the bone-and-rope ladder attached to the front of the tractor in the center of image 1. Depict him in a low, tense climbing pose, gripping the bone rungs with his hands and placing his bare feet onto the lower rungs. Position his head turned over his left shoulder to look toward the dark cavern tunnel opening in the center-left. Preserve his facial features, short reddish-brown hair, open black leather jacket over his bare muscular torso, light grey boxer shorts, and bare feet from image 3.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The heavily armored brown metal tractor from image 1, including its massive spiked steel tires, dual exhaust smokestacks emitting white smoke, pointed metal fender spikes, and the bone-and-rope ladder mounted on the front grille.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark underground tunnel environment from image 1, featuring the arched brick wall on the center-left, the dark cavern opening in the background, patches of green moss on the stone floor, and the rough cavernous ceiling.\"\n      }\n    ],\n    \"style_change_instructions\": [\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"Shift the lighting on the character from the bright white studio lighting of image 3 to the dim, moody ambient lighting with deep black shadows and subtle warm highlights from image 1.\"\n      }\n    ],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic-book ink illustration style with bold black line art, crosshatching shadows, and textured cel shading from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f1-goblins-s5.png",
+  "lineage": "char:goblins",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 13.9,
+  "note": "mask [0.03, 0.5, 0.26, 0.71] (stored [0.05, 0.44, 0.38, 0.66], which overlapped Carl)",
+  "fields": [
+   [
+    "prompt",
+    "Add two small green goblins in ragged clothes, standing side by side on the tunnel floor far back to the left of the vehicle, a short distance from it. Each goblin is only about waist-high to a man and drawn small in the frame, standing close together. Both are whole, clearly visible and uncropped, their heads clearly readable in profile. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Both have their backs mostly turned and their heads turned in profile toward the far end of the tunnel, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "5"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-goblins-mask.png"
+   ]
+  ],
+  "seed": 5,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add two small green goblins in ragged clothes on the tunnel floor to the left of the vehicle in image 1, located in the dark region marked in image 2.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add two small green-skinned goblins wearing tattered, ragged brownish-grey cloth garments standing side by side on the stone ground on the center-left side of the tunnel, within the area highlighted in image 2. Make each goblin waist-high relative to the man from image 1, with their backs mostly turned away from the viewer and their heads drawn in profile looking deeper into the dark tunnel.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The brown-haired man from image 1, wearing a black leather jacket and white boxer shorts, sitting on the bone ladder in the center of the frame.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The large rusted industrial tractor with giant spiked steel wheels, dual smoking exhaust pipes, and the tied bone ladder from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The vaulted stone cavern environment from image 1, including the brickwork wall on the left, dark cavern ceiling, patches of green moss, and dirt ground.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style with bold black inking, flat cel shading, and a color palette of muted stone greys, murky lichen greens, and warm amber highlights from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f1-goblins-s13.png",
+  "lineage": "char:goblins",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 15.3,
+  "note": "mask [0.03, 0.5, 0.26, 0.71] (stored [0.05, 0.44, 0.38, 0.66], which overlapped Carl)",
+  "fields": [
+   [
+    "prompt",
+    "Add two small green goblins in ragged clothes, standing side by side on the tunnel floor far back to the left of the vehicle, a short distance from it. Each goblin is only about waist-high to a man and drawn small in the frame, standing close together. Both are whole, clearly visible and uncropped, their heads clearly readable in profile. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Both have their backs mostly turned and their heads turned in profile toward the far end of the tunnel, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "13"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f1-goblins-mask.png"
+   ]
+  ],
+  "seed": 13,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add two small green goblins to the tunnel floor in the background on the left side of the vehicle in image 1 while preserving the comic book illustration style.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add two small green goblins wearing ragged brown cloth tunics, standing side by side on the dirt ground in the center-left area of the tunnel floor, positioned to the left of the large spiked vehicle from image 1. Make each goblin roughly waist-high relative to the man from image 1, with their backs mostly facing the viewer and their heads seen in profile facing toward the dark tunnel opening on the far left.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man with short brown hair, wearing a black leather jacket and light grey shorts, climbing the ladder in the center of image 1, preserved exactly.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty tractor vehicle with spiked wheels, exhaust pipes emitting white smoke, and the rope-bound bone ladder mounted to its side from image 1, preserved exactly.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark cavern ceiling, left-side stone brick tunnel wall with green lichen patches, and textured ground from image 1, preserved exactly.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book ink illustration style with bold black outlines, cel-shaded coloring, and muted underground palette of stone greys, dark shadows, and lichen greens from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f2-carl-s17.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.4,
+  "note": "vision-refined mask [0.02, 0.08, 0.58, 0.78] (stored [0.04, 0.2, 0.62, 0.9]: feet would land on the vehicle side)",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, standing on the vehicle's open deck on the left, seen from the side in profile and facing right toward the spiked wheel. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about seven tenths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He is in the middle of a throwing wind-up: both fists clenched and both arms cocked back over his right shoulder as if gripping something heavy, body twisted, feet braced wide apart. His head is turned forward in profile, eyes on the huge spinning wheel at the far end of the deck, so his whole face is visible, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "17"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-deck-side-on.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 17,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 onto the open deck of the vehicle from image 1 in a throwing wind-up pose facing right.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 onto the flat deck of the vehicle in the center-left foreground. Position him standing in full-body profile facing right toward the spiked wheel, with feet braced wide apart on the deck and his torso twisted in a throwing wind-up stance with both arms drawn back over his right shoulder. Preserve his facial features, short reddish-brown hair, open black leather jacket, light grey boxer shorts, bare chest, bare legs, and bare feet from image 3.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The industrial machinery and vehicle from image 1, including the dashboard controls on the center-left, the twin smoking exhaust chimneys, the flat flatbed deck, and the large spiked wheel in the bottom-right corner.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The cavernous background from image 1, featuring the dark craggy rock ceiling, mossy green patches, and the rough stone brick wall behind the vehicle.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book illustration style from image 1, characterized by bold black contour lines, graphic hatching, and flat cel shading.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The dim underground color palette from image 1, consisting of cool slate greys, murky moss greens, and industrial warm brown tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f2-carl-s3.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 18.0,
+  "note": "vision-refined mask [0.02, 0.08, 0.58, 0.78] (stored [0.04, 0.2, 0.62, 0.9]: feet would land on the vehicle side)",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, standing on the vehicle's open deck on the left, seen from the side in profile and facing right toward the spiked wheel. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about seven tenths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He is in the middle of a throwing wind-up: both fists clenched and both arms cocked back over his right shoulder as if gripping something heavy, body twisted, feet braced wide apart. His head is turned forward in profile, eyes on the huge spinning wheel at the far end of the deck, so his whole face is visible, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "3"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-deck-side-on.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 3,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Place the muscular man from image 3 and image 4 onto the vehicle deck on the left in image 1, posing him in a throwing wind-up facing toward the spiked wheel.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 standing on the flat deck of the vehicle in the center-left area, facing toward the spiked wheel on the bottom-right. Pose him in right profile in a throwing wind-up, with bare feet planted wide on the deck, torso twisted, both fists clenched, and arms pulled back over his shoulder. Render him wearing the open black leather jacket and grey boxer shorts from image 3, with bare chest, bare legs, and bare feet.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The heavy machinery vehicle from image 1, including the control console with switches, the fur-lined dash ledge, the twin smoking exhaust pipes, and the spiked roller wheel in the bottom-right.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark cavern ceiling and stone brick wall with green moss patches from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The graphic novel comic-book illustration style with bold black contour lines, flat cel shading, and dim atmospheric cavern lighting from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f2-goblin-s9.png",
+  "lineage": "char:goblin",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 15.6,
+  "note": "mask [0.28, 0.02, 0.8, 0.3] (stored [0.3, 0.12, 0.62, 0.34] overlapped his head)",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin in ragged clothes, hauled off its feet, held up in the man's two fists by the front of its ragged clothing, cocked back above his right shoulder at the top of the throw. He is a small goblin, only about half the man's height, with his feet dangling in the air. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His limbs flail and his green face is caught in startled surprise. He stares wide-eyed at the man's face, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "9"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-goblin-mask.png"
+   ]
+  ],
+  "seed": 9,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a small flailing green goblin held above the right shoulder of the man from image 1, matching the comic book illustration style of image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small goblin with olive-green skin, pointed ears, wide startled eyes, and a tattered brown burlap tunic in the top-center, positioned above the right shoulder of the man from image 1. The goblin is about half the man's height, with limbs flailing and feet dangling in mid-air, staring wide-eyed back at the man's face.\"\n      },\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Modify the hands and arms of the man from image 1 in the top-center so his fists firmly grip the ragged fabric of the newly added goblin's tunic, holding the creature cocked back above his shoulder.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man from image 1, including his muscular build, facial features, reddish-brown hair, open black leather jacket, grey boxer briefs, and wide barefoot stance.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The heavy metal industrial machine from image 1, including the flat steel platform, control console, and large front roller with steel spikes in the lower half of the scene.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark cavern ceiling and the mortared grey stone brick wall in the background from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book graphic novel illustration style from image 1, with heavy black ink line art, cel-shaded shadows, and a dark stone-grey and murky green color palette.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f2-goblin-s31.png",
+  "lineage": "char:goblin",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 16.7,
+  "note": "mask [0.28, 0.02, 0.8, 0.3] (stored [0.3, 0.12, 0.62, 0.34] overlapped his head)",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin in ragged clothes, hauled off its feet, held up in the man's two fists by the front of its ragged clothing, cocked back above his right shoulder at the top of the throw. He is a small goblin, only about half the man's height, with his feet dangling in the air. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His limbs flail and his green face is caught in startled surprise. He stares wide-eyed at the man's face, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "31"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f2-goblin-mask.png"
+   ]
+  ],
+  "seed": 31,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a startled small green goblin held aloft by the man's raised fists above his shoulder in the comic panel from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green-skinned goblin dressed in ragged brown cloth in the top-center area, held up by the collar in the man's raised fists. The goblin is approximately half the height of the man from image 1, with flailing limbs, dangling feet, pointed ears, and wide eyes staring in shock toward the man's face.\"\n      },\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Modify the hands of the muscular man from image 1 in the top-center to firmly grip the front of the goblin's ragged shirt in both fists, cocked back above his right shoulder in a throwing motion.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The muscular man from image 1, maintaining his reddish-brown hair, determined facial expression, open black leather jacket, grey boxer briefs, and barefoot stance.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The heavy metal vehicle with spiked front rollers, flat top platform, and mechanical control panel from image 1 occupying the lower half of the frame.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark cavern ceiling and weathered stone block wall in the background from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book illustration style from image 1, characterized by heavy black ink outlines, flat cel shading, and a muted palette of stone-grey, dark charcoal, and lichen green.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f3-goblin.png",
+  "lineage": "char:goblin",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 16.5,
+  "note": "stored mask [0.12, 0.2, 0.88, 0.82]",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin shown as a dark stylised silhouette, arms and legs splayed, slammed against the huge spinning spiked wheel in a burst of motion lines, sparks and an abstracted flash of impact, drawn in comic-book style and not graphic, in front of the spinning spiked wheel at the centre of the frame. He is close to the camera and large in the frame, filling about three fifths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms and both legs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His face is turned away in profile, eyes squeezed shut, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-wheel-closeup.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f3-goblin-mask.png"
+   ]
+  ],
+  "seed": 620736160,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a splayed-out green goblin impacting the spiked wheel in the foreground with comic-book motion lines and sparks against the scene from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green-skinned goblin rendered as a dark silhouette with detailed comic-book ink linework in the center of the frame, slammed against the large spiked metal wheel from image 1. Position him in full view filling roughly three-fifths of the vertical frame with arms and legs splayed outwards, his face turned in profile with eyes tightly shut, surrounded by dynamic radiating black motion lines, bright orange sparks, and an abstracted amber-yellow impact burst.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The large dark iron spiked wheel in the foreground, the smaller spiked wheel in the lower-left, and the rusty mechanical tractor-like structure from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark stone brick wall, tangled silhouettes of bare branches, and gloomy background environment from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book illustration style featuring heavy black ink outlines, flat cel shading, and a muted palette of dim stone-grey, murky lichen-green, and warm amber-orange accents from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f4-carl.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.8,
+  "note": "vision-refined mask [0.02, 0.12, 0.5, 0.78] (stored [0.02, 0.22, 0.5, 0.88])",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the open deck at the left, nearer the camera, seen in three-quarter view. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about two thirds of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He braces in a low defensive crouch, knees bent, shoulders hunched, both hands raised and open in front of him to ward off the attack, mouth set in a snarl. His head is turned toward the goblin on his right, his whole face visible, looking at it, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-deck-front-back.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 399482842,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 onto the wooden deck of the minecart in image 1 in a defensive crouching pose.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 onto the wooden deck at the center-left of the cart in image 1. Depict him in a low defensive crouch facing three-quarters toward the right, with knees deeply bent, shoulders hunched, and both hands raised open in front of his chest to ward off a threat. Give him an intense snarling expression with his head turned toward the center-right. Preserve his physical features from image 3, including his short spiked reddish-brown hair, defined athletic physique, open black leather jacket over an unclad muscular chest, light grey boxer briefs, and bare feet planted fully on the wooden floor.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark underground stone tunnel, vaulted rock ceiling, brick side walls, and deep shadowy tunnel opening from image 1.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The mechanical iron control console with dials, levers, and smoking exhaust stacks in the bottom foreground, along with the wooden railcart bed and railings from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book graphic illustration art style with heavy black outlines, sharp ink hatching, and flat cel shading from image 1.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The dim dungeon color palette of cool stone greys, muted lichen greens, and deep charcoal shadows from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f4-goblin-engineer.png",
+  "lineage": "char:goblin-engineer",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 16.8,
+  "note": "stored mask [0.5, 0.28, 0.96, 0.74]",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin in ragged clothes wearing a battered cooking pot as a helmet, on the open deck at the right, lunging toward the man. He is a small goblin, only about two thirds of the man's height. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He lunges forward mid-stride with a small curved knife thrust out in one fist, mouth open in a shout, ragged clothes flaring. He glares at the man ahead of him, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-goblin-mask.png"
+   ]
+  ],
+  "seed": 310942261,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a small goblin attacking the man on the right side of the comic scene from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green-skinned goblin on the open wooden deck at the center-right, lunging forward to the left toward the man from image 1. The goblin is approximately two-thirds the height of the man, wearing tattered dark brown cloth rags and a dented grey metal cooking pot inverted on his head as a helmet. He is captured mid-stride with his mouth wide open in an aggressive shout, glaring at the man, and thrusting a small curved iron dagger forward in his right hand.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The terrified man from image 1, with brown hair, an open black leather jacket, white boxers, and dynamic leaping posture across the wooden platform, remains completely unchanged.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The steampunk machinery, control levers, dials, exhaust pipes venting white steam, and the wooden carriage structure from image 1 remain unchanged in the foreground and midground.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The subterranean arched stone tunnel with cracked masonry and lichen-covered cavern ceiling from image 1 stays exactly the same.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, featuring bold black ink outlines, flat cel shading, and a dim dungeon color palette of stone-grey, dark brown, and mossy green tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f4-carl-s19.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.5,
+  "note": "retry seed 19: mask ends at deck floor [0.04, 0.1, 0.48, 0.72]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the open deck at the left, nearer the camera, seen in three-quarter view. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about two thirds of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He braces in a low defensive crouch, knees bent, shoulders hunched, both hands raised and open in front of him to ward off the attack, mouth set in a snarl. His head is turned toward the goblin on his right, his whole face visible, looking at it, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "19"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-deck-front-back.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 19,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 onto the open deck of the mechanical cart in image 1 in a low defensive crouch.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 onto the open wooden deck in the center-left foreground of image 1. Pose him in a three-quarter view facing toward the right in a low defensive crouch with bent knees, hunched shoulders, both bare hands raised open in front of his torso, and his face snarling toward the right. Render him with his full body visible from head to bare feet, maintaining his brown styled hair, muscular build, unzipped black leather jacket over his bare chest, and light grey boxer shorts from image 3 and image 4.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark stone and brick mine tunnel ceiling and walls from image 1.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusted mechanical engine console with round analog gauges, control levers, smoking exhaust funnels, and the wooden cart platform from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic-book graphic novel illustration style from image 1, featuring bold black ink outlines, cel shading, and a dark dungeon color palette with dim stone-grey, murky green, and warm metallic tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f4-carl-s4.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.3,
+  "note": "retry seed 4: mask ends at deck floor [0.04, 0.1, 0.48, 0.72]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the open deck at the left, nearer the camera, seen in three-quarter view. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about two thirds of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He braces in a low defensive crouch, knees bent, shoulders hunched, both hands raised and open in front of him to ward off the attack, mouth set in a snarl. His head is turned toward the goblin on his right, his whole face visible, looking at it, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "4"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-deck-front-back.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 4,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the man from image 3 and image 4 into the underground tunnel scene from image 1 standing on the cart deck in a defensive crouch.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 onto the open wooden deck on the center-left of the scene from image 1, positioned in the foreground. Render him in a three-quarter view striking a low defensive crouch with bent knees, hunched shoulders, both bare feet planted firmly on the floorboards, hands raised and open to ward off an attack, and his head turned toward the center-right with a snarling expression.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark underground mine tunnel, arched rough-hewn stone ceiling, aged brick side walls, and receding dark shaft from image 1.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The metal engine machinery, levers, round analog dials, exhaust chimneys emitting grey smoke, and wooden cart structure from image 1.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The facial features, short reddish-brown hair, muscular physique, open black leather jacket, and light grey boxer shorts of the man from image 3 and image 4.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book illustration style featuring heavy black ink line work, dramatic shadows, and cel-shaded coloring from image 1, image 3, and image 4.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The murky dungeon color palette consisting of dim stone-greys, earthy browns, rusty metal tones, and faint lichen-green highlights from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f4-goblin-engineer.png",
+  "lineage": "char:goblin-engineer",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 13.8,
+  "note": "mask [0.56, 0.36, 0.97, 0.74] (stored [0.5, 0.28, 0.96, 0.74] overlapped Carl's hand)",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin in ragged clothes wearing a battered cooking pot as a helmet, on the open deck at the right, lunging toward the man. He is a small goblin, only about two thirds of the man's height. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He lunges forward mid-stride with a small curved knife thrust out in one fist, mouth open in a shout, ragged clothes flaring. He glares at the man ahead of him, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f4-goblin-mask-b.png"
+   ]
+  ],
+  "seed": 1798357081,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add an aggressive small goblin wearing a cooking pot helmet onto the wooden cart deck on the center-right of image 1, matching the existing comic book illustration style.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green-skinned goblin in the center-right area on the wooden platform, corresponding to the black mask region of image 2. The goblin is approximately two-thirds the height of the man from image 1, wearing torn brownish rags and a dented metal cooking pot worn upside down as a helmet. He is lunging forward in mid-stride toward the left, clutching a small curved steel dagger in one outstretched fist, with his mouth wide open in a shout and his gaze locked onto the man.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man from image 1 leaping across the foreground with a startled expression, wearing a black leather jacket, white shorts, and a prosthetic lower right leg.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The steampunk mechanical machinery, steam vents emitting white smoke, wooden cart frame, and control levers in the foreground and midground from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark underground stone cavern ceiling and brick-lined tunnel walls from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The graphic comic-book ink illustration aesthetic from image 1, characterized by crisp heavy black outlines, flat cel shading, and atmospheric lighting contrasting murky green and stone-grey cave tones with warm industrial highlights.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-carl.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 20.2,
+  "note": "stored mask [0.0, 0.16, 0.65, 0.95]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the left, shown from the waist up and seen from the side. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about three quarters of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He swings a battered metal cooking pot gripped in both fists in a hard sweeping arc toward the goblin, his arms stretched out to the side and clear of his face. His head is bowed and turned in profile, eyes on the goblin below him, so his whole face is visible, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-boiler-closeup.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 2026977432,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 onto the left side of the comic scene from image 1, swinging a metal pot.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 in the foreground on the center-left, filling roughly three-quarters of the frame height from the waist up. Position him in side profile facing right, head bowed slightly downward with a focused, intense expression. Render his arms extended outward in a wide sweeping swing to ensure his face is fully visible, wearing the open black leather jacket over a bare muscular torso and light grey boxer briefs from image 3 and image 4.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Add a battered, dented dark grey cast-iron cooking pot gripped firmly in both of the man's hands on the center-left, caught mid-arc in a downward swing.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty armored tractor from image 1, including its exhaust smokestacks emitting puffs of white smoke, spiked tires, angled headlights, and animal bones tied to the front grill with brown twine, remains unchanged across the center and right side.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dark, textured forest and shadowy sky background from image 1 remains preserved.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style featuring bold black inked outlines, crosshatch shading, flat cel coloring, and a moody, desaturated palette from image 1 and image 3 remains consistent.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-goblin.png",
+  "lineage": "char:goblin",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 17.9,
+  "note": "stored mask [0.45, 0.4, 1.0, 0.9]",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin with a bare head and no helmet, ragged clothes, its head snapped sideways by a hard blow, on the right, below the man's swinging arms. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about half of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His eyes are squeezed shut and his face is turned away to the side, not looking at the viewer. Motion lines sweep through the picture around the blow. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-goblin-mask.png"
+   ]
+  ],
+  "seed": 710315244,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a reeling green goblin character in the bottom-right foreground of the comic scene from image 1, reacting to a blow.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green-skinned goblin character in the bottom-right area, positioned close to the foreground below the man's reaching arm from image 1. Depict the goblin from the waist up, filling approximately half the frame height, wearing tattered brownish-grey ragged cloth garments with no helmet on its bare head. Show the goblin's head violently snapped sideways to the right, with its eyes tightly shut, sharp facial features contorted in pain, and comic-book motion lines radiating around the impact point.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man from image 1 with brown hair and black jacket reaching forward from the vehicle, positioned in the center-left.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The heavy armored industrial vehicle from image 1, including the vertical exhaust smokestacks billowing white smoke at the top, the spiked iron wheels, and the tied skeleton bones on the lower left.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dim, sketchy forest or cave background visible behind the vehicle from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The Western comic book illustration style from image 1, characterized by heavy black inking, bold outlines, cross-hatching, and flat cel-shaded coloring.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The desaturated palette of murky lichen-greens, rusted browns, deep greys, and warm ambient highlights from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-carl-s8.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.1,
+  "note": "retry seed 8, mask [0.0, 0.1, 0.66, 0.8]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the left, shown from the waist up and seen from the side. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about three quarters of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He swings a battered metal cooking pot gripped in both fists in a hard sweeping arc toward the goblin, his arms stretched out to the side and clear of his face. His head is bowed and turned in profile, eyes on the goblin below him, so his whole face is visible, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "8"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-boiler-closeup.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 8,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 to the left foreground of the scene from image 1 swinging a metal pot.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 in the foreground on the left, shown from the waist up in right-facing profile. He retains his short reddish-brown hair, defined athletic facial features, bare muscular torso, open black leather jacket, and light grey boxer briefs from image 3 and image 4. Position him occupying the left third to half of the frame with his head turned downward to the right, swinging a dented silver-grey metal cooking pot held firmly in both hands with arms stretched outward to the side clear of his face.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusted, spiked diesel vehicle from image 1 on the center-right, including its vertical exhaust pipes venting white smoke, angular headlights, spiked tire, and white skeletal bones bound to the front grille with brown rope.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dim, smoky background behind the vehicle from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1, featuring bold black ink outlines, textured crosshatching, flat cel shading, and atmospheric lighting.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-carl-s27.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 19.9,
+  "note": "retry seed 27, mask [0.0, 0.1, 0.66, 0.8]",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, on the left, shown from the waist up and seen from the side. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about three quarters of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He swings a battered metal cooking pot gripped in both fists in a hard sweeping arc toward the goblin, his arms stretched out to the side and clear of his face. His head is bowed and turned in profile, eyes on the goblin below him, so his whole face is visible, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "27"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-boiler-closeup.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-carl-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 27,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 into the left foreground of the apocalyptic vehicle scene from image 1, depicted from the waist up swinging a metal cooking pot.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the man from image 3 and image 4 to the left foreground, framed from the waist up in a profile view facing right. He maintains his short reddish-brown hair, muscular torso, open black leather jacket, and grey boxer briefs from image 3, gripping a battered dark grey metal cooking pot with both hands as he swings it downward in an arc, with his face turned in profile and gaze directed downward.\"\n      },\n      {\n        \"type\": \"object_add\",\n        \"desc\": \"Add a dented, rustic charcoal-grey metal cooking pot held in both fists of the man on the left side of the frame as he swings it in a forceful arc.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty armored tractor from image 1, including the exhaust pipes emitting white smoke at the top, the front grille bundled with white animal bones and brown rope on the center-left, and the spiked black wheel at the bottom-right, remains unchanged in structure and position.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The shadowy, desaturated cool grey and muted green background from image 1 remains visible behind the vehicle.\"\n      }\n    ],\n    \"style_change_instructions\": [\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"Incorporate warm amber firelight and hot orange glow highlights onto the left side of the vehicle and the man's figure, shifting from the cool neutral lighting of image 3 to the atmospheric dungeon illumination.\"\n      }\n    ],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The bold ink comic-book illustration style from image 1, featuring heavy black contour linework, gritty crosshatching, and flat cel shading, is preserved throughout the image.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-goblin.png",
+  "lineage": "char:goblin",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 13.2,
+  "note": "mask [0.5, 0.45, 1.0, 0.95] (stored [0.45, 0.4, 1.0, 0.9]), below Carl's face",
+  "fields": [
+   [
+    "prompt",
+    "Add a small green goblin with a bare head and no helmet, ragged clothes, its head snapped sideways by a hard blow, on the right, below the man's swinging arms. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about half of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His eyes are squeezed shut and his face is turned away to the side, not looking at the viewer. Motion lines sweep through the picture around the blow. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-goblin-mask-b.png"
+   ]
+  ],
+  "seed": 384481385,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a small green goblin getting hit in the bottom-right section of the comic scene from image 1 within the region indicated by image 2.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add a small green goblin in ragged tattered brownish clothing in the bottom-right area, positioned in the masked zone shown in image 2 below the man's hands from image 1. Render the goblin from the waist up, filling approximately half the frame height, with a bare unhelmeted head recoiling sharply sideways to the right from a forceful blow, eyes squeezed shut, mouth open in pain, and dynamic curved comic motion lines streaking around the impact.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man with short spiky auburn hair wearing an open black leather jacket, waist wraps, and tied bones from image 1, leaning forward while holding the curved metallic shield component in the center-left and lower-left.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The large industrial vehicle with twin smoking exhaust pipes, metal plating, rivets, and spiked wheel base from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The dim textured cavern background and grey smoke plumes rising from the vehicle exhausts from image 1.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1 with bold black ink linework, flat cel shading, and a muted stone-grey, dark steel, and earthy palette.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-sfx-s18.png",
+  "lineage": "sfx:CLANG!",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 14.6,
+  "note": "SFX CLANG! mask [0.3, 0.02, 0.97, 0.15]",
+  "fields": [
+   [
+    "prompt",
+    "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: C L A N G ! (C, L, A, N, G, then an exclamation mark; six characters in total). The same word, \"CLANG!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper right of the panel over the dark tunnel wall and pipes, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the goblin at all. The man, the goblin, the pot, the boiler and the pipes stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "18"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-chars.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-sfx-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/sfx/baroom-panel-reference.png"
+   ]
+  ],
+  "seed": 18,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the comic-book sound effect text \\\"CLANG!\\\" across the upper section of image 1 in the area specified by image 2, styled after the lettering in image 3.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"text_add\",\n        \"desc\": \"Add bold comic-book sound effect text reading \\\"CLANG!\\\" in large, stylized beige-white block letters with thick black outlines and drop shadows inspired by image 3, aligned horizontally in a single straight line in the top-right region of image 1 indicated by the black mask in image 2.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The red-haired man in the black jacket holding the metal pot from image 1, in the center-left and bottom-left.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The green-skinned goblin character in brown rags from image 1, in the bottom-right.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The rusty industrial vehicle with smokestacks and smoke plumes from image 1, across the background.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book illustration style, heavy black inks, and muted palette from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f5-sfx-s6.png",
+  "lineage": "sfx:CLANG!",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 16.6,
+  "note": "SFX CLANG! mask [0.3, 0.02, 0.97, 0.15]",
+  "fields": [
+   [
+    "prompt",
+    "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: C L A N G ! (C, L, A, N, G, then an exclamation mark; six characters in total). The same word, \"CLANG!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper right of the panel over the dark tunnel wall and pipes, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the goblin at all. The man, the goblin, the pot, the boiler and the pipes stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "6"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-chars.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f5-sfx-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/sfx/baroom-panel-reference.png"
+   ]
+  ],
+  "seed": 6,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a large comic-book sound-effect reading \\\"CLANG!\\\" across the top-right area of the scene from image 1, following the placement indicated in image 2 and the lettering aesthetic of image 3.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"text_add\",\n        \"desc\": \"Add bold, blocky comic-book sound-effect text reading \\\"CLANG!\\\" in capital letters across the upper-right area of the scene from image 1, placed within the rectangular region designated in image 2. Render each letter in off-white with thick black outlines and comic-style dimensionality inspired by the lettering in image 3, arranged evenly along a single horizontal line from left to right without overlapping.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The man with short brown hair wearing an open black jacket from image 1, positioned on the center-left while striking downwards with a grey metal pot.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The green goblin character with pointed ears and closed, wincing eyes from image 1, positioned in the bottom-right corner.\"\n      },\n      {\n        \"type\": \"object_reference:object_same\",\n        \"desc\": \"The rusty truck with vertical smokestacks and bone decorations from image 1 in the background.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book illustration style featuring dark ink line art, textured shading, and desaturated color palette from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f6-carl.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 16.3,
+  "note": "mask [0.08, 0.2, 0.66, 0.92] (stored [0.15, 0.22, 0.72, 0.9], nudged left off the door)",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, running along the tunnel floor toward the camera in the foreground, a few strides from the wooden door. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet spattered with dark blood. He is close to the camera and large in the frame, filling about seven tenths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He sprints at full speed, arms pumping, one knee high, body leaning forward, bare feet slapping the stone. His head is turned back over his shoulder toward the glowing vehicle far behind him, his face visible in profile, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-tunnel-door-low.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f6-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 1252179517,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Place the muscular man from image 3 and image 4 sprinting down the stone tunnel from image 1 in the foreground, looking back over his shoulder at the glowing machine.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man with short reddish-brown hair from image 3 and image 4 running forward in the center foreground of the stone tunnel from image 1. He wears the open black leather jacket and grey boxer briefs from image 3 and image 4, with his muscular bare torso, legs, and bare feet visible, adding dark red blood spatters across his bare feet and lower legs. He is captured mid-sprint in an active running pose with his body leaning forward, one knee driven high, arms pumping, and his head turned back over his shoulder looking toward the distant glowing vehicle behind him in profile.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The arched stone and brick dungeon tunnel from image 1, including the cracked floor, the murky green lichen patches on the walls, the large iron-banded wooden door on the right, and the dark steaming tractor-like vehicle with glowing orange undercarriage at the far end of the tunnel.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style with bold black ink linework, cel shading, and atmospheric dim palette illuminated by warm orange furnace glow from image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-carl.png",
+  "lineage": "char:carl",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 18.4,
+  "note": "vision-refined mask [0.14, 0.5, 0.68, 0.97] (stored [0.04, 0.46, 0.62, 0.97])",
+  "fields": [
+   [
+    "prompt",
+    "Add the man shown in the reference images, sprawled backward on the worn gray carpet in the foreground at the lower left. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket spattered with dark blood, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling a little over half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms and both legs and feet stretched out in front of him, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He has just been thrown off his feet: leaning back on one straight arm, the other hand raised near his ringing ear, knees bent, dazed. His face is turned up toward the heavy door and fully visible, not covered by his hand, looking at the door, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/plate-guild-hall-door.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-carl-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Carl/looks/look-002-action.png"
+   ]
+  ],
+  "seed": 1949901247,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the muscular man from image 3 and image 4 sprawled on the circular rug in the foreground of the stone chamber from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the muscular man from image 3 and image 4 in the bottom-left foreground, sprawled backward across the worn circular rug. He leans back propped up on one straight arm against the wooden floor, raising his other hand near his ear with a dazed, pained expression turned upward toward the heavy wooden door at the center-back. Depict him with the short reddish-brown hair, athletic build, open black leather jacket spattered with dark red blood spots, grey boxer shorts, and bare legs and bare feet from image 3 and image 4.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The entire stone room environment from image 1, including the roaring stone fireplace on the center-left, the heavy reinforced wooden door in the center background, the wooden school chairs encircling the round carpet, and the tall wooden bookshelves with framed sketches and desk on the center-right.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book art style from image 1 with bold black ink outlines, cel-shaded coloring, crosshatch shadowing, and the warm orange firelight glow casting over the dim stone room palette.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-mordecai.png",
+  "lineage": "char:mordecai",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 23.5,
+  "note": "vision-refined mask [0.62, 0.22, 0.99, 0.84] (stored [0.55, 0.22, 0.98, 0.84])",
+  "fields": [
+   [
+    "prompt",
+    "Add the creature shown in the reference images, standing on the right, beside and a little behind the sprawled man. Drawn exactly as in the reference images: the same bearded, rat-like creature, a ratkin hooligan standing about a head shorter than a tall man, with furry rat hands and a rat arm, wearing a black vest, blue pants and a pair of well-worn sandals. He is close to the camera and large in the frame, filling about three fifths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He leans slightly toward the man with one furry hand half-raised in alarm. His head is bowed, looking down at the man on the carpet with alarm, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-carl.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-mordecai-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Mordecai/looks/look-001-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Mordecai/looks/look-001-action.png"
+   ]
+  ],
+  "seed": 234569350,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the rat creature from image 3 and image 4 into the comic room scene of image 1, standing on the right side and looking down at the sprawled man in alarm.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the anthropomorphic rat character from image 3 and image 4 standing in the center-right foreground on the round grey floor rug, positioned beside and slightly behind the sprawled man from image 1. He has greyish-brown fur, large round pink-toned ears, long whiskers, a dark brown sleeveless distressed vest, cropped blue denim trousers, and brown strapped leather sandals. He leans forward with his head turned down toward the injured man with an alarmed expression, raising one furry pawed hand slightly in surprise, with his full body visible from head to sandals.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The sprawled muscular man with black hair, unbuttoned jacket, and light blue shorts lying injured on the wooden floor and rug in the bottom-left from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The entire stone and timber room background from image 1, including the burning stone fireplace on the left, the heavy wooden plank door in the center background, the wooden bookshelf filled with books and circular framed portraits on the right, the small wooden chairs, desk, and round floor rug.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book graphic novel illustration style from image 1, characterized by bold black ink outlines, textured crosshatching, cel-shading, and dynamic warm amber-orange lighting cast from the fireplace across the floor and subjects.\"\n      },\n      {\n        \"type\": \"color_palette\",\n        \"desc\": \"The moody color palette from image 1, featuring deep shadows, warm firelight tones, dim slate-grey stone, and earthy wood textures.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-donut.png",
+  "lineage": "char:donut",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 18.9,
+  "note": "vision-refined mask [0.04, 0.38, 0.24, 0.56] (stored [0.05, 0.33, 0.25, 0.44])",
+  "fields": [
+   [
+    "prompt",
+    "Add the cat shown in the reference images, on the carpet in the corner beside the fireplace on the left. Drawn exactly as in the reference images: the same tortoiseshell Persian cat with her warm brown coat, face and orange eyes, whole body visible, no collar or crown. She is a normal house cat at realistic scale, about a third of the standing creature's height. Her whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Her coat is fully puffed out, back arched, mouth open mid-hiss. She stares at the heavy door, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-mordecai.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-donut-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-action.png"
+   ]
+  ],
+  "seed": 156107216,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the hissing tortoiseshell Persian cat from image 4 onto the floor near the fireplace in the comic panel scene from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the fluffy tortoiseshell Persian cat from image 4 and image 3 to the center-left area on the wooden floor beside the glowing stone fireplace from image 1. Position the cat facing toward the heavy wooden door at the center-back, with its warm brown and black striped fur puffed out, back arched, and mouth open mid-hiss, maintaining a realistic scale approximately one-third the height of the standing rat creature.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The injured muscular man from image 1 lying on his back on the floor in light blue briefs and an unbuttoned black jacket.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The anthropomorphic rat character from image 1 standing on the right in blue rolled-up trousers, sandals, and an open black vest.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The entire room interior from image 1, including the burning stone fireplace on the left, the heavy wooden door in the center background, the wooden bookshelf filled with books and framed pictures on the right, the wooden chairs, and the circular floor rug.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The bold ink linework, graphic comic book illustration style, flat cel shading, and warm ambient lighting from the fireplace in image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-donut-s14.png",
+  "lineage": "char:donut",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 20.6,
+  "note": "retry seed 14: on the carpet, mask [0.2, 0.5, 0.4, 0.64] (first try landed inside the fireplace)",
+  "fields": [
+   [
+    "prompt",
+    "Add the cat shown in the reference images, on the carpet in the corner beside the fireplace on the left. Drawn exactly as in the reference images: the same tortoiseshell Persian cat with her warm brown coat, face and orange eyes, whole body visible, no collar or crown. She is a normal house cat at realistic scale, about a third of the standing creature's height. Her whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Her coat is fully puffed out, back arched, mouth open mid-hiss. She stares at the heavy door, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "14"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-mordecai.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-donut-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-action.png"
+   ]
+  ],
+  "seed": 14,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the hissing tortoiseshell cat from image 4 onto the circular rug beside the fireplace on the left in the comic scene from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_reference:character_modify\",\n        \"desc\": \"Add the tortoiseshell Persian cat from image 4 onto the grey circular rug in the center-left of image 1, positioned in the open floor space between the stone fireplace hearth and the small wooden stool. Render the cat from image 4 with puffed-out fluffy brown and black brindle fur, arched back, claws bared, and mouth open mid-hiss facing towards the wooden door in the center background at realistic house-cat proportions relative to the standing rat creature from image 1.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The injured muscular man from image 1 lying on his back on the floor with his leg raised, wearing an open black jacket and light blue shorts.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The anthropomorphic rat creature from image 1 standing on the right side of the room in a black vest, blue cuffed trousers, and leather sandals.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The entire room interior from image 1, including the burning stone fireplace on the left, the heavy wooden door with black iron hinges, the bookshelf filled with framed portraits and books on the right, the wooden chairs, the timber ceiling beams, and the circular floor rug.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The hand-drawn comic book illustration style from image 1, featuring heavy black ink outlines, flat cel shading, and warm amber-orange firelight illumination contrasting with cool grey stone tones.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-donut-s2.png",
+  "lineage": "char:donut",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 21.1,
+  "note": "retry seed 2: on the carpet, mask [0.2, 0.5, 0.4, 0.64] (first try landed inside the fireplace)",
+  "fields": [
+   [
+    "prompt",
+    "Add the cat shown in the reference images, on the carpet in the corner beside the fireplace on the left. Drawn exactly as in the reference images: the same tortoiseshell Persian cat with her warm brown coat, face and orange eyes, whole body visible, no collar or crown. She is a normal house cat at realistic scale, about a third of the standing creature's height. Her whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Her coat is fully puffed out, back arched, mouth open mid-hiss. She stares at the heavy door, not looking at the viewer. Keep everything else exactly the same."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "2"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-mordecai.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-donut-mask-b.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-standing.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/core/Princess Donut/looks/look-001-action.png"
+   ]
+  ],
+  "seed": 2,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add the hissing tortoiseshell Persian cat from image 4 onto the circular carpet near the fireplace on the left side of the room in image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"character_add\",\n        \"desc\": \"Add the fluffy tortoiseshell Persian cat from image 3 and image 4 to the center-left area on the circular grey rug, positioned between the stone fireplace and the injured man, matching the spatial location indicated in image 2. Depict the cat in the aggressive stance from image 4 with an arched back, bristled brown-and-black fur, unsheathed front claws, an open mouth showing fangs in a hiss, and wide amber-orange eyes fixed on the heavy wooden door in the center-back.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The injured muscular man from image 1 lying on his back across the bottom-left and bottom-center floor, wearing an open black jacket and grey briefs with his legs raised and blood on his chest.\"\n      },\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The anthropomorphic rat man from image 1 standing on the center-right side, wearing a black leather vest, torn blue jeans, and brown strappy sandals.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The entire rustic stone cabin interior from image 1, including the burning stone fireplace on the left, the heavy wooden plank door in the center background, the wooden bookshelf with framed pictures on the right, the timber ceiling, the wooden chairs, and the circular floor rug.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The graphic comic-book illustration style from image 1, characterized by heavy black ink line work, detailed cross-hatching, flat cel shading, and warm amber illumination cast across the room from the fireplace.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-sfx-s22.png",
+  "lineage": "sfx:BAM!",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 14.0,
+  "note": "SFX BAM! mask [0.1, 0.03, 0.77, 0.2]",
+  "fields": [
+   [
+    "prompt",
+    "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: B A M ! (B, A, M, then an exclamation mark; four characters in total). The same word, \"BAM!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper left of the panel over the wooden door and wall, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the creature and the cat at all. The man, the creature, the cat, the door and the room stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "22"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-chars.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-sfx-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/sfx/baroom-panel-reference.png"
+   ]
+  ],
+  "seed": 22,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a large comic-book sound effect reading \\\"B A M !\\\" horizontally across the top section of the cabin scene from image 1.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"text_add\",\n        \"desc\": \"Add a large comic-book sound-effect text reading \\\"B A M !\\\" across the top-center ceiling area of the room from image 1, positioned in the region indicated by the black mask in image 2. Render the text along a single straight horizontal line with bold, blocky, cream-colored capital letters featuring black outlines and drop shadows inspired by the sound effect in image 3, keeping each letter (\\\"B\\\", \\\"A\\\", \\\"M\\\", and \\\"!\\\") evenly spaced and non-overlapping.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The injured muscular man lying on the floor in blue shorts, the standing rat-headed character wearing a black vest and blue jeans, and the hissing brown striped cat by the hearth from image 1.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The rustic cabin interior from image 1, including the stone fireplace with a burning fire on the left, the heavy wooden door at the center-back, the wooden bookshelf on the right, and the wooden chairs and circular rug.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The detailed comic book line art, ink crosshatching, and dramatic warm illumination from the fireplace in image 1.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ },
+ {
+  "out": "f7-sfx-s3.png",
+  "lineage": "sfx:BAM!",
+  "endpoint": "/v2/image/precise-edit/ideogram-4-5",
+  "quote_usd": 0.06,
+  "http": "200",
+  "seconds": 14.7,
+  "note": "SFX BAM! mask [0.1, 0.03, 0.77, 0.2]",
+  "fields": [
+   [
+    "prompt",
+    "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: B A M ! (B, A, M, then an exclamation mark; four characters in total). The same word, \"BAM!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper left of the panel over the wooden door and wall, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the creature and the cat at all. The man, the creature, the cat, the door and the room stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+   ],
+   [
+    "quality",
+    "medium"
+   ],
+   [
+    "seed",
+    "3"
+   ]
+  ],
+  "files": [
+   [
+    "image",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-chars.png"
+   ],
+   [
+    "mask",
+    "audiobook-copilot/storyboards/book1/ch03-comic/f7-sfx-mask.png"
+   ],
+   [
+    "reference_images",
+    "reference-images/sfx/baroom-panel-reference.png"
+   ]
+  ],
+  "seed": 3,
+  "final_prompt": "{\n  \"instruction_caption\": {\n    \"high_level_instruction\": \"Add a large comic-book sound-effect text reading \\\"B A M !\\\" across the upper portion of the scene from image 1 in the graphic sound-effect lettering style seen in image 3.\",\n    \"content_change_instructions\": [\n      {\n        \"type\": \"text_add\",\n        \"desc\": \"Add large comic-book sound-effect text reading \\\"B A M !\\\" horizontally across the top-center ceiling area of the room from image 1, placed in the upper region indicated by the black mask in image 2. Render the letters 'B', 'A', 'M', and '!' along a single straight horizontal line with even spacing and no overlap between characters, featuring thick off-white block letters with bold black outlines and dimensional extruded drop-shadow edges inspired by the lettering style from image 3.\"\n      }\n    ],\n    \"content_that_stay_the_same\": [\n      {\n        \"type\": \"character_reference:character_same\",\n        \"desc\": \"The muscular man lying on the wooden floor wearing grey shorts and an open dark jacket, the anthropomorphic rat-man standing on the right wearing a black vest and blue jeans, and the hissing brown striped cat near the fireplace from image 1 remain unchanged in appearance, position, and pose.\"\n      },\n      {\n        \"type\": \"background_reference\",\n        \"desc\": \"The stone fireplace with blazing orange flames, the wooden plank ceiling and walls, the heavy wooden door at the center back, the tall wooden bookshelf filled with books and framed portraits on the right, and the wooden chairs from image 1 remain unchanged.\"\n      }\n    ],\n    \"style_change_instructions\": [],\n    \"style_that_stay_the_same\": [\n      {\n        \"type\": \"style_reference\",\n        \"desc\": \"The comic book illustration style with detailed ink linework, crosshatch shading, and dramatic warm firelight against dark shadows from image 1 is preserved.\"\n      }\n    ]\n  }\n}",
+  "resolution": "736x1312",
+  "is_image_safe": true,
+  "download_http": "200"
+ }
+]

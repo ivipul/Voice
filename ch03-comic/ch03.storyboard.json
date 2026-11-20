@@ -1,0 +1,730 @@
+{
+  "scene_id": "book1-ch03-storming-the-dozer",
+  "book": 1,
+  "chapter": 3,
+  "chapter_book_timestamp": "44:26",
+  "scene_book_timestamp_range_approx": "00:49:00-00:55:20",
+  "summary": "With the goblins' backs turned, Carl climbs the now-driverless murder-dozer, throws one goblin into its spinning blade, beats the Goblin Engineer with his own pot helmet, then sprints back to the guild hall door with twelve seconds before the abandoned machine's boiler explodes.",
+  "emotional_beat": "Carl's first real kills -- adrenaline curdling into nausea, then relief.",
+  "skip_policy": "Physical action with clear visual stakes, building to a signature set-piece explosion.",
+  "key_characters": [
+    "carl",
+    "mordecai",
+    "princess-donut"
+  ],
+  "character_tags_ref": "character-tags.json",
+  "schema_version": 2,
+  "palette": "the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight",
+  "sfx_colour": "cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel.",
+  "location_plates": {
+    "tunnel-rear-wide": {
+      "source": null,
+      "camera_view": "eye-level wide, three-quarter rear view, the vehicle's bone-and-rope ladder in the foreground right",
+      "purpose": "frame 1 establishing",
+      "spec": {
+        "location": "Empty establishing wide shot of a dungeon tunnel section where a tractor-sized, scrap-metal vehicle with a huge spiked front wheel sits idling and driverless, smoke drifting from its pipes, a crude ladder made of bones lashed with rope hanging off its back end. The tunnel ceiling is low and rough-hewn stone, the walls are streaked with dark brick and a faint green lichen glow. Mood: tense lull, a weapon left unattended.",
+        "viewpoint": "The camera is at eye level, wide shot, from a three-quarter rear angle: the scrap-metal vehicle fills the right side of the frame with its back end and the bone-and-rope ladder hanging toward the camera, and the tunnel stretches away on the left into the dark distance.",
+        "room_for": "Leave an open stretch of tunnel floor in the far left distance and clear space beside the ladder."
+      },
+      "prompt": "Comic-book panel. Full-bleed illustration, no border. Empty establishing wide shot of a dungeon tunnel section where a tractor-sized, scrap-metal vehicle with a huge spiked front wheel sits idling and driverless, smoke drifting from its pipes, a crude ladder made of bones lashed with rope hanging off its back end. The tunnel ceiling is low and rough-hewn stone, the walls are streaked with dark brick and a faint green lichen glow. Mood: tense lull, a weapon left unattended. The camera is at eye level, wide shot, from a three-quarter rear angle: the scrap-metal vehicle fills the right side of the frame with its back end and the bone-and-rope ladder hanging toward the camera, and the tunnel stretches away on the left into the dark distance. Leave an open stretch of tunnel floor in the far left distance and clear space beside the ladder. The attached images are style references only: copy their comic-book ink linework, colour palette and lighting mood, but do not copy any of their subjects, objects or layouts. No people or characters in the image. No text, lettering or signs with writing anywhere."
+    },
+    "deck-side-on": {
+      "source": "tunnel-rear-wide",
+      "camera_view": "side-on at deck height across the open top deck, spiked wheel at the far end",
+      "purpose": "frame 2",
+      "spec": {
+        "anchors": "the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder",
+        "viewpoint": "The camera is now standing on the vehicle's open top deck at deck height, looking side-on ACROSS the deck: the fur-lined recessed bench seating and the control levers sit in the middle ground, smoke curls from the pipes, and the huge spiked wheel stands at the far right end of the deck. The tunnel walls form the background behind the deck.",
+        "room_for": "Leave an empty stretch of open deck in the middle."
+      },
+      "prompt": "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now standing on the vehicle's open top deck at deck height, looking side-on ACROSS the deck: the fur-lined recessed bench seating and the control levers sit in the middle ground, smoke curls from the pipes, and the huge spiked wheel stands at the far right end of the deck. The tunnel walls form the background behind the deck. Leave an empty stretch of open deck in the middle. No people or characters. No text, lettering or signs with writing."
+    },
+    "wheel-closeup": {
+      "source": "tunnel-rear-wide",
+      "camera_view": "extreme close-up, low and straight-on, the spiked wheel fills the frame",
+      "purpose": "frame 3",
+      "spec": {
+        "anchors": "the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder",
+        "viewpoint": "Extreme close-up, low and straight-on at the front of the vehicle: the enormous spiked wheel fills the frame, its curved spikes and scuffed metal rim catching a dull orange glow, with dark tunnel stone blurred and out of focus around it. Nothing else of the tunnel is visible."
+      },
+      "prompt": "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Extreme close-up, low and straight-on at the front of the vehicle: the enormous spiked wheel fills the frame, its curved spikes and scuffed metal rim catching a dull orange glow, with dark tunnel stone blurred and out of focus around it. Nothing else of the tunnel is visible. No people or characters. No text, lettering or signs with writing."
+    },
+    "deck-front-back": {
+      "source": "tunnel-rear-wide",
+      "camera_view": "from the front of the open deck at head height looking back toward the rear, steam around the controls",
+      "purpose": "frame 4",
+      "spec": {
+        "anchors": "the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder",
+        "viewpoint": "The camera is now at the front of the open top deck at head height, looking back toward the rear: the control levers and a boiler with blank dials and pipes stand in the foreground with steam and smoke drifting around them, the fur-lined bench seating is in the middle ground, and the top of the bone-and-rope ladder shows at the back edge of the deck with the dark tunnel beyond.",
+        "room_for": "Leave an empty stretch of open deck in the middle."
+      },
+      "prompt": "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now at the front of the open top deck at head height, looking back toward the rear: the control levers and a boiler with blank dials and pipes stand in the foreground with steam and smoke drifting around them, the fur-lined bench seating is in the middle ground, and the top of the bone-and-rope ladder shows at the back edge of the deck with the dark tunnel beyond. Leave an empty stretch of open deck in the middle. No people or characters. No text, lettering or signs with writing."
+    },
+    "boiler-closeup": {
+      "source": "tunnel-rear-wide",
+      "camera_view": "tight close-up at head height on the boiler gauges and control levers, pipes behind",
+      "purpose": "frame 5",
+      "spec": {
+        "anchors": "the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder",
+        "viewpoint": "Tight close-up at head height on the vehicle's boiler and control levers: round gauges with blank dials, riveted pipes, a soot-stained iron panel and a curl of steam fill the frame, with the dim tunnel blurred behind.",
+        "room_for": "Leave clear dark space in the middle of the frame."
+      },
+      "prompt": "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Tight close-up at head height on the vehicle's boiler and control levers: round gauges with blank dials, riveted pipes, a soot-stained iron panel and a curl of steam fill the frame, with the dim tunnel blurred behind. Leave clear dark space in the middle of the frame. No people or characters. No text, lettering or signs with writing."
+    },
+    "tunnel-door-low": {
+      "source": "tunnel-rear-wide",
+      "camera_view": "low at floor level at the tunnel's end looking back, wooden door close on the right, vehicle glowing in the distance",
+      "purpose": "frame 6 (state change: the abandoned vehicle is about to fail)",
+      "spec": {
+        "anchors": "the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder",
+        "viewpoint": "The camera is now low at floor level at the end of the tunnel, looking back along it: a heavy wooden door with iron bands stands close to the camera in the right-hand wall, and the tunnel runs away to the far distance where the vehicle sits, now glowing hot orange from inside its machinery with smoke pouring faster from its pipes and orange light spilling across the stone floor.",
+        "room_for": "Leave an open stretch of tunnel floor in the foreground."
+      },
+      "prompt": "Re-draw the source image from a completely different camera position. Same location as the source image: the same dungeon tunnel with its low rough-hewn stone ceiling and lichen-streaked brick walls, and the same scrap-metal vehicle with its smoking pipes, spiked front wheel and bone-and-rope ladder. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. The camera is now low at floor level at the end of the tunnel, looking back along it: a heavy wooden door with iron bands stands close to the camera in the right-hand wall, and the tunnel runs away to the far distance where the vehicle sits, now glowing hot orange from inside its machinery with smoke pouring faster from its pipes and orange light spilling across the stone floor. Leave an open stretch of tunnel floor in the foreground. No people or characters. No text, lettering or signs with writing."
+    },
+    "guild-hall-door": {
+      "source": null,
+      "camera_view": "eye-level wide from across the room toward the heavy wooden door, fireplace on the left, carpet in the foreground",
+      "purpose": "frame 7, second location (the guild hall)",
+      "spec": {
+        "location": "Empty establishing wide shot of a warm, firelit guild hall interior: a crackling stone fireplace along one wall, shelves cluttered with odd objects and a few framed oval photographs of bird-like creatures, a well-worn oval gray carpet in the center of the room with mismatched classroom-style chairs scattered loosely around it, a plain wooden desk off to one side, and a heavy wooden door in the back wall. Mood: cozy but strange, firelight flickering across worn furniture.",
+        "viewpoint": "The camera is at eye level on the far side of the room, looking toward the heavy wooden door in the back wall: the door stands in the middle background, the stone fireplace glows on the left wall, the shelves with the framed photographs line the right wall, and the oval gray carpet fills the foreground.",
+        "room_for": "Leave a wide empty stretch of carpet in the foreground and an open spot beside the fireplace."
+      },
+      "prompt": "Comic-book panel. Full-bleed illustration, no border. Empty establishing wide shot of a warm, firelit guild hall interior: a crackling stone fireplace along one wall, shelves cluttered with odd objects and a few framed oval photographs of bird-like creatures, a well-worn oval gray carpet in the center of the room with mismatched classroom-style chairs scattered loosely around it, a plain wooden desk off to one side, and a heavy wooden door in the back wall. Mood: cozy but strange, firelight flickering across worn furniture. The camera is at eye level on the far side of the room, looking toward the heavy wooden door in the back wall: the door stands in the middle background, the stone fireplace glows on the left wall, the shelves with the framed photographs line the right wall, and the oval gray carpet fills the foreground. Leave a wide empty stretch of carpet in the foreground and an open spot beside the fireplace. The attached images are style references only: copy their comic-book ink linework, colour palette and lighting mood, but do not copy any of their subjects, objects or layouts. No people or characters in the image. No text, lettering or signs with writing anywhere."
+    }
+  },
+  "frames": [
+    {
+      "frame": 1,
+      "timestamp_approx": "00:49:00",
+      "shot": "WIDE",
+      "establishing": true,
+      "change_from_previous": null,
+      "plate_id": "tunnel-rear-wide",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:49:00",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man wearing boxers, an open leather jacket, and bare feet (he lost the crocs from chapter 3 onwards), with no pants.",
+          "framing": "full_body",
+          "prominence_pct": 45,
+          "mask_box": [
+            0.46,
+            0.3,
+            0.92,
+            0.82
+          ],
+          "mask_how": "estimate on the plate: on the ladder at the vehicle's back end, right of centre; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket, grey boxer shorts, bare legs and bare feet",
+            "feet": "",
+            "placement": "on the crude bone-and-rope ladder at the back end of the vehicle, climbing up it",
+            "body_parts": "head, torso, both arms, both legs and both bare feet on the ladder rungs, nothing hidden behind other objects",
+            "pose": "He climbs slowly, one hand gripping a rung above him and one foot on a lower rung, body low and tense, every movement careful and deliberate.",
+            "gaze": "His head is turned over his shoulder to the left toward the two goblins far back along the tunnel, so his face is visible in profile, looking at them, not looking at the viewer.",
+            "extra": "His feet are bare: no shoes and no crocs."
+          },
+          "prompt": "Add the man shown in the reference images, on the crude bone-and-rope ladder at the back end of the vehicle, climbing up it. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He stands in the middle ground, filling a little under half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet on the ladder rungs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He climbs slowly, one hand gripping a rung above him and one foot on a lower rung, body low and tense, every movement careful and deliberate. His head is turned over his shoulder to the left toward the two goblins far back along the tunnel, so his face is visible in profile, looking at them, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        },
+        {
+          "id": "goblins",
+          "kind": "text_only",
+          "role": "secondary",
+          "tag": null,
+          "look_note": "No look images: drawn from the text description.",
+          "framing": "group",
+          "prominence_pct": null,
+          "mask_box": [
+            0.05,
+            0.44,
+            0.38,
+            0.66
+          ],
+          "mask_how": "small group box on the open tunnel floor at the far left, a short distance from the vehicle",
+          "spec": {
+            "description": "two small green goblins in ragged clothes, standing side by side on the tunnel floor far back to the left of the vehicle, a short distance from it",
+            "short": "the goblins",
+            "pron": "they",
+            "group_layout": "Each goblin is only about waist-high to a man and drawn small in the frame, standing close together.",
+            "gaze": "Both have their backs mostly turned and their heads turned in profile toward the far end of the tunnel, not looking at the viewer.",
+            "group_visibility": "Both are whole, clearly visible and uncropped, their heads clearly readable in profile."
+          },
+          "prompt": "Add two small green goblins in ragged clothes, standing side by side on the tunnel floor far back to the left of the vehicle, a short distance from it. Each goblin is only about waist-high to a man and drawn small in the frame, standing close together. Both are whole, clearly visible and uncropped, their heads clearly readable in profile. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Both have their backs mostly turned and their heads turned in profile toward the far end of the tunnel, not looking at the viewer. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [],
+      "overlay": {
+        "caption": null,
+        "dialogue": []
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "char:carl",
+        "char:goblins",
+        "overlay"
+      ],
+      "camera_view": "eye-level wide, three-quarter rear view, the vehicle's bone-and-rope ladder in the foreground right",
+      "est_cost_usd": 0.12,
+      "start_ms": 2940000
+    },
+    {
+      "frame": 2,
+      "timestamp_approx": "00:50:39",
+      "shot": "MEDIUM",
+      "change_from_previous": "MAJOR",
+      "plate_id": "deck-side-on",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:50:30",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man wearing boxers, an open leather jacket, and bare feet (he lost the crocs from chapter 3 onwards), with no pants.",
+          "framing": "full_body",
+          "prominence_pct": 70,
+          "mask_box": [
+            0.04,
+            0.2,
+            0.62,
+            0.9
+          ],
+          "mask_how": "estimate on the plate: left half of the deck, standing; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket, grey boxer shorts, bare legs and bare feet",
+            "feet": "",
+            "placement": "standing on the vehicle's open deck on the left, seen from the side in profile and facing right toward the spiked wheel",
+            "pose": "He is in the middle of a throwing wind-up: both fists clenched and both arms cocked back over his right shoulder as if gripping something heavy, body twisted, feet braced wide apart.",
+            "gaze": "His head is turned forward in profile, eyes on the huge spinning wheel at the far end of the deck, so his whole face is visible, not looking at the viewer.",
+            "extra": "His feet are bare: no shoes and no crocs."
+          },
+          "prompt": "Add the man shown in the reference images, standing on the vehicle's open deck on the left, seen from the side in profile and facing right toward the spiked wheel. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about seven tenths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He is in the middle of a throwing wind-up: both fists clenched and both arms cocked back over his right shoulder as if gripping something heavy, body twisted, feet braced wide apart. His head is turned forward in profile, eyes on the huge spinning wheel at the far end of the deck, so his whole face is visible, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        },
+        {
+          "id": "goblin",
+          "kind": "text_only",
+          "role": "secondary",
+          "tag": null,
+          "look_note": "No look images: drawn from the text description.",
+          "framing": "small",
+          "prominence_pct": null,
+          "mask_box": [
+            0.3,
+            0.12,
+            0.62,
+            0.34
+          ],
+          "mask_how": "small box above and behind the man's right shoulder where his fists hold the goblin",
+          "spec": {
+            "description": "a small green goblin in ragged clothes, hauled off its feet",
+            "short": "the goblin",
+            "pron": "he",
+            "placement": "held up in the man's two fists by the front of its ragged clothing, cocked back above his right shoulder at the top of the throw",
+            "scale": "He is a small goblin, only about half the man's height, with his feet dangling in the air.",
+            "pose": "His limbs flail and his green face is caught in startled surprise.",
+            "gaze": "He stares wide-eyed at the man's face, not looking at the viewer."
+          },
+          "prompt": "Add a small green goblin in ragged clothes, hauled off its feet, held up in the man's two fists by the front of its ragged clothing, cocked back above his right shoulder at the top of the throw. He is a small goblin, only about half the man's height, with his feet dangling in the air. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His limbs flail and his green face is caught in startled surprise. He stares wide-eyed at the man's face, not looking at the viewer. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [],
+      "overlay": {
+        "caption": "One shot. Make it count.",
+        "dialogue": []
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "plate:deck-side-on",
+        "char:carl",
+        "char:goblin",
+        "overlay"
+      ],
+      "camera_view": "side-on at deck height across the open top deck, spiked wheel at the far end",
+      "est_cost_usd": 0.12,
+      "start_ms": 3039700
+    },
+    {
+      "frame": 3,
+      "timestamp_approx": "00:51:06",
+      "shot": "CLOSEUP",
+      "change_from_previous": "MAJOR",
+      "plate_id": "wheel-closeup",
+      "characters": [
+        {
+          "id": "goblin",
+          "kind": "text_only",
+          "role": "primary",
+          "tag": null,
+          "look_note": "No look images: drawn from the text description.",
+          "framing": "full_body",
+          "prominence_pct": 60,
+          "mask_box": [
+            0.12,
+            0.2,
+            0.88,
+            0.82
+          ],
+          "mask_how": "the goblin fills the middle of the frame against the wheel",
+          "spec": {
+            "description": "a small green goblin shown as a dark stylised silhouette, arms and legs splayed, slammed against the huge spinning spiked wheel in a burst of motion lines, sparks and an abstracted flash of impact, drawn in comic-book style and not graphic",
+            "short": "the goblin",
+            "pron": "he",
+            "placement": "in front of the spinning spiked wheel at the centre of the frame",
+            "body_parts": "head, torso, both arms and both legs, nothing hidden behind other objects",
+            "gaze": "His face is turned away in profile, eyes squeezed shut, not looking at the viewer."
+          },
+          "prompt": "Add a small green goblin shown as a dark stylised silhouette, arms and legs splayed, slammed against the huge spinning spiked wheel in a burst of motion lines, sparks and an abstracted flash of impact, drawn in comic-book style and not graphic, in front of the spinning spiked wheel at the centre of the frame. He is close to the camera and large in the frame, filling about three fifths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms and both legs, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His face is turned away in profile, eyes squeezed shut, not looking at the viewer. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [],
+      "overlay": {
+        "caption": null,
+        "dialogue": []
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "plate:wheel-closeup",
+        "char:goblin",
+        "overlay"
+      ],
+      "camera_view": "extreme close-up, low and straight-on, the spiked wheel fills the frame",
+      "est_cost_usd": 0.06,
+      "start_ms": 3066900
+    },
+    {
+      "frame": 4,
+      "timestamp_approx": "00:52:08",
+      "shot": "MEDIUM",
+      "change_from_previous": "MAJOR",
+      "plate_id": "deck-front-back",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:51:30",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man wearing boxers, an open leather jacket, and bare feet (he lost the crocs from chapter 3 onwards), with no pants.",
+          "framing": "full_body",
+          "prominence_pct": 65,
+          "mask_box": [
+            0.02,
+            0.22,
+            0.5,
+            0.88
+          ],
+          "mask_how": "estimate on the plate: left foreground of the deck; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket, grey boxer shorts, bare legs and bare feet",
+            "feet": "",
+            "placement": "on the open deck at the left, nearer the camera, seen in three-quarter view",
+            "pose": "He braces in a low defensive crouch, knees bent, shoulders hunched, both hands raised and open in front of him to ward off the attack, mouth set in a snarl.",
+            "gaze": "His head is turned toward the goblin on his right, his whole face visible, looking at it, not looking at the viewer.",
+            "low_angle": true,
+            "extra": "His feet are bare: no shoes and no crocs."
+          },
+          "prompt": "Add the man shown in the reference images, on the open deck at the left, nearer the camera, seen in three-quarter view. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling about two thirds of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He braces in a low defensive crouch, knees bent, shoulders hunched, both hands raised and open in front of him to ward off the attack, mouth set in a snarl. His head is turned toward the goblin on his right, his whole face visible, looking at it, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        },
+        {
+          "id": "goblin-engineer",
+          "kind": "text_only",
+          "role": "secondary",
+          "tag": null,
+          "look_note": "No look images: drawn from the text description.",
+          "framing": "small",
+          "prominence_pct": null,
+          "mask_box": [
+            0.5,
+            0.28,
+            0.96,
+            0.74
+          ],
+          "mask_how": "right half of the deck, the goblin lunging toward the man; refine with a vision query",
+          "spec": {
+            "description": "a small green goblin in ragged clothes wearing a battered cooking pot as a helmet",
+            "short": "the goblin",
+            "pron": "he",
+            "placement": "on the open deck at the right, lunging toward the man",
+            "scale": "He is a small goblin, only about two thirds of the man's height.",
+            "pose": "He lunges forward mid-stride with a small curved knife thrust out in one fist, mouth open in a shout, ragged clothes flaring.",
+            "gaze": "He glares at the man ahead of him, not looking at the viewer."
+          },
+          "prompt": "Add a small green goblin in ragged clothes wearing a battered cooking pot as a helmet, on the open deck at the right, lunging toward the man. He is a small goblin, only about two thirds of the man's height. His whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He lunges forward mid-stride with a small curved knife thrust out in one fist, mouth open in a shout, ragged clothes flaring. He glares at the man ahead of him, not looking at the viewer. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [],
+      "overlay": {
+        "caption": null,
+        "dialogue": [
+          {
+            "speaker": "goblin-engineer",
+            "line": "You're in my world now!",
+            "bubble_hint": "upper right, in the dark above the goblin's head"
+          },
+          {
+            "speaker": "carl",
+            "line": "You need to speak my language, you weird green piece of—",
+            "bubble_hint": "upper left, above the man's head"
+          }
+        ]
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "plate:deck-front-back",
+        "char:carl",
+        "char:goblin-engineer",
+        "overlay"
+      ],
+      "camera_view": "from the front of the open deck at head height looking back toward the rear, steam around the controls",
+      "est_cost_usd": 0.12,
+      "start_ms": 3128200
+    },
+    {
+      "frame": 5,
+      "timestamp_approx": "00:52:50",
+      "shot": "CLOSEUP",
+      "change_from_previous": "MAJOR",
+      "plate_id": "boiler-closeup",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:52:50",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man wearing boxers, an open leather jacket, and bare feet (he lost the crocs from chapter 3 onwards), with no pants.",
+          "framing": "upper_body",
+          "prominence_pct": 75,
+          "mask_box": [
+            0.0,
+            0.16,
+            0.65,
+            0.95
+          ],
+          "mask_how": "left two thirds of the frame, waist up; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket, grey boxer shorts, bare legs and bare feet",
+            "placement": "on the left, shown from the waist up and seen from the side",
+            "pose": "He swings a battered metal cooking pot gripped in both fists in a hard sweeping arc toward the goblin, his arms stretched out to the side and clear of his face.",
+            "gaze": "His head is bowed and turned in profile, eyes on the goblin below him, so his whole face is visible, not looking at the viewer."
+          },
+          "prompt": "Add the man shown in the reference images, on the left, shown from the waist up and seen from the side. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about three quarters of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He swings a battered metal cooking pot gripped in both fists in a hard sweeping arc toward the goblin, his arms stretched out to the side and clear of his face. His head is bowed and turned in profile, eyes on the goblin below him, so his whole face is visible, not looking at the viewer. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        },
+        {
+          "id": "goblin",
+          "kind": "text_only",
+          "role": "secondary",
+          "tag": null,
+          "look_note": "No look images: drawn from the text description.",
+          "framing": "upper_body",
+          "prominence_pct": 50,
+          "mask_box": [
+            0.45,
+            0.4,
+            1.0,
+            0.9
+          ],
+          "mask_how": "lower right, the goblin's head and shoulders where the pot lands",
+          "spec": {
+            "description": "a small green goblin with a bare head and no helmet, ragged clothes, its head snapped sideways by a hard blow",
+            "short": "the goblin",
+            "pron": "he",
+            "placement": "on the right, below the man's swinging arms",
+            "gaze": "His eyes are squeezed shut and his face is turned away to the side, not looking at the viewer.",
+            "extra": "Motion lines sweep through the picture around the blow."
+          },
+          "prompt": "Add a small green goblin with a bare head and no helmet, ragged clothes, its head snapped sideways by a hard blow, on the right, below the man's swinging arms. He is close to the camera, shown from the waist up, head and shoulders large in the frame, filling about half of the frame height, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible, not covered by hands or arms. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. His eyes are squeezed shut and his face is turned away to the side, not looking at the viewer. Motion lines sweep through the picture around the blow. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [
+        {
+          "text": "CLANG!",
+          "mask_box": [
+            0.3,
+            0.02,
+            0.97,
+            0.15
+          ],
+          "mask_how": "wide shallow box over the dark top of the frame, above both heads",
+          "style": "cream letters, dark charcoal outline and drop shadow",
+          "reference_image": "sfx_lettering",
+          "spec": {
+            "region": "upper right",
+            "background": "dark tunnel wall and pipes",
+            "stay_same": "The man, the goblin, the pot, the boiler and the pipes"
+          },
+          "prompt": "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: C L A N G ! (C, L, A, N, G, then an exclamation mark; six characters in total). The same word, \"CLANG!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper right of the panel over the dark tunnel wall and pipes, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the goblin at all. The man, the goblin, the pot, the boiler and the pipes stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+        }
+      ],
+      "overlay": {
+        "caption": null,
+        "dialogue": []
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "plate:boiler-closeup",
+        "char:carl",
+        "char:goblin",
+        "sfx:CLANG!",
+        "overlay"
+      ],
+      "camera_view": "tight close-up at head height on the boiler gauges and control levers, pipes behind",
+      "est_cost_usd": 0.18,
+      "start_ms": 3170000
+    },
+    {
+      "frame": 6,
+      "timestamp_approx": "00:55:28",
+      "shot": "WIDE",
+      "change_from_previous": "MAJOR",
+      "plate_id": "tunnel-door-low",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:54:50",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man wearing boxers, an open leather jacket, and bare feet (he lost the crocs from chapter 3 onwards), with no pants, bare feet covered in blood. Look 1 images show the crocs; the story has him barefoot here.",
+          "framing": "full_body",
+          "prominence_pct": 70,
+          "mask_box": [
+            0.15,
+            0.22,
+            0.72,
+            0.9
+          ],
+          "mask_how": "estimate on the plate: foreground running toward the camera; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket, grey boxer shorts, bare legs and bare feet spattered with dark blood",
+            "feet": "",
+            "placement": "running along the tunnel floor toward the camera in the foreground, a few strides from the wooden door",
+            "body_parts": "head, torso, both arms, both legs and both bare feet, nothing hidden behind other objects",
+            "pose": "He sprints at full speed, arms pumping, one knee high, body leaning forward, bare feet slapping the stone.",
+            "gaze": "His head is turned back over his shoulder toward the glowing vehicle far behind him, his face visible in profile, not looking at the viewer.",
+            "low_angle": true,
+            "extra": "His feet are bare: no shoes and no crocs."
+          },
+          "prompt": "Add the man shown in the reference images, running along the tunnel floor toward the camera in the foreground, a few strides from the wooden door. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket, grey boxer shorts, bare legs and bare feet spattered with dark blood. He is close to the camera and large in the frame, filling about seven tenths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms, both legs and both bare feet, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Low camera angle. He sprints at full speed, arms pumping, one knee high, body leaning forward, bare feet slapping the stone. His head is turned back over his shoulder toward the glowing vehicle far behind him, his face visible in profile, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        }
+      ],
+      "sfx": [],
+      "overlay": {
+        "caption": null,
+        "dialogue": []
+      },
+      "lineage": [
+        "plate:tunnel-rear-wide",
+        "plate:tunnel-door-low",
+        "char:carl",
+        "overlay"
+      ],
+      "camera_view": "low at floor level at the tunnel's end looking back, wooden door close on the right, vehicle glowing in the distance",
+      "est_cost_usd": 0.06,
+      "start_ms": 3328700
+    },
+    {
+      "frame": 7,
+      "timestamp_approx": "00:55:38",
+      "shot": "MEDIUM",
+      "change_from_previous": "MAJOR",
+      "plate_id": "guild-hall-door",
+      "characters": [
+        {
+          "id": "carl",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "carl",
+          "look_at": "00:55:15",
+          "look_seq": 2,
+          "reference_images": {
+            "standing": "reference-images/core/Carl/looks/look-002-standing.png",
+            "action": "reference-images/core/Carl/looks/look-002-action.png"
+          },
+          "look_note": "A man standing six-foot, three inches tall, about 230 pounds, wearing boxers and an open leather jacket, covered in goblin blood, bare feet. Look 1 images show the crocs; the story has him barefoot here.",
+          "framing": "full_body",
+          "prominence_pct": 55,
+          "mask_box": [
+            0.04,
+            0.46,
+            0.62,
+            0.97
+          ],
+          "mask_how": "estimate on the plate: sprawled on the carpet, lower left; refine with a vision query",
+          "spec": {
+            "noun": "man",
+            "pron": "he",
+            "outfit": "open black leather jacket spattered with dark blood, grey boxer shorts, bare legs and bare feet",
+            "feet": "",
+            "placement": "sprawled backward on the worn gray carpet in the foreground at the lower left",
+            "body_parts": "head, torso, both arms and both legs and feet stretched out in front of him, nothing hidden behind other objects",
+            "pose": "He has just been thrown off his feet: leaning back on one straight arm, the other hand raised near his ringing ear, knees bent, dazed.",
+            "gaze": "His face is turned up toward the heavy door and fully visible, not covered by his hand, looking at the door, not looking at the viewer.",
+            "extra": "His feet are bare: no shoes and no crocs."
+          },
+          "prompt": "Add the man shown in the reference images, sprawled backward on the worn gray carpet in the foreground at the lower left. Drawn exactly as in the reference images: his exact face, hair, build, open black leather jacket spattered with dark blood, grey boxer shorts, bare legs and bare feet. He is close to the camera and large in the frame, filling a little over half of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both arms and both legs and feet stretched out in front of him, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He has just been thrown off his feet: leaning back on one straight arm, the other hand raised near his ringing ear, knees bent, dazed. His face is turned up toward the heavy door and fully visible, not covered by his hand, looking at the door, not looking at the viewer. His feet are bare: no shoes and no crocs. Keep everything else exactly the same.",
+          "look_override": "Vipul 2026-10-02: Carl is barefoot from chapter 3 onwards; look 2 (barefoot) officially starts at 00:55:30, mid-chapter, so chapter 3 uses it throughout."
+        },
+        {
+          "id": "mordecai",
+          "kind": "reference",
+          "role": "primary",
+          "tag": "mordecai",
+          "look_at": "00:55:15",
+          "look_seq": 1,
+          "reference_images": {
+            "standing": "reference-images/core/Mordecai/looks/look-001-standing.png",
+            "action": "reference-images/core/Mordecai/looks/look-001-action.png"
+          },
+          "look_note": "Bearded ratkin hooligan, black vest, blue pants, worn sandals.",
+          "framing": "full_body",
+          "prominence_pct": 60,
+          "mask_box": [
+            0.55,
+            0.22,
+            0.98,
+            0.84
+          ],
+          "mask_how": "estimate on the plate: standing right of the man; refine with a vision query",
+          "spec": {
+            "noun": "creature",
+            "pron": "he",
+            "drawn": "the same bearded, rat-like creature, a ratkin hooligan standing about a head shorter than a tall man, with furry rat hands and a rat arm, wearing a black vest, blue pants and a pair of well-worn sandals",
+            "placement": "standing on the right, beside and a little behind the sprawled man",
+            "pose": "He leans slightly toward the man with one furry hand half-raised in alarm.",
+            "gaze": "His head is bowed, looking down at the man on the carpet with alarm, not looking at the viewer."
+          },
+          "prompt": "Add the creature shown in the reference images, standing on the right, beside and a little behind the sprawled man. Drawn exactly as in the reference images: the same bearded, rat-like creature, a ratkin hooligan standing about a head shorter than a tall man, with furry rat hands and a rat arm, wearing a black vest, blue pants and a pair of well-worn sandals. He is close to the camera and large in the frame, filling about three fifths of the frame height from head to feet, with his whole body clearly visible and uncropped: head, torso, both legs and both feet fully on the ground, nothing hidden behind other objects. Strong, expressive, well-drawn face with sharp detail, clearly visible. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. He leans slightly toward the man with one furry hand half-raised in alarm. His head is bowed, looking down at the man on the carpet with alarm, not looking at the viewer. Keep everything else exactly the same."
+        },
+        {
+          "id": "donut",
+          "kind": "reference",
+          "role": "secondary",
+          "tag": "princess-donut",
+          "look_at": "00:55:15",
+          "look_seq": 1,
+          "reference_images": {
+            "standing": "reference-images/core/Princess Donut/looks/look-001-standing.png",
+            "action": "reference-images/core/Princess Donut/looks/look-001-action.png"
+          },
+          "look_note": "A plain tortoiseshell Persian cat with a puffed-out coat, no collar or crown.",
+          "framing": "small",
+          "prominence_pct": null,
+          "mask_box": [
+            0.05,
+            0.33,
+            0.25,
+            0.44
+          ],
+          "mask_how": "small box on the carpet in the corner beside the fireplace; refine with a vision query",
+          "spec": {
+            "noun": "cat",
+            "pron": "she",
+            "drawn": "the same tortoiseshell Persian cat with her warm brown coat, face and orange eyes, whole body visible, no collar or crown",
+            "placement": "on the carpet in the corner beside the fireplace on the left",
+            "scale": "She is a normal house cat at realistic scale, about a third of the standing creature's height.",
+            "pose": "Her coat is fully puffed out, back arched, mouth open mid-hiss.",
+            "gaze": "She stares at the heavy door, not looking at the viewer."
+          },
+          "prompt": "Add the cat shown in the reference images, on the carpet in the corner beside the fireplace on the left. Drawn exactly as in the reference images: the same tortoiseshell Persian cat with her warm brown coat, face and orange eyes, whole body visible, no collar or crown. She is a normal house cat at realistic scale, about a third of the standing creature's height. Her whole body is visible, nothing hidden behind other objects, and the face is sharp and clearly readable. Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D. Her coat is fully puffed out, back arched, mouth open mid-hiss. She stares at the heavy door, not looking at the viewer. Keep everything else exactly the same."
+        }
+      ],
+      "sfx": [
+        {
+          "text": "BAM!",
+          "mask_box": [
+            0.1,
+            0.03,
+            0.77,
+            0.2
+          ],
+          "mask_how": "wide shallow box over the door and wall at the top, clear of all three figures",
+          "style": "cream letters, dark charcoal outline and drop shadow",
+          "reference_image": "sfx_lettering",
+          "spec": {
+            "region": "upper left",
+            "background": "wooden door and wall",
+            "stay_same": "The man, the creature, the cat, the door and the room"
+          },
+          "prompt": "Add one big comic-book sound-effect word to the image, written on a SINGLE straight line from left to right with the letters evenly spaced and not overlapping, reading exactly: B A M ! (B, A, M, then an exclamation mark; four characters in total). The same word, \"BAM!\", with nothing before or after it. Bold chunky capital letters with a thick dark navy-black outline and a hard navy drop-shadow, tilted slightly upward to the right, growing larger toward the end. COLOUR: cream / warm off-white letters (#F2E6C4) with a thick dark charcoal-black outline and a hard dark charcoal drop-shadow, over a burst shadow in muted rust-orange and dark smoky green-grey, like furnace sparks in a dim stone tunnel. Muted and legible, not saturated red or neon. It sits in the upper left of the panel over the wooden door and wall, in the same hand-inked comic style as the panel, and must not touch, cover or overlap the man and the creature and the cat at all. The man, the creature, the cat, the door and the room stay exactly the same. Spell the word exactly as given. Match the lettering style of the reference image (chunky outlined letters like its 'BAROOM!') but write ONLY the given word. Copy nothing else from the reference image."
+        }
+      ],
+      "overlay": {
+        "caption": null,
+        "dialogue": [
+          {
+            "speaker": "mordecai",
+            "line": "What the bloody hell did you do, kid?",
+            "bubble_hint": "upper right, over the dark wall beside the door, clear of his face"
+          }
+        ]
+      },
+      "lineage": [
+        "plate:guild-hall-door",
+        "char:carl",
+        "char:mordecai",
+        "char:donut",
+        "sfx:BAM!",
+        "overlay"
+      ],
+      "camera_view": "eye-level wide from across the room toward the heavy wooden door, fireplace on the left, carpet in the foreground",
+      "est_cost_usd": 0.24,
+      "start_ms": 3338900
+    }
+  ],
+  "style_lock": "Keep the exact same comic-book ink illustration style as the source image: bold black linework, flat cel colouring, the same dim stone-grey and murky lichen-green dungeon palette with hot orange furnace glow and warm amber firelight. It must look like a hand-drawn comic panel, not a photograph, not realistic, not 3D.",
+  "cost_estimate": {
+    "plate_calls": 7,
+    "edit_calls": 15,
+    "total_calls": 22,
+    "usd_first_try": 1.32,
+    "usd_with_retries_1_5x_to_2x": [
+      1.98,
+      2.64
+    ]
+  }
+}
